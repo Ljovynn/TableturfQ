@@ -12,28 +12,32 @@ var settings = {
     //vol : Default volatility (expected fluctation on the player rating)
     vol : 0.06
   };
-  var ranking = new glicko2.Glicko2(settings);
 
-export async function FinishMatch(matchId, matchResult){
-  //get player 1 and player 2 from database with the match id.
-  var player1 = "temp";
-  var player2 = "temp";
+async function FinishMatch(matchId, matchResult){
+  //get playerDatas from database with the match id. it need player ranks, rating deviations, and volatility.
+  var playerDatas;
+  var player1Data = playerDatas.player1;
+  var player2Data = playerDatas.player2;
+
+  var ranking = new glicko2.Glicko2(settings);
+  var player1 = ranking.makePlayer(player1Data.rating, player1Data.rd, player1Data.vol);
+  var player2 = ranking.makePlayer(player2Data.rating, player2Data.rd, player2Data.vol);
+
   ranking.addResult(player1, player2, matchResult);
+  ranking.calculatePlayersRatings();
   //Update database with new player data and match result
   return true;
 }
 
-  // Create players
-  var Ryan = ranking.makePlayer();
-  var Bob = ranking.makePlayer(1400, 30, 0.06);
-  var John = ranking.makePlayer(1550, 100, 0.06);
-  var Mary = ranking.makePlayer(1700, 300, 0.06);
+// Testing glick2 functionality
+var ranking = new glicko2.Glicko2(settings);
 
-  var matches = [];
-matches.push([Ryan, Bob, 1]); //Ryan won over Bob
-matches.push([Ryan, John, 0]); //Ryan lost against John
-matches.push([Ryan, Mary, 0.5]); //A draw between Ryan and Mary
-ranking.updateRatings(matches);
+var Ryan = ranking.makePlayer();
+var Mary = ranking.makePlayer(1700, 300, 0.06);
+
+var matches = [];
+ranking.addResult(Ryan, Mary, 0);
+ranking.calculatePlayersRatings();
 
 console.log("Ryan new rating: " + Ryan.getRating());
 console.log("Ryan new rating deviation: " + Ryan.getRd());
