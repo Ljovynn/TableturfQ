@@ -11,6 +11,7 @@ const pool = mysql.createPool({
     database: process.env.MYSQL_DATABASE
 }).promise()
 
+//Get
 async function GetMatch(matchId){
     const [rows] = await pool.query(`SELECT *, SUBSTRING(DATE_FORMAT(\`created_at\`, '%Y-%m-%d %T.%f'),1,21) as formatted_created_at FROM matches WHERE id = ?`, [matchId]);
     return rows[0];
@@ -58,6 +59,7 @@ async function GetChatMessages(matchId){
     return rows;
 }
 
+//Create
 async function CreateMatch(player1Id, player2Id, ranked, rulesetId)
 {
     const result = await pool.query(`INSERT INTO matches (player1_id, player2_id, ranked, ruleset_id) VALUES (?, ?, ?, ?)`, [player1Id, player2Id, ranked, rulesetId])
@@ -83,4 +85,30 @@ async function CreateStageStrike(gameId, stage, strikeOwner)
 async function CreateChatMessage(matchId, messageNumber, messageOwner, content)
 {
     await pool.query(`INSERT INTO games (match_id, message_number, message_owner, content) VALUES (?, ?, ?, ?)`, [matchId, messageNumber, messageOwner, content]);
+}
+
+//Update
+async function SetMatchResult(matchId, result){
+    await pool.query(`UPDATE matches SET result = ? WHERE id = ?`, [result, matchId]);
+}
+
+async function DeleteMessage(matchId, messageNumber){
+    await pool.query(`DELETE chat_messages WHERE match_id = ? AND message_number = ?`, [matchId, messageNumber]);
+}
+
+async function SetGameStage(gameId, stage){
+    await pool.query(`UPDATE games SET stage = ? WHERE id = ?`, [stage, gameId]);
+}
+
+async function SetGameResult(gameId, result){
+    await pool.query(`UPDATE games SET result = ? WHERE id = ?`, [result, gameId]);
+}
+
+async function SetPlayerRating(playerId, rating, rd, vol){
+    await pool.query(`UPDATE players SET g2_rating = ?, g2_rd = ?, g2_vol = ? WHERE id = ?`, [rating, rd, vol, playerId]);
+}
+
+//probably needs change later when i know how oauth works
+async function SetPlayerDiscord(playerId, discordId){
+    await pool.query(`UPDATE players SET discord_id = ? WHERE id = ?`, [discordId, playerId]);
 }
