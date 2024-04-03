@@ -58,9 +58,9 @@ async function GetChatMessages(matchId){
     return rows;
 }
 
-async function CreateMatch(player1Id, player2Id, matchType, ruleset_id)
+async function CreateMatch(player1Id, player2Id, matchType, rulesetId)
 {
-    const result = await pool.query(`INSERT INTO matches (player1_id, player2_id, match_type, ruleset_id) VALUES (?, ?, ?, ?)`, [player1Id, player2Id, matchType, ruleset_id])
+    const result = await pool.query(`INSERT INTO matches (player1_id, player2_id, match_type, ruleset_id) VALUES (?, ?, ?, ?)`, [player1Id, player2Id, matchType, rulesetId])
     return JSON.stringify(result[0].insertId);
 }
 
