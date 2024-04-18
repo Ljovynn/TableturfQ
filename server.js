@@ -41,8 +41,8 @@ app.post("/GetMatchInfo", async (req, res) =>{
             return;
         }
     
-        //get match 
-        data[1] = await MatchGames(matchId);
+        //get match games
+        data[1] = await GetMatchGames(matchId);
 
         //get players
         data[2][0] = await GetPlayerData(data[0][1]);
