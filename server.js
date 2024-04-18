@@ -27,6 +27,38 @@ app.get("/ljovynnspestingpage", async (req, res) => {
     res.sendFile(join(__dirname, "LjovynnsTestingPage.html"));
 });
 
+app.post("/GetMatchInfo", async (req, res) =>{
+    try {
+        //todo: if match is already in local matches array in code, get data from there intstead of DB?
+
+        const matchId = req.body.matchId;
+        let data = [];
+    
+        //get match
+        data[0] = await GetMatch(matchId);
+        if (data[0] == null){
+            res.sendStatus(599);
+            return;
+        }
+    
+        //get match 
+        data[1] = await MatchGames(matchId);
+
+        //get players
+        data[2][0] = await GetPlayerData(data[0][1]);
+        data[2][1] = await GetPlayerData(data[0][2]);
+    
+        //get strikes
+        for (let i = 0; i < data[1].length; i++){
+            data[3][i] = GetStageStrikes(data[1][i].id);
+        }
+    
+        res.status(200).send(data);
+    } catch (err){
+        res.sendStatus(599);
+    }
+})
+
 app.get("/api/auth/discord/redirect", async (req, res) => {
     const { code } = req.query;
 

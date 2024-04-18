@@ -22,6 +22,21 @@ async function GetPlayer(playerId){
     return rows[0];
 }
 
+async function GetPlayerLoginData(playerId){
+    const [rows] = await pool.query(`SELECT discord_verified, discord_access_token, discord_refresh_token FROM players WHERE id = ?`, [playerId]);
+    return rows[0];
+}
+
+async function GetPlayerData(playerId){
+    const [rows] = await pool.query(`SELECT username, role, g2_rating, discord_verified, created_at FROM players WHERE id = ?`, [playerId]);
+    return rows[0];
+}
+
+async function GetPlayerRankData(playedId){
+    const [rows] = await pool.query(`SELECT id, g2_rating, g2_rd, g2_vol FROM players WHERE id = ?`, [playerId]);
+    return rows[0];
+}
+
 async function GetPlayerMatchHistory(playerId)
 {
     const [rows] = await pool.query(`SELECT * FROM matches WHERE player1_id = ? OR player2_id = ? ORDER BY id DESC`, [playerId, playerId]);
