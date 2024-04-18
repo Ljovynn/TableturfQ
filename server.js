@@ -32,28 +32,49 @@ app.post("/GetMatchInfo", async (req, res) =>{
         //todo: if match is already in local matches array in code, get data from there intstead of DB?
 
         const matchId = req.body.matchId;
-        let data = [];
-    
-        //get match
-        data[0] = await GetMatch(matchId);
-        if (data[0] == null){
+
+        var match = await GetMatch(matchId);
+        if (match == null){
             res.sendStatus(599);
             return;
         }
     
-        //get match games
-        data[1] = await GetMatchGames(matchId);
+        var matchGames = await GetMatchGames(matchId);
 
-        //get players
-        data[2][0] = await GetPlayerData(data[0][1]);
-        data[2][1] = await GetPlayerData(data[0][2]);
+        var players = []
+        players[0] = await GetPlayerData(match.player1_id);
+        players[1] = await GetPlayerData(match.player2_id);
     
-        //get strikes
+        var strikes = []
         for (let i = 0; i < data[1].length; i++){
-            data[3][i] = GetStageStrikes(data[1][i].id);
+            strikes[i] = GetStageStrikes(matchGames[i].id);
         }
+
+        var data = [];
+        data[0] = match;
+        data[1] = matchGames;
+        data[2] = players;
+        data[3] = strikes;
     
         res.status(200).send(data);
+    } catch (err){
+        res.sendStatus(599);
+    }
+})
+
+app.post("/PlayerReportStageStrike", async (req, res) => {
+    try {
+        const data = req.body;
+        const player = await GetPlayer(data.playerId);
+
+        //todo: check if player in match
+        const matchId = 0;
+        if (!true){
+            res.sendStatus(599);
+            return;
+        }
+        //todo: update match data and database
+        res.sendStatus(201);
     } catch (err){
         res.sendStatus(599);
     }
