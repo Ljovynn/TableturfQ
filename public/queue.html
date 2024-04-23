@@ -26,6 +26,7 @@
     <p id="timer-text" style="display: none;">Matchmaking... <span id="timer">00:00:00<span></p>
     <script src="/socket.io/socket.io.js"></script>
     <script>
+      // Honestly, move all of this into a script under /public/scripts or something
       const socket = io();
 
       const form = document.getElementById('form');

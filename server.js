@@ -72,10 +72,10 @@ hash({ password: 'zab' }, function (err, pass, salt, hash) {
     users.kimi.hash = hash;
 });
 
-var games = {
-    game1: {gameid: 1, player1id: null, player2id: null},
-    game2: {gameid: 2, player1id: null, player2id: null}
-};
+var games = [
+    {gameid: 1, player1: null, player1id: null, player1Ready: false, player2: null, player2id: null, player2Ready: false},
+    {gameid: 2, player1: null, player1id: null, player1Ready: false, player2: null, player2id: null, player2Ready: false}
+];
 
 function getGames() {
     return games;
@@ -243,7 +243,11 @@ app.get('/logout', function(req, res){
     });
 });
 
-app.get('/game/:gameid', function(req, res){
+app.get('/player', restrict, function(req, res){
+    res.json( {user: {id: req.session.user.userid, name: req.session.user.name} } );
+});
+
+app.get('/game/:gameid', restrict, function(req, res){
     res.sendFile( join(__dirname, 'public/game.html') );
 });
 
@@ -300,5 +304,60 @@ io.on('connection', (socket) => {
     socket.on('found game', (destination) => {
         console.log('redirecting players to ' + destination);
         socket.emit('redirection', destination)
+    });
+
+
+    socket.on('game ready', (gameid) => {
+        user = session.user;
+        console.log('Current user: ' + JSON.stringify(user));
+        // I guess we should make sure the player emitting the event is actually supposed to be in that game room
+        games = getGames();
+        currentGame = games.find( (game) => game.gameid == gameid );
+        console.log('The current game is: ' + JSON.stringify(currentGame) + ' and the current user is: ' + user.userid );
+
+
+        // This check needs to be done in the page restriction function, but since that's not working right now I'll do it here
+        if ( currentGame.player1id != user.userid && currentGame.player2id != user.userid) {
+            console.log('Current player with id ' + user.userid + ' is not player 1 or 2. Access denied and redirecting.');
+            socket.emit('invalid game', '/');
+        } else {
+            socket.join('game ' + gameid);
+            console.log('Legit user, let\'s go!');
+            console.log( 'Current game data: ' + JSON.stringify(currentGame) );
+            console.log('Current User: ' + user.userid);
+            if ( currentGame.player1id == user.userid ) {
+                currentGame.player1Ready = true;
+                currentGame.player1 = { id: user.userid, name: user.name };
+                games[currentGame] = currentGame;
+            }
+
+            if ( currentGame.player2id == user.userid ) {
+                currentGame.player2Ready = true;
+                currentGame.player2 = { id: user.userid, name: user.name };
+                games[currentGame] = currentGame;
+            }
+
+            console.log(JSON.stringify(games));
+
+            // Coin flip
+            var firstStrike = Math.random() < 0.5;
+            if ( firstStrike ) {
+                currentGame.currentStriker = currentGame.player1;
+            } else {
+                currentGame.currentStriker = currentGame.player2;
+            }
+
+            // Going to control the state of interactions with phases
+            // Phase 1 - Initial strikes of starting stages
+            // Phase 2 - Reporting the game score
+            // Phase 3 - Winner's strikes
+            // Phases 2-3 will repeat until the game is over
+            // Phase 4 - Final reporting/game finish events
+            currentGame.gamePhase = 'Phase 1';
+
+            if ( currentGame.player1Ready && currentGame.player2Ready ) {
+                io.to('game ' + gameid).emit('begin game', currentGame);
+            }
+        }
     });
 });

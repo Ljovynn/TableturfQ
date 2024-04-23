@@ -5,6 +5,102 @@
     <title>Tableturf Competetive Queue</title>
   </head>
   <body>
-    Welcome to the game!
+    <p id="loading-message">Loading...</p>
+    <p id="players-list" style="display: none;">Player 1 vs Player 2</p>
+    <p id="current-striker" style="display: none;"></p>
+    <div id="stage-selection" class="stage-selection" style="display: none;">
+      <div class="stage-row">
+        <div id="stage-main-street" class="stage-section starter-stage" style="display: inline-block">
+          <h3>Main Street</h3>
+          <img  src="/images/Main-Street-Icon.png" />
+        </div>
+        <div id="stage-thunder-point" class="stage-section" style="display: inline-block">
+          <h3>Thunder Point</h3>
+          <img  src="/images/Thunder-Point-Icon.png" />
+        </div>
+        <div id="stage-x-marks" class="stage-section starter-stage" style="display: inline-block">
+          <h3>X Marks The Garden</h3>
+          <img src="/images/X-Marks-Icon.png" />
+        </div>
+        <div id="stage-square-squared" class="stage-section starter-stage" style="display: inline-block">
+          <h3>Square Squared</h3>
+          <img  src="/images/Square-Squared-Icon.png" />
+        </div>
+      </div>
+      <div class="stage-row">
+         <div id="stage-lakefront" class="stage-section starter-stage" style="display: inline-block">
+            <h3>Lakefront Property</h3>
+            <img  src="/images/Lakefront-Icon.png" />
+        </div>
+         <div id="stage-gemini" class="stage-section" style="display: inline-block">
+          <h3>Double Gemini</h3>
+          <img  src="/images/Gemini-Icon.png" />
+        </div>
+         <div id="stage-river-drift" class="stage-section starter-stage" style="display: inline-block">
+          <h3>River Drift</h3>
+          <img src="/images/River-Drift-Icon.png" />
+        </div>
+         <div id="stage-box-seats" class="stage-section" style="display: inline-block">
+          <h3>Box Seats</h3>
+          <img src="/images/Box-Seats-Icon.png" />
+        </div>
+      </div>
+      <div id="strike-confirmation" style="display: none;">
+        <button id="confirm-strikes">Confirm Strikes</button>
+      </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      var userData = {};
+      getPlayerData();
+
+      const socket = io();
+      var url = window.location.href;
+
+      const loading = document.getElementById('loading-message');
+      const players = document.getElementById('players-list');
+      const stages = document.getElementById('stage-selection');
+      const currentStriker = document.getElementById('current-striker');
+      const strikeConfirmation = document.getElementById('strike-confirmation');
+      const strikeButton = document.getElementById('confirm-strikes');
+
+      // Get the gameid from the url
+      gameid = url.split('/').slice(4);
+      console.log('Game id is: ' + gameid);
+      // Fire the ready event and once both players are ready the server will emit the event to begin striking
+      socket.emit('game ready', gameid);
+
+      socket.on('begin game', (gameData) => {
+        console.log('Game Data: ' + JSON.stringify(gameData) );
+        loading.style.display = 'none';
+        players.innerHTML = 'Player 1: ' + gameData.player1.name + ' -- Player 2: ' + gameData.player2.name;
+        players.style.display = 'block';
+        stages.style.display = 'block';
+        currentStriker.innerHTML = gameData.currentStriker.name + ' has won the coin toss and may strike one stage.';
+        currentStriker.style.display = 'block';
+
+        // If user is the current striker, make starting maps selectable and unhide the confirm selection button
+        if ( gameData.currentStriker.id == userData.user.id ) {
+          strikeConfirmation.style.display = 'block';
+          strikeableStages = getElementsByClassName('starter-stage');
+          for (let i = 0; i < strikeableStages.length; i++) {
+            collection.item(i).classList.add('strikeable');
+          }
+        }
+      });
+
+      socket.on('invalid game', (destination) => {
+        console.log('Redirection event, going to ' + destination);
+        window.location.href = destination;
+      });
+
+      async function getPlayerData() {
+        const response = await fetch('/player');
+        userData = await response.json();
+        console.log(userData);
+      }
+    </script>
+
   </body>
 </html>
