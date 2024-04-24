@@ -3,6 +3,23 @@
   <head>
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>Tableturf Competetive Queue</title>
+    <style>
+            header {
+                text-align: center;
+                padding: 20px 0px -5px 0px;
+            }
+            body {
+                font-family:Arial, Helvetica, sans-serif;
+                text-align: center;
+            }
+            .selected {
+              border: 3px solid red;
+            }
+
+            .playable-selected {
+              border: 3px solid green;
+            }
+        </style>
   </head>
   <body>
     <p id="loading-message">Loading...</p>
@@ -10,44 +27,55 @@
     <p id="current-striker" style="display: none;"></p>
     <div id="stage-selection" class="stage-selection" style="display: none;">
       <div class="stage-row">
-        <div id="stage-main-street" class="stage-section starter-stage" style="display: inline-block">
+        <div id="stage-main-street" class="stage-section starter-stage" style="display: none">
           <h3>Main Street</h3>
           <img  src="/images/Main-Street-Icon.png" />
         </div>
-        <div id="stage-thunder-point" class="stage-section" style="display: inline-block">
+        <div id="stage-thunder-point" class="stage-section starter-stage" style="display: none">
           <h3>Thunder Point</h3>
           <img  src="/images/Thunder-Point-Icon.png" />
         </div>
-        <div id="stage-x-marks" class="stage-section starter-stage" style="display: inline-block">
+        <div id="stage-x-marks" class="stage-section" style="display: none">
           <h3>X Marks The Garden</h3>
           <img src="/images/X-Marks-Icon.png" />
         </div>
-        <div id="stage-square-squared" class="stage-section starter-stage" style="display: inline-block">
+        <div id="stage-square-squared" class="stage-section starter-stage" style="display: none">
           <h3>Square Squared</h3>
           <img  src="/images/Square-Squared-Icon.png" />
         </div>
       </div>
       <div class="stage-row">
-         <div id="stage-lakefront" class="stage-section starter-stage" style="display: inline-block">
+         <div id="stage-lakefront" class="stage-section starter-stage" style="display: none">
             <h3>Lakefront Property</h3>
             <img  src="/images/Lakefront-Icon.png" />
         </div>
-         <div id="stage-gemini" class="stage-section" style="display: inline-block">
+         <div id="stage-gemini" class="stage-section" style="display: none">
           <h3>Double Gemini</h3>
           <img  src="/images/Gemini-Icon.png" />
         </div>
-         <div id="stage-river-drift" class="stage-section starter-stage" style="display: inline-block">
+         <div id="stage-river-drift" class="stage-section starter-stage" style="display: none">
           <h3>River Drift</h3>
           <img src="/images/River-Drift-Icon.png" />
         </div>
-         <div id="stage-box-seats" class="stage-section" style="display: inline-block">
+         <div id="stage-box-seats" class="stage-section" style="display: none">
           <h3>Box Seats</h3>
           <img src="/images/Box-Seats-Icon.png" />
         </div>
       </div>
-      <div id="strike-confirmation" style="display: none;">
+      <div id="strike-wait" style="display: none;">
+        <p>Please wait, opponent is striking.</p>
+      </div>
+      <div id="strike-content" style="display: none;">
+        <div id="strike-info"><span id="strike-amount">1</span> stage strike remaining.</div>
         <button id="confirm-strikes">Confirm Strikes</button>
       </div>
+      <div id="map-select" style="display: none;">
+        <div id="strike-info">Select one of the remaining maps to play on.</div>
+        <button id="confirm-map">Play Map</button>
+      </div>
+    </div>
+    <div id="play-game" style="display: none;">
+      <p id="game-info"></p>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
@@ -55,19 +83,87 @@
       var userData = {};
       getPlayerData();
 
+      var strikes = [];
+
       const socket = io();
       var url = window.location.href;
 
       const loading = document.getElementById('loading-message');
       const players = document.getElementById('players-list');
-      const stages = document.getElementById('stage-selection');
+      const stageContent = document.getElementById('stage-selection');
+      const stages = document.getElementsByClassName('stage-section');
       const currentStriker = document.getElementById('current-striker');
-      const strikeConfirmation = document.getElementById('strike-confirmation');
+      const strikeContent = document.getElementById('strike-content');
       const strikeButton = document.getElementById('confirm-strikes');
+      const strikeInfo = document.getElementById('strike-info');
+      const strikeAmount = document.getElementById('strike-amount');
+      const strikeWait = document.getElementById('strike-wait');
+      const mapSelect = document.getElementById('map-select');
+      const playButton = document.getElementById('confirm-map');
+      const playGame = document.getElementById('play-game');
+      const gameInfo = document.getElementById('game-info');
+
+      var strikes = [];
+      // Initial value
+      var strikeCount = 1;
+      var mapSelection = false;
 
       // Get the gameid from the url
       gameid = url.split('/').slice(4);
       console.log('Game id is: ' + gameid);
+
+      //stages.forEach(function(stage) {
+      for (let stage of stages ) {
+        stage.addEventListener('click', function(e) {
+          console.log('Classes: ' + stage.classList);
+          if ( stage.classList.contains('strikeable') ) {
+            stage.classList.toggle('selected');
+            // If a strike is made with zero or fewer strikes remaining, don't act on it and immediately reverse the toggle
+            if ( stage.classList.contains('selected') ) {
+              if ( strikeCount > 0 ) {
+                strikeCount--;
+                strikes.push(stage.id);
+              } else {
+                stage.classList.toggle('selected');
+              }
+            } else {
+              index = strikes.indexOf(stage.id);
+              if (index > -1) { // only splice array when item is found
+                strikes.splice(index, 1); // 2nd parameter means remove one item only
+                strikeCount++;
+              }
+            }
+            if ( strikeCount == 1 ) {
+              strikeInfo.innerHTML = '<span id="strike-amount">1<span> stage strike remaining';
+            } else {
+              strikeInfo.innerHTML = '<span id="strike-amount">' + strikeCount + '<span> stage strikes remaining';
+            }
+            console.log('Strike list: ' + strikes);
+          }
+
+          if ( stage.classList.contains('playable') ) {
+            for (let i = 0; i < stages.length; i++) {
+              stages.item(i).classList.remove('playable-selected');
+            }
+            stage.classList.add('playable-selected');
+          }
+        });
+      }
+      //});
+
+      strikeButton.addEventListener('click', (e) => {
+        console.log('Sending strike data to the server ' + strikes);
+        // send off the strike event
+        socket.emit('strike', { gameid: gameid, strikes: strikes } );
+      });
+
+      playButton.addEventListener('click', (e) => {
+        selected = document.getElementsByClassName('playable-selected')[0].id;
+        console.log('Selecting ' + selected);
+        // send off the strike event
+        socket.emit('play map', { gameid: gameid, selected: selected } );
+      });
+
       // Fire the ready event and once both players are ready the server will emit the event to begin striking
       socket.emit('game ready', gameid);
 
@@ -76,23 +172,99 @@
         loading.style.display = 'none';
         players.innerHTML = 'Player 1: ' + gameData.player1.name + ' -- Player 2: ' + gameData.player2.name;
         players.style.display = 'block';
-        stages.style.display = 'block';
+        stageContent.style.display = 'block';
         currentStriker.innerHTML = gameData.currentStriker.name + ' has won the coin toss and may strike one stage.';
         currentStriker.style.display = 'block';
+        if ( gameData.currentStriker.id == userData.user.id ) {
+          strikingPlayer = true;
+        } else {
+          strikingPlayer = false;
+        }
 
         // If user is the current striker, make starting maps selectable and unhide the confirm selection button
-        if ( gameData.currentStriker.id == userData.user.id ) {
-          strikeConfirmation.style.display = 'block';
-          strikeableStages = getElementsByClassName('starter-stage');
-          for (let i = 0; i < strikeableStages.length; i++) {
-            collection.item(i).classList.add('strikeable');
+        if ( strikingPlayer ) {
+          strikeContent.style.display = 'block';
+        } else {
+          strikeWait.style.display = 'block';
+        }
+
+        strikeableStages = document.getElementsByClassName('starter-stage');
+        for (let i = 0; i < strikeableStages.length; i++) {
+          if ( strikingPlayer ) {
+            strikeableStages.item(i).classList.add('strikeable');
           }
+          strikeableStages.item(i).style.display = 'inline-block';
         }
       });
 
       socket.on('invalid game', (destination) => {
         console.log('Redirection event, going to ' + destination);
         window.location.href = destination;
+      });
+
+      socket.on('invalid strikes', () => {
+        // Temporary, there will be a notification/message div on the final page
+        alert('You have made a mistake in striking. Please correct the error and try again.');
+      });
+
+      socket.on('apply strikes', (strikes, gameData) => {
+        console.log('received strikes!');
+        console.log(strikes);
+        console.log('New striker is: ' + gameData.currentStriker.id + ' and gets ' + gameData.strikeNumber + 'strikes!');
+
+        strikeCount = gameData.strikeNumber;
+        if ( strikeCount == -10 ) {
+          mapSelection = true;
+        }
+
+        strikeableStages = document.getElementsByClassName('starter-stage');
+
+        if ( gameData.currentStriker.id == userData.user.id ) {
+          if ( mapSelection ) {
+            mapSelect.style.display = 'block';
+            strikeContent.style.display = 'none';
+            strikeWait.style.display = 'none';
+          } else {
+            strikeContent.style.display = 'block';
+            strikeWait.style.display = 'none';
+            strikeInfo.innerHTML = '<span id="strike-amount">' + strikeCount + '<span> stage strikes remaining';
+          }
+          
+          // Either add the strikeable class or if this is the final selection, add the playable class
+          for (let i = 0; i < strikeableStages.length; i++) {
+            if ( mapSelection ) {
+              strikeableStages.item(i).classList.add('playable');
+            } else {
+              strikeableStages.item(i).classList.add('strikeable');
+            }
+          }
+        } else {
+          for (let i = 0; i < strikeableStages.length; i++) {
+            strikeableStages.item(i).classList.remove('strikeable');
+          }
+          strikeContent.style.display = 'none';
+          strikeWait.style.display = 'block';
+        }
+
+        for( var i = 0; i < strikes.length; i++ ) {
+          stage = document.getElementById(strikes[i]);
+          if ( !stage.classList.contains('selected') ) {
+            stage.classList.toggle('selected');
+            // Remove the strikeable and playable classes since this stage is already stricken
+            stage.classList.remove('strikeable');
+            stage.classList.remove('playable');
+          }
+        }
+      });
+
+      socket.on('start game', (gameNumber, selected) => {
+        console.log('The selected stage is: ' + selected);
+        stageContent.style.display = 'none';
+        selectedStage = document.getElementById(selected);
+
+        gameInfo.innerHTML = 'Game ' + gameNumber + ' will be played on';
+        playGame.append(selectedStage);
+        playGame.style.display = 'block';
       });
 
       async function getPlayerData() {

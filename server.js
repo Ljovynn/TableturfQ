@@ -73,12 +73,27 @@ hash({ password: 'zab' }, function (err, pass, salt, hash) {
 });
 
 var games = [
-    {gameid: 1, player1: null, player1id: null, player1Ready: false, player2: null, player2id: null, player2Ready: false},
+    {
+        gameid: 1,
+        player1: null,
+        player1id: null,
+        player1Ready: false,
+        player2: null,
+        player2id: null,
+        player2Ready: false,
+        strikes: {},
+        selectedMap: {}
+    },
     {gameid: 2, player1: null, player1id: null, player1Ready: false, player2: null, player2id: null, player2Ready: false}
 ];
 
 function getGames() {
     return games;
+}
+
+function getGame(gameid) {
+    games = getGames();
+    return games.find( (game) => game.gameid == gameid );
 }
 
 // Rewrite this to not be so dumb and haphazard
@@ -311,8 +326,7 @@ io.on('connection', (socket) => {
         user = session.user;
         console.log('Current user: ' + JSON.stringify(user));
         // I guess we should make sure the player emitting the event is actually supposed to be in that game room
-        games = getGames();
-        currentGame = games.find( (game) => game.gameid == gameid );
+        currentGame = getGame(gameid);
         console.log('The current game is: ' + JSON.stringify(currentGame) + ' and the current user is: ' + user.userid );
 
 
@@ -353,11 +367,69 @@ io.on('connection', (socket) => {
             // Phase 3 - Winner's strikes
             // Phases 2-3 will repeat until the game is over
             // Phase 4 - Final reporting/game finish events
-            currentGame.gamePhase = 'Phase 1';
+            currentGame.gamePhase = 1;
+            currentGame.gameNumber = 1;
+            currentGame.strikeNumber = 1;
 
             if ( currentGame.player1Ready && currentGame.player2Ready ) {
                 io.to('game ' + gameid).emit('begin game', currentGame);
             }
         }
+    });
+
+    socket.on('strike', (gameData) => {
+        console.log('Received strikes!');
+        console.log('Game state: ' + JSON.stringify(gameData) );
+        gameid = gameData.gameid;
+        currentGame = getGame(gameid);
+        console.log('Retrieved the current game: ' + JSON.stringify(currentGame));
+        strikes = gameData.strikes;
+        strikeAmount = gameData.strikes.length;
+        gameNumber = currentGame.gameNumber;
+
+        if ( strikeAmount > currentGame.strikeNumber ) {
+            // If the user tries to strike more stages than are allowed in the current round of striking
+            socket.emit('invalid strikes');
+        } else {
+            // If no strikes have been set, push the first value to the array otherwise we can concat the current array with the new one
+            if ( currentGame.strikes[gameNumber] == undefined ) {
+                currentGame.strikes[gameNumber] = strikes;
+            } else {
+                currentGame.strikes[gameNumber] = currentGame.strikes[gameNumber].concat(strikes);
+            }
+            // Switch the striking player and then change the amount of strikes
+            if ( currentGame.currentStriker.id == currentGame.player1id ) {
+                currentGame.currentStriker = currentGame.player2;
+            } else {
+                currentGame.currentStriker = currentGame.player1;
+            }
+
+
+            // If we're on game 1, check the amount of strikes there currently are. If there are fewer than three, only the first round of striking has happened
+            // Otherwise, set the strike number to zero. For game 1, that means the next player must choose one of the remaining stages
+            // for other games, the next plyer has to select one of the unstricken stages
+            console.log( 'Current game: ' + currentGame.gameNumber +' and amount of user strikes: ' + strikes.length );
+            if ( currentGame.strikes[gameNumber].length == 3 ) {
+                // When all selections are made, set the strike number to something outrageous so we can control the flow to select the map isntead of striking it
+                currentGame.strikeNumber = -10;
+            } else {
+                currentGame.strikeNumber = 2;
+            }
+
+            console.log('New game state after striking and switching: ' + JSON.stringify(currentGame));
+            io.to('game ' + gameid).emit('apply strikes', strikes, currentGame);
+        }
+    });
+
+    socket.on('play map', (gameData) => {
+        gameid = gameData.gameid;
+        currentGame = getGame(gameid);
+
+        console.log('The selected map is ' + gameData.selected);
+
+        selected = gameData.selected;
+        currentGame.selectedMap[currentGame.gameNumber] = selected;
+
+        io.to('game ' + gameid).emit('start game', currentGame.gameNumber, currentGame.selectedMap[currentGame.gameNumber]);
     });
 });
