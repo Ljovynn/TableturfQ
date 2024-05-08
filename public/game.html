@@ -25,6 +25,16 @@
     <p id="loading-message">Loading...</p>
     <p id="players-list" style="display: none;">Player 1 vs Player 2</p>
     <p id="current-striker" style="display: none;"></p>
+    <div id="player1-info" style="display: none;">
+      <p id="player1-name">Player Name</p>
+      <p id="player1-score">0</p>
+      <button id="player1-victory-button" class="player-victory-button" value="player1" style="display: none;">Mark as winner</button>
+    </div>
+    <div id="player2-info">
+      <p id="player2-name">Player Name</p>
+      <p id="player2-score">0</p>
+      <button id="player2-victory-button" class="player-victory-button" value="player2" style="display: none;">Mark as winner</button>
+    </div>
     <div id="stage-selection" class="stage-selection" style="display: none;">
       <div class="stage-row">
         <div id="stage-main-street" class="stage-section starter-stage" style="display: none">
@@ -76,7 +86,10 @@
     </div>
     <div id="play-game" style="display: none;">
       <p id="game-info"></p>
+      <p></p>
     </div>
+    <p id="game-messages"></p>
+    <a id="requeue-button" style="display: none;" href="/queue"><button>Queue Again</button></a>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
@@ -88,6 +101,7 @@
       const socket = io();
       var url = window.location.href;
 
+      // General elements
       const loading = document.getElementById('loading-message');
       const players = document.getElementById('players-list');
       const stageContent = document.getElementById('stage-selection');
@@ -102,6 +116,19 @@
       const playButton = document.getElementById('confirm-map');
       const playGame = document.getElementById('play-game');
       const gameInfo = document.getElementById('game-info');
+      const gameMessages = document.getElementById('game-messages');
+      const requeueButton = document.getElementById('requeue-button');
+
+      // Player elements
+      const player1Info = document.getElementById('player1-info');
+      const player2Info = document.getElementById('player2-info');
+      const player1Name = document.getElementById('player1-name');
+      const player2Name = document.getElementById('player2-name');
+      const player1Score = document.getElementById('player1-score');
+      const player2Score = document.getElementById('player2-score');
+      const player1VictoryButton = document.getElementById('player1-victory-button');
+      const player2VictoryButton = document.getElementById('player2-victory-button');
+      const playerVictoryButtons = document.getElementsByClassName('player-victory-button');
 
       var strikes = [];
       // Initial value
@@ -164,17 +191,51 @@
         socket.emit('play map', { gameid: gameid, selected: selected } );
       });
 
+      for (let playerVictoryButton of playerVictoryButtons ) {
+        playerVictoryButton.addEventListener('click', function(e) {
+          console.log(playerVictoryButton.value + ' is the winner!');
+          gameWinner = playerVictoryButton.value;
+          socket.emit('player victory', { gameid: gameid, gameWinner: gameWinner });
+        });
+      }
+
       // Fire the ready event and once both players are ready the server will emit the event to begin striking
       socket.emit('game ready', gameid);
 
       socket.on('begin game', (gameData) => {
+        // Be sure to reset the strikes every time
+        strikes = [];
+
         console.log('Game Data: ' + JSON.stringify(gameData) );
         loading.style.display = 'none';
-        players.innerHTML = 'Player 1: ' + gameData.player1.name + ' -- Player 2: ' + gameData.player2.name;
+        player1Name.innerHTML = gameData.player1.name;
+        player2Name.innerHTML = gameData.player2.name;
+        player1Score.innerHTML = gameData.player1score;
+        player2Score.innerHTML = gameData.player2score;
+
+        playGame.removeChild(playGame.lastChild);
+        playGame.style.display = 'none';
+
+        player1Info.style.display = 'inline-block';
+        player2Info.style.display = 'inline-block';
+
+        strikeCount = gameData.strikeNumber;
+        strikeInfo.innerHTML = '<span id="strike-amount">' + strikeCount + '<span> stage strikes remaining';
+
+        for (let playerVictoryButton of playerVictoryButtons ) {
+          playerVictoryButton.style.display = 'none';
+        }
+
         players.style.display = 'block';
         stageContent.style.display = 'block';
-        currentStriker.innerHTML = gameData.currentStriker.name + ' has won the coin toss and may strike one stage.';
+        if ( gameData.gameNumber == 1 ) {
+          currentStriker.innerHTML = gameData.currentStriker.name + ' has won the coin toss and may strike one stage.';
+        } else {
+          currentStriker.innerHTML = gameData.currentStriker.name + ' may strike three stages.';
+        }
         currentStriker.style.display = 'block';
+
+
         if ( gameData.currentStriker.id == userData.user.id ) {
           strikingPlayer = true;
         } else {
@@ -188,12 +249,23 @@
           strikeWait.style.display = 'block';
         }
 
-        strikeableStages = document.getElementsByClassName('starter-stage');
-        for (let i = 0; i < strikeableStages.length; i++) {
-          if ( strikingPlayer ) {
-            strikeableStages.item(i).classList.add('strikeable');
+        if ( gameData.gameNumber == 1 ) {
+          strikeableStages = document.getElementsByClassName('starter-stage');
+          for (let i = 0; i < strikeableStages.length; i++) {
+            if ( strikingPlayer ) {
+              strikeableStages.item(i).classList.add('strikeable');
+            }
+            strikeableStages.item(i).style.display = 'inline-block';
           }
-          strikeableStages.item(i).style.display = 'inline-block';
+        } else {
+          // Make all stages strikeable after game 1
+          strikeableStages = document.getElementsByClassName('stage-section');
+          for (let i = 0; i < strikeableStages.length; i++) {
+            if ( strikingPlayer ) {
+              strikeableStages.item(i).classList.add('strikeable');
+            }
+            strikeableStages.item(i).style.display = 'inline-block';
+          }
         }
       });
 
@@ -257,14 +329,45 @@
         }
       });
 
-      socket.on('start game', (gameNumber, selected) => {
+      socket.on('start game', (gameData, selected) => {
         console.log('The selected stage is: ' + selected);
         stageContent.style.display = 'none';
         selectedStage = document.getElementById(selected);
 
-        gameInfo.innerHTML = 'Game ' + gameNumber + ' will be played on';
+        gameInfo.innerHTML = 'Game ' + gameData.gameNumber + ' will be played on';
         playGame.append(selectedStage);
         playGame.style.display = 'block';
+
+        player1VictoryButton.value = gameData.player1.id;
+        player2VictoryButton.value = gameData.player2.id;
+
+        for ( let playerVictoryButton of playerVictoryButtons ) {
+          playerVictoryButton.style.display = 'block';
+        }
+
+        for ( let stage of stages ) {
+          stage.classList.remove('selected');
+        }
+
+        mapSelect.style.display = 'none';
+
+      });
+
+      socket.on('game finished', (gameData) => {
+        // Update the score a final time
+        player1Score.innerHTML = gameData.player1score;
+        player2Score.innerHTML = gameData.player2score;
+
+        // Hide buttons a final time
+        for (let playerVictoryButton of playerVictoryButtons ) {
+          playerVictoryButton.style.display = 'none';
+        }
+
+        console.log('The game is over');
+        stageContent.style.display = 'none';
+        playGame.style.display = 'none';
+        gameMessages.innerHTML = gameData.matchWinner.name + ' has won the set.';
+        requeueButton.style.display = 'block';        
       });
 
       async function getPlayerData() {

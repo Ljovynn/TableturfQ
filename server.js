@@ -77,14 +77,32 @@ var games = [
         gameid: 1,
         player1: null,
         player1id: null,
+        player1score: 0,
         player1Ready: false,
         player2: null,
         player2id: null,
+        player2score: 0,
         player2Ready: false,
         strikes: {},
-        selectedMap: {}
+        selectedMap: {},
+        score: {},
+        matchWinner: {}
     },
-    {gameid: 2, player1: null, player1id: null, player1Ready: false, player2: null, player2id: null, player2Ready: false}
+    {
+        gameid: 2,
+        player1: null,
+        player1id: null,
+        player1score: 0,
+        player1Ready: false,
+        player2: null,
+        player2id: null,
+        player2score: 0,
+        player2Ready: false,
+        strikes: {},
+        selectedMap: {},
+        score: {},
+        matchWinner: {}
+    }
 ];
 
 function getGames() {
@@ -430,6 +448,53 @@ io.on('connection', (socket) => {
         selected = gameData.selected;
         currentGame.selectedMap[currentGame.gameNumber] = selected;
 
-        io.to('game ' + gameid).emit('start game', currentGame.gameNumber, currentGame.selectedMap[currentGame.gameNumber]);
+        io.to('game ' + gameid).emit('start game', currentGame, currentGame.selectedMap[currentGame.gameNumber]);
+    });
+
+    socket.on('player victory', (gameData) => {
+        gameid = gameData.gameid;
+        currentGame = getGame(gameid);
+        gameNumber = currentGame.gameNumber;
+
+        console.log('Winning player id: ' + gameData.gameWinner);
+
+        currentGame.score['game' + gameNumber] = gameData.gameWinner;
+
+        if (currentGame.gameNumber < 5) {
+            console.log('Next game: ' + gameNumber++);
+            currentGame.gameNumber = gameNumber++;
+
+            // If player 1 is the winner, set player 2 as the striker, otherwise player 2 was the winner
+            if ( currentGame.player1id == gameData.gameWinner ) {
+                currentGame.player1score = currentGame.player1score + 1; 
+                currentGame.currentStriker = currentGame.player2;
+            } else {
+                currentGame.player2score = currentGame.player2score + 1;
+                currentGame.currentStriker = currentGame.player1;
+            }
+
+            if ( currentGame.player1score == 3 || currentGame.player2score == 3 ) {
+                console.log('A player has won the set!');
+                if ( currentGame.player1score == 3 ) {
+                    currentGame.matchWinner = currentGame.player1;
+                } else {
+                    currentGame.matchWinner = currentGame.player2;
+                }
+
+                console.log('Game data: ' + JSON.stringify(currentGame) );
+
+                io.to('game ' + gameid).emit('game finished', currentGame);
+            } else {
+                currentGame.gamePhase = 2;
+                currentGame.strikeNumber = 3;
+
+                console.log('Plyer victory marked. New game data: ' + JSON.stringify(currentGame) );
+
+                io.to('game ' + gameid).emit('begin game', currentGame);
+            }            
+        } else {
+            // Auto emit game finished event -- players can't play more than 5 games
+            io.to('game ' + gameid).emit('game finished', currentGame);
+        }
     });
 });
