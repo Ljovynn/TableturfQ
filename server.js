@@ -1,66 +1,64 @@
-const express = require("express");
-const axios = require("axios");
-const dotenv = require("dotenv");
-const url = require("url");
-const { request } = require("http");
+import express from "express";
+import session from "express-session";
+import dotenv from "dotenv";
+import url from "url";
+import cookieParser from "cookie-parser";
+import { fileURLToPath } from 'url';
+import path from 'path';
+
+import { DeserializeSession } from "./utils/session.js";
+
+//const { request } = require("http");
 
 dotenv.config();
 
 const website_url = process.env.URL;
 const app = express();
 const port = process.env.PORT;
+const sessionSecret = process.env.SESSION_SECRET;
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 app.listen(port, () => {
     console.log(`TableturfQ is up at port ${port}`);
 });
 
+app.use(
+    session({
+        secret: sessionSecret,
+        name: 'DISCORD_OAUTH2_SESSION_ID',
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+            maxAge: 3600000 * 24,
+        },
+    })
+);
+app.use(cookieParser(sessionSecret));
+app.use(DeserializeSession);
 app.use(express.static('public',{extensions:['html']}));
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
+
+import {AuthDiscordRedirect} from './routes/auth.js';
+import {GetMatchInfo} from './routes/matchRequests.js';
+
+//auth
+app.get('/api/auth/discord/redirect', AuthDiscordRedirect);
+
+//match requests
+app.post("/MatchRequests/GetMatchInfo", GetMatchInfo);
+
+
+app.get("/testing", async (req, res) => {
+    res.sendFile(path.join(__dirname, "public/Testing/LjovynnsTestingPage.html"));
+    console.log(req.sessionID);
+});
 
 app.get("/login", async (req, res) => {
     //check log in
     //res.sendFile(join(__dirname, "index.html"));
 });
-
-app.get("/ljovynnspestingpage", async (req, res) => {
-    res.sendFile(join(__dirname, "LjovynnsTestingPage.html"));
-});
-
-app.post("/GetMatchInfo", async (req, res) =>{
-    try {
-        //todo: if match is already in local matches array in code, get data from there intstead of DB?
-
-        const matchId = req.body.matchId;
-
-        var match = await GetMatch(matchId);
-        if (match == null){
-            res.sendStatus(599);
-            return;
-        }
-    
-        var matchGames = await GetMatchGames(matchId);
-
-        var players = []
-        players[0] = await GetPlayerData(match.player1_id);
-        players[1] = await GetPlayerData(match.player2_id);
-    
-        var strikes = []
-        for (let i = 0; i < data[1].length; i++){
-            strikes[i] = GetStageStrikes(matchGames[i].id);
-        }
-
-        var data = [];
-        data[0] = match;
-        data[1] = matchGames;
-        data[2] = players;
-        data[3] = strikes;
-    
-        res.status(200).send(data);
-    } catch (err){
-        res.sendStatus(599);
-    }
-})
 
 app.post("/PlayerReportStageStrike", async (req, res) => {
     try {
@@ -79,54 +77,3 @@ app.post("/PlayerReportStageStrike", async (req, res) => {
         res.sendStatus(599);
     }
 })
-
-app.get("/api/auth/discord/redirect", async (req, res) => {
-    const { code } = req.query;
-
-    if (!code){
-        return;
-    }
-
-    const formData = new url.URLSearchParams({
-        client_id: process.env.CLIENT_ID,
-        client_secret: process.env.CLIENT_SECRET,
-        grant_type: "authorization_code",
-        code: code.toString(),
-        redirect_uri: website_url + ":" + port + "/api/auth/discord/redirect",
-    });
-
-    const output = await axios.post("https://discord.com/api/v10/oauth2/token",
-        formData, {
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
-    });
-
-    if (output.data) {
-        const access = output.data.access_token;
-
-        const userInfo = await axios.get("https://discord.com/api/v10/users/@me", {
-            headers: {
-                "Authorization": `Bearer ${access}`,
-            },
-        });
-
-        //refresh token
-
-        const requestFormData = new url.URLSearchParams({
-            client_id: process.env.CLIENT_ID,
-            client_secret: process.env.CLIENT_SECRET,
-            grant_type: "refresh_token",
-            refresh_token: output.data.refresh_token,
-        });
-
-        const refresh = await axios.post("https://discord.com/api/v10/oauth2/token",
-            requestFormData, {
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
-        });
-
-        //console.log(output.data, userInfo.data, refresh.data);
-    }
-});

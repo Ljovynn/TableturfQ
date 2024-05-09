@@ -1,4 +1,4 @@
-var glicko2 = require("glicko2");
+import glicko2 from "glicko2";
 
 var settings = {
     // tau : "Reasonable choices are between 0.3 and 1.2, though the system should
