@@ -1,6 +1,7 @@
 import {stages, matchStatuses, matchModes, setLengths, disputeResolveOptions, MatchRuleset, Player, Game, Match, currentRankedRuleset, currentCasualRuleset} from "./public/constants/matchData.js";
 import { ApplyMatchEloResults } from "./glicko2Manager.js";
 import { CreateMatch, SetMatchResult } from "./database.js";
+import { FindPlayerPosInMatch } from "./utils/matchUtils.js";
 import { json } from "express";
 
 var matches = [];
@@ -283,15 +284,6 @@ export function FindMatchWithPlayer(playerId){
             return matches[i];
         }
     }
-}
-
-function FindPlayerPosInMatch(match, playerId){
-    if (match.players[0].id == playerId){
-        return 1;
-    } else if (match.players[1].id == playerId){
-        return 2;
-    }
-    return 0;
 }
 
 async function PushMatchToDatabase(match){

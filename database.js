@@ -2,7 +2,7 @@ import mysql from 'mysql2';
 import dotenv from 'dotenv';
 import { json } from 'express';
 import { Game, stages, Player, Match, matchStatuses, matchModes, setLengths, matchResults } from "./public/constants/matchData.js";
-import { ConvertMatchStatusToResult } from './utils/convertMatchData.js';
+import { ConvertMatchStatusToResult, FindPlayerPosInMatch } from './utils/matchUtils.js';
 
 dotenv.config();
 
@@ -41,7 +41,7 @@ export async function GetPlayerLoginData(playerId){
 }
 
 export async function GetPlayerData(playerId){
-    const [rows] = await pool.query(`SELECT username, role, g2_rating, discord_verified, created_at FROM players WHERE id = ?`, [playerId]);
+    const [rows] = await pool.query(`SELECT id, username, role, g2_rating, discord_verified, created_at FROM players WHERE id = ?`, [playerId]);
     return rows[0];
 }
 
@@ -106,7 +106,8 @@ export async function CreateMatch(player1Id, player2Id, isRanked){
 
 async function CreateFirstGameStrikes(match){
     var game = match.gamesArr[0];
-    const result = await pool.query(`INSERT INTO games (match_id, stage) VALUES (?, 1, ?)`, [match.id, game.stage]);
+    var winnerPos = FindPlayerPosInMatch(match, game.winnerId);
+    const result = await pool.query(`INSERT INTO games (match_id, stage, result) VALUES (?, ?, ?)`, [match.id, game.stage, winnerPos]);
 
     const gameId = result[0].id;
 
@@ -121,12 +122,13 @@ async function CreateFirstGameStrikes(match){
         data[i] = [gameId, game.strikes[i].stage, strikeOwner];
     }
 
-    await pool.query(`INSERT INTO stage_strikes (game_id, stage, strike_owner) VALUES ?`, [data.map(strike => [strike[0], strike[1], strike[2]])]);
+    await pool.query(`INSERT INTO stage_strikes (game_id, stage, strike_owner, result) VALUES ?`, [data.map(strike => [strike[0], strike[1], strike[2]])]);
 }
 
 async function CreateCounterpickGameAndStrikes(match, gameNumber){
     var game = match.gamesArr[gameNumber - 1];
-    const result = await pool.query(`INSERT INTO games (match_id, game_number, stage) VALUES (?, ?)`, [match.id, game.stage]);
+    var winnerPos = FindPlayerPosInMatch(match, game.winnerId);
+    const result = await pool.query(`INSERT INTO games (match_id, stage) VALUES (?, ?, ?)`, [match.id, game.stage, winnerPos]);
 
     const gameId = result[0].id;
     var data = [];

@@ -33,17 +33,6 @@ export const matchResults = Object.freeze({
     player2Win: 2,
 });
 
-export function ConvertMatchStatusToResult(matchStatus){
-    switch (matchStatus){
-        case matchStatuses.player1Win:
-            return matchResults.player1Win;
-        case matchStatus.player2Win:
-            return matchResults.player2Win;
-        default:
-            return matchResults.noWinner;
-    }
-}
-
 export const matchModes = Object.freeze({ 
     casual: 0, 
     ranked: 1
@@ -109,7 +98,6 @@ export function Match(id, player1Id, player2Id, matchMode, matchRuleset)
     this.mode = matchMode;
     this.ruleset = matchRuleset;
     this.gamesArr = [new Game()];
-    this.player1Ver
     this.status = startingStatus;
     this.createdAt = Date.now();
 }

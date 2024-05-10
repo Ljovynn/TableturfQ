@@ -7,6 +7,7 @@ dotenv.config();
 const sessionSecret = dotenv.config.SESSION_SECRET;
 
 export async function SerializeSession(req, discordId){
+    //bruh ändra till userid inte discordid
     req.session.user = discordId;
     //kanske måste ändra cookien till access tokens o sånt, inte bara id?
     //TODO: skapa bara om det inte redan finns en
