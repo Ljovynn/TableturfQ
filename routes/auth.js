@@ -81,8 +81,6 @@ async function StoreUserData(accessToken, refreshToken){
     console.log(response.data);
 
     var userId = await GetPlayerByDiscordId(response.data.id);
-    console.log("user id: " + userId);
-    console.log("user id stringified: " + JSON.stringify(userId))
     if (!userId){
         userId = await CreatePlayerWithDiscord(response.data.username, response.data.id, accessToken, refreshToken);
     }

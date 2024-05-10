@@ -1,4 +1,5 @@
 import glicko2 from "glicko2";
+import { Match } from "./public/constants/matchData.js";
 
 var settings = {
     // tau : "Reasonable choices are between 0.3 and 1.2, though the system should
@@ -13,8 +14,9 @@ var settings = {
     vol : 0.06
   };
 
-async function FinishMatch(matchId, matchResult){
-  //get playerDatas from database with the match id. it need player ranks, rating deviations, and volatility.
+export async function ApplyMatchEloResults(match){
+
+  //get playerDatas from database with the player ids. it need player ranks, rating deviations, and volatility.
   var playerDatas;
   var player1Data = playerDatas.player1;
   var player2Data = playerDatas.player2;
@@ -25,6 +27,7 @@ async function FinishMatch(matchId, matchResult){
 
   ranking.addResult(player1, player2, matchResult);
   ranking.calculatePlayersRatings();
+
   //Update database with new player data and match result
   return true;
 }
@@ -39,8 +42,8 @@ var matches = [];
 ranking.addResult(Ryan, Mary, 0);
 ranking.calculatePlayersRatings();
 
-console.log("Ryan new rating: " + Ryan.getRating());
+/*console.log("Ryan new rating: " + Ryan.getRating());
 console.log("Ryan new rating deviation: " + Ryan.getRd());
-console.log("Ryan new volatility: " + Ryan.getVol());
+console.log("Ryan new volatility: " + Ryan.getVol());*/
 
 var players = ranking.getPlayers();

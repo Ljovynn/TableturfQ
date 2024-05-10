@@ -1,6 +1,7 @@
 import mysql from 'mysql2';
 import dotenv from 'dotenv';
 import { json } from 'express';
+import { Game, stages, Player, Match, matchStatuses, matchModes, setLengths, matchResults, ConvertMatchStatusToResult} from "./public/constants/matchData.js";
 
 dotenv.config();
 
@@ -43,7 +44,7 @@ export async function GetPlayerData(playerId){
     return rows[0];
 }
 
-export async function GetPlayerRankData(playedId){
+export async function GetPlayerRankData(playerId){
     const [rows] = await pool.query(`SELECT id, g2_rating, g2_rd, g2_vol FROM players WHERE id = ?`, [playerId]);
     return rows[0];
 }
@@ -96,33 +97,83 @@ export async function GetSession(sessionId){
 }
 
 //Create
-export async function CreateMatch(player1Id, player2Id, ranked, rulesetId)
+
+export async function InsertMatch(match){
+    const matchResult = ConvertMatchStatusToResult(match.status);
+    switch (match.mode){
+        case matchModes.casual:
+            result = await CreateCasualMatch(match, matchResult);
+            return result;
+        case matchModes.ranked:
+            result = await CreateRankedMatch(match, matchResult);
+            return result;
+    }
+    return false;
+}
+
+//todo: convert status to result from matchdata, then add result
+export async function CreateCasualMatch(match, matchResult){
+    const result = await pool.query(`INSERT INTO matches (player1_id, player2_id, ranked, result, created_at) VALUES (?, ?, ?, ?)`, [match.players[0].id, match.players[1].id, matchResult, match.createdAt]);
+    return result[0].id;
+}
+
+export async function CreateRankedMatch(match, matchResult)
 {
-    const result = await pool.query(`INSERT INTO matches (player1_id, player2_id, ranked, ruleset_id) VALUES (?, ?, ?, ?)`, [player1Id, player2Id, ranked, rulesetId])
-    return JSON.stringify(result[0].id);
+    const result = await pool.query(`INSERT INTO matches (player1_id, player2_id, ranked, result, created_at) VALUES (?, ?, ?, ?)`, [match.players[0].id, match.players[1].id, matchResult, match.createdAt])
+    const matchId = result[0].id;
+
+    CreateFirstGameStrikes(matchId, match);
+
+    for (let i = 1; i < match.games.length; i++){
+        CreateCounterpickGameAndStrikes(matchId, i + 1, match);
+    }
+
+    return matchId;
+}
+
+async function CreateFirstGameStrikes(matchId, match){
+    var game = match.gamesArr[0];
+    const result = await pool.query(`INSERT INTO games (match_id, game_number, stage) VALUES (?, 1, ?)`, [matchId, game.stage]);
+
+    const gameId = result[0].id;
+
+    var data = [];
+    for (let i = 0; i < strikes.length; i++){
+        var strikeOwner;
+        if (i + 1 % 4 < 2){
+            strikeOwner = match.player1Id;
+        } else{
+            strikeOwner = match.player2Id;
+        }
+        data[i] = [gameId, game.strikes[i].stage, strikeOwner];
+    }
+
+    await pool.query(`INSERT INTO stage_strikes (game_id, stage, strike_owner) VALUES ?`, [data.map(strike => [strike[0], strike[1], strike[2]])]);
+}
+
+async function CreateCounterpickGameAndStrikes(matchId, gameNumber, match){
+    var game = match.gamesArr[gameNumber - 1];
+    const result = await pool.query(`INSERT INTO games (match_id, game_number, stage) VALUES (?, ?, ?)`, [matchId, gameNumber, game.stage]);
+
+    const gameId = result[0].id;
+    var data = [];
+    for (let i = 1; i < strikes.length; i++){
+        data[i] = [gameId, game.strikes[i].stage, game.winnerId];
+    }
+
+    await pool.query(`INSERT INTO stage_strikes (game_id, stage, strike_owner) VALUES ?`, [data.map(strike => [strike[0], strike[1], strike[2]])]);
 }
 
 export async function CreatePlayer(username)
 {
     const result = await pool.query(`INSERT INTO players (username) VALUES (?)`, [username]);
-    return JSON.stringify(result[0].id);
+    return result[0].id;
 }
 
 export async function CreatePlayerWithDiscord(username, discordId, discordAccessToken, discordRefreshToken){
     const result = await pool.query(`INSERT INTO players (username, discord_id, discord_access_token, discord_refresh_token) VALUES (?, ?, ?, ?)`,
     [username, discordId, discordAccessToken, discordRefreshToken]);
-    return JSON.stringify(result[0].id);
-}
-
-export async function CreateGame(matchId, gameNumber, stage)
-{
-    const result = await pool.query(`INSERT INTO games (match_id, game_number, stage) VALUES (?, ?, ?)`, [matchId, gameNumber, stage]);
-    return JSON.stringify(result[0].id);
-}
-
-export async function CreateStageStrike(gameId, stage, strikeOwner)
-{
-    await pool.query(`INSERT INTO games (game_id, stage, strike_owner) VALUES (?, ?, ?)`, [gameId, stage, strikeOwner]);
+    return result[0].id;
 }
 
 export async function CreateChatMessage(matchId, messageOwner, content)
