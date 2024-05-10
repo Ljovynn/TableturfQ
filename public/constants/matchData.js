@@ -92,8 +92,9 @@ export function Player(id, isReady){
     this.unpickableStagesArr = [];
 }
 
-export function Match(player1Id, player2Id, matchMode, matchRuleset)
+export function Match(id, player1Id, player2Id, matchMode, matchRuleset)
 {
+    this.id = id;
     var startReady = false;
     var startingStatus = matchStatuses.waitingForPlayersReady;
     if (matchMode == matchModes.casual){

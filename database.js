@@ -1,7 +1,8 @@
 import mysql from 'mysql2';
 import dotenv from 'dotenv';
 import { json } from 'express';
-import { Game, stages, Player, Match, matchStatuses, matchModes, setLengths, matchResults, ConvertMatchStatusToResult} from "./public/constants/matchData.js";
+import { Game, stages, Player, Match, matchStatuses, matchModes, setLengths, matchResults } from "./public/constants/matchData.js";
+import { ConvertMatchStatusToResult } from './utils/convertMatchData.js';
 
 dotenv.config();
 
@@ -14,7 +15,7 @@ const pool = mysql.createPool({
 
 //Get
 export async function GetMatch(matchId){
-    const [rows] = await pool.query(`SELECT *, SUBSTRING(DATE_FORMAT(\`created_at\`, '%Y-%m-%d %T.%f'),1,21) as formatted_created_at FROM matches WHERE id = ?`, [matchId]);
+    const [rows] = await pool.query(`SELECT * FROM matches WHERE id = ?`, [matchId]);
     return rows[0];
 }
 
@@ -62,7 +63,7 @@ export async function GetPlayerMatchCount(playerId)
 }
 
 export async function GetMatchGames(matchId){
-    const [rows] = await pool.query(`SELECT * FROM games WHERE match_id = ? ORDER BY game_number`, [matchId])
+    const [rows] = await pool.query(`SELECT * FROM games WHERE match_id = ? ORDER BY id`, [matchId])
     return rows;
 }
 
@@ -98,52 +99,24 @@ export async function GetSession(sessionId){
 
 //Create
 
-export async function InsertMatch(match){
-    const matchResult = ConvertMatchStatusToResult(match.status);
-    switch (match.mode){
-        case matchModes.casual:
-            result = await CreateCasualMatch(match, matchResult);
-            return result;
-        case matchModes.ranked:
-            result = await CreateRankedMatch(match, matchResult);
-            return result;
-    }
-    return false;
-}
-
-//todo: convert status to result from matchdata, then add result
-export async function CreateCasualMatch(match, matchResult){
-    const result = await pool.query(`INSERT INTO matches (player1_id, player2_id, ranked, result, created_at) VALUES (?, ?, ?, ?)`, [match.players[0].id, match.players[1].id, matchResult, match.createdAt]);
+export async function CreateMatch(player1Id, player2Id, isRanked){
+    const result = await pool.query(`INSERT INTO matches (player1_id, player2_id, ranked) VALUES (?, ?, ?)`, [player1Id.id, player2Id, isRanked]);
     return result[0].id;
 }
 
-export async function CreateRankedMatch(match, matchResult)
-{
-    const result = await pool.query(`INSERT INTO matches (player1_id, player2_id, ranked, result, created_at) VALUES (?, ?, ?, ?)`, [match.players[0].id, match.players[1].id, matchResult, match.createdAt])
-    const matchId = result[0].id;
-
-    CreateFirstGameStrikes(matchId, match);
-
-    for (let i = 1; i < match.games.length; i++){
-        CreateCounterpickGameAndStrikes(matchId, i + 1, match);
-    }
-
-    return matchId;
-}
-
-async function CreateFirstGameStrikes(matchId, match){
+async function CreateFirstGameStrikes(match){
     var game = match.gamesArr[0];
-    const result = await pool.query(`INSERT INTO games (match_id, game_number, stage) VALUES (?, 1, ?)`, [matchId, game.stage]);
+    const result = await pool.query(`INSERT INTO games (match_id, stage) VALUES (?, 1, ?)`, [match.id, game.stage]);
 
     const gameId = result[0].id;
 
     var data = [];
     for (let i = 0; i < strikes.length; i++){
         var strikeOwner;
-        if (i + 1 % 4 < 2){
-            strikeOwner = match.player1Id;
+        if ((i + 1) % 4 < 2){
+            strikeOwner = match.players[0].id;
         } else{
-            strikeOwner = match.player2Id;
+            strikeOwner = match.players[1].id;
         }
         data[i] = [gameId, game.strikes[i].stage, strikeOwner];
     }
@@ -151,9 +124,9 @@ async function CreateFirstGameStrikes(matchId, match){
     await pool.query(`INSERT INTO stage_strikes (game_id, stage, strike_owner) VALUES ?`, [data.map(strike => [strike[0], strike[1], strike[2]])]);
 }
 
-async function CreateCounterpickGameAndStrikes(matchId, gameNumber, match){
+async function CreateCounterpickGameAndStrikes(match, gameNumber){
     var game = match.gamesArr[gameNumber - 1];
-    const result = await pool.query(`INSERT INTO games (match_id, game_number, stage) VALUES (?, ?, ?)`, [matchId, gameNumber, game.stage]);
+    const result = await pool.query(`INSERT INTO games (match_id, game_number, stage) VALUES (?, ?)`, [match.id, game.stage]);
 
     const gameId = result[0].id;
     var data = [];
@@ -187,8 +160,16 @@ export async function CreateSession(sessionId, expiresAt, data){
 }
 
 //Update
-export async function SetMatchResult(matchId, result){
-    await pool.query(`UPDATE matches SET result = ? WHERE id = ?`, [result, matchId]);
+export async function SetMatchResult(match){
+
+    const matchResult = ConvertMatchStatusToResult(match.status);
+    await pool.query(`UPDATE matches SET result = ? WHERE id = ?`, [matchResult, match.id]);
+
+    CreateFirstGameStrikes(match);
+
+    for (let i = 1; i < match.games.length; i++){
+        CreateCounterpickGameAndStrikes(match, i + 1);
+    }
 }
 
 export async function DeleteMessage(matchId, messageNumber){

@@ -1,16 +1,16 @@
 import {stages, matchStatuses, matchModes, setLengths, disputeResolveOptions, MatchRuleset, Player, Game, Match, currentRankedRuleset, currentCasualRuleset} from "./public/constants/matchData.js";
 import { ApplyMatchEloResults } from "./glicko2Manager.js";
-import { InsertMatch } from "./database.js";
+import { CreateMatch, SetMatchResult } from "./database.js";
 import { json } from "express";
 
 var matches = [];
 
 //tick for match timers
-export function MatchTick(){
+export async function MatchTick(){
 
 }
 
-var match = CreateMatch(1, 2, matchModes.ranked);
+var match = await MakeNewMatch(1, 1, 2, matchModes.ranked);
 
 PlayerSentReady(1);
 PlayerSentReady(2);
@@ -27,18 +27,20 @@ PlayerSentGameWin(2, 1);
 
 console.log(JSON.stringify(match));
 
-function CreateMatch(player1Id, player2Id, matchMode){
-    switch (matchMode) {
-    case matchModes.casual:
-        var match = new Match(player1Id, player2Id, matchMode, currentCasualRuleset);
-        matches.push(match);
-        return match;
-    case matchModes.ranked:
-        var match = new Match(player1Id, player2Id, matchMode, currentRankedRuleset);
-        matches.push(match);
-        return match;
+async function MakeNewMatch(player1Id, player2Id, matchMode){
+    var isRanked = false;
+    var ruleset = currentCasualRuleset;
+    if (matchMode == matchModes.ranked){
+        isRanked = true;
+        ruleset = currentRankedRuleset;
     }
-    return false;
+
+    const matchId = await CreateMatch(player1Id, player2Id, isRanked);
+    if (!matchId) return false;
+
+    var match = new Match(matchId, player1Id, player2Id, matchMode, ruleset);
+    matches.push(match);
+    return match;
 }
 
 export function PlayerSentReady(playerId){
@@ -79,6 +81,7 @@ export function PlayerSentStageStrike(playerId, stage){
     }
 }
 
+//TODO: make it array of stages
 function StarterStrikeLogic(match, playerPos, stage){
     const stageList = match.ruleset.starterStagesArr;
     var game = match.gamesArr[0];
@@ -257,6 +260,14 @@ export function ResolveMatchDispute(matchId, resolveOption){
 
 }
 
+export function FindMatch(matchId){
+    for (let i = 0; i < matches.length; i++){
+        if (matches[i].id == matchId){
+            return matches[i];
+        }
+    }
+}
+
 export function FindIfPlayerInMatch(playerId){
     for (let i = 0; i < matches.length; i++){
         if (matches[i].players[0].id == playerId || matches[i].players[1].id == playerId){
@@ -272,7 +283,6 @@ export function FindMatchWithPlayer(playerId){
             return matches[i];
         }
     }
-    return null;
 }
 
 function FindPlayerPosInMatch(match, playerId){

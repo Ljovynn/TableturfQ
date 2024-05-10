@@ -3,10 +3,10 @@ import express from 'express';
 
 import {GetMatch, GetMatchGames, GetPlayerData, GetStageStrikes} from '../database.js';
 
+//req: match id
+//res: match object, player id
 export async function GetMatchInfo(req, res){
     try {
-        //todo: if match is already in local matches array in code, get data from there intstead of DB?
-
         const matchId = req.body.matchId;
 
         var match = await GetMatch(matchId);
