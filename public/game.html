@@ -53,12 +53,12 @@
           <h3>Square Squared</h3>
           <img  src="/images/Square-Squared-Icon.png" />
         </div>
-      </div>
-      <div class="stage-row">
-         <div id="stage-lakefront" class="stage-section starter-stage" style="display: none">
+        <div id="stage-lakefront" class="stage-section starter-stage" style="display: none">
             <h3>Lakefront Property</h3>
             <img  src="/images/Lakefront-Icon.png" />
         </div>
+      </div>
+      <div class="stage-row">
          <div id="stage-gemini" class="stage-section" style="display: none">
           <h3>Double Gemini</h3>
           <img  src="/images/Gemini-Icon.png" />
@@ -71,9 +71,39 @@
           <h3>Box Seats</h3>
           <img src="/images/Box-Seats-Icon.png" />
         </div>
+        <div id="stage-girder" class="stage-section" style="display: none">
+            <h3>Girder For Battle</h3>
+            <img  src="/images/Girder-Icon.png" />
+        </div>
+        <div id="stage-cracker-snap" class="stage-section" style="display: none">
+            <h3>Cracker Snap</h3>
+            <img  src="/images/Cracker-Snap-Icon.png" />
+        </div>
+      </div>
+      <div class="stage-row">
+        <div id="stage-mansion" class="stage-section" style="display: none">
+            <h3>Mask Mansion</h3>
+            <img  src="/images/Mask-Mansion-Icon.png" />
+        </div>
+        <div id="stage-thicket" class="stage-section" style="display: none">
+            <h3>Sticky Thicket</h3>
+            <img  src="/images/Sticky-Thicket-Icon.png" />
+        </div>
+        <div id="stage-pedal" class="stage-section" style="display: none">
+            <h3>Pedal to the Metal</h3>
+            <img  src="/images/Pedal-Icon.png" />
+        </div>
+        <div id="stage-two-lane" class="stage-section" style="display: none">
+            <h3>Two-Lane Splattop</h3>
+            <img  src="/images/Two-Lane-Icon.png" />
+        </div>
+        <div id="stage-over-the-line" class="stage-section" style="display: none">
+            <h3>Over the Line</h3>
+            <img  src="/images/Over-the-Line-Icon.png" />
+        </div>
       </div>
       <div id="strike-wait" style="display: none;">
-        <p>Please wait, opponent is striking.</p>
+        <p>Please wait for your opponent.</p>
       </div>
       <div id="strike-content" style="display: none;">
         <div id="strike-info"><span id="strike-amount">1</span> stage strike remaining.</div>
@@ -133,6 +163,8 @@
       var strikes = [];
       // Initial value
       var strikeCount = 1;
+      // The total number of allowed strikes to validate against
+      var strikeNumber = 1;
       var mapSelection = false;
 
       // Get the gameid from the url
@@ -180,8 +212,12 @@
 
       strikeButton.addEventListener('click', (e) => {
         console.log('Sending strike data to the server ' + strikes);
-        // send off the strike event
-        socket.emit('strike', { gameid: gameid, strikes: strikes } );
+        if ( validateStrikes(strikes, strikeNumber) ) {
+          // send off the strike event
+          socket.emit('strike', { gameid: gameid, strikes: strikes } );
+        } else {
+          alert('Please select ' + strikeNumber + ' maps to strike.');
+        }
       });
 
       playButton.addEventListener('click', (e) => {
@@ -220,6 +256,7 @@
         player2Info.style.display = 'inline-block';
 
         strikeCount = gameData.strikeNumber;
+        strikeNumber = strikeCount;
         strikeInfo.innerHTML = '<span id="strike-amount">' + strikeCount + '<span> stage strikes remaining';
 
         for (let playerVictoryButton of playerVictoryButtons ) {
@@ -285,11 +322,16 @@
         console.log('New striker is: ' + gameData.currentStriker.id + ' and gets ' + gameData.strikeNumber + 'strikes!');
 
         strikeCount = gameData.strikeNumber;
+        strikeNumber = strikeCount;
         if ( strikeCount == -10 ) {
           mapSelection = true;
         }
 
-        strikeableStages = document.getElementsByClassName('starter-stage');
+        if ( gameData.gameNumber == 1 ) {
+          strikeableStages = document.getElementsByClassName('starter-stage');
+        } else {
+          strikeableStages = document.getElementsByClassName('stage-section');
+        }
 
         if ( gameData.currentStriker.id == userData.user.id ) {
           if ( mapSelection ) {
@@ -333,9 +375,10 @@
         console.log('The selected stage is: ' + selected);
         stageContent.style.display = 'none';
         selectedStage = document.getElementById(selected);
+        selectedStage.classList.remove('playable-selected');
 
         gameInfo.innerHTML = 'Game ' + gameData.gameNumber + ' will be played on';
-        playGame.append(selectedStage);
+        playGame.append( selectedStage.cloneNode(true) );
         playGame.style.display = 'block';
 
         player1VictoryButton.value = gameData.player1.id;
@@ -347,6 +390,7 @@
 
         for ( let stage of stages ) {
           stage.classList.remove('selected');
+          stage.classList.remove('playable');
         }
 
         mapSelect.style.display = 'none';
@@ -374,6 +418,13 @@
         const response = await fetch('/player');
         userData = await response.json();
         console.log(userData);
+      }
+
+      function validateStrikes(strikes, strikeCount) {
+        if ( strikes.length != strikeCount ) 
+          return false;
+        else
+          return true;
       }
     </script>
 

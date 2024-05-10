@@ -405,8 +405,8 @@ io.on('connection', (socket) => {
         strikeAmount = gameData.strikes.length;
         gameNumber = currentGame.gameNumber;
 
-        if ( strikeAmount > currentGame.strikeNumber ) {
-            // If the user tries to strike more stages than are allowed in the current round of striking
+        if ( strikeAmount != currentGame.strikeNumber ) {
+            // If the user tries to strike the incorrect number of stages 
             socket.emit('invalid strikes');
         } else {
             // If no strikes have been set, push the first value to the array otherwise we can concat the current array with the new one
@@ -460,17 +460,17 @@ io.on('connection', (socket) => {
 
         currentGame.score['game' + gameNumber] = gameData.gameWinner;
 
-        if (currentGame.gameNumber < 5) {
+        if (currentGame.gameNumber <= 5) {
             console.log('Next game: ' + gameNumber++);
             currentGame.gameNumber = gameNumber++;
 
-            // If player 1 is the winner, set player 2 as the striker, otherwise player 2 was the winner
+            // Increase the winner's score and make them the striker
             if ( currentGame.player1id == gameData.gameWinner ) {
                 currentGame.player1score = currentGame.player1score + 1; 
-                currentGame.currentStriker = currentGame.player2;
+                currentGame.currentStriker = currentGame.player1;
             } else {
                 currentGame.player2score = currentGame.player2score + 1;
-                currentGame.currentStriker = currentGame.player1;
+                currentGame.currentStriker = currentGame.player2;
             }
 
             if ( currentGame.player1score == 3 || currentGame.player2score == 3 ) {
