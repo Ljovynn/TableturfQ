@@ -1,4 +1,4 @@
-import { matchStatuses, matchResults, Match, Game, MatchRuleset, Player, matchModes, currentCasualRuleset, currentRankedRuleset} from "../public/constants/matchData";
+import { matchStatuses, matchResults, Match, Game, MatchRuleset, Player, matchModes, currentCasualRuleset, currentRankedRuleset, ChatMessage} from "../public/constants/matchData";
 
 export function ConvertMatchStatusToResult(matchStatus){
     switch (matchStatus){
@@ -31,7 +31,7 @@ export function FindPlayerPosInMatch(match, playerId){
     return 0;
 }
 
-export function ConvertDBMatchToMatch(matchData, gamesData, strikeData){
+export function ConvertDBMatchToMatch(matchData, gamesData, strikeData, chatMessages){
     var matchMode = matchModes.casual;
     var ruleset = currentCasualRuleset;
     if (matchData.ranked == true) {
@@ -44,6 +44,8 @@ export function ConvertDBMatchToMatch(matchData, gamesData, strikeData){
 
     match.gamesArr = [];
     for (let i = 0; i < gamesData.length; i++){
+        if (i != 0) match.gamesArr.push(new Game());
+
         match.gamesArr[i].stage = gamesData[i].stage;
         if (gamesData[i].result != 0){
             match.gamesArr[i].winnerId = match.players[gamesData[i].result - 1];
@@ -52,6 +54,11 @@ export function ConvertDBMatchToMatch(matchData, gamesData, strikeData){
         for (let j = 0; j < strikeData[i].length; j++){
             match.gamesArr[i].strikes.push(strikeData[i][j].stage);
         }
+    }
+
+    for (let i = 0; i < chatMessages.length; i++){
+        var chatMessage = new ChatMessage(chatMessages[i].content, chatMessages[i].owner_id);
+        match.chat.push(chatMessage);
     }
 
     return match;

@@ -18,13 +18,12 @@ export const stages = Object.freeze({
 });
 
 export const matchStatuses = Object.freeze({ 
-    waitingForPlayersReady: 0,
-    stageSelection: 1,
-    ingame: 2,
-    player1Win: 3, 
-    player2Win: 4, 
-    verifyingResults: 5,
-    dispute: 6
+    stageSelection: 0,
+    ingame: 1,
+    player1Win: 2, 
+    player2Win: 3, 
+    verifyingResults: 4,
+    dispute: 5
 });
 
 export const matchResults = Object.freeze({ 
@@ -56,8 +55,7 @@ export const disputeResolveOptions = Object.freeze({
     player2Win: 5
 });
 
-export function MatchRuleset(readyTimer, timer, timeAddOnPick, setLength, starterStagesArr, counterPickStagesArr, counterPickBans, DSR, verificationTimer){
-    this.readyTimer = readyTimer;
+export function MatchRuleset(timer, timeAddOnPick, setLength, starterStagesArr, counterPickStagesArr, counterPickBans, DSR, verificationTimer){
     this.timer = timer;
     this.timeAddOnPick = timeAddOnPick;
     this.setLength = setLength;
@@ -68,15 +66,19 @@ export function MatchRuleset(readyTimer, timer, timeAddOnPick, setLength, starte
     this.verificationTimer = verificationTimer;
 }
 
+export function ChatMessage(content, ownerId){
+    this.content = content;
+    this.ownerId = ownerId;
+}
+
 export function Game(){
     this.stage = stages.unpicked;
     this.strikes = [];
     this.winnerId = 0;
 }
 
-export function Player(id, isReady){
+export function Player(id){
     this.id = id;
-    this.isReady = isReady;
     this.hasVerifiedResult = false;
     this.unpickableStagesArr = [];
 }
@@ -84,12 +86,11 @@ export function Player(id, isReady){
 export function Match(id, player1Id, player2Id, matchMode, matchRuleset)
 {
     this.id = id;
-    var startReady = false;
-    var startingStatus = matchStatuses.waitingForPlayersReady;
+    var startingStatus = matchStatuses.stageSelection;
     if (matchMode == matchModes.casual){
-        startReady = true;
         startingStatus = matchStatuses.ingame;
     }
+    this.status = matchStatuses.startingStatus;
 
     var player1 = new Player(player1Id, startReady);
     var player2 = new Player(player2Id, startReady);
@@ -98,8 +99,8 @@ export function Match(id, player1Id, player2Id, matchMode, matchRuleset)
     this.mode = matchMode;
     this.ruleset = matchRuleset;
     this.gamesArr = [new Game()];
-    this.status = startingStatus;
     this.createdAt = Date.now();
+    this.chat = [];
 }
 
 const currentRankedStarters = [
@@ -128,6 +129,6 @@ const currentRankedCounterpicks = [
     stages.overTheLine
     ];
 
-export const currentRankedRuleset = new MatchRuleset(15, 180, 20, setLengths.bo5, currentRankedStarters, currentRankedCounterpicks, 3, true, 60);
+export const currentRankedRuleset = new MatchRuleset(180, 20, setLengths.bo5, currentRankedStarters, currentRankedCounterpicks, 3, true, 60);
 
 export const currentCasualRuleset = new MatchRuleset(0, 0, 0, setLengths.unlimited, [], [], 0, false, 0);

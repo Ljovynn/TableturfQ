@@ -2,11 +2,13 @@ import express from 'express';
 import { Match } from '../public/constants/matchData.js';
 import { FindMatch } from '../matchManager.js';
 
-import {GetMatch, GetMatchGames, GetPlayerData, GetStageStrikes} from '../database.js';
+import { GetChatMessages, GetMatch, GetMatchGames, GetPlayerChatData, GetPlayerData, GetStageStrikes } from '../database.js';
 import { ConvertDBMatchToMatch } from '../utils/matchUtils.js';
 
 //req: match id
-//res: match object, players, your player pos
+//res: match object, players, your player pos, other users in chat
+
+//TODO: chat info
 export async function GetMatchInfo(req, res){
     try {
         const matchId = req.body.matchId;
@@ -24,7 +26,10 @@ export async function GetMatchInfo(req, res){
             for (let i = 0; i < gameData.length; i++){
                 strikeData[i] = await GetStageStrikes(gameData[i].id);
             }
-            match = ConvertDBMatchToMatch(matchData, gameData, strikeData);
+
+            var chatMessages = await GetChatMessages(matchId);
+
+            match = ConvertDBMatchToMatch(matchData, gameData, strikeData, chatMessages);
         }
 
         var players = []
@@ -41,7 +46,19 @@ export async function GetMatchInfo(req, res){
             }
         }
 
-        var data = [match, players, playerPos];
+        var othersInChatIds = [];
+
+        for (let i = 0; i < match.chat.length; i++){
+            if (!othersInChatIds.includes(match.chat[i].ownerId)) othersInChatIds.push(match.chat[i].ownerId);
+        }
+
+        for (let i = othersInChatIds.length - 1; i >= 0; i--){
+            if (othersInChatIds[i] == players[0].id || othersInChatIds[i] == players[1].id) othersInChatIds.splice(i, 1);
+        }
+
+        var othersInChat = await GetPlayerChatData(othersInChatIds);
+
+        var data = [match, players, playerPos, othersInChat];
     
         res.status(200).send(data);
     } catch (err){

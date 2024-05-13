@@ -1,4 +1,4 @@
-import {stages, matchStatuses, matchModes, setLengths, disputeResolveOptions, MatchRuleset, Player, Game, Match, currentRankedRuleset, currentCasualRuleset} from "./public/constants/matchData.js";
+import {stages, matchStatuses, matchModes, setLengths, disputeResolveOptions, MatchRuleset, Player, Game, Match, currentRankedRuleset, currentCasualRuleset, ChatMessage} from "./public/constants/matchData.js";
 import { ApplyMatchEloResults } from "./glicko2Manager.js";
 import { CreateMatch, SetMatchResult } from "./database.js";
 import { FindPlayerPosInMatch } from "./utils/matchUtils.js";
@@ -13,8 +13,6 @@ export async function MatchTick(){
 
 var match = await MakeNewMatch(1, 1, 2, matchModes.ranked);
 
-PlayerSentReady(1);
-PlayerSentReady(2);
 PlayerSentStageStrike(1, stages.thunderPoint);
 PlayerSentStageStrike(2, stages.mainStreet);
 PlayerSentStageStrike(2, stages.lakefrontProperty);
@@ -28,7 +26,7 @@ PlayerSentGameWin(2, 1);
 
 console.log(JSON.stringify(match));
 
-async function MakeNewMatch(player1Id, player2Id, matchMode){
+export async function MakeNewMatch(player1Id, player2Id, matchMode){
     var isRanked = false;
     var ruleset = currentCasualRuleset;
     if (matchMode == matchModes.ranked){
@@ -42,27 +40,6 @@ async function MakeNewMatch(player1Id, player2Id, matchMode){
     var match = new Match(matchId, player1Id, player2Id, matchMode, ruleset);
     matches.push(match);
     return match;
-}
-
-export function PlayerSentReady(playerId){
-    var match = FindMatchWithPlayer(playerId);
-    if (!match) return false;
-
-    var playerPos = FindPlayerPosInMatch(match, playerId);
-
-    if (match.status != matchStatuses.waitingForPlayersReady) return false;
-
-    match.players[playerPos - 1].isReady = true;
-
-    //return annorlunda?
-    CheckAllPlayersReady(match);
-    return true;
-}
-
-function CheckAllPlayersReady(match){
-    if (match.players[0].isReady == false || match.players[1].isReady == false) return false;
-    match.status = matchStatuses.stageSelection;
-    return true;
 }
 
 //TODO: make it so multiple strikes are sent together
@@ -253,8 +230,16 @@ export async function PlayerSentCasualMatchEnd(playerId){
     return true;
 }
 
-export function PlayerSentMatchDispute(playerId){
-    
+export function PlayerSentChatMessage(content, playerId){
+    var match = FindMatchWithPlayer(playerId);
+    if (!match) return false;
+
+    var chatMessage = new ChatMessage(content, playerId)
+    match.chat.push(chatMessage);
+}
+
+export function PlayerSentMatchDispute(){
+
 }
 
 export function ResolveMatchDispute(matchId, resolveOption){

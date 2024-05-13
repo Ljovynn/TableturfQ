@@ -3,7 +3,9 @@ import session from "express-session";
 import dotenv from "dotenv";
 import url from "url";
 import cookieParser from "cookie-parser";
+import { createServer } from 'http';
 import { fileURLToPath } from 'url';
+import { Server } from "socket.io";
 import path from 'path';
 
 import { DeserializeSession } from "./utils/session.js";
@@ -13,13 +15,30 @@ import { DeserializeSession } from "./utils/session.js";
 dotenv.config();
 
 const website_url = process.env.URL;
-const app = express();
-const port = process.env.PORT;
 const sessionSecret = process.env.SESSION_SECRET;
+const port = process.env.PORT;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-app.listen(port, () => {
+const app = express();
+const server = createServer(app);
+const io = new Server(server);
+
+io.on("connection", socket => {
+    //join match id as room
+    socket.on('join', function(room){
+        socket.join(room.toString());
+        console.log("user joined " + room);
+    });
+
+    //message: playerId, matchId
+    socket.on('player ready', message => {
+        console.log("socket sent player ready in room " + message[1]);
+        socket.to(message[1].toString()).emit('player ready', message[0]);
+    })
+});
+
+server.listen(port, () => {
     console.log(`TableturfQ is up at port ${port}`);
 });
 
