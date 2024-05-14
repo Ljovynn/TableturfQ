@@ -1,7 +1,6 @@
 import { matchModes } from "./public/constants/matchData.js";
 import { FindIfPlayerInMatch, MakeNewMatch } from "./matchManager.js";
 
-//add more variables for que stuff idk
 function Que(matchMode){
     this.queArr = [];
     this.matchMode = matchMode;
@@ -12,7 +11,7 @@ function MatchmadePlayer(id){
     this.ready = false;
 }
 
-function MatchingPlayers(player1Id, player2Id, matchMode){
+function MatchedPlayers(player1Id, player2Id, matchMode){
     this.players = [new MatchmadePlayer(player1Id), new MatchmadePlayer(player2Id)];
     this.matchMode = matchMode;
     this.createdAt = Date.now();
@@ -21,9 +20,12 @@ function MatchingPlayers(player1Id, player2Id, matchMode){
 var ques = [
     new Que(matchModes.casual),
     new Que(matchModes.ranked)
-];
+]
 
 var matchingPlayersList = [];
+
+//also uses MathedPlayers function
+var recentlyMatchedPlayersList = [];
 
 export function AddPlayerToQue(playerId, matchMode){
     for (let i = 0; i < ques.length; i++){
@@ -69,7 +71,7 @@ async function MakeMatch(player1Id, player2Id, matchMode){
             break;
         case matchModes.ranked:
             RemovePlayersFromQue(ques[1].queArr);
-            matchingPlayersList.push(new MatchingPlayers(player1Id, player2Id, matchMode));
+            matchingPlayersList.push(new MatchedPlayers(player1Id, player2Id, matchMode));
             break;
     }
 }

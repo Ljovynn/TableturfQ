@@ -1,4 +1,4 @@
-import {stages, matchStatuses, matchModes, setLengths, disputeResolveOptions, MatchRuleset, Player, Game, Match, currentRankedRuleset, currentCasualRuleset, ChatMessage} from "./public/constants/matchData.js";
+import {stages, matchStatuses, matchModes, Game, Match, ChatMessage} from "./public/constants/matchData.js";
 import { ApplyMatchEloResults } from "./glicko2Manager.js";
 import { CreateMatch, SetMatchResult } from "./database.js";
 import { FindPlayerPosInMatch } from "./utils/matchUtils.js";
@@ -11,7 +11,7 @@ export async function MatchTick(){
 
 }
 
-var match = await MakeNewMatch(1, 1, 2, matchModes.ranked);
+/*var match = await MakeNewMatch(1, 1, 2, matchModes.ranked);
 
 PlayerSentStageStrike(1, stages.thunderPoint);
 PlayerSentStageStrike(2, stages.mainStreet);
@@ -24,20 +24,18 @@ PlayerSentStageStrike(1, stages.crackerSnap);
 PlayerSentStagePick(2, stages.doubleGemini);
 PlayerSentGameWin(2, 1);
 
-console.log(JSON.stringify(match));
+console.log(JSON.stringify(match));*/
 
 export async function MakeNewMatch(player1Id, player2Id, matchMode){
     var isRanked = false;
-    var ruleset = currentCasualRuleset;
     if (matchMode == matchModes.ranked){
         isRanked = true;
-        ruleset = currentRankedRuleset;
     }
 
     const matchId = await CreateMatch(player1Id, player2Id, isRanked);
     if (!matchId) return false;
 
-    var match = new Match(matchId, player1Id, player2Id, matchMode, ruleset);
+    var match = new Match(matchId, player1Id, player2Id, matchMode);
     matches.push(match);
     return match;
 }
@@ -49,7 +47,6 @@ export function PlayerSentStageStrike(playerId, stage){
 
     var playerPos = FindPlayerPosInMatch(match, playerId);
 
-    if (match.mode == matchModes.casual) return false;
     if (match.status != matchStatuses.stageSelection) return false;
 
     if (match.gamesArr.length == 1){
@@ -61,7 +58,7 @@ export function PlayerSentStageStrike(playerId, stage){
 
 //TODO: make it array of stages
 function StarterStrikeLogic(match, playerPos, stage){
-    const stageList = match.ruleset.starterStagesArr;
+    const stageList = match.mode.rulesetData.starterStagesArr;
     var game = match.gamesArr[0];
 
     if (!stageList.includes(stage)) return false;
@@ -94,7 +91,7 @@ function CheckStarterStrikesFinished(game, stageList){
 }
 
 function CounterpickLogic(match, playerId, playerPos, stage){
-    const stageList = match.ruleset.counterPickStagesArr;
+    const stageList = match.mode.rulesetData.counterPickStagesArr;
     var game = match.gamesArr[match.gamesArr.length - 1];
 
     if (match.gamesArr[match.gamesArr.length - 2].winnerId != playerId) return false;
@@ -105,7 +102,7 @@ function CounterpickLogic(match, playerId, playerPos, stage){
 
     if (game.strikes.includes(stage)) return false;
 
-    if (game.strikes.length >= match.ruleset.counterPickBans) return false;
+    if (game.strikes.length >= match.mode.rulesetData.counterPickBans) return false;
 
     if (match.players[playerPos % 2].unpickableStagesArr.includes(stage)) return false;
 
@@ -119,11 +116,10 @@ export function PlayerSentStagePick(playerId, stage){
 
     var playerPos = FindPlayerPosInMatch(match, playerId);
 
-    if (match.mode == matchModes.casual) return false;
     if (match.status != matchStatuses.stageSelection) return false;
     if (match.gamesArr.length <= 1) return false;
 
-    if (!match.ruleset.counterPickStagesArr.includes(stage)) return false;
+    if (!match.mode.rulesetData.counterPickStagesArr.includes(stage)) return false;
 
     if (match.players[playerPos - 1].unpickableStagesArr.includes(stage)) return false;
 
@@ -131,7 +127,7 @@ export function PlayerSentStagePick(playerId, stage){
 
     var game = match.gamesArr[match.gamesArr.length - 1];
 
-    if (game.strikes.length < match.ruleset.counterPickBans) return false;
+    if (game.strikes.length < match.mode.rulesetData.counterPickBans) return false;
 
     game.stage = stage;
     match.status = matchStatuses.ingame;
@@ -155,7 +151,7 @@ export function PlayerSentGameWin(playerId, winnerId){
 
     var game = match.gamesArr[match.gamesArr.length - 1];
 
-    if (match.ruleset.dsr){
+    if (match.mode.rulesetData.dsr){
         match.players[winnerPos - 1].unpickableStagesArr.push(game.stage);
     }
 
@@ -207,7 +203,7 @@ async function CheckAllPlayersVerified(match){
         match.status = matchStatuses.player2Win;
     }
 
-    if (!await PushMatchToDatabase(match)) return false;
+    if (!await UpdateMatchInDatabase(match)) return false;
     if (!ApplyMatchEloResults(match)) return false;
 
     const matchIndex = matches.indexOf(match);
@@ -221,7 +217,7 @@ export async function PlayerSentCasualMatchEnd(playerId){
     var match = FindMatchWithPlayer(playerId);
     if (!match) return false;
 
-    if (!await PushMatchToDatabase(match)) return false;
+    if (!await UpdateMatchInDatabase(match)) return false;
 
     const matchIndex = matches.indexOf(match);
     if (matchIndex == -1) return false;
@@ -271,7 +267,7 @@ export function FindMatchWithPlayer(playerId){
     }
 }
 
-async function PushMatchToDatabase(match){
-    const result = await InsertMatch(match);
+async function UpdateMatchInDatabase(match){
+    const result = await SetMatchResult(match);
     return result;
 }

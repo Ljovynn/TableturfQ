@@ -1,7 +1,5 @@
 import mysql from 'mysql2';
 import dotenv from 'dotenv';
-import { json } from 'express';
-import { Game, stages, Player, Match, matchStatuses, matchModes, setLengths, matchResults } from "./public/constants/matchData.js";
 import { userRoles } from './public/constants/userData.js';
 import { ConvertMatchStatusToResult, FindPlayerPosInMatch } from './utils/matchUtils.js';
 

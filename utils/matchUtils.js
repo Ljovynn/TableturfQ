@@ -1,4 +1,4 @@
-import { matchStatuses, matchResults, Match, Game, MatchRuleset, Player, matchModes, currentCasualRuleset, currentRankedRuleset, ChatMessage} from "../public/constants/matchData";
+import { matchStatuses, matchResults, Match, Game, matchModes, ChatMessage } from "../public/constants/matchData.js";
 
 export function ConvertMatchStatusToResult(matchStatus){
     switch (matchStatus){
@@ -33,12 +33,11 @@ export function FindPlayerPosInMatch(match, playerId){
 
 export function ConvertDBMatchToMatch(matchData, gamesData, strikeData, chatMessages){
     var matchMode = matchModes.casual;
-    var ruleset = currentCasualRuleset;
     if (matchData.ranked == true) {
         matchMode = matchModes.ranked;
-        ruleset = currentRankedRuleset;
+
     }
-    var match = new Match(matchData.id, matchData.player1_id, matchData.player2_id, matchMode, ruleset);
+    var match = new Match(matchData.id, matchData.player1_id, matchData.player2_id, matchMode);
     match.status = ConvertResultToMatchStatus(matchData.result);
     match.createdAt = matchData.created_at;
 
