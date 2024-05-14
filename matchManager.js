@@ -2,6 +2,7 @@ import {stages, matchStatuses, matchModes, Game, Match, ChatMessage} from "./pub
 import { ApplyMatchEloResults } from "./glicko2Manager.js";
 import { CreateMatch, SetMatchResult } from "./database.js";
 import { FindPlayerPosInMatch } from "./utils/matchUtils.js";
+import { AddRecentlyMatchedPlayers } from "./matchmakingManager.js";
 import { json } from "express";
 
 var matches = [];
@@ -203,12 +204,9 @@ async function CheckAllPlayersVerified(match){
         match.status = matchStatuses.player2Win;
     }
 
-    if (!await UpdateMatchInDatabase(match)) return false;
-    if (!ApplyMatchEloResults(match)) return false;
+    if (!await FinishMatch(match)) return false;
 
-    const matchIndex = matches.indexOf(match);
-    if (matchIndex == -1) return false;
-    array.splice(matchIndex, 1);
+    if (!ApplyMatchEloResults(match)) return false;
 
     return true;
 }
@@ -217,11 +215,7 @@ export async function PlayerSentCasualMatchEnd(playerId){
     var match = FindMatchWithPlayer(playerId);
     if (!match) return false;
 
-    if (!await UpdateMatchInDatabase(match)) return false;
-
-    const matchIndex = matches.indexOf(match);
-    if (matchIndex == -1) return false;
-    array.splice(matchIndex, 1);
+    if (!await FinishMatch(match)) return false;
 
     return true;
 }
@@ -267,7 +261,14 @@ export function FindMatchWithPlayer(playerId){
     }
 }
 
-async function UpdateMatchInDatabase(match){
+async function FinishMatch(match){
     const result = await SetMatchResult(match);
+
+    const matchIndex = matches.indexOf(match);
+    if (matchIndex == -1) return false;
+    matches.splice(matchIndex, 1);
+
+    AddRecentlyMatchedPlayers(match.players[0].id, match.players[1].id, match.mode);
+
     return result;
 }

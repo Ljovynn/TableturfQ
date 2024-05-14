@@ -66,7 +66,7 @@ import {GetMatchInfo} from './routes/matchRequests.js';
 app.get('/api/auth/discord/redirect', AuthDiscordRedirect);
 
 //match requests
-app.post("/MatchRequests/GetMatchInfo", GetMatchInfo);
+app.get("/MatchRequests/GetMatchInfo", GetMatchInfo);
 
 
 app.get("/testing", async (req, res) => {
@@ -80,19 +80,5 @@ app.get("/login", async (req, res) => {
 });
 
 app.post("/PlayerReportStageStrike", async (req, res) => {
-    try {
-        const data = req.body;
-        const player = await GetPlayer(data.playerId);
 
-        //todo: check if player in match
-        const matchId = 0;
-        if (!true){
-            res.sendStatus(599);
-            return;
-        }
-        //todo: update match data and database
-        res.sendStatus(201);
-    } catch (err){
-        res.sendStatus(599);
-    }
 })

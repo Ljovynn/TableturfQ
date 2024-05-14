@@ -1,5 +1,3 @@
-import express from 'express';
-import { Match } from '../public/constants/matchData.js';
 import { FindMatch } from '../matchManager.js';
 
 import { GetChatMessages, GetMatch, GetMatchGames, GetPlayerChatData, GetPlayerData, GetStageStrikes } from '../database.js';
@@ -18,7 +16,7 @@ export async function GetMatchInfo(req, res){
         if (!match){
             var matchData = await GetMatch(matchId);
             if (!matchData){
-                res.sendStatus(599); 
+                res.sendStatus(400); 
                 return;
             }
             var gameData = await GetMatchGames(matchId);
@@ -62,6 +60,6 @@ export async function GetMatchInfo(req, res){
     
         res.status(200).send(data);
     } catch (err){
-        res.sendStatus(599);
+        res.sendStatus(500);
     }
 };

@@ -143,12 +143,6 @@ export async function CreatePlayerWithDiscord(username, discordId, discordAccess
     return result[0].id;
 }
 
-export async function CreateChatMessage(matchId, messageOwnerId, content)
-{
-    const messageNumber = await GetChatCount(matchId) + 1;
-    await pool.query(`INSERT INTO games (match_id, message_number, owner_id, content) VALUES (?, ?, ?, ?)`, [matchId, messageNumber, messageOwnerId, content]);
-}
-
 export async function CreateSession(sessionId, expiresAt, data){
     await pool.query(`INSERT INTO sessions (id, expires_at, data) VALUES (?, ?, ?)`, [sessionId, expiresAt, data]);
 }
@@ -164,6 +158,13 @@ export async function SetMatchResult(match){
     for (let i = 1; i < match.games.length; i++){
         CreateCounterpickGameAndStrikes(match, i + 1);
     }
+
+    var chatData = [];
+    for (let i = 0; i < match.chat.length; i++){
+        chatData[i] = [match.id, i + 1, match.chat[i].ownerId, match.chat[i].content];
+    }
+
+    await pool.query(`INSERT INTO chat_messages (match_id, message_number, owner_id, content) VALUES ?, ?, ?, ?`, [chatData.map(msg => [msg[0], msg[1], msg[2], msg[3]])]);
 }
 
 export async function SetPlayerRating(playerId, rating, rd, vol){
