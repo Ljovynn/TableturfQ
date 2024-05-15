@@ -11,8 +11,12 @@ export async function GetMatchInfo(req, res){
     try {
         const matchId = req.body.matchId;
 
-        var match = FindMatch(matchId);
+        if (!matchId){
+            res.sendStatus(400); 
+            return;
+        }
 
+        var match = FindMatch(matchId);
         if (!match){
             var matchData = await GetMatch(matchId);
             if (!matchData){
@@ -35,7 +39,7 @@ export async function GetMatchInfo(req, res){
         players[1] = await GetPlayerData(match.player2_id);
 
         var playerPos = 0;
-        //assumes req.session.user is userid, not discordid
+
         if (req.session.user){
             if (req.session.user == players[0].id){
                 playerPos = 1;

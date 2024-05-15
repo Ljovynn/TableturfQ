@@ -20,16 +20,10 @@ export const stages = Object.freeze({
 export const matchStatuses = Object.freeze({ 
     stageSelection: 0,
     ingame: 1,
-    player1Win: 2, 
-    player2Win: 3, 
-    verifyingResults: 4,
-    dispute: 5
-});
-
-export const matchResults = Object.freeze({ 
-    noWinner: 0,
-    player1Win: 1,
-    player2Win: 2,
+    dispute: 2,
+    player1Win: 3, 
+    player2Win: 4,
+    noWinner: 5
 });
 
 //value = number of wins required
@@ -46,8 +40,10 @@ export const disputeResolveOptions = Object.freeze({
     revertLastChange: 1,
     restartMatch: 2,
     cancelMatch: 3,
-    player1Win: 4,
-    player2Win: 5
+    gameWinPlayer1: 4,
+    gameWinPlayer2: 5,
+    player1Win: 6,
+    player2Win: 7
 });
 
 export function MatchMode(rulesetData, queData){
@@ -60,15 +56,12 @@ export function QueData(readyTimer){
     this.readyTimer = readyTimer;
 }
 
-export function RulesetData(timer, timeAddOnPick, setLength, starterStagesArr, counterPickStagesArr, counterPickBans, DSR, verificationTimer){
-    this.timer = timer;
-    this.timeAddOnPick = timeAddOnPick;
+export function RulesetData(setLength, starterStagesArr, counterPickStagesArr, counterPickBans, DSR){
     this.setLength = setLength;
     this.starterStagesArr = starterStagesArr;
     this.counterPickStagesArr = counterPickStagesArr;
     this.counterPickBans = counterPickBans;
     this.dsr = DSR;
-    this.verificationTimer = verificationTimer;
 }
 
 const currentRankedStarters = [
@@ -98,11 +91,11 @@ const currentRankedCounterpicks = [
 ];
 
 const rankedQueData = new QueData(20);
-const rankedRulesetData = new RulesetData(300, 15, setLengths.bo5, currentRankedStarters, currentRankedCounterpicks, 3, true, 60)
+const rankedRulesetData = new RulesetData(setLengths.bo5, currentRankedStarters, currentRankedCounterpicks, 3, true)
 const rankedMatchMode = new MatchMode(rankedRulesetData, rankedQueData);
 
 const casualQueData = new QueData(0);
-const casualRulesetData = new RulesetData(0, 0, setLengths.unlimited, [], [], 0, false, 0)
+const casualRulesetData = new RulesetData(setLengths.unlimited, [], [], 0, false)
 const casualMatchMode = new MatchMode(casualRulesetData, casualQueData);
 
 export const matchModes = Object.freeze({ 
@@ -119,11 +112,12 @@ export function Game(){
     this.stage = stages.unpicked;
     this.strikes = [];
     this.winnerId = 0;
+    this.player1Confirmed = false;
+    this.player2Confirmed = false;
 }
 
 export function Player(id){
     this.id = id;
-    this.hasVerifiedResult = false;
     this.unpickableStagesArr = [];
 }
 

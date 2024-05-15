@@ -1,12 +1,11 @@
-import express from 'express';
 import axios from 'axios';
 import url from 'url';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import path from 'path';
 
-import {GetPlayerByDiscordId, CreatePlayerWithDiscord} from '../database.js';
-import {SerializeSession, DeserializeSession} from '../utils/session.js';
+import { GetPlayerByDiscordId, CreatePlayerWithDiscord } from '../database.js';
+import { SerializeSession } from '../utils/session.js';
 
 const apiRouteOauth2Token = "https://discord.com/api/v10/oauth2/token";
 const apiRouteUserInfo = "https://discord.com/api/v10/users/@me";
@@ -47,9 +46,9 @@ export async function AuthDiscordRedirect(req, res){
     
         if (response.data) {
 
-            const discordId = await StoreUserData(access_token, refresh_token);
+            const userId = await StoreUserData(access_token, refresh_token);
 
-            await SerializeSession(req, discordId);
+            await SerializeSession(req, userId);
     
             //refresh token
             /*const requestFormData = new url.URLSearchParams({
@@ -84,5 +83,5 @@ async function StoreUserData(accessToken, refreshToken){
     if (!userId){
         userId = await CreatePlayerWithDiscord(response.data.username, response.data.id, accessToken, refreshToken);
     }
-    return response.data.id;
+    return userId;
 }
