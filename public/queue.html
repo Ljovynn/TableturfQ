@@ -22,7 +22,7 @@
             <div id="casual-queue" class="queue-section">
                 <h4>Casual Queue</h4>
                 <p>There are currently 12387 in the queue and 6742 active matches</p>
-                <button id="join-casual-queue">Join Queue</button>
+                <p>Enter username: <input id="casual-username" type="text"></p><button id="join-casual-queue">Join Queue</button>
             </div>
             <div id="queue-matchmaking">
                 <p id="queue-timer">Matchmaking... 00:00:00</p>
@@ -32,4 +32,31 @@
             </div>
         </main>
     </body>
+    <script>
+        const joinCompetetive = document.getElementById('join-competetive-queue');
+        const joinCasual = document.getElementById('join-casual-queue');
+        const casualUsername = document.getElementById('casual-username');
+        const competetiveReady = document.getElementById('ready-for-match');
+
+        joinCompetetive.addEventListener('click', (e) => {
+            console.log('User has joined the competetive queue');
+
+            // Join the queue
+        });
+
+        joinCasual.addEventListener('click', (e) => {
+            console.log('User has joined the casual queue');
+            console.log('Submitted user name: ' + casualUsername.value);
+
+            // Check that there is a username entered
+            // Join the queue
+        });
+
+        competetiveReady.addEventListener('click', (e) => {
+            console.log('User is ready for competetive match.')
+
+            // Redirect to the game room once the game is created
+        });
+
+    </script>
 </html>
