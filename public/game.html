@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Tableturf Competetive Queue</title>
+    <link rel="stylesheet" href="./style.css">
+  </head>
+  <body class="body">
+    <main class="main">
+        <p id="loading-message">Loading...</p>
+        <div id="match-info">
+            <p id="players-list">Player 1 vs Player 2</p>
+            <p id="current-striker"></p>
+            <div id="ruleset">
+                <p id="poolcode">Pool: TBS</p>
+                <p id="set-length">Set Length: Best of 5 games</p>
+                <p id="timer-duration">Timer Duration: 50 seconds per turn</p>
+            </div>
+        </div>
+        <div id="player-content">
+            <div id="player1-info" class="player-info">
+              <p id="player1-name">Player 1 Name</p>
+              <span>Discord profile pic here I guess</span>
+              <p id="player1-score">Score: 0</p>
+              <button id="player1-victory-button" class="player-victory-button" value="player1">Mark as winner</button>
+            </div>
+            <div id="player2-info" class="player-info">
+              <p id="player2-name">Player 2 Name</p>
+              <span>Discord profile pic here I guess</span>
+              <p id="player2-score">Score: 0</p>
+              <button id="player2-victory-button" class="player-victory-button" value="player2">Mark as winner</button>
+            </div>
+        </div>
+        <div id="match-chat-content">
+            <div id="match-chat-log">
+                <p>Test message</p>
+            </div>
+            <div id="match-chat-inputs">
+                <input type="text" id="match-chat-input" /><button id="match-chat-button">Send</button>
+            </div>
+        </div>
+        <div id="stages-list" class="stages-list">
+            <div class="stage-row">
+                <div id="stage-main-street" class="stage starter-stage stage-selectable">
+                    <h3>Main Street</h3>
+                    <!--<img  src="/images/Main-Street-Icon.png" />-->
+                    <img  src="https://cdn.wikimg.net/en/splatoonwiki/images/thumb/1/1d/S3_Tableturf_Battle_Board_Main_Street.png/128px-S3_Tableturf_Battle_Board_Main_Street.png" />
+                </div>
+                <div id="stage-thunder-point" class="stage starter-stage stage-selectable">
+                    <h3>Thunder Point</h3>
+                    <!--<img  src="/images/Thunder-Point-Icon.png" />-->
+                    <img src="https://cdn.wikimg.net/en/splatoonwiki/images/thumb/d/d5/S3_Tableturf_Battle_Board_Thunder_Point.png/128px-S3_Tableturf_Battle_Board_Thunder_Point.png" />
+                </div>
+                <div id="stage-x-marks" class="stage stage-stricken">
+                    <h3>X Marks The Garden</h3>
+                    <!--<img src="/images/X-Marks-Icon.png" />-->
+                    <img src="https://cdn.wikimg.net/en/splatoonwiki/images/thumb/d/da/S3_Tableturf_Battle_Board_X_Marks_the_Garden.png/128px-S3_Tableturf_Battle_Board_X_Marks_the_Garden.png" />
+                </div>
+                <div id="stage-square-squared" class="stage starter-stage stage-selectable">
+                    <h3>Square Squared</h3>
+                    <!--<img  src="/images/Square-Squared-Icon.png" />-->
+                    <img src="https://cdn.wikimg.net/en/splatoonwiki/images/thumb/5/58/S3_Tableturf_Battle_Board_Square_Squared.png/128px-S3_Tableturf_Battle_Board_Square_Squared.png" />
+                </div>
+                <div id="stage-lakefront" class="stage starter-stage stage-selectable">
+                    <h3>Lakefront Property</h3>
+                    <!--<img  src="/images/Lakefront-Icon.png" />-->
+                    <img src="https://cdn.wikimg.net/en/splatoonwiki/images/thumb/e/ed/S3_Tableturf_Battle_Board_Lakefront_Property.png/128px-S3_Tableturf_Battle_Board_Lakefront_Property.png" />
+                </div>
+              </div>
+              <div class="stage-row">
+                    <div id="stage-gemini" class="stage stage-stricken">
+                    <h3>Double Gemini</h3>
+                    <!--<img  src="/images/Gemini-Icon.png" />-->
+                    <img src="https://cdn.wikimg.net/en/splatoonwiki/images/thumb/9/9e/S3_Tableturf_Battle_Board_Double_Gemini.png/128px-S3_Tableturf_Battle_Board_Double_Gemini.png" />
+                </div>
+                    <div id="stage-river-drift" class="stage starter-stage stage-selectable">
+                    <h3>River Drift</h3>
+                    <!--<img src="/images/River-Drift-Icon.png" />-->
+                    <img src="https://cdn.wikimg.net/en/splatoonwiki/images/thumb/d/d8/S3_Tableturf_Battle_Board_River_Drift.png/128px-S3_Tableturf_Battle_Board_River_Drift.png" />
+                </div>
+                    <div id="stage-box-seats" class="stage stage-stricken">
+                    <h3>Box Seats</h3>
+                    <!--<img src="/images/Box-Seats-Icon.png" />-->
+                    <img src="https://cdn.wikimg.net/en/splatoonwiki/images/thumb/f/f0/S3_Tableturf_Battle_Board_Box_Seats.png/128px-S3_Tableturf_Battle_Board_Box_Seats.png" />
+                </div>
+                <div id="stage-girder" class="stage stage-stricken">
+                    <h3>Girder For Battle</h3>
+                    <!--<img  src="/images/Girder-Icon.png" />-->
+                    <img src="https://cdn.wikimg.net/en/splatoonwiki/images/thumb/7/74/S3_Tableturf_Battle_Board_Girder_for_Battle.png/128px-S3_Tableturf_Battle_Board_Girder_for_Battle.png" />
+                </div>
+                <div id="stage-cracker-snap" class="stage stage-stricken">
+                    <h3>Cracker Snap</h3>
+                    <!--<img  src="/images/Cracker-Snap-Icon.png" />-->
+                    <img src="https://cdn.wikimg.net/en/splatoonwiki/images/thumb/4/42/S3_Tableturf_Battle_Board_Cracker_Snap.png/128px-S3_Tableturf_Battle_Board_Cracker_Snap.png" />
+                </div>
+              </div>
+              <div class="stage-row">
+                <div id="stage-mansion" class="stage stage-stricken">
+                    <h3>Mask Mansion</h3>
+                    <!--<img  src="/images/Mask-Mansion-Icon.png" />-->
+                    <img src="https://cdn.wikimg.net/en/splatoonwiki/images/thumb/d/d8/S3_Tableturf_Battle_Board_Mask_Mansion.png/128px-S3_Tableturf_Battle_Board_Mask_Mansion.png" />
+                </div>
+                <div id="stage-thicket" class="stage stage-stricken">
+                    <h3>Sticky Thicket</h3>
+                    <!--<img  src="/images/Sticky-Thicket-Icon.png" />-->
+                    <img src="https://cdn.wikimg.net/en/splatoonwiki/images/thumb/c/c0/S3_Tableturf_Battle_Board_Sticky_Thicket.png/128px-S3_Tableturf_Battle_Board_Sticky_Thicket.png" />
+                </div>
+                <div id="stage-pedal" class="stage stage-stricken">
+                    <h3>Pedal to the Metal</h3>
+                    <!--<img  src="/images/Pedal-Icon.png" />-->
+                    <img src="https://cdn.wikimg.net/en/splatoonwiki/images/thumb/8/8d/S3_Tableturf_Battle_Board_Pedal_to_the_Metal.png/128px-S3_Tableturf_Battle_Board_Pedal_to_the_Metal.png" />
+                </div>
+                <div id="stage-two-lane" class="stage stage-stricken">
+                    <h3>Two-Lane Splattop</h3>
+                    <!--<img  src="/images/Two-Lane-Icon.png" />-->
+                    <img src="https://cdn.wikimg.net/en/splatoonwiki/images/thumb/4/4f/S3_Tableturf_Battle_Board_Two-Lane_Splattop.png/128px-S3_Tableturf_Battle_Board_Two-Lane_Splattop.png" />
+                </div>
+                <div id="stage-over-the-line" class="stage stage-stricken">
+                    <h3>Over the Line</h3>
+                    <!--<img  src="/images/Over-the-Line-Icon.png" />-->
+                    <img src="https://cdn.wikimg.net/en/splatoonwiki/images/thumb/0/0e/S3_Tableturf_Battle_Board_Over_the_Line.png/128px-S3_Tableturf_Battle_Board_Over_the_Line.png" />
+                </div>
+              </div>
+            <p id="game-messages">Please wait for your opponent.</p>
+            <div id="strike-content">
+                <div id="strike-info"><span id="strike-amount">1</span> stage strike remaining.</div>
+                <div>(Alternate text for final selection)Please select the stage to play on</div>
+                <button id="confirm-map-selection">Confirm Strikes</button>
+            </div>
+        </div>
+        <div id="play-game">
+            <p id="game-info"></p>
+            <p></p>
+        </div>
+        <a id="requeue-button" href="/queue"><button>Queue Again</button></a>
+    </main>
+  </body>
+  <script>
+        const selectableStages = document.getElementsByClassName('stage-selectable');
+        const strikeButton = document.getElementById('confirm-map-selection');
+
+        // Stage selection event listener
+        for (let stage of selectableStages ) {
+            stage.addEventListener('click', (e) => {
+                stage.classList.toggle('stage-selected');
+
+                // Add/Remove stage from the list of strikes that will be sent off to the server when the confirm strikes button is selected
+            });
+        }
+        
+        strikeButton.addEventListener('click', (e) => {
+            var selectedStages = document.getElementsByClassName('stage-selected');
+            for (let stage of selectedStages ) {
+                // Change the classes to remove selected stage from eligible selections
+                stage.classList.remove('stage-selected');
+                stage.classList.remove('stage-selectable');
+                stage.classList.add('stage-stricken');
+
+                // Send off strike data to the server
+            } 
+        });
+    </script>
+</html>
