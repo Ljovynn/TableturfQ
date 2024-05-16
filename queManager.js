@@ -35,9 +35,8 @@ export function AddPlayerToQue(playerId, matchMode){
 }
 
 function TryAddPlayerToQue(que, playerId){
-    for (let i = 0; i < ques.length; i++){
-        if (ques[i].queArr.includes(playerId)) return false;
-    }
+    if (FindIfPlayerInQue(playerId)) return false;
+    
     if (FindIfPlayerInMatch(playerId)) return false;
 
     que.queArr.push(playerId);
@@ -67,6 +66,27 @@ function CheckRecentlyMatchedPlayesr(){
 
 }
 
+export function FindIfPlayerInQue(playerId){
+    for (let i = 0; i < ques.length; i++){
+        if (ques[i].queArr.includes(playerId)) return ques[i].matchMode;
+    }
+    return undefined;
+}
+
+export function RemovePlayerFromQue(playerId, matchMode){
+    for (let i = 0; i < ques.length; i++){
+        if (ques[i].matchMode != matchMode) continue;
+
+        for (let j = 0; j < ques[i].queArr.length; i++){
+            if (ques[i].queArr[j] == playerId){
+                ques[i].queArr.splice(j, 1);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 export function AddRecentlyMatchedPlayers(player1Id, player2Id, matchMode){
     recentlyMatchedPlayersList.push(new MatchedPlayers(player1Id, player2Id, matchMode));
 }
@@ -75,27 +95,20 @@ async function MakeMatch(player1Id, player2Id, matchMode){
     
     switch (matchMode){
         case matchModes.casual:
-            RemovePlayersFromQue(ques[0].queArr);
+            RemovePlayersFromQue(ques[0].queArr, player1Id, player2Id);
             await MakeNewMatch(player1Id, player2Id, matchMode)
             break;
         case matchModes.ranked:
-            RemovePlayersFromQue(ques[1].queArr);
+            RemovePlayersFromQue(ques[1].queArr, player1Id, player2Id);
             matchingPlayersList.push(new MatchedPlayers(player1Id, player2Id, matchMode));
             break;
     }
 }
 
-function RemovePlayersFromQue(queArr){
-    for (let i = 0; i < queArr.length; i++){
+function RemovePlayersFromQue(queArr, player1Id, player2Id){
+    for (let i = queArr.le; i >= 0; i--){
         if (queArr[i] == player1Id || queArr[i] == player2Id) queArr.splice(i, 1);
     }
-}
-
-async function MatchReady(matchingPlayersIndex){
-    var matchingPlayers = matchingPlayersList[matchingPlayersIndex];
-    await MakeNewMatch(matchingPlayers.players[0], matchingPlayers.players[1], matchingPlayers.matchMode);
-
-    matchingPlayersList.splice(matchingPlayersIndex, 1);
 }
 
 export async function PlayerSentReady(playerId){

@@ -176,22 +176,19 @@ export async function PlayerSentGameWin(playerId, winnerId){
         match.players[winnerPos - 1].unpickableStagesArr.push(game.stage);
     }
 
-    if (game.winnerId == 0){
-        game.winnerId = winnerId;
-        if (playerPos == 1){
+    if (playerPos == 1){
             game.player1Confirmed = true;
         } else{
             game.player2Confirmed = true;
         }
 
-    } else if (game.winnerId == winnerId){
-        if (playerPos == 1){
-            game.player1Confirmed = true;
-        } else{
-            game.player2Confirmed = true;
-        }
-    } else{
-        //dispute
+    if (game.winnerId == 0){
+        game.winnerId = winnerId;
+    } else if (game.winnerId != winnerId){
+        game.player1Confirmed = false;
+        game.player2Confirmed = false;
+
+        //TODO: dispute
     }
 
     //check game verified

@@ -10,8 +10,6 @@ import path from 'path';
 
 import { DeserializeSession } from "./utils/session.js";
 
-//const { request } = require("http");
-
 dotenv.config();
 
 const website_url = process.env.URL;
@@ -60,13 +58,13 @@ app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 
 import {AuthDiscordRedirect} from './routes/auth.js';
-import {GetMatchInfo} from './routes/matchRequests.js';
+import {GetMatchInfo} from './routes/match.js';
 
 //auth
 app.get('/api/auth/discord/redirect', AuthDiscordRedirect);
 
-//match requests
-app.get("/MatchRequests/GetMatchInfo", GetMatchInfo);
+//match
+app.get("/GetMatchInfo", GetMatchInfo);
 
 
 app.get("/testing", async (req, res) => {
