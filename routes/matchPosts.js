@@ -4,13 +4,13 @@ import { PlayerSentStageStrikes, PlayerSentStagePick, PlayerSentGameWin, PlayerS
 //stages
 export function PostStageStrikes(req, res){
     try {
-        const playerId = req.session.user;
+        const userId = req.session.user;
         const stages = req.body.stages;
 
         if (!CheckUserDefined(req, res)) return;
         if (!CheckIfArray(stages, res)) return;
 
-        if (PlayerSentStageStrikes(playerId, stages)){
+        if (PlayerSentStageStrikes(userId, stages)){
             res.sendStatus(201);
             return;
         }
@@ -23,13 +23,13 @@ export function PostStageStrikes(req, res){
 //stage
 export function PostStagePick(req, res){
     try {
-        const playerId = req.session.user;
+        const userId = req.session.user;
         const stage = req.body.stage;
 
         if (!CheckUserDefined(req, res)) return;
         if (!CheckVariableDefined(stage, res)) return;
 
-        if (PlayerSentStagePick(playerId, stage)){
+        if (PlayerSentStagePick(userId, stage)){
             res.sendStatus(201);
             return;
         }
@@ -42,13 +42,13 @@ export function PostStagePick(req, res){
 //winnerId
 export async function PostGameWin(req, res){
     try {
-        const playerId = req.session.user;
+        const userId = req.session.user;
         const winnerId = req.body.winnerId;
 
         if (!CheckUserDefined(req, res)) return;
         if (!CheckVariableDefined(winnerId, res)) return;
 
-        if (await PlayerSentGameWin(playerId, winnerId)){
+        if (await PlayerSentGameWin(userId, winnerId)){
             res.sendStatus(201);
             return;
         }
@@ -75,13 +75,13 @@ export async function PostCasualMatchEnd(req, res){
 //message
 export function PostChatMessage(req, res){
     try {
-        const playerId = req.session.user;
+        const userId = req.session.user;
         const message = req.body.message;
 
         if (!CheckUserDefined(req, res)) return;
         if (!CheckIfString(message, res)) return;
 
-        if (PlayerSentChatMessage(playerId, message)){
+        if (PlayerSentChatMessage(userId, message)){
             res.sendStatus(201);
             return;
         }

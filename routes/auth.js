@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import path from 'path';
 
-import { GetPlayerByDiscordId, CreatePlayerWithDiscord } from '../database.js';
+import { GetUserByDiscordId, CreateUserWithDiscord } from '../database.js';
 import { SerializeSession } from '../utils/session.js';
 
 const apiRouteOauth2Token = "https://discord.com/api/v10/oauth2/token";
@@ -79,9 +79,9 @@ async function StoreUserData(accessToken, refreshToken){
 
     console.log(response.data);
 
-    var userId = await GetPlayerByDiscordId(response.data.id);
+    var userId = await GetUserByDiscordId(response.data.id);
     if (!userId){
-        userId = await CreatePlayerWithDiscord(response.data.username, response.data.id, accessToken, refreshToken);
+        userId = await CreateUserWithDiscord(response.data.username, response.data.id, accessToken, refreshToken);
     }
     return userId;
 }

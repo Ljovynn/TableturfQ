@@ -1,6 +1,6 @@
 import { FindMatch } from '../matchManager.js';
 
-import { GetChatMessages, GetMatch, GetMatchGames, GetPlayerChatData, GetPlayerData, GetStageStrikes } from '../database.js';
+import { GetChatMessages, GetMatch, GetMatchGames, GetUserChatData, GetUserData, GetStageStrikes } from '../database.js';
 import { ConvertDBMatchToMatch } from '../utils/matchUtils.js';
 import { userRoles } from '../public/constants/userData.js';
 
@@ -14,7 +14,7 @@ export async function GetMatchInfo(req, res){
 
         var user;
         if (req.session && req.session.user){
-            user = GetPlayerData(req.session)
+            user = GetUserData(req.session)
         } else{
             res.sendStatus(401);
         }
@@ -47,8 +47,8 @@ export async function GetMatchInfo(req, res){
         }
 
         var players = []
-        players[0] = await GetPlayerData(match.player1_id);
-        players[1] = await GetPlayerData(match.player2_id);
+        players[0] = await GetUserData(match.player1_id);
+        players[1] = await GetUserData(match.player2_id);
 
         //check if user has access
         if (matchHidden){
@@ -70,7 +70,7 @@ export async function GetMatchInfo(req, res){
             if (othersInChatIds[i] == players[0].id || othersInChatIds[i] == players[1].id) othersInChatIds.splice(i, 1);
         }
 
-        var othersInChat = await GetPlayerChatData(othersInChatIds);
+        var othersInChat = await GetUserChatData(othersInChatIds);
 
         var data = {
             "user": user,

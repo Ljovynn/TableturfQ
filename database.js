@@ -18,54 +18,54 @@ export async function GetMatch(matchId){
     return rows[0];
 }
 
-export async function GetPlayer(playerId){
-    const [rows] = await pool.query(`SELECT * FROM players WHERE id = ?`, [playerId]);
+export async function GetUser(userId){
+    const [rows] = await pool.query(`SELECT * FROM users WHERE id = ?`, [userId]);
     return rows[0];
 }
 
-export async function GetPlayerByDiscordId(discordId){
-    const [rows] = await pool.query(`SELECT * FROM players WHERE discord_id = ?`, [discordId]);
+export async function GetUserByDiscordId(discordId){
+    const [rows] = await pool.query(`SELECT * FROM users WHERE discord_id = ?`, [discordId]);
     if (rows[0]){
-        console.log("databse did find player with discord id " + discordId);
+        console.log("databse did find user with discord id " + discordId);
         return rows[0].id;
     } else {
-        console.log("databse did not find player with discord id " + discordId);
+        console.log("databse did not find user with discord id " + discordId);
         return null;
     }
 }
 
-export async function GetPlayerLoginData(playerId){
-    const [rows] = await pool.query(`SELECT discord_verified, discord_access_token, discord_refresh_token FROM players WHERE id = ?`, [playerId]);
+export async function GetUserLoginData(userId){
+    const [rows] = await pool.query(`SELECT discord_verified, discord_access_token, discord_refresh_token FROM users WHERE id = ?`, [userId]);
     return rows[0];
 }
 
-export async function GetPlayerData(playerId){
-    const [rows] = await pool.query(`SELECT id, username, role, g2_rating, discord_verified, created_at FROM players WHERE id = ?`, [playerId]);
+export async function GetUserData(userId){
+    const [rows] = await pool.query(`SELECT id, username, role, g2_rating, discord_verified, created_at FROM users WHERE id = ?`, [userId]);
     return rows[0];
 }
 
-export async function GetPlayerRankData(playerId){
-    const [rows] = await pool.query(`SELECT id, g2_rating, g2_rd, g2_vol FROM players WHERE id = ?`, [playerId]);
+export async function GetUserRankData(userId){
+    const [rows] = await pool.query(`SELECT id, g2_rating, g2_rd, g2_vol FROM users WHERE id = ?`, [userId]);
     return rows[0];
 }
 
-export async function GetPlayerChatData(playerIdArr){
+export async function GetUserChatData(userIdArr){
     const rows = [];
-    for (let i = 0; i < playerIdArr.length; i++){
-        rows[i] = await pool.query(`SELECT id, username, role FROM players WHERE id = ?`, [playerIdArr[i]]);
+    for (let i = 0; i < userIdArr.length; i++){
+        rows[i] = await pool.query(`SELECT id, username, role FROM users WHERE id = ?`, [userIdArr[i]]);
     }
     return rows;
 }
 
-export async function GetPlayerMatchHistory(playerId)
+export async function GetUserMatchHistory(userId)
 {
-    const [rows] = await pool.query(`SELECT * FROM matches WHERE player1_id = ? OR player2_id = ? ORDER BY id DESC`, [playerId, playerId]);
+    const [rows] = await pool.query(`SELECT * FROM matches WHERE player1_id = ? OR player2_id = ? ORDER BY id DESC`, [userId, userId]);
     return rows;
 }
 
-export async function GetPlayerMatchCount(playerId)
+export async function GetUserMatchCount(userId)
 {
-    const [count] = await pool.query(`SELECT COUNT(*) AS matchCount FROM matches WHERE player1_id = ? OR player2_id = ?`, [playerId, playerId]);
+    const [count] = await pool.query(`SELECT COUNT(*) AS matchCount FROM matches WHERE player1_id = ? OR player2_id = ?`, [userId, userId]);
     return count[0].matchCount;
 }
 
@@ -131,14 +131,14 @@ async function CreateCounterpickGameAndStrikes(match, gameNumber){
     await pool.query(`INSERT INTO stage_strikes (game_id, stage, strike_owner) VALUES ?`, [data.map(strike => [strike[0], strike[1], strike[2]])]);
 }
 
-export async function CreatePlayer(username)
+export async function CreateUser(username)
 {
-    const result = await pool.query(`INSERT INTO players (username) VALUES (?)`, [username]);
+    const result = await pool.query(`INSERT INTO users (username) VALUES (?)`, [username]);
     return result[0].id;
 }
 
-export async function CreatePlayerWithDiscord(username, discordId, discordAccessToken, discordRefreshToken){
-    const result = await pool.query(`INSERT INTO players (username, role, discord_id, discord_access_token, discord_refresh_token) VALUES (?, ?, ?, ?, ?)`,
+export async function CreateUserWithDiscord(username, discordId, discordAccessToken, discordRefreshToken){
+    const result = await pool.query(`INSERT INTO users (username, role, discord_id, discord_access_token, discord_refresh_token) VALUES (?, ?, ?, ?, ?)`,
     [username, userRoles.verified, discordId, discordAccessToken, discordRefreshToken]);
     return result[0].id;
 }
@@ -167,16 +167,16 @@ export async function SetMatchResult(match){
     await pool.query(`INSERT INTO chat_messages (match_id, message_number, owner_id, content) VALUES ?, ?, ?, ?`, [chatData.map(msg => [msg[0], msg[1], msg[2], msg[3]])]);
 }
 
-export async function SetPlayerRating(playerId, rating, rd, vol){
-    await pool.query(`UPDATE players SET g2_rating = ?, g2_rd = ?, g2_vol = ? WHERE id = ?`, [rating, rd, vol, playerId]);
+export async function SetUserRating(userId, rating, rd, vol){
+    await pool.query(`UPDATE users SET g2_rating = ?, g2_rd = ?, g2_vol = ? WHERE id = ?`, [rating, rd, vol, userId]);
 }
 
-export async function SetPlayerDiscord(playerId, discordId, discordAccessToken, discordRefreshToken){
-    await pool.query(`UPDATE players SET discord_id = ?, discord_access_token = ?, discord_refresh_token = ? WHERE id = ?`, [discordId, discordAccessToken, discordRefreshToken, playerId]);
+export async function SetUserDiscord(userId, discordId, discordAccessToken, discordRefreshToken){
+    await pool.query(`UPDATE users SET discord_id = ?, discord_access_token = ?, discord_refresh_token = ? WHERE id = ?`, [discordId, discordAccessToken, discordRefreshToken, userId]);
 }
 
-export async function SetPlayerBan(playerId, banned){
-    await pool.query(`UPDATE players SET banned = ? WHERE id = ?`, [banned, playerId]);
+export async function SetUserBan(userId, banned){
+    await pool.query(`UPDATE users SET banned = ? WHERE id = ?`, [banned, userId]);
 }
 
 //delete
