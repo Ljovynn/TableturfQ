@@ -2,22 +2,34 @@ import { FindMatch } from '../matchManager.js';
 
 import { GetChatMessages, GetMatch, GetMatchGames, GetPlayerChatData, GetPlayerData, GetStageStrikes } from '../database.js';
 import { ConvertDBMatchToMatch } from '../utils/matchUtils.js';
+import { userRoles } from '../public/constants/userData.js';
 
 //req: match id
-//res: match object, players, your player pos, other users in chat
+//res: user, match object, players, other users in chat
 
 //TODO: chat info
 export async function GetMatchInfo(req, res){
     try {
         const matchId = req.body.matchId;
 
+        var user;
+        if (req.session && req.session.user){
+            user = GetPlayerData(req.session)
+        } else{
+            res.sendStatus(401);
+        }
+
         if (!matchId){
             res.sendStatus(400); 
             return;
         }
 
+        var matchHidden = true;
+
         var match = FindMatch(matchId);
         if (!match){
+            matchHidden = false;
+
             var matchData = await GetMatch(matchId);
             if (!matchData){
                 res.sendStatus(400); 
@@ -38,13 +50,13 @@ export async function GetMatchInfo(req, res){
         players[0] = await GetPlayerData(match.player1_id);
         players[1] = await GetPlayerData(match.player2_id);
 
-        var playerPos = 0;
-
-        if (req.session.user){
-            if (req.session.user == players[0].id){
-                playerPos = 1;
-            } else if (req.session.user == players[1].id){
-                playerPos = 2;
+        //check if user has access
+        if (matchHidden){
+            if (user.id != players[0].id && user.id != players[1].id){
+                if (user.role != userRoles.mod){
+                    res.sendStatus(403);
+                    return;
+                }
             }
         }
 
@@ -60,7 +72,12 @@ export async function GetMatchInfo(req, res){
 
         var othersInChat = await GetPlayerChatData(othersInChatIds);
 
-        var data = [match, players, playerPos, othersInChat];
+        var data = {
+            "user": user,
+            "match": match,
+            "players": players,
+            "othersInChat": othersInChat
+        };
     
         res.status(200).send(data);
     } catch (err){

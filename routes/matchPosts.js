@@ -4,19 +4,11 @@ import { PlayerSentStageStrikes, PlayerSentStagePick, PlayerSentGameWin, PlayerS
 //stages
 export function PostStageStrikes(req, res){
     try {
-
         const playerId = req.session.user;
         const stages = req.body.stages;
 
-        if (!playerId){
-            res.sendStatus(401);
-            return;
-        }
-
-        if (!Array.isArray(stages)){
-            res.sendStatus(400);
-            return;
-        }
+        if (!CheckUserDefined(req, res)) return;
+        if (!CheckIfArray(stages, res)) return;
 
         if (PlayerSentStageStrikes(playerId, stages)){
             res.sendStatus(201);
@@ -34,7 +26,8 @@ export function PostStagePick(req, res){
         const playerId = req.session.user;
         const stage = req.body.stage;
 
-        if (!CheckPlayerAndVariableDefined(playerId, stage, res)) return;
+        if (!CheckUserDefined(req, res)) return;
+        if (!CheckVariableDefined(stage, res)) return;
 
         if (PlayerSentStagePick(playerId, stage)){
             res.sendStatus(201);
@@ -47,14 +40,15 @@ export function PostStagePick(req, res){
 }
 
 //winnerId
-export function PostGameWin(req, res){
+export async function PostGameWin(req, res){
     try {
         const playerId = req.session.user;
         const winnerId = req.body.winnerId;
 
-        if (!CheckPlayerAndVariableDefined(playerId, winnerId, res)) return;
+        if (!CheckUserDefined(req, res)) return;
+        if (!CheckVariableDefined(winnerId, res)) return;
 
-        if (PlayerSentGameWin(playerId, winnerId)){
+        if (await PlayerSentGameWin(playerId, winnerId)){
             res.sendStatus(201);
             return;
         }
@@ -66,12 +60,7 @@ export function PostGameWin(req, res){
 
 export async function PostCasualMatchEnd(req, res){
     try {
-        const playerId = req.session.user;
-
-        if (!playerId){
-            res.sendStatus(401);
-            return;
-        }
+        if (!CheckUserDefined(req, res)) return;
 
         if (await PlayerSentCasualMatchEnd(playerId)){
             res.sendStatus(201);
@@ -89,11 +78,8 @@ export function PostChatMessage(req, res){
         const playerId = req.session.user;
         const message = req.body.message;
 
-        if (!CheckPlayerAndVariableDefined(playerId, message, res)) return;
-
-        if (typeof(message) != "string"){
-            res.sendStatus(400);
-        }
+        if (!CheckUserDefined(req, res)) return;
+        if (!CheckIfString(message, res)) return;
 
         if (PlayerSentChatMessage(playerId, message)){
             res.sendStatus(201);
@@ -105,11 +91,32 @@ export function PostChatMessage(req, res){
     }
 }
 
-function CheckPlayerAndVariableDefined(playerId, variable, res){
-    if (!playerId){
+function CheckUserDefined(req, res){
+    if (!req.session || !req.session.user){
         res.sendStatus(401);
         return false;
-    } else if (!variable){
+    }
+    return true;
+}
+
+function CheckVariableDefined(variable, res){
+    if (!variable){
+        res.sendStatus(400);
+        return false;
+    }
+    return true;
+}
+
+function CheckIfArray(arr, res){
+    if (!Array.isArray(arr)){
+        res.sendStatus(400);
+        return false;
+    }
+    return true;
+}
+
+function CheckIfString(str, res){
+    if (typeof(str) != "string"){
         res.sendStatus(400);
         return false;
     }
