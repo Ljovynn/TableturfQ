@@ -6,7 +6,7 @@ header {
 }
 
 html {
-    background-image: linear-gradient(45deg, rgba(52.2,47.5,76.1,1), rgba(87.5,78.8,19.8,1));
+    background-image: linear-gradient(45deg, rgba(52.9,48.6,76.1,1), rgba(85.1,77.3,27.8,1));
     background-repeat: no-repeat;
     background-size: 100% 100%;
     min-height: 100%;
@@ -64,13 +64,27 @@ h3 {
     height: 100px;
     background: white;
     padding: 5px;
+    overflow-y: scroll;
 }
 
-#match-chat-log p {
+.match-chat-message {
     text-align: left;
     text-shadow: none;
     color: black;
     margin: 0;
+}
+
+.match-chat-player {
+    text-align: left;
+    text-shadow: none;
+}
+
+.match-chat-current-player {
+    color: orange;
+}
+
+.match-chat-opponent-player {
+    color: black;
 }
 
 .stage {
@@ -120,4 +134,83 @@ h3 {
 
 #strike-content, #map-select {
     margin: 10px 0;
+}
+
+/**** USER PROFILE ****/
+
+#user-info-section {
+    display: inline-block;
+    width: 50%;
+    margin: auto;
+}
+
+#user-profile-picture {
+    width: 150px;
+    border-radius: 50%;
+}
+
+#user-match-info {
+    display: inline-block;
+    width: 50%;
+    margin: auto;
+}
+
+#user-rank-info {
+    display: block;
+}
+
+#user-match-history {
+    display: block;
+    width: 80%;
+    margin: auto;
+    outline: 2px solid black;
+}
+
+.match-row {
+    display: flex;
+    outline: 1px solid black;
+}
+
+.match-row div {
+    width: 100%;
+    padding: 10px 5px;
+}
+
+.rating-positive {
+    color: green;
+}
+
+.rating-negative {
+    color: red;
+}
+
+/**** LEADERBOARD STYLES ****/
+
+#leader-board-options {
+    margin: 10px 10px 20px 10px;
+}
+
+.leader-board-options-section {
+    margin: 10px 5px;
+}
+
+#leader-board-filter-label {
+    display: inline-block;
+}
+
+#leader-board {
+    display: block;
+    width: 50%;
+    margin: auto;
+    outline: 2px solid black;
+}
+
+.leader-board-row {
+    display: flex;
+    outline: 1px solid black;
+}
+
+.leader-board-row div {
+    width: 100%;
+    padding: 10px 5px;
 }

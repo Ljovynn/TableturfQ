@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <meta name="title" property="og:title" content="TableturfQ"/>
+		<meta name="description" property="og:description" content="Tableturf Matchmaking!"/>
+        <title>TableturfQ</title>
+        <link rel="stylesheet" href="./style.css">
+    </head>
+    <body class="body">
+        <header>
+            <h1>TableturfQ Leaderboard</h1>
+        </header>
+        <main class="main">
+            <div id="leader-board-options">
+                <div class="leader-board-options-section">
+                    <input id="leader-board-search" type="text" placeholder="Search for a player" />
+                    <input id="leader-board-search-button" type="button" value="Search" />
+                </div>
+                <div class="leader-board-options-section">
+                    <div id="leader-board-filter-label">Players per page</div>
+                    <select id="leader-board-page-amount">
+                        <option value="10">10</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                        <option value="1000">1000</option>
+                    </select>
+                </div>
+            </div>
+            <div id="leader-board">
+                <div class="leader-board-row">
+                    <div class="leader-board-placement">#</div>
+                    <div class="leader-board-name">Player Name</div>
+                    <div class="leader-board-ELO">ELO Rating</div>
+                    <div class="leader-board-rank">Rank</div>
+                </div>
+                <div class="leader-board-row">
+                    <div class="leader-board-placement">#1</div>
+                    <div class="leader-board-name">Ljovynn</div>
+                    <div class="leader-board-ELO">2165</div>
+                    <div class="leader-board-rank">Legendary Duelist</div>
+                </div>
+                <div class="leader-board-row">
+                    <div class="leader-board-placement">#2</div>
+                    <div class="leader-board-name">Jackshainy</div>
+                    <div class="leader-board-ELO">2035</div>
+                    <div class="leader-board-rank">Legendary Duelist</div>
+                </div>
+                <div class="leader-board-row">
+                    <div class="leader-board-placement">#3</div>
+                    <div class="leader-board-name">AaronIsP1</div>
+                    <div class="leader-board-ELO">2014</div>
+                    <div class="leader-board-rank">Legendary Duelist</div>
+                </div>
+            </div>
+        </main>
+    </body>
+    <script>
+        const searchInput = document.getElementById('leader-board-search');
+        const searchButton = document.getElementById('leader-board-search-button');
+        const pageFilter = document.getElementById('leader-board-page-amount');
+
+        searchButton.addEventListener('click', (e) => {
+            console.log('User is searching for the player: ' + searchInput.value);
+        });
+
+        pageFilter.addEventListener('change', (e) => {
+            console.log('Changing the listed amount to ' + pageFilter.value);
+        });
+    </script>
+</html>

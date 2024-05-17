@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <meta name="title" property="og:title" content="TableturfQ"/>
+		<meta name="description" property="og:description" content="Tableturf Matchmaking!"/>
+        <title>TableturfQ</title>
+        <link rel="stylesheet" href="./style.css">
+        <link rel="stylesheet" href="./assets/fontawesome-free-6.5.2-web/css/all.min.css">
+    </head>
+    <body class="body">
+        <header>
+            <h1>Profile</h1>
+        </header>
+        <main class="main">
+            <div id="user-info-section">
+                <img id="user-profile-picture" src="https://www.spitzer.caltech.edu/system/avm_images/binaries/1746/jpg_original/ssc2007-03a1.jpg?1603781845"/>
+                <p id="user-in-game-name">zeb&nbsp;<span id="user-profile-edit-name"><i class="fa-solid fa-pencil"></i></span></p>
+                <p id="user-discord-name"><i class="fa-brands fa-discord"></i>&nbsp;mcondave</p>
+            </div>
+            <div id="user-match-info">
+                <div id="user-rank-info">
+                    <p id="user-rank-elo">ELO Rating: 1679</p>
+                    <p id="user-rank">User Rank: Diamond</p>
+                </div>
+                <div id="user-match-history">
+                    <div class="match-row">
+                        <div class="match-date">Match Date</div>
+                        <div class="matchup">Matchup</div>
+                        <div class="match-outcome">Outcome</div>
+                        <div class="rating-change">Rating Change</div>
+                        <div class="in-dispute">In Dispute?</div>
+                    </div>
+                    <div class="match-row">
+                        <div class="match-date">May 17th, 2024</div>
+                        <div class="matchup">zeb vs Ljovynn</div>
+                        <div class="match-outcome">W</div>
+                        <div class="rating-change rating-positive">+47.5</div>
+                        <div class="in-dispute">No</div>
+                    </div>
+                    <div class="match-row">
+                        <div class="match-date">May 17th, 2024</div>
+                        <div class="matchup">zeb vs Jackshainy</div>
+                        <div class="match-outcome">L</div>
+                        <div class="rating-change rating-negative">-36.2</div>
+                        <div class="in-dispute">No</div>
+                    </div>
+                    <div class="match-row">
+                        <div class="match-date">May 17th, 2024</div>
+                        <div class="matchup">zeb vs AaronIsP1</div>
+                        <div class="match-outcome">L</div>
+                        <div class="rating-change rating-negative">-33.8</div>
+                        <div class="in-dispute">No</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </body>
+    <script>
+        const editDisplayName = document.getElementById('user-profile-edit-name');
+
+        editDisplayName.addEventListener('click', (e) => {
+            console.log('User clicked the display name edit button');
+        });
+    </script>
+</html>
