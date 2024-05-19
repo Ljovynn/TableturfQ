@@ -9,6 +9,8 @@ import { userRoles } from '../public/constants/userData.js';
 
 import { CheckIfArray, CheckIfString, CheckUserDefined, CheckVariableDefined } from '../utils/checkDefined.js';
 
+import { GetCurrentUser } from '../utils/userUtils.js';
+
 //Posts
 
 //stages
@@ -110,12 +112,7 @@ export async function GetMatchInfo(req, res){
     try {
         const matchId = req.body.matchId;
 
-        var user;
-        if (req.session && req.session.user){
-            user = GetUserData(req.session)
-        } else{
-            res.sendStatus(401);
-        }
+        var user = GetCurrentUser(req);
 
         if (!matchId){
             res.sendStatus(400); 

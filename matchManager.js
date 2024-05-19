@@ -2,7 +2,7 @@ import {stages, matchStatuses, matchModes, Game, Match, ChatMessage} from "./pub
 import { ApplyMatchEloResults } from "./glicko2Manager.js";
 import { CreateMatch, SetMatchResult } from "./database.js";
 import { FindPlayerPosInMatch } from "./utils/matchUtils.js";
-import { AddRecentlyMatchedPlayers } from "./matchmakingManager.js";
+import { AddRecentlyMatchedPlayers } from "./queManager.js";
 
 var matches = [];
 
@@ -22,7 +22,15 @@ PlayerSentGameWin(2, 1);
 console.log(JSON.stringify(match));*/
 
 export async function MakeNewMatch(player1Id, player2Id, matchMode){
-    //TODO: random player pos
+
+    //randomize player positions
+    var tempName;
+    let r = Math.floor(Math.random() * 2);
+    if (r == 1){
+        let tempName = player1Id;
+        player1Id = player2Id;
+        player2Id = tempName;
+    }
 
     var isRanked = false;
     if (matchMode == matchModes.ranked){
@@ -30,7 +38,7 @@ export async function MakeNewMatch(player1Id, player2Id, matchMode){
     }
 
     const matchId = await CreateMatch(player1Id, player2Id, isRanked);
-    if (!matchId) return false;
+    if (!matchId) return undefined;
 
     var match = new Match(matchId, player1Id, player2Id, matchMode);
     matches.push(match);

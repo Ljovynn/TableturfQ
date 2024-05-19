@@ -1,4 +1,4 @@
-import { matchModes } from "../public/constants/matchData";
+import { matchModes } from "../public/constants/matchData.js";
 
 export function CheckUserDefined(req, res){
     if (!req.session || !req.session.user){

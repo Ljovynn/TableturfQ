@@ -46,11 +46,6 @@ export const disputeResolveOptions = Object.freeze({
     player2Win: 7
 });
 
-export function MatchMode(rulesetData, queData){
-    this.rulesetData = rulesetData;
-    this.queData = queData;
-}
-
 //add que variables here
 export function QueData(readyTimer){
     this.readyTimer = readyTimer;
@@ -62,6 +57,11 @@ export function RulesetData(setLength, starterStagesArr, counterPickStagesArr, c
     this.counterPickStagesArr = counterPickStagesArr;
     this.counterPickBans = counterPickBans;
     this.dsr = DSR;
+}
+
+export function MatchMode(rulesetData, queData){
+    this.rulesetData = rulesetData;
+    this.queData = queData;
 }
 
 const currentRankedStarters = [

@@ -1,7 +1,8 @@
 import mysql from 'mysql2';
 import dotenv from 'dotenv';
 import { userRoles } from './public/constants/userData.js';
-import { ConvertMatchStatusToResult, FindPlayerPosInMatch } from './utils/matchUtils.js';
+import { FindPlayerPosInMatch } from './utils/matchUtils.js';
+import { json } from 'express';
 
 dotenv.config();
 
@@ -12,6 +13,13 @@ const pool = mysql.createPool({
     database: process.env.MYSQL_DATABASE
 }).promise()
 
+/*
+await GetUserByDiscordId(168290358470508544);
+var e = await GetUser(1);
+if (e){
+    console.log(JSON.stringify(e));
+}*/
+
 //Get
 export async function GetMatch(matchId){
     const [rows] = await pool.query(`SELECT * FROM matches WHERE id = ?`, [matchId]);
@@ -20,27 +28,31 @@ export async function GetMatch(matchId){
 
 export async function GetUser(userId){
     const [rows] = await pool.query(`SELECT * FROM users WHERE id = ?`, [userId]);
+    console.log("insert id: " + rows[0].insertId); 
+    console.log("id: " + rows[0].id); 
     return rows[0];
 }
 
 export async function GetUserByDiscordId(discordId){
     const [rows] = await pool.query(`SELECT * FROM users WHERE discord_id = ?`, [discordId]);
     if (rows[0]){
-        console.log("databse did find user with discord id " + discordId);
+        console.log("databse found user with discord id " + discordId);
+        console.log("insert id: " + rows[0].insertId); 
+        console.log("id: " + rows[0].id); 
         return rows[0].id;
     } else {
         console.log("databse did not find user with discord id " + discordId);
-        return null;
+        return undefined;
     }
 }
 
 export async function GetUserLoginData(userId){
-    const [rows] = await pool.query(`SELECT discord_verified, discord_access_token, discord_refresh_token FROM users WHERE id = ?`, [userId]);
+    const [rows] = await pool.query(`SELECT discord_id, discord_access_token, discord_refresh_token FROM users WHERE id = ?`, [userId]);
     return rows[0];
 }
 
 export async function GetUserData(userId){
-    const [rows] = await pool.query(`SELECT id, username, role, g2_rating, discord_verified, created_at FROM users WHERE id = ?`, [userId]);
+    const [rows] = await pool.query(`SELECT id, username, role, g2_rating, discord_id, created_at FROM users WHERE id = ?`, [userId]);
     return rows[0];
 }
 
@@ -52,7 +64,7 @@ export async function GetUserRankData(userId){
 export async function GetUserChatData(userIdArr){
     const rows = [];
     for (let i = 0; i < userIdArr.length; i++){
-        rows[i] = await pool.query(`SELECT id, username, role FROM users WHERE id = ?`, [userIdArr[i]]);
+        rows[i] = await pool.query(`SELECT id, username, role, discord_id FROM users WHERE id = ?`, [userIdArr[i]]);
     }
     return rows;
 }
@@ -150,7 +162,7 @@ export async function CreateSession(sessionId, expiresAt, data){
 //Update
 export async function SetMatchResult(match){
 
-    const matchResult = ConvertMatchStatusToResult(match.status);
+    const matchResult = match.status;
     await pool.query(`UPDATE matches SET result = ? WHERE id = ?`, [matchResult, match.id]);
 
     CreateFirstGameStrikes(match);

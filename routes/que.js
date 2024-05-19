@@ -1,7 +1,9 @@
-import { AddPlayerToQue, RemovePlayerFromQue, PlayerSentReady } from "../queManager";
+import { AddPlayerToQue, RemovePlayerFromQue, PlayerSentReady, FindIfPlayerInQue } from "../queManager";
 import { GetUserData } from "../database";
 
 import { CheckIfRealMatchMode, CheckUserDefined, CheckVariableDefined } from "../utils/checkDefined";
+
+import { GetCurrentUser } from "../utils/userUtils";
 
 //Posts
 
@@ -52,20 +54,47 @@ export function PostLeaveQue(req, res){
     }
 };
 
-export function PostPlayerReady(req, res){
+export async function PostPlayerReady(req, res){
     try {
         const userId = req.session.user;
 
         if (!CheckUserDefined(req, res)) return;
 
-        if (PlayerSentReady(userId)){
+        var match = await PlayerSentReady(userId);
+
+        if (await PlayerSentReady(userId)){
             res.sendStatus(201);
-            return;
+            return match;
         }
         res.sendStatus(403);
+        return undefined;
     } catch (err){
         res.sendStatus(500);
+        return undefined;
     }
 };
 
 //Requests
+
+//res: user, quedata
+//quedata: matchmode, time when que started
+export function GetUserQueData(req, res){
+    try {
+        var user = GetCurrentUser(req);
+        if (!user){
+            res.sendStatus(401);
+            return;
+        }
+
+        var queData = FindIfPlayerInQue(user.id);
+
+        var data = {
+            "user": user,
+            "queData": queData
+        }
+
+        res.status(200).send(data);
+    } catch (err){
+        res.sendStatus(500);
+    }
+}
