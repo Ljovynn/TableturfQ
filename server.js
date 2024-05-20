@@ -78,7 +78,7 @@ app.get("/GetMatchInfo", GetMatchInfo);
 
 //que
 app.post("/PlayerEnterQue", PostEnterQue);
-app.post("PlayerLeaveQue", PostLeaveQue);
+app.post("/PlayerLeaveQue", PostLeaveQue);
 
 app.post("/PlayerReady", async (req, res) => {
     //if match created send socket
