@@ -119,6 +119,7 @@ function CounterpickStrikingLogic(match, playerId, playerPos, stages){
     if (match.gamesArr[match.gamesArr.length - 2].winnerId != playerId) return false;
 
     var alreadySentStages = [];
+    //for each stage
     for (let i = 0; i < stages.length; i++){
         if (!stageList.includes(stages[i])) return false;
 

@@ -1,5 +1,6 @@
 import { matchModes } from "./public/constants/matchData.js";
 import { FindIfPlayerInMatch, MakeNewMatch } from "./matchManager.js";
+import { GetUserRankData } from "./database.js";
 
 const readyTimerGracePeriod = 1000 * 3;
 const alreadyMatchedPlayersTime = 1000 * 60 * 20;
@@ -9,9 +10,11 @@ function Que(matchMode){
     this.matchMode = matchMode;
 }
 
-function PlayerInQue(id){
+function PlayerInQue(id, baseSearchElo){
     this.id = id;
+    this.baseSearchElo = baseSearchElo;
     this.startedQue = Date.now();
+    this.eloSearchRange = 0;
 }
 
 function MatchmadePlayer(id){
@@ -35,35 +38,72 @@ var matchingPlayersList = [];
 //also uses MathedPlayers function
 var recentlyMatchedPlayersList = [];
 
-export function AddPlayerToQue(playerId, matchMode){
+export async function AddPlayerToQue(playerId, matchMode){
     for (let i = 0; i < ques.length; i++){
-        if (ques[i].matchMode == matchMode) return TryAddPlayerToQue(playerId);
+        if (ques[i].matchMode == matchMode) return await TryAddPlayerToQue(playerId);
     }
     return false;
 }
 
-function TryAddPlayerToQue(que, playerId){
+async function TryAddPlayerToQue(que, playerId){
     if (FindIfPlayerInQue(playerId)) return false;
     
     if (FindIfPlayerInMatch(playerId)) return false;
 
-    que.queArr.push(new PlayerInQue(playerId));
+    var playerRankData = await GetUserRankData(playerId);
+    if (!playerRankData || !playerRankData.g2_rating) return false;
+
+    var baseSearchElo = Math.max(playerRankData.g2_rating, que.matchMode.queData.minEloStart);
+    baseSearchElo = Math.min(playerRankData.g2_rating, que.matchMode.queData.maxEloStart);
+
+    que.queArr.push(new PlayerInQue(playerId, baseSearchElo));
     return true;
 }
 
-//main matchmaking algorithm. once every X seconds
-//X = currently undecided
+//main matchmaking algorithm. once every n seconds
 export async function MatchMakingTick(){
-    for (let i = 0; i < ques.length; i++){
-        QueTick(ques[i]);
-    }
     CheckMatchmadePlayers();
     CheckRecentlyMatchedPlayers();
+    
+    var result = [];
+    for (let i = 0; i < ques.length; i++){
+        var matchedPlayers = QueTick(ques[i]);
+        if (matchedPlayers) result.push(matchedPlayers);
+    }
+
+    return result;
 }
 
 //algorithm for any singular que
-async function QueTick(que, matchMode){
+//Finds only one match per tick per que rn
+async function QueTick(que){
+    //set all players search range
+    for (let i = 0; i < que.queArr.length; i++){
+        var secondsPlayerWaited = (Date.now() - que.queArr[i].startedQue) / 1000;
+        que.queArr[i].eloSearchRange = Math.min(que.matchMode.queData.baseEloRange + (secondsPlayerWaited * que.matchMode.queData.eloGrowthPerSecond), maxEloRange);
+    }
 
+    return FindPlayersToMatch(que);
+}
+
+function FindPlayersToMatch(que){
+    for (let i = 0; i < que.queArr.length - 1; i++){
+        for (let j = i + 1; j < queArr.length; j++){
+
+            //check if elo search ranges overlap
+            if (que.queArr[i].baseSearchElo - que.queArr[i].eloSearchRange > que.queArr[j].baseSearchElo + que.queArr[j].eloSearchRange) continue;
+            if (que.queArr[j].baseSearchElo - que.queArr[j].eloSearchRange > que.queArr[i].baseSearchElo + que.queArr[i].eloSearchRange) continue;
+
+            //check if players didn't match recently
+            var index = SearchMatchedPlayersList(recentlyMatchedPlayersList, que.queArr[i].id);
+            if (index != -1){
+                if (recentlyMatchedPlayersList[index].players[0] == que.queArr[j].id || recentlyMatchedPlayersList[index].players[1] == que.queArr[j].id) continue;
+            }
+
+            return [que.queArr[i].id, que.queArr[i].id];
+        }
+    }
+    return undefined;
 }
 
 //checks if timer has run out for any matchmade players
@@ -135,6 +175,12 @@ export function RemovePlayerFromQue(playerId, matchMode){
 }
 
 export function AddRecentlyMatchedPlayers(player1Id, player2Id, matchMode){
+    //delete older data
+    var index = SearchMatchedPlayersList(recentlyMatchedPlayersList, player1Id);
+    if (index != -1) recentlyMatchedPlayersList.splice(index, 1);
+    index = SearchMatchedPlayersList(recentlyMatchedPlayersList, player2Id);
+    if (index != -1) recentlyMatchedPlayersList.splice(index, 1);
+
     recentlyMatchedPlayersList.push(new MatchedPlayers(player1Id, player2Id, matchMode));
 }
 

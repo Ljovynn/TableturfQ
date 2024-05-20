@@ -25,7 +25,7 @@ export async function PostEnterQue(req, res){
             return;
         }
 
-        if (AddPlayerToQue(userId, matchMode)){
+        if (await AddPlayerToQue(userId, matchMode)){
             res.sendStatus(201);
             return;
         }

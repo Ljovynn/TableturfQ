@@ -47,8 +47,13 @@ export const disputeResolveOptions = Object.freeze({
 });
 
 //add que variables here
-export function QueData(readyTimer){
+export function QueData(readyTimer, eloGrowthPerSecond, baseEloRange, maxEloRange, minEloStart, maxEloStart){
     this.readyTimer = readyTimer;
+    this.eloGrowthPerSecond = eloGrowthPerSecond;
+    this.baseEloRange = baseEloRange;
+    this.maxEloRange = maxEloRange;
+    this.minEloStart = minEloStart;
+    this.maxEloStart = maxEloStart;
 }
 
 export function RulesetData(setLength, starterStagesArr, counterPickStagesArr, counterPickBans, DSR){
@@ -90,11 +95,11 @@ const currentRankedCounterpicks = [
     stages.overTheLine
 ];
 
-const rankedQueData = new QueData(20);
+const rankedQueData = new QueData(20, 1, 100, 500, 500, 2500);
 const rankedRulesetData = new RulesetData(setLengths.bo5, currentRankedStarters, currentRankedCounterpicks, 3, true)
 const rankedMatchMode = new MatchMode(rankedRulesetData, rankedQueData);
 
-const casualQueData = new QueData(0);
+const casualQueData = new QueData(0, 7, 300, 2000, 500, 2500);
 const casualRulesetData = new RulesetData(setLengths.unlimited, [], [], 0, false)
 const casualMatchMode = new MatchMode(casualRulesetData, casualQueData);
 

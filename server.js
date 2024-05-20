@@ -40,10 +40,13 @@ io.on("connection", socket => {
 
 server.listen(port, () => {
     console.log(`TableturfQ is up at port ${port}`);
-    queTickInterval = setInterval(() => {
-        MatchMakingTick(matchmakingTickInterval);
-    }, matchmakingTickInterval);
+    var queTickInterval = setInterval(RunQue, matchmakingTickInterval);
 });
+
+function RunQue(){
+    var matchedPlayersList = MatchMakingTick();
+    if (matchedPlayersList) io.to("queRoom").emit("matchesFound", matchedPlayersList);
+}
 
 app.use(
     session({
