@@ -16,7 +16,15 @@
         <main class="main">
             <div id="user-info-section">
                 <img id="user-profile-picture" src="https://www.spitzer.caltech.edu/system/avm_images/binaries/1746/jpg_original/ssc2007-03a1.jpg?1603781845"/>
-                <p id="user-in-game-name">zeb&nbsp;<span id="user-profile-edit-name"><i class="fa-solid fa-pencil"></i></span></p>
+                <p id="user-in-game-name">
+                    <span id="user-profile-edit-name"><i class="fa-solid fa-pencil"></i></span>
+                    &nbsp;zeb
+                </p>
+                <div id="user-profile-edit-name-form">
+                    <i id="user-profile-edit-close" class="fa-solid fa-x"></i>
+                    <input type="text" id="user-profile-name-input" />
+                    <input type="button" id="user-profile-name-submit" value="Edit Display name" />
+                </div>
                 <p id="user-discord-name"><i class="fa-brands fa-discord"></i>&nbsp;mcondave</p>
             </div>
             <div id="user-match-info">
@@ -57,11 +65,6 @@
             </div>
         </main>
     </body>
-    <script>
-        const editDisplayName = document.getElementById('user-profile-edit-name');
-
-        editDisplayName.addEventListener('click', (e) => {
-            console.log('User clicked the display name edit button');
-        });
-    </script>
+    <script type="text/javascript" src="./scripts/dataPOST.js"></script>
+    <script type="text/javascript" src="./scripts/profile.js"></script>
 </html>

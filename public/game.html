@@ -49,64 +49,64 @@
             </div>
         </div>
         <div id="stages-list" class="stages-list">
-                <div id="stage-main-street" class="stage starter-stage stage-selectable">
+                <div id="mainStreet" class="stage starter-stage stage-selectable">
                     <h3>Main Street</h3>
                     <img  src="./assets/images/Main-Street-Icon.png" />
                 </div>
-                <div id="stage-thunder-point" class="stage starter-stage stage-selectable">
+                <div id="thunderPoint" class="stage starter-stage stage-selectable">
                     <h3>Thunder Point</h3>
                     <img  src="./assets/images/Thunder-Point-Icon.png" />
                 </div>
-                <div id="stage-x-marks" class="stage stage-stricken">
+                <div id="xMarksTheGarden" class="stage stage-stricken">
                     <h3>X Marks The Garden</h3>
                     <img src="./assets/images/X-Marks-Icon.png" />
                 </div>
-                <div id="stage-square-squared" class="stage starter-stage stage-selectable">
+                <div id="squareSquared" class="stage starter-stage stage-selectable">
                     <h3>Square Squared</h3>
                     <img  src="./assets/images/Square-Squared-Icon.png" />
                 </div>
-                <div id="stage-lakefront" class="stage starter-stage stage-selectable">
+                <div id="lakefrontProperty" class="stage starter-stage stage-selectable">
                     <h3>Lakefront Property</h3>
                     <img  src="./assets/images/Lakefront-Icon.png" />
                 </div>
-                    <div id="stage-gemini" class="stage stage-stricken">
+                    <div id="doubleGemini" class="stage stage-stricken">
                     <h3>Double Gemini</h3>
                     <img  src="./assets/images/Double-Gemini-Icon.png" />
                 </div>
-                    <div id="stage-river-drift" class="stage starter-stage stage-selectable">
+                    <div id="riverDrift" class="stage starter-stage stage-selectable">
                     <h3>River Drift</h3>
                     <img src="./assets/images/River-Drift-Icon.png" />
                 </div>
-                    <div id="stage-box-seats" class="stage stage-stricken">
+                    <div id="boxSeats" class="stage stage-stricken">
                     <h3>Box Seats</h3>
                     <img src="./assets/images/Box-Seats-Icon.png" />
                 </div>
-                <div id="stage-girder" class="stage stage-stricken">
+                <div id="girderForBattle" class="stage stage-stricken">
                     <h3>Girder For Battle</h3>
                     <img  src="./assets/images/Girder-Icon.png" />
                 </div>
-                <div id="stage-cracker-snap" class="stage stage-stricken">
-                    <h3>Cracker Snap</h3>
-                    <img  src="./assets/images/Cracker-Snap-Icon.png" />
-                </div>
-
-                <div id="stage-mansion" class="stage stage-stricken">
+                <div id="maskMansion" class="stage stage-stricken">
                     <h3>Mask Mansion</h3>
                     <img  src="./assets/images/Mask-Mansion-Icon.png" />
                 </div>
-                <div id="stage-thicket" class="stage stage-stricken">
+
+                <div id="stickyThicket" class="stage stage-stricken">
                     <h3>Sticky Thicket</h3>
                     <img  src="./assets/images/Sticky-Thicket-Icon.png" />
                 </div>
-                <div id="stage-pedal" class="stage stage-stricken">
-                    <h3>Pedal to the Metal</h3>
-                    <img  src="./assets/images/Pedal-Icon.png" />
+                <div id="crackerSnap" class="stage stage-stricken">
+                    <h3>Cracker Snap</h3>
+                    <img  src="./assets/images/Cracker-Snap-Icon.png" />
                 </div>
-                <div id="stage-two-lane" class="stage stage-stricken">
+                <div id="twoLaneSplattop" class="stage stage-stricken">
                     <h3>Two-Lane Splattop</h3>
                     <img  src="./assets/images/Two-Lane-Icon.png" />
                 </div>
-                <div id="stage-over-the-line" class="stage stage-stricken">
+                <div id="pedalToTheMedal" class="stage stage-stricken">
+                    <h3>Pedal to the Metal</h3>
+                    <img  src="./assets/images/Pedal-Icon.png" />
+                </div>
+                <div id="overTheLine" class="stage stage-stricken">
                     <h3>Over the Line</h3>
                     <img  src="./assets/images/Over-the-Line-Icon.png" />
                 </div>
@@ -124,50 +124,6 @@
         <a id="requeue-button" href="/queue"><button>Queue Again</button></a>
     </main>
   </body>
-  <script>
-        // Create variables for all the elements we need to interact with
-        const selectableStages = document.getElementsByClassName('stage-selectable');
-        const strikeButton = document.getElementById('confirm-map-selection');
-        const victoryButtons = document.getElementsByClassName('stage-selectable');
-        const chatInput = document.getElementById('match-chat-input');
-        const chatSend = document.getElementById('match-chat-button');
-
-        // Set event listeners for interactable elements
-
-        // Stage selection event listener
-        for (let stage of selectableStages ) {
-            stage.addEventListener('click', (e) => {
-                stage.classList.toggle('stage-selected');
-
-                // Add/Remove stage from the list of strikes that will be sent off to the server when the confirm strikes button is selected
-            });
-        }
-
-        // Victory button click listener
-        for (let victoryButton of victoryButtons ) {
-            victoryButton.addEventListener('click', (e) => {
-                console.log('Marked victory for ' + victoryButton.value);
-                // Send off the victory mark event for the selected player and wait for the other player to submit the victor
-            });
-        }
-
-        // Chat send listener
-        chatSend.addEventListener('click', (e) => {
-            var chatMessage = chatInput.value;
-            console.log( 'Player is sending the message: ' + chatMessage );
-        });
-        
-        // Confirm strikes/Select map to play on listener
-        strikeButton.addEventListener('click', (e) => {
-            var selectedStages = document.getElementsByClassName('stage-selected');
-            for (let stage of selectedStages ) {
-                // Change the classes to remove selected stage from eligible selections
-                stage.classList.remove('stage-selected');
-                stage.classList.remove('stage-selectable');
-                stage.classList.add('stage-stricken');
-
-                // Send off strike data to the server
-            } 
-        });
-    </script>
+  <script type="text/javascript" src="./scripts/dataPOST.js"></script>
+  <script type="text/javascript" src="./scripts/game.js"></script>
 </html>
