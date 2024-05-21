@@ -1,6 +1,6 @@
 import { matchModes } from "./public/constants/matchData.js";
 import { FindIfPlayerInMatch, MakeNewMatch } from "./matchManager.js";
-import { GetUserRankData } from "./database.js";
+import { GetUserData, GetUserRankData } from "./database.js";
 
 const readyTimerGracePeriod = 1000 * 3;
 const alreadyMatchedPlayersTime = 1000 * 60 * 20;
@@ -39,6 +39,13 @@ var matchingPlayersList = [];
 var recentlyMatchedPlayersList = [];
 
 export async function AddPlayerToQue(playerId, matchMode){
+    if (matchMode == matchModes.ranked){
+        var user = await GetUserData(playerId);
+        if (!user || !user.discord_id){
+            return false;
+        }
+    }
+
     for (let i = 0; i < ques.length; i++){
         if (ques[i].matchMode == matchMode) return await TryAddPlayerToQue(playerId);
     }
