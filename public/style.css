@@ -210,6 +210,17 @@ h3 {
     color: red;
 }
 
+/**** MOBILE STLYES ****/
+@media only screen and (max-width: 600px) {
+    #user-match-history {
+        width: 100%;
+    }
+
+    .match-row {
+        display: block;
+    }
+}
+
 /**** LEADERBOARD STYLES ****/
 
 #leader-board-options {
@@ -231,6 +242,14 @@ h3 {
     outline: 2px solid black;
 }
 
+
+#leader-board {
+    display: block;
+    width: 50%;
+    margin: auto;
+    outline: 2px solid black;
+}
+
 .leader-board-row {
     display: flex;
     outline: 1px solid black;
@@ -239,4 +258,16 @@ h3 {
 .leader-board-row div {
     width: 100%;
     padding: 10px 5px;
+}
+
+/**** MOBILE STLYES ****/
+@media only screen and (max-width: 600px) {
+    #leader-board {
+        width: 100%;
+    }
+
+    .leader-board-row {
+        display: block;
+    }
+
 }
