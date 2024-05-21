@@ -119,6 +119,7 @@ export function PostChatMessage(req, res){
             res.sendStatus(201);
             var data = {
                 "matchId": matchId,
+                "userId": userId,
                 "message": message
             }
             return data;
