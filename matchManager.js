@@ -7,31 +7,47 @@ import { userRoles } from "./public/constants/userData.js";
 
 var matches = [];
 
-/*var match = await MakeNewMatch(1, 1, 2, matchModes.ranked);
+var match = await MakeNewMatch(1, 2, matchModes.ranked);
 
-PlayerSentStageStrike(1, stages.thunderPoint);
-PlayerSentStageStrike(2, stages.mainStreet);
-PlayerSentStageStrike(2, stages.lakefrontProperty);
-PlayerSentStageStrike(1, stages.riverDrift);
-PlayerSentGameWin(1, 1);
-PlayerSentStageStrike(1, stages.thunderPoint);
-PlayerSentStageStrike(1, stages.boxSeats);
-PlayerSentStageStrike(1, stages.crackerSnap);
+PlayerSentStageStrikes(1, [stages.thunderPoint]);
+PlayerSentStageStrikes(2, [stages.mainStreet, stages.lakefrontProperty]);
+PlayerSentStageStrikes(1, [stages.riverDrift]);
+
+await PlayerSentGameWin(1, 1);
+await PlayerSentGameWin(2, 1);
+
+PlayerSentStageStrikes(1, [stages.mainStreet, stages.crackerSnap, stages.boxSeats]);
 PlayerSentStagePick(2, stages.doubleGemini);
-PlayerSentGameWin(2, 1);
+await PlayerSentGameWin(2, 1);
+await PlayerSentGameWin(1, 1);
 
-console.log(JSON.stringify(match));*/
+PlayerSentStageStrikes(1, [stages.girderForBattle, stages.crackerSnap, stages.boxSeats]);
+PlayerSentStagePick(2, stages.lakefrontProperty);
+await PlayerSentGameWin(2, 2);
+await PlayerSentGameWin(1, 2);
+
+PlayerSentStageStrikes(2, [stages.thunderPoint, stages.pedalToTheMedal, stages.twoLaneSplattop]);
+PlayerSentStagePick(1, stages.lakefrontProperty);
+await PlayerSentGameWin(2, 1);
+
+await UserSentChatMessage(1, "Hej på dig leverpastej");
+await UserSentChatMessage(2, "Smaken är som röven klöven");
+await PlayerSentGameWin(1, 1);
+
+console.log(JSON.stringify(match));
 
 export async function MakeNewMatch(player1Id, player2Id, matchMode){
 
     //randomize player positions
+    //disabled for testing purposes
+    /*
     var tempName;
     let r = Math.floor(Math.random() * 2);
     if (r == 1){
         let tempName = player1Id;
         player1Id = player2Id;
         player2Id = tempName;
-    }
+    }*/
 
     var isRanked = false;
     if (matchMode == matchModes.ranked){
@@ -184,10 +200,6 @@ export async function PlayerSentGameWin(playerId, winnerId){
 
     var game = match.gamesArr[match.gamesArr.length - 1];
 
-    if (match.mode.rulesetData.dsr){
-        match.players[winnerPos - 1].unpickableStagesArr.push(game.stage);
-    }
-
     if (playerPos == 1){
             game.player1Confirmed = true;
         } else{
@@ -205,11 +217,16 @@ export async function PlayerSentGameWin(playerId, winnerId){
 
     //check game verified
     if (game.player1Confirmed && game.player2Confirmed){
+
+        if (match.mode.rulesetData.dsr){
+            match.players[winnerPos - 1].unpickableStagesArr.push(game.stage);
+        }
+
         match.status = matchStatuses.stageSelection;
 
-        if (await CheckMatchWin(match, winnerId)){
+        if (CheckMatchWin(match, winnerId)){
             match.winnerId = winnerId;
-            if (HandleMatchWin(match)) return true;
+            if (await HandleMatchWin(match)) return true;
             return false;
         } else{
             match.gamesArr.push(new Game());
@@ -218,14 +235,14 @@ export async function PlayerSentGameWin(playerId, winnerId){
     return match.id;
 }
 
-async function CheckMatchWin(match, winnerId){
+function CheckMatchWin(match, winnerId){
     var winCount = 0;
     for (let i = 0; i < match.gamesArr.length; i++){
         if (match.gamesArr[i].winnerId != winnerId){
             continue;
         }
         winCount++;
-        if (winCount >= match.setLength){
+        if (winCount >= match.mode.rulesetData.setLength){
             return true;
         }
     }
@@ -241,7 +258,8 @@ async function HandleMatchWin(match){
 
     if (!await FinishMatch(match)) return false;
 
-    if (!ApplyMatchEloResults(match)) return false;
+    console.log("boutta apply elo");
+    if (!await ApplyMatchEloResults(match)) return false;
 
     return true;
 }
@@ -313,7 +331,7 @@ export function FindMatchWithPlayer(playerId){
 }
 
 async function FinishMatch(match){
-    const result = await SetMatchResult(match);
+    await SetMatchResult(match);
 
     const matchIndex = matches.indexOf(match);
     if (matchIndex == -1) return false;
@@ -321,5 +339,5 @@ async function FinishMatch(match){
 
     AddRecentlyMatchedPlayers(match.players[0].id, match.players[1].id, match.mode);
 
-    return result;
+    return true;
 }

@@ -39,7 +39,7 @@ export async function GetUserByDiscordId(discordId){
         console.log("databse found user with discord id " + discordId);
         console.log("insert id: " + rows[0].insertId); 
         console.log("id: " + rows[0].id); 
-        return rows[0].id;
+        return rows[0].insertId;
     } else {
         console.log("databse did not find user with discord id " + discordId);
         return undefined;
@@ -52,7 +52,7 @@ export async function GetUserLoginData(userId){
 }
 
 export async function GetUserData(userId){
-    const [rows] = await pool.query(`SELECT id, username, role, g2_rating, discord_id, created_at FROM users WHERE id = ?`, [userId]);
+    const [rows] = await pool.query(`SELECT id, username, role, g2_rating, discord_id, created_at, banned FROM users WHERE id = ?`, [userId]);
     return rows[0];
 }
 
@@ -104,40 +104,46 @@ export async function GetSession(sessionId){
 //Create
 
 export async function CreateMatch(player1Id, player2Id, isRanked){
-    const result = await pool.query(`INSERT INTO matches (player1_id, player2_id, ranked) VALUES (?, ?, ?)`, [player1Id.id, player2Id, isRanked]);
-    return result[0].id;
+    const result = await pool.query(`INSERT INTO matches (player1_id, player2_id, ranked) VALUES (?, ?, ?)`, [player1Id, player2Id, isRanked]);
+    if (result[0].id){
+        console.log("no insert id");
+        return result[0].id;
+    } else{
+        console.log("insert id");
+        return result[0].insertId;
+    }
 }
 
 async function CreateFirstGameStrikes(match){
     var game = match.gamesArr[0];
-    var winnerPos = FindPlayerPosInMatch(match, game.winnerId);
-    const result = await pool.query(`INSERT INTO games (match_id, stage, result) VALUES (?, ?, ?)`, [match.id, game.stage, winnerPos]);
+    var strikePos = FindPlayerPosInMatch(match, game.winnerId);
+    const result = await pool.query(`INSERT INTO games (match_id, stage, result) VALUES (?, ?, ?)`, [match.id, game.stage, strikePos]);
 
-    const gameId = result[0].id;
+    const gameId = result[0].insertId;
 
     var data = [];
-    for (let i = 0; i < strikes.length; i++){
-        var strikeOwner;
+    for (let i = 0; i < game.strikes.length; i++){
+        var strikePos;
         if ((i + 1) % 4 < 2){
-            strikeOwner = match.players[0].id;
+            strikePos = 1;
         } else{
-            strikeOwner = match.players[1].id;
+            strikePos = 2;
         }
-        data[i] = [gameId, game.strikes[i].stage, strikeOwner];
+        data[i] = [gameId, game.strikes[i], strikePos];
     }
 
-    await pool.query(`INSERT INTO stage_strikes (game_id, stage, strike_owner, result) VALUES ?`, [data.map(strike => [strike[0], strike[1], strike[2]])]);
+    await pool.query(`INSERT INTO stage_strikes (game_id, stage, strike_owner) VALUES ?`, [data.map(strike => [strike[0], strike[1], strike[2]])]);
 }
 
 async function CreateCounterpickGameAndStrikes(match, gameNumber){
     var game = match.gamesArr[gameNumber - 1];
     var winnerPos = FindPlayerPosInMatch(match, game.winnerId);
-    const result = await pool.query(`INSERT INTO games (match_id, stage) VALUES (?, ?, ?)`, [match.id, game.stage, winnerPos]);
+    const result = await pool.query(`INSERT INTO games (match_id, stage, result) VALUES (?, ?, ?)`, [match.id, game.stage, winnerPos]);
 
-    const gameId = result[0].id;
+    const gameId = result[0].insertId;
     var data = [];
-    for (let i = 1; i < strikes.length; i++){
-        data[i] = [gameId, game.strikes[i].stage, game.winnerId];
+    for (let i = 0; i < game.strikes.length; i++){
+        data[i] = [gameId, game.strikes[i], winnerPos];
     }
 
     await pool.query(`INSERT INTO stage_strikes (game_id, stage, strike_owner) VALUES ?`, [data.map(strike => [strike[0], strike[1], strike[2]])]);
@@ -146,13 +152,13 @@ async function CreateCounterpickGameAndStrikes(match, gameNumber){
 export async function CreateUser(username)
 {
     const result = await pool.query(`INSERT INTO users (username) VALUES (?)`, [username]);
-    return result[0].id;
+    return result[0].insertId;
 }
 
 export async function CreateUserWithDiscord(username, discordId, discordAccessToken, discordRefreshToken){
     const result = await pool.query(`INSERT INTO users (username, role, discord_id, discord_access_token, discord_refresh_token) VALUES (?, ?, ?, ?, ?)`,
     [username, userRoles.verified, discordId, discordAccessToken, discordRefreshToken]);
-    return result[0].id;
+    return result[0].insertId;
 }
 
 export async function CreateSession(sessionId, expiresAt, data){
@@ -167,7 +173,7 @@ export async function SetMatchResult(match){
 
     CreateFirstGameStrikes(match);
 
-    for (let i = 1; i < match.games.length; i++){
+    for (let i = 1; i < match.gamesArr.length; i++){
         CreateCounterpickGameAndStrikes(match, i + 1);
     }
 
@@ -176,7 +182,8 @@ export async function SetMatchResult(match){
         chatData[i] = [match.id, i + 1, match.chat[i].ownerId, match.chat[i].content];
     }
 
-    await pool.query(`INSERT INTO chat_messages (match_id, message_number, owner_id, content) VALUES ?, ?, ?, ?`, [chatData.map(msg => [msg[0], msg[1], msg[2], msg[3]])]);
+    if (chatData.length == 0) return;
+    await pool.query(`INSERT INTO chat_messages (match_id, message_number, owner_id, content) VALUES ?`, [chatData.map(msg => [msg[0], msg[1], msg[2], msg[3]])]);
 }
 
 export async function SetUserRating(userId, rating, rd, vol){
@@ -199,4 +206,13 @@ export async function SetUserBan(userId, banned){
 
 export async function DeleteSession(sessionId){
     await pool.query(`DELETE FROM sessions WHERE id = ?`, [sessionId]);
+}
+
+export async function DeleteOldSessions(){
+    await pool.query(`DELETE FROM sessions WHERE expires_at < ?`, [Date.now()]);
+}
+
+export async function DeleteOldUnverifiedAccounts(ageThreshold){
+    var cutoffDate = Date.now() - ageThreshold;
+    await pool.query(`DELETE FROM users WHERE role = ? AND created_at < ?`, [userRoles.unverified, cutoffDate]);
 }

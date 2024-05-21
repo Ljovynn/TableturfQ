@@ -1,6 +1,7 @@
 import { matchModes } from "./public/constants/matchData.js";
 import { FindIfPlayerInMatch, MakeNewMatch } from "./matchManager.js";
-import { GetUserData, GetUserRankData } from "./database.js";
+import { GetUser } from "./database.js";
+import { userRoles } from "./public/constants/userData.js";
 
 const readyTimerGracePeriod = 1000 * 3;
 const alreadyMatchedPlayersTime = 1000 * 60 * 20;
@@ -39,13 +40,6 @@ var matchingPlayersList = [];
 var recentlyMatchedPlayersList = [];
 
 export async function AddPlayerToQue(playerId, matchMode){
-    if (matchMode == matchModes.ranked){
-        var user = await GetUserData(playerId);
-        if (!user || !user.discord_id){
-            return false;
-        }
-    }
-
     for (let i = 0; i < ques.length; i++){
         if (ques[i].matchMode == matchMode) return await TryAddPlayerToQue(playerId);
     }
@@ -57,11 +51,15 @@ async function TryAddPlayerToQue(que, playerId){
     
     if (FindIfPlayerInMatch(playerId)) return false;
 
-    var playerRankData = await GetUserRankData(playerId);
-    if (!playerRankData || !playerRankData.g2_rating) return false;
+    var user = await GetUser(playerId);
+    if (!user) return false;
+    if (user.banned) return false;
+    if (que.matchMode == matchModes.ranked){
+        if (user.role == userRoles.unverified) return false;
+    }
 
-    var baseSearchElo = Math.max(playerRankData.g2_rating, que.matchMode.queData.minEloStart);
-    baseSearchElo = Math.min(playerRankData.g2_rating, que.matchMode.queData.maxEloStart);
+    var baseSearchElo = Math.max(user.g2_rating, que.matchMode.queData.minEloStart);
+    baseSearchElo = Math.min(user.g2_rating, que.matchMode.queData.maxEloStart);
 
     que.queArr.push(new PlayerInQue(playerId, baseSearchElo));
     return true;

@@ -133,7 +133,7 @@ export function Match(id, player1Id, player2Id, matchMode)
     if (matchMode.rulesetData.setLength == setLengths.unlimited){
         startingStatus = matchStatuses.ingame;
     }
-    this.status = matchStatuses.startingStatus;
+    this.status = startingStatus;
 
     var player1 = new Player(player1Id);
     var player2 = new Player(player2Id);
