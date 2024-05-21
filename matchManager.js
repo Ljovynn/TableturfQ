@@ -198,25 +198,21 @@ export async function PlayerSentGameWin(playerId, winnerId){
         return;
     }
 
-    var game = match.gamesArr[match.gamesArr.length - 1];
+    match.players[playerPos - 1].gameConfirmed = true;
 
-    if (playerPos == 1){
-            game.player1Confirmed = true;
-        } else{
-            game.player2Confirmed = true;
-        }
+    var game = match.gamesArr[match.gamesArr.length - 1];
 
     if (game.winnerId == 0){
         game.winnerId = winnerId;
     } else if (game.winnerId != winnerId){
-        game.player1Confirmed = false;
-        game.player2Confirmed = false;
+        match.players[0].gameConfirmed = false;
+        match.players[1].gameConfirmed = false;
 
         //TODO: dispute
     }
 
     //check game verified
-    if (game.player1Confirmed && game.player2Confirmed){
+    if (match.players[0].gameConfirmed && match.players[1].gameConfirmed){
 
         if (match.mode.rulesetData.dsr){
             match.players[winnerPos - 1].unpickableStagesArr.push(game.stage);
@@ -230,6 +226,8 @@ export async function PlayerSentGameWin(playerId, winnerId){
             return false;
         } else{
             match.gamesArr.push(new Game());
+            match.players[0].gameConfirmed = false;
+            match.players[1].gameConfirmed = false;
         }
     }
     return match.id;

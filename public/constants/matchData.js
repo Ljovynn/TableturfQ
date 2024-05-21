@@ -117,13 +117,12 @@ export function Game(){
     this.stage = stages.unpicked;
     this.strikes = [];
     this.winnerId = 0;
-    this.player1Confirmed = false;
-    this.player2Confirmed = false;
 }
 
 export function Player(id){
     this.id = id;
     this.unpickableStagesArr = [];
+    this.gameConfirmed = false;
 }
 
 export function Match(id, player1Id, player2Id, matchMode)
