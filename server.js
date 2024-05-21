@@ -66,14 +66,52 @@ app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 
 import { AuthDiscordRedirect } from './routes/auth.js';
-import { GetMatchInfo } from './routes/match.js';
+import { GetMatchInfo, PostChatMessage, PostGameWin, PostStagePick, PostStageStrikes } from './routes/match.js';
 import { MatchMakingTick } from "./queManager.js";
 import { PostEnterQue, PostLeaveQue, PostPlayerReady, GetUserQueData } from "./routes/que.js";
+import { match } from "assert";
 
 //auth
 app.get('/api/auth/discord/redirect', AuthDiscordRedirect);
 
 //match
+app.post("/StrikeStages", async (req, res) => {
+    var data = PostStageStrikes();
+    if (data){
+        io.to(data.matchId).emit("stageStrikes", data.stages);
+    }
+});
+
+app.post("/PickStage", async (req, res) => {
+    var data = PostStagePick();
+    if (data){
+        io.to(data.matchId).emit("stagePick", data.stage);
+    }
+});
+
+app.post("/WinGame", async (req, res) => {
+    var data = PostGameWin();
+    if (data){
+        io.to(data.matchId).emit("gameWin", data.winnerId);
+    }
+});
+
+app.post("/CasualMatchEnd", async (req, res) => {
+    var matchId = PostGameWin();
+    if (matchId){
+        io.to(data.matchId).emit("matchEnd");
+    }
+});
+
+app.post("/SendChatMessage", async (req, res) => {
+    var data = PostChatMessage();
+    if (data){
+        io.to(data.matchId).emit("chatMessage", data.userId, data.message);
+    }
+});
+
+//todo dispute
+
 app.get("/GetMatchInfo", GetMatchInfo);
 
 //que
@@ -95,6 +133,11 @@ app.post("/PlayerReady", async (req, res) => {
 
 app.get("/GetQueData", GetUserQueData);
 
+//mod stuff
+
+//chat message
+
+//resolve dispute
 
 app.get("/", async (req, res) => {
     res.end();

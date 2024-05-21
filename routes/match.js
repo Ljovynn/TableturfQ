@@ -1,5 +1,5 @@
 import { PlayerSentStageStrikes, PlayerSentStagePick, PlayerSentGameWin, PlayerSentCasualMatchEnd, 
-    PlayerSentChatMessage, PlayerSentMatchDispute, ResolveMatchDispute } from '../matchManager.js';
+    UserSentChatMessage, PlayerSentMatchDispute, ResolveMatchDispute } from '../matchManager.js';
 
 import { FindMatch } from '../matchManager.js';
 
@@ -22,9 +22,15 @@ export function PostStageStrikes(req, res){
         if (!CheckUserDefined(req, res)) return;
         if (!CheckIfArray(stages, res)) return;
 
-        if (PlayerSentStageStrikes(userId, stages)){
+        var matchId = PlayerSentStageStrikes(userId, stages);
+
+        if (matchId){
             res.sendStatus(201);
-            return;
+            var data = {
+                "matchId": matchId,
+                "stages": stages
+            }
+            return data;
         }
         res.sendStatus(403);
     } catch (err){
@@ -41,9 +47,15 @@ export function PostStagePick(req, res){
         if (!CheckUserDefined(req, res)) return;
         if (!CheckVariableDefined(stage, res)) return;
 
-        if (PlayerSentStagePick(userId, stage)){
+        var matchId = PlayerSentStagePick(userId, stage);
+
+        if (matchId){
             res.sendStatus(201);
-            return;
+            var data = {
+                "matchId": matchId,
+                "stage": stage
+            }
+            return data;
         }
         res.sendStatus(403);
     } catch (err){
@@ -60,9 +72,15 @@ export async function PostGameWin(req, res){
         if (!CheckUserDefined(req, res)) return;
         if (!CheckVariableDefined(winnerId, res)) return;
 
-        if (await PlayerSentGameWin(userId, winnerId)){
+        var matchId = PlayerSentGameWin(userId, winnerId);
+
+        if (matchId){
             res.sendStatus(201);
-            return;
+            var data = {
+                "matchId": matchId,
+                "winnerId": winnerId
+            }
+            return data;
         }
         res.sendStatus(403);
     } catch (err){
@@ -74,9 +92,11 @@ export async function PostCasualMatchEnd(req, res){
     try {
         if (!CheckUserDefined(req, res)) return;
 
-        if (await PlayerSentCasualMatchEnd(playerId)){
+        var matchId = PlayerSentCasualMatchEnd(userId);
+
+        if (matchId){
             res.sendStatus(201);
-            return;
+            return matchId;
         }
         res.sendStatus(403);
     } catch (err){
@@ -93,9 +113,15 @@ export function PostChatMessage(req, res){
         if (!CheckUserDefined(req, res)) return;
         if (!CheckIfString(message, res)) return;
 
-        if (PlayerSentChatMessage(userId, message)){
+        var matchId = UserSentChatMessage(userId, message);
+
+        if (matchId){
             res.sendStatus(201);
-            return;
+            var data = {
+                "matchId": matchId,
+                "message": message
+            }
+            return data;
         }
         res.sendStatus(403);
     } catch (err){

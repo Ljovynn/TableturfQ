@@ -1,8 +1,9 @@
 import {stages, matchStatuses, matchModes, Game, Match, ChatMessage} from "./public/constants/matchData.js";
 import { ApplyMatchEloResults } from "./glicko2Manager.js";
-import { CreateMatch, SetMatchResult } from "./database.js";
+import { CreateMatch, GetUserData, SetMatchResult } from "./database.js";
 import { FindPlayerPosInMatch } from "./utils/matchUtils.js";
 import { AddRecentlyMatchedPlayers } from "./queManager.js";
+import { userRoles } from "./public/constants/userData.js";
 
 var matches = [];
 
@@ -38,7 +39,7 @@ export async function MakeNewMatch(player1Id, player2Id, matchMode){
     }
 
     const matchId = await CreateMatch(player1Id, player2Id, isRanked);
-    if (!matchId) return undefined;
+    if (!matchId) return;
 
     var match = new Match(matchId, player1Id, player2Id, matchMode);
     matches.push(match);
@@ -47,16 +48,18 @@ export async function MakeNewMatch(player1Id, player2Id, matchMode){
 
 export function PlayerSentStageStrikes(playerId, stages){
     var match = FindMatchWithPlayer(playerId);
-    if (!match) return false;
+    if (!match) return;
 
     var playerPos = FindPlayerPosInMatch(match, playerId);
 
-    if (match.status != matchStatuses.stageSelection) return false;
+    if (match.status != matchStatuses.stageSelection) return;
 
     if (match.gamesArr.length == 1){
-        return StarterStrikeLogic(match, playerPos, stages);
+        if (!StarterStrikeLogic(match, playerPos, stages)) return;
+        return match.id;
     } else{
-        return CounterpickStrikingLogic(match, playerId, playerPos, stages);
+        if (!CounterpickStrikingLogic(match, playerId, playerPos, stages)) return;
+        return match.id;
     }
 }
 
@@ -139,36 +142,36 @@ function CounterpickStrikingLogic(match, playerId, playerPos, stages){
 
 export function PlayerSentStagePick(playerId, stage){
     var match = FindMatchWithPlayer(playerId);
-    if (!match) return false;
+    if (!match) return;
 
     var playerPos = FindPlayerPosInMatch(match, playerId);
 
-    if (match.status != matchStatuses.stageSelection) return false;
-    if (match.gamesArr.length <= 1) return false;
+    if (match.status != matchStatuses.stageSelection) return;
+    if (match.gamesArr.length <= 1) return;
 
-    if (!match.mode.rulesetData.counterPickStagesArr.includes(stage)) return false;
+    if (!match.mode.rulesetData.counterPickStagesArr.includes(stage)) return;
 
-    if (match.players[playerPos - 1].unpickableStagesArr.includes(stage)) return false;
+    if (match.players[playerPos - 1].unpickableStagesArr.includes(stage)) return;
 
-    if (match.gamesArr[match.gamesArr.length - 2].winnerId == playerId) return false;
+    if (match.gamesArr[match.gamesArr.length - 2].winnerId == playerId) return;
 
     var game = match.gamesArr[match.gamesArr.length - 1];
 
-    if (game.strikes.length < match.mode.rulesetData.counterPickBans) return false;
+    if (game.strikes.length < match.mode.rulesetData.counterPickBans) return;
 
     game.stage = stage;
     match.status = matchStatuses.ingame;
-    return true;
+    return match.id;
 }
 
 export async function PlayerSentGameWin(playerId, winnerId){
     var match = FindMatchWithPlayer(playerId);
-    if (!match) return false;
+    if (!match) return;
 
     var playerPos = FindPlayerPosInMatch(match, playerId);
 
-    if (match.mode == matchModes.casual) return false;
-    if (match.status != matchStatuses.ingame) return false;
+    if (match.mode == matchModes.casual) return;
+    if (match.status != matchStatuses.ingame) return;
 
     var winnerPos;
     if (match.players[0].id == winnerId){
@@ -176,7 +179,7 @@ export async function PlayerSentGameWin(playerId, winnerId){
     } else if (match.players[1].id == winnerId){
         winnerPos = 2;
     } else{
-        return false;
+        return;
     }
 
     var game = match.gamesArr[match.gamesArr.length - 1];
@@ -212,7 +215,7 @@ export async function PlayerSentGameWin(playerId, winnerId){
             match.gamesArr.push(new Game());
         }
     }
-    return true;
+    return match.id;
 }
 
 async function CheckMatchWin(match, winnerId){
@@ -245,19 +248,35 @@ async function HandleMatchWin(match){
 
 export async function PlayerSentCasualMatchEnd(playerId){
     var match = FindMatchWithPlayer(playerId);
-    if (!match) return false;
+    if (!match) return;
 
-    if (!await FinishMatch(match)) return false;
+    if (!await FinishMatch(match)) return;
 
-    return true;
+    return match.id;
 }
 
-export function PlayerSentChatMessage(playerId, content){
+export function UserSentChatMessage(playerId, content){
     var match = FindMatchWithPlayer(playerId);
-    if (!match) return false;
 
-    var chatMessage = new ChatMessage(content, playerId)
+    if (!match) return;
+
+    var chatMessage = new ChatMessage(content, playerId);
     match.chat.push(chatMessage);
+    return match.id;
+}
+
+export async function ModSentChatMessage(matchId, userId, content){
+    var user = await GetUserData(userId);
+    if (!user) return;
+    
+    if (user.role != userRoles.mod) return;
+
+    var match = FindMatch(matchId);
+    if (!match) return;
+
+    var chatMessage = new ChatMessage(content, userId);
+    match.chat.push(chatMessage);
+    return match.id;
 }
 
 export function PlayerSentMatchDispute(playerId){
