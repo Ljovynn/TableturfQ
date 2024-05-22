@@ -32,7 +32,7 @@ for (let victoryButton of victoryButtons ) {
         console.log('Marked victory for ' + victoryButton.value);
         // Send off the victory mark event for the selected player and wait for the other player to submit the victor
         data = { gameWinner: victoryButton.value };
-        response = postData('/mark-winner', data);
+        response = postData('/WinGame', data);
     });
 }
 
@@ -44,7 +44,7 @@ chatSend.addEventListener('click', (e) => {
     // Do front end validation/sanitization functions
     if ( validateChatMessage(chatMessage) ) {
         data = { message: chatMessage };
-        response = postData('/chat', data);
+        response = postData('/SendChatMessage', data);
 
         // If the message is accepted by the server
         chatInput.value = '';
@@ -57,8 +57,8 @@ chatSend.addEventListener('click', (e) => {
 strikeButton.addEventListener('click', (e) => {
     console.log(strikes);
     if ( validateStrikes(strikes, strikeAmount) ) {
-        data = { stageStrikes: strikes };
-        response = postData('/strikes', data);
+        data = { strikes };
+        response = postData('/StrikeStages', data);
 
         // If strikes are accepted
         strikes = [];

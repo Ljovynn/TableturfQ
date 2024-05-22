@@ -6,9 +6,8 @@ const competetiveReady = document.getElementById('ready-for-match');
 joinCompetetive.addEventListener('click', (e) => {
     console.log('User has joined the competetive queue');
 
-    data = { mode: 'competetive' };
     // Join the queue
-    response = postData('/join-queue', data);
+    response = postData('/PlayerEnterQue');
 });
 
 joinCasual.addEventListener('click', (e) => {
@@ -18,9 +17,8 @@ joinCasual.addEventListener('click', (e) => {
 
     // Check that there is a username entered
     if (validateDisplayname(displayName)) {
-        data = { mode: 'casual', displayName: displayName }; 
         // Join the queue
-        response = postData('/join-queue', data)
+        response = postData('/PlayerEnterQue');
     } else {
         alert('Please enter a valid display name.');
     }
@@ -32,7 +30,7 @@ competetiveReady.addEventListener('click', (e) => {
     // Not sure if we need to send any data but we can leave it blank for now
     data = {};
 
-    response = postData('/ready', data);
+    response = postData('/PlayerReady', data);
 
     // Redirect to the game room once the game is created
 });
