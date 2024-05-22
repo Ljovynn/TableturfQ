@@ -52,7 +52,7 @@ function RunQue(){
             }
             io.to("queRoom").emit("matchReady", matchedPlayersData);
         } else{
-            io.to("queRoom").emit("matchesFound", matchedPlayersList);
+            io.to("queRoom").emit("matchesFound", matchedPlayersList[i]);
         }
     }
 }
