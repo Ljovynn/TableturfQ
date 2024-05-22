@@ -1,144 +1,193 @@
 import {stages, matchStatuses, matchModes, Game, Match, ChatMessage} from "./public/constants/matchData.js";
 import { ApplyMatchEloResults } from "./glicko2Manager.js";
-import { CreateMatch, SetMatchResult } from "./database.js";
+import { CreateMatch, GetUserData, SetMatchResult } from "./database.js";
 import { FindPlayerPosInMatch } from "./utils/matchUtils.js";
-import { json } from "express";
+import { AddRecentlyMatchedPlayers } from "./queManager.js";
+import { userRoles } from "./public/constants/userData.js";
 
 var matches = [];
 
-//tick for match timers
-export async function MatchTick(){
+/*var match = await MakeNewMatch(1, 2, matchModes.ranked);
 
-}
+PlayerSentStageStrikes(1, [stages.thunderPoint]);
+PlayerSentStageStrikes(2, [stages.mainStreet, stages.lakefrontProperty]);
+PlayerSentStageStrikes(1, [stages.riverDrift]);
 
-/*var match = await MakeNewMatch(1, 1, 2, matchModes.ranked);
+await PlayerSentGameWin(1, 1);
+await PlayerSentGameWin(2, 1);
 
-PlayerSentStageStrike(1, stages.thunderPoint);
-PlayerSentStageStrike(2, stages.mainStreet);
-PlayerSentStageStrike(2, stages.lakefrontProperty);
-PlayerSentStageStrike(1, stages.riverDrift);
-PlayerSentGameWin(1, 1);
-PlayerSentStageStrike(1, stages.thunderPoint);
-PlayerSentStageStrike(1, stages.boxSeats);
-PlayerSentStageStrike(1, stages.crackerSnap);
+PlayerSentStageStrikes(1, [stages.mainStreet, stages.crackerSnap, stages.boxSeats]);
 PlayerSentStagePick(2, stages.doubleGemini);
-PlayerSentGameWin(2, 1);
+await PlayerSentGameWin(2, 1);
+await PlayerSentGameWin(1, 1);
+
+PlayerSentStageStrikes(1, [stages.girderForBattle, stages.crackerSnap, stages.boxSeats]);
+PlayerSentStagePick(2, stages.lakefrontProperty);
+await PlayerSentGameWin(2, 2);
+await PlayerSentGameWin(1, 2);
+
+PlayerSentStageStrikes(2, [stages.thunderPoint, stages.pedalToTheMedal, stages.twoLaneSplattop]);
+PlayerSentStagePick(1, stages.lakefrontProperty);
+await PlayerSentGameWin(2, 1);
+
+await UserSentChatMessage(1, "Hej på dig leverpastej");
+await UserSentChatMessage(2, "Smaken är som röven klöven");
+await PlayerSentGameWin(1, 1);
 
 console.log(JSON.stringify(match));*/
 
 export async function MakeNewMatch(player1Id, player2Id, matchMode){
+
+    //randomize player positions
+    //disabled for testing purposes
+    /*
+    var tempName;
+    let r = Math.floor(Math.random() * 2);
+    if (r == 1){
+        let tempName = player1Id;
+        player1Id = player2Id;
+        player2Id = tempName;
+    }*/
+
     var isRanked = false;
     if (matchMode == matchModes.ranked){
         isRanked = true;
     }
 
     const matchId = await CreateMatch(player1Id, player2Id, isRanked);
-    if (!matchId) return false;
+    if (!matchId) return;
 
     var match = new Match(matchId, player1Id, player2Id, matchMode);
     matches.push(match);
     return match;
 }
 
-//TODO: make it so multiple strikes are sent together
-export function PlayerSentStageStrike(playerId, stage){
+export function PlayerSentStageStrikes(playerId, stages){
     var match = FindMatchWithPlayer(playerId);
-    if (!match) return false;
+    if (!match) return;
 
     var playerPos = FindPlayerPosInMatch(match, playerId);
 
-    if (match.status != matchStatuses.stageSelection) return false;
+    if (match.status != matchStatuses.stageSelection) return;
 
     if (match.gamesArr.length == 1){
-        return StarterStrikeLogic(match, playerPos, stage);
+        if (!StarterStrikeLogic(match, playerPos, stages)) return;
+        return match.id;
     } else{
-        return CounterpickLogic(match, playerId, playerPos, stage);
+        if (!CounterpickStrikingLogic(match, playerId, playerPos, stages)) return;
+        return match.id;
     }
 }
 
-//TODO: make it array of stages
-function StarterStrikeLogic(match, playerPos, stage){
+function StarterStrikeLogic(match, playerPos, stages){
     const stageList = match.mode.rulesetData.starterStagesArr;
     var game = match.gamesArr[0];
 
-    if (!stageList.includes(stage)) return false;
+    var correctStagesLength = 2;
+    if (game.strikes.length == 0 || game.strikes.length >= stageList.length - 2){
+        correctStagesLength = 1;
+    }
 
-    if (game.strikes.includes(stage)) return false;
+    if (stages.length != correctStagesLength) return false;
 
-    if (game.strikes.length >= stageList.length - 1) return false;
-
+    //Check if current player
     if ((game.strikes.length + 1) % 4 < 2){
         if (playerPos == 2) return false;
     } else{
         if (playerPos == 1) return false;
     }
 
-    game.strikes.push(stage);
-    if (CheckStarterStrikesFinished(game, stageList)) match.status = matchStatuses.ingame;
+    //check each stage
+    var alreadySentStages = [];
+    for (let i = 0; i < stages.length; i++){
+        if (!stageList.includes(stages[i])) return false;
+
+        if (alreadySentStages.includes(stages[i])) return false;
+        alreadySentStages.push(stages[i]);
+
+        if (game.strikes.includes(stages[i])) return false;
+    }
+
+    for (let i = 0; i < stages.length; i++){
+        game.strikes.push(stages[i]);
+    }
+    
+    if (CheckStarterStrikesFinished(game, stageList)){
+        match.status = matchStatuses.ingame;
+    }
     return true;
 }
 
 function CheckStarterStrikesFinished(game, stageList){
-    if (game.strikes.length == stageList.length - 1){
-        for (let i = 0; i < stageList.length; i++){
-            if (!game.strikes.includes(stageList[i])){
-                game.stage = stageList[i];
-                return true;
-            }
+    if (game.strikes.length < stageList.length - 1) return false;
+    for (let i = 0; i < stageList.length; i++){
+        if (!game.strikes.includes(stageList[i])){
+            game.stage = stageList[i];
+            return true;
         }
     }
     return false;
 }
 
-function CounterpickLogic(match, playerId, playerPos, stage){
+function CounterpickStrikingLogic(match, playerId, playerPos, stages){
     const stageList = match.mode.rulesetData.counterPickStagesArr;
     var game = match.gamesArr[match.gamesArr.length - 1];
 
+    if (stages.length != match.mode.rulesetData.counterPickBans) return false;
+
     if (match.gamesArr[match.gamesArr.length - 2].winnerId != playerId) return false;
 
-    if (!stageList.includes(stage)) return false;
+    var alreadySentStages = [];
+    //for each stage
+    for (let i = 0; i < stages.length; i++){
+        if (!stageList.includes(stages[i])) return false;
 
-    if (match.players[playerPos - 1].unpickableStagesArr.includes(stage)) return false;
+        if (alreadySentStages.includes(stages[i])) return false;
+        alreadySentStages.push(stages[i]);
 
-    if (game.strikes.includes(stage)) return false;
+        if (match.players[playerPos % 2].unpickableStagesArr.includes(stages[i])) return false;
 
-    if (game.strikes.length >= match.mode.rulesetData.counterPickBans) return false;
+        if (game.strikes.includes(stages[i])) return false;
+    }
 
-    if (match.players[playerPos % 2].unpickableStagesArr.includes(stage)) return false;
-
-    game.strikes.push(stage);
+    for (let i = 0; i < stages.length; i++){
+        game.strikes.push(stages[i]);
+    }
     return true;
 }
 
 export function PlayerSentStagePick(playerId, stage){
     var match = FindMatchWithPlayer(playerId);
-    if (!match) return false;
+    if (!match) return;
 
     var playerPos = FindPlayerPosInMatch(match, playerId);
 
-    if (match.status != matchStatuses.stageSelection) return false;
-    if (match.gamesArr.length <= 1) return false;
+    if (match.status != matchStatuses.stageSelection) return;
+    if (match.gamesArr.length <= 1) return;
 
-    if (!match.mode.rulesetData.counterPickStagesArr.includes(stage)) return false;
+    if (!match.mode.rulesetData.counterPickStagesArr.includes(stage)) return;
 
-    if (match.players[playerPos - 1].unpickableStagesArr.includes(stage)) return false;
+    if (match.players[playerPos - 1].unpickableStagesArr.includes(stage)) return;
 
-    if (match.gamesArr[match.gamesArr.length - 2].winnerId == playerId) return false;
+    if (match.gamesArr[match.gamesArr.length - 2].winnerId == playerId) return;
 
     var game = match.gamesArr[match.gamesArr.length - 1];
 
-    if (game.strikes.length < match.mode.rulesetData.counterPickBans) return false;
+    if (game.strikes.length < match.mode.rulesetData.counterPickBans) return;
 
     game.stage = stage;
     match.status = matchStatuses.ingame;
-    return true;
+    return match.id;
 }
 
-export function PlayerSentGameWin(playerId, winnerId){
+export async function PlayerSentGameWin(playerId, winnerId){
     var match = FindMatchWithPlayer(playerId);
-    if (!match) return false;
-    if (match.mode == matchModes.casual) return false;
-    if (match.status != matchStatuses.ingame) return false;
+    if (!match) return;
+
+    var playerPos = FindPlayerPosInMatch(match, playerId);
+
+    if (match.mode == matchModes.casual) return;
+    if (match.status != matchStatuses.ingame) return;
 
     var winnerPos;
     if (match.players[0].id == winnerId){
@@ -146,19 +195,42 @@ export function PlayerSentGameWin(playerId, winnerId){
     } else if (match.players[1].id == winnerId){
         winnerPos = 2;
     } else{
-        return false;
+        return;
     }
+
+    match.players[playerPos - 1].gameConfirmed = true;
 
     var game = match.gamesArr[match.gamesArr.length - 1];
 
-    if (match.mode.rulesetData.dsr){
-        match.players[winnerPos - 1].unpickableStagesArr.push(game.stage);
+    if (game.winnerId == 0){
+        game.winnerId = winnerId;
+    } else if (game.winnerId != winnerId){
+        match.players[0].gameConfirmed = false;
+        match.players[1].gameConfirmed = false;
+
+        //TODO: dispute
     }
 
-    game.winnerId = winnerId;
-    match.status = matchStatuses.stageSelection;
-    CheckMatchWin(match, winnerId);
-    return true;
+    //check game verified
+    if (match.players[0].gameConfirmed && match.players[1].gameConfirmed){
+
+        if (match.mode.rulesetData.dsr){
+            match.players[winnerPos - 1].unpickableStagesArr.push(game.stage);
+        }
+
+        match.status = matchStatuses.stageSelection;
+
+        if (CheckMatchWin(match, winnerId)){
+            match.winnerId = winnerId;
+            if (await HandleMatchWin(match)) return true;
+            return false;
+        } else{
+            match.gamesArr.push(new Game());
+            match.players[0].gameConfirmed = false;
+            match.players[1].gameConfirmed = false;
+        }
+    }
+    return match.id;
 }
 
 function CheckMatchWin(match, winnerId){
@@ -168,73 +240,62 @@ function CheckMatchWin(match, winnerId){
             continue;
         }
         winCount++;
-        if (winCount >= match.setLength){
-            match.status = matchStatuses.verifyingResults;
-            match.winnerId = winnerId;
+        if (winCount >= match.mode.rulesetData.setLength){
             return true;
         }
     }
-    match.gamesArr.push(new Game());
     return false;
 }
 
-export async function PlayerSentMatchVerification(playerId){
-    var match = FindMatchWithPlayer(playerId);
-    if (!match) return false;
-
-    var playerPos = FindPlayerPosInMatch(match, playerId);
-
-    if (match.mode == matchModes.casual) return false;
-    if (match.status != matchStatuses.verifyingResults) return false;
-
-    match.players[playerPos - 1].hasVerifiedResult = true;
-
-    await CheckAllPlayersVerified(match);
-
-    return true;
-}
-
-async function CheckAllPlayersVerified(match){
-    if (match.players[0].hasVerifiedResult == false || match.players[1].hasVerifiedResult == false) return false;
-
+async function HandleMatchWin(match){
     if (match.players[0].id == match.winnerId){
         match.status = matchStatuses.player1Win;
     } else {
         match.status = matchStatuses.player2Win;
     }
 
-    if (!await UpdateMatchInDatabase(match)) return false;
-    if (!ApplyMatchEloResults(match)) return false;
+    if (!await FinishMatch(match)) return false;
 
-    const matchIndex = matches.indexOf(match);
-    if (matchIndex == -1) return false;
-    array.splice(matchIndex, 1);
+    console.log("boutta apply elo");
+    if (!await ApplyMatchEloResults(match)) return false;
 
     return true;
 }
 
 export async function PlayerSentCasualMatchEnd(playerId){
     var match = FindMatchWithPlayer(playerId);
-    if (!match) return false;
+    if (!match) return;
 
-    if (!await UpdateMatchInDatabase(match)) return false;
+    if (!await FinishMatch(match)) return;
 
-    const matchIndex = matches.indexOf(match);
-    if (matchIndex == -1) return false;
-    array.splice(matchIndex, 1);
-
-    return true;
+    return match.id;
 }
 
-export function PlayerSentChatMessage(content, playerId){
+export function UserSentChatMessage(playerId, content){
     var match = FindMatchWithPlayer(playerId);
-    if (!match) return false;
 
-    var chatMessage = new ChatMessage(content, playerId)
+    if (!match) return;
+
+    var chatMessage = new ChatMessage(content, playerId);
     match.chat.push(chatMessage);
+    return match.id;
 }
 
-export function PlayerSentMatchDispute(){
+export async function ModSentChatMessage(matchId, userId, content){
+    var user = await GetUserData(userId);
+    if (!user) return;
+    
+    if (user.role != userRoles.mod) return;
+
+    var match = FindMatch(matchId);
+    if (!match) return;
+
+    var chatMessage = new ChatMessage(content, userId);
+    match.chat.push(chatMessage);
+    return match.id;
+}
+
+export function PlayerSentMatchDispute(playerId){
 
 }
 
@@ -267,7 +328,14 @@ export function FindMatchWithPlayer(playerId){
     }
 }
 
-async function UpdateMatchInDatabase(match){
-    const result = await SetMatchResult(match);
-    return result;
+async function FinishMatch(match){
+    await SetMatchResult(match);
+
+    const matchIndex = matches.indexOf(match);
+    if (matchIndex == -1) return false;
+    matches.splice(matchIndex, 1);
+
+    AddRecentlyMatchedPlayers(match.players[0].id, match.players[1].id, match.mode);
+
+    return true;
 }

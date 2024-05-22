@@ -1,26 +1,4 @@
-import { matchStatuses, matchResults, Match, Game, matchModes, ChatMessage } from "../public/constants/matchData.js";
-
-export function ConvertMatchStatusToResult(matchStatus){
-    switch (matchStatus){
-        case matchStatuses.player1Win:
-            return matchResults.player1Win;
-        case matchStatus.player2Win:
-            return matchResults.player2Win;
-        default:
-            return matchResults.noWinner;
-    }
-}
-
-function ConvertResultToMatchStatus(matchResult){
-    switch (matchResult){
-        case matchResults.player1Win:
-            return matchStatuses.player1Win;
-        case matchResults.player2Win:
-            return matchStatuses.player2Win;
-        default:
-            return matchStatuses.dispute;
-    }
-}
+import { Match, Game, matchModes, ChatMessage } from "../public/constants/matchData.js";
 
 export function FindPlayerPosInMatch(match, playerId){
     if (match.players[0].id == playerId){
@@ -38,7 +16,7 @@ export function ConvertDBMatchToMatch(matchData, gamesData, strikeData, chatMess
 
     }
     var match = new Match(matchData.id, matchData.player1_id, matchData.player2_id, matchMode);
-    match.status = ConvertResultToMatchStatus(matchData.result);
+    match.status = matchData.result;
     match.createdAt = matchData.created_at;
 
     match.gamesArr = [];

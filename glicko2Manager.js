@@ -1,5 +1,6 @@
 import glicko2 from "glicko2";
-import { Match } from "./public/constants/matchData.js";
+import { GetUserRankData, SetUserRating } from "./database.js";
+import { matchStatuses } from "./public/constants/matchData.js";
 
 var settings = {
     // tau : "Reasonable choices are between 0.3 and 1.2, though the system should
@@ -9,41 +10,41 @@ var settings = {
     rating : 1500,
     //rd : Default rating deviation 
     //     small number = good confidence on the rating accuracy
-    rd : 200,
+    rd : 100,
     //vol : Default volatility (expected fluctation on the player rating)
     vol : 0.06
   };
 
 export async function ApplyMatchEloResults(match){
 
-  //get playerDatas from database with the player ids. it need player ranks, rating deviations, and volatility.
-  var playerDatas;
-  var player1Data = playerDatas.player1;
-  var player2Data = playerDatas.player2;
+  //get rank data
+  var player1Data = await GetUserRankData(match.players[0].id);
+  var player2Data = await GetUserRankData(match.players[1].id);
+  if (!player1Data || !player2Data) return false;
 
+  //initialize g2 player rankings
   var ranking = new glicko2.Glicko2(settings);
-  var player1 = ranking.makePlayer(player1Data.rating, player1Data.rd, player1Data.vol);
-  var player2 = ranking.makePlayer(player2Data.rating, player2Data.rd, player2Data.vol);
+  var player1 = ranking.makePlayer(player1Data.g2_rating, player1Data.g2_rd, player1Data.g2_vol);
+  var player2 = ranking.makePlayer(player2Data.g2_rating, player2Data.g2_rd, player2Data.g2_vol);
+
+  var matchResult;
+  switch (match.status){
+    case matchStatuses.player1Win:
+      matchResult = 1;
+      break;
+    case matchStatuses.player2Win:
+      matchResult = 0;
+      break;
+    default:
+      return false;
+  }
 
   ranking.addResult(player1, player2, matchResult);
   ranking.calculatePlayersRatings();
 
-  //Update database with new player data and match result
+  //update database
+  await SetUserRating(match.players[0].id, player1.getRating(), player1.getRd(), player1.getVol());
+  await SetUserRating(match.players[1].id, player2.getRating(), player2.getRd(), player2.getVol());
+
   return true;
 }
-
-// Testing glick2 functionality
-var ranking = new glicko2.Glicko2(settings);
-
-var Ryan = ranking.makePlayer();
-var Mary = ranking.makePlayer(1700, 300, 0.06);
-
-var matches = [];
-ranking.addResult(Ryan, Mary, 0);
-ranking.calculatePlayersRatings();
-
-/*console.log("Ryan new rating: " + Ryan.getRating());
-console.log("Ryan new rating deviation: " + Ryan.getRd());
-console.log("Ryan new volatility: " + Ryan.getVol());*/
-
-var players = ranking.getPlayers();
