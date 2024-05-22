@@ -27,8 +27,8 @@ export function PostStageStrikes(req, res){
         if (matchId){
             res.sendStatus(201);
             var data = {
-                "matchId": matchId,
-                "stages": stages
+                matchId: matchId,
+                stages: stages
             }
             return data;
         }
@@ -52,8 +52,8 @@ export function PostStagePick(req, res){
         if (matchId){
             res.sendStatus(201);
             var data = {
-                "matchId": matchId,
-                "stage": stage
+                matchId: matchId,
+                stage: stage
             }
             return data;
         }
@@ -77,8 +77,8 @@ export async function PostGameWin(req, res){
         if (matchId){
             res.sendStatus(201);
             var data = {
-                "matchId": matchId,
-                "winnerId": winnerId
+                matchId: matchId,
+                winnerId: winnerId
             }
             return data;
         }
@@ -118,9 +118,9 @@ export function PostChatMessage(req, res){
         if (matchId){
             res.sendStatus(201);
             var data = {
-                "matchId": matchId,
-                "userId": userId,
-                "message": message
+                matchId: matchId,
+                userId: userId,
+                message: message
             }
             return data;
         }
@@ -199,10 +199,10 @@ export async function GetMatchInfo(req, res){
         var othersInChat = await GetUserChatData(othersInChatIds);
 
         var data = {
-            "user": user,
-            "match": match,
-            "players": players,
-            "othersInChat": othersInChat
+            user: user,
+            match: match,
+            players: players,
+            othersInChat: othersInChat
         };
     
         res.status(200).send(data);

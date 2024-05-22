@@ -89,8 +89,8 @@ export function GetUserQueData(req, res){
         var queData = FindIfPlayerInQue(user.id);
 
         var data = {
-            "user": user,
-            "queData": queData
+            user: user,
+            queData: queData
         }
 
         res.status(200).send(data);

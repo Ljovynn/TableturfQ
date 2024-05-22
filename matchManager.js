@@ -7,7 +7,7 @@ import { userRoles } from "./public/constants/userData.js";
 
 var matches = [];
 
-var match = await MakeNewMatch(1, 2, matchModes.ranked);
+/*var match = await MakeNewMatch(1, 2, matchModes.ranked);
 
 PlayerSentStageStrikes(1, [stages.thunderPoint]);
 PlayerSentStageStrikes(2, [stages.mainStreet, stages.lakefrontProperty]);
@@ -34,7 +34,7 @@ await UserSentChatMessage(1, "Hej på dig leverpastej");
 await UserSentChatMessage(2, "Smaken är som röven klöven");
 await PlayerSentGameWin(1, 1);
 
-console.log(JSON.stringify(match));
+console.log(JSON.stringify(match));*/
 
 export async function MakeNewMatch(player1Id, player2Id, matchMode){
 

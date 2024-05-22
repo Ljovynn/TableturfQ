@@ -10,7 +10,7 @@ var settings = {
     rating : 1500,
     //rd : Default rating deviation 
     //     small number = good confidence on the rating accuracy
-    rd : 200,
+    rd : 100,
     //vol : Default volatility (expected fluctation on the player rating)
     vol : 0.06
   };

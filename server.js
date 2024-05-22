@@ -25,17 +25,13 @@ const server = createServer(app);
 const io = new Server(server);
 
 io.on("connection", socket => {
+    //Not complete
+
     //join match id as room
     socket.on('join', function(room){
         socket.join(room.toString());
         console.log("user joined " + room);
     });
-
-    //message: playerId, matchId
-    socket.on('player ready', message => {
-        console.log("socket sent player ready in room " + message[1]);
-        socket.to(message[1].toString()).emit('player ready', message[0]);
-    })
 });
 
 server.listen(port, () => {
@@ -45,7 +41,20 @@ server.listen(port, () => {
 
 function RunQue(){
     var matchedPlayersList = MatchMakingTick();
-    if (matchedPlayersList) io.to("queRoom").emit("matchesFound", matchedPlayersList);
+    if (!matchedPlayersList) return;
+
+    for (let i = 0; i < matchedPlayersList.length; i++){
+        if (matchedPlayersList.matchMode == matchModes.casual){
+            var matchedPlayersData = {
+                matchId: matchedPlayersList[i].matchId,
+                player1Id: matchedPlayersList[i].players[0].id,
+                player2Id: matchedPlayersList[i].players[1].id
+            }
+            io.to("queRoom").emit("matchReady", matchedPlayersData);
+        } else{
+            io.to("queRoom").emit("matchesFound", matchedPlayersList);
+        }
+    }
 }
 
 app.use(
@@ -70,6 +79,7 @@ import { GetMatchInfo, PostChatMessage, PostGameWin, PostStagePick, PostStageStr
 import { MatchMakingTick } from "./queManager.js";
 import { PostEnterQue, PostLeaveQue, PostPlayerReady, GetUserQueData } from "./routes/que.js";
 import { match } from "assert";
+import { matchModes } from "./public/constants/matchData.js";
 
 //auth
 app.get('/api/auth/discord/redirect', AuthDiscordRedirect);
@@ -123,9 +133,9 @@ app.post("/PlayerReady", async (req, res) => {
     var match = await PostPlayerReady(req, res);
     if (match){
         var matchedPlayersData = {
-            "matchId": match.id,
-            "player1Id": match.players[0].id,
-            "player2Id": match.players[1].id
+            matchId: match.id,
+            player1Id: match.players[0].id,
+            player2Id: match.players[1].id
         }
         io.to("queRoom").emit("matchReady", matchedPlayersData);
     }

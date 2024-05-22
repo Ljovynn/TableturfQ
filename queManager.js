@@ -76,6 +76,17 @@ export async function MatchMakingTick(){
         if (matchedPlayers) result.push(matchedPlayers);
     }
 
+    //set up match
+    for (let i = 0; i < result.length; i++){
+        if (result[i].matchMode == matchModes.casual){
+            RemovePlayersFromQue(ques[0].queArr, result[i].players[0].id, result[i].players[1].id);
+            var match = await MakeNewMatch(result[i].players[0].id, result[i].players[1].id, result[i].matchMode);
+            result[i].matchId = match.id;
+        } else{
+            RemovePlayersFromQue(ques[1].queArr, result[i].players[0].id, result[i].players[1].id);
+            matchingPlayersList.push(new MatchedPlayers(result[i].players[0].id, result[i].players[1].id, result[i].matchMode));
+        }
+    }
     return result;
 }
 
@@ -104,8 +115,12 @@ function FindPlayersToMatch(que){
             if (index != -1){
                 if (recentlyMatchedPlayersList[index].players[0] == que.queArr[j].id || recentlyMatchedPlayersList[index].players[1] == que.queArr[j].id) continue;
             }
-
-            return [que.queArr[i].id, que.queArr[i].id];
+            var data = {
+                players: [que.queArr[i].id, que.queArr[j].id],
+                matchMode: que.matchMode,
+                matchId: 0
+            }
+            return data;
         }
     }
     return undefined;
@@ -220,6 +235,7 @@ export async function PlayerSentReady(playerId){
 async function CheckIfBothPlayersReady(matchingPlayersListIndex){
     var matchingPlayers = matchingPlayersList[matchingPlayersListIndex];
     if (matchingPlayers.players[0].ready && matchingPlayers.players[1].ready){
+        await MakeMatch(matchingPlayers.players[0].id, matchingPlayers.players[1].id, matchingPlayers.matchMode);
         var match = await MakeNewMatch(matchingPlayers.players[0].id, matchingPlayers.players[1].id, matchingPlayers.matchMode);
         matchingPlayersList.splice(matchingPlayersListIndex, 1);
         return match;
