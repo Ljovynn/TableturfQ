@@ -59,6 +59,7 @@ strikeButton.addEventListener('click', (e) => {
     if ( validateStrikes(strikes, strikeAmount) ) {
         data = { strikes };
         response = postData('/StrikeStages', data);
+        console.log(response);
 
         // If strikes are accepted
         strikes = [];

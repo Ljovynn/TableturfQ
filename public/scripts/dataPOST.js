@@ -2,19 +2,23 @@
 // Set data and call from the buttons
 async function postData(url='', data={}) {
     try {
-        const response = await fetch(url, {
+        return fetch(url, {
             method: 'POST',
             mode: 'cors',
             cache: 'no-cache',
             credentials: 'same-origin',
-            headers: {
+            headers: new Headers({
                 'Content-Type': 'application/json'
-            },
+            }),
             redirect: 'follow',
             referrerPolicy: 'no-referrer',
             body: JSON.stringify(data)
+        }).then(function(response) {
+            return response.status;
+        }).then(function(data) {
+            console.log('Promise data response: ' + data);
+            return data;
         });
-        return response.json();
     } catch (error) {
         console.error('Error:', error);
     }
