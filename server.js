@@ -40,9 +40,9 @@ server.listen(port, () => {
     setInterval(RunQue, matchmakingTickInterval);
 });
 
-function RunQue(){
+async function RunQue(){
     console.log('Run queue function');
-    var matchedPlayersList = MatchMakingTick();
+    var matchedPlayersList = await MatchMakingTick();
     console.log(matchedPlayersList);
     if (!matchedPlayersList) return;
 
