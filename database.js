@@ -27,10 +27,18 @@ export async function GetMatch(matchId){
 }
 
 export async function GetUser(userId){
+    console.log('DB.js user id: ' + userId);
     const [rows] = await pool.query(`SELECT * FROM users WHERE id = ?`, [userId]);
-    console.log("insert id: " + rows[0].insertId); 
-    console.log("id: " + rows[0].id); 
-    return rows[0];
+    console.log(rows);
+    if ( rows[0].id ) {
+        console.log("id: " + rows[0].id); 
+        console.log('No insert id');
+        return rows[0].id;
+    } else {
+        console.log("insert id: " + rows[0].insertId); 
+        console.log('Insert id');
+        return rows[0].insertId;
+    }
 }
 
 export async function GetUserByDiscordId(discordId){
@@ -38,8 +46,14 @@ export async function GetUserByDiscordId(discordId){
     if (rows[0]){
         console.log("databse found user with discord id " + discordId);
         console.log("insert id: " + rows[0].insertId); 
-        console.log("id: " + rows[0].id); 
-        return rows[0].insertId;
+        console.log("id: " + rows[0].id);
+        if ( rows[0].id ) {
+            console.log('No insert id');
+            return rows[0].id;
+        } else {
+            console.log('Insert id');
+            return rows[0].insertId;
+        }
     } else {
         console.log("databse did not find user with discord id " + discordId);
         return undefined;
