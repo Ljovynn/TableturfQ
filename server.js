@@ -37,7 +37,7 @@ io.on("connection", socket => {
 
 server.listen(port, () => {
     console.log(`TableturfQ is up at port ${port}`);
-    var queTickInterval = setInterval(RunQue, matchmakingTickInterval);
+    setInterval(RunQue, matchmakingTickInterval);
 });
 
 function RunQue(){

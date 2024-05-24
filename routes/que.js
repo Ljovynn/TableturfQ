@@ -64,7 +64,7 @@ export async function PostPlayerReady(req, res){
 
         var match = await PlayerSentReady(userId);
 
-        if (await PlayerSentReady(userId)){
+        if (match){
             res.sendStatus(201);
             return match;
         }
