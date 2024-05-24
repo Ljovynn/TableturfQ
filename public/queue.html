@@ -25,14 +25,16 @@
                 <p>Enter username: <input id="casual-username" type="text"></p><button id="join-casual-queue">Join Queue</button>
             </div>
             <div id="queue-matchmaking">
-                <p id="queue-timer">Matchmaking... 00:00:00</p>
-                <p>(ONLY APPLICABLE TO RANKED MATCHES)Match found! Please ready up.</p>
-                <p>(COUNTDOWN TIMER)5:00</p>
-                <button id="ready-for-match" value="ready">Ready!</button>
+                <p id="queue-timer">Finding Match... 00:00:00</p>
+                <div id="ranked-match-ready">
+                    <p id="ranked-match-found-message">Match found! Please ready up.</p>
+                    <p id="ranked-match-ready-countdown">5:00</p>
+                    <button id="ranked-match-ready-button" value="ready">Ready!</button>
+                </div>
             </div>
         </main>
     </body>
     <script type="text/javascript" src="./scripts/dataPOST.js"></script>
+    <script src="http://localhost:8080/socket.io/socket.io.js"></script>
     <script type="text/javascript" src="./scripts/queue.js"></script>
-    <script src="/socket.io/socket.io.js"></script>
 </html>

@@ -1,9 +1,9 @@
-import { AddPlayerToQue, RemovePlayerFromQue, PlayerSentReady, FindIfPlayerInQue } from "../queManager";
-import { GetUserData } from "../database";
+import { AddPlayerToQue, RemovePlayerFromQue, PlayerSentReady, FindIfPlayerInQue } from "../queManager.js";
+import { GetUserData } from "../database.js";
 
-import { CheckIfRealMatchMode, CheckUserDefined, CheckVariableDefined } from "../utils/checkDefined";
+import { CheckIfRealMatchMode, CheckUserDefined, CheckVariableDefined } from "../utils/checkDefined.js";
 
-import { GetCurrentUser } from "../utils/userUtils";
+import { GetCurrentUser } from "../utils/userUtils.js";
 
 //Posts
 
@@ -11,14 +11,15 @@ import { GetCurrentUser } from "../utils/userUtils";
 export async function PostEnterQue(req, res){
     try {
         const userId = req.session.user;
+        console.log(userId);
         const matchMode = req.body.matchMode;
 
         if (!CheckUserDefined(req, res)) return;
-        if (!CheckIfRealMatchMode(matchMode)) return;
+        if (!CheckIfRealMatchMode(matchMode, res)) return;
 
         var user = await GetUserData(userId);
 
-        if (!CheckVariableDefined(user)) return;
+        if (!CheckVariableDefined(user, res)) return;
 
         if (user.banned){
             res.sendStatus(403);
@@ -31,6 +32,7 @@ export async function PostEnterQue(req, res){
         }
         res.sendStatus(403);
     } catch (err){
+        console.log(err);
         res.sendStatus(500);
     }
 };

@@ -29,6 +29,7 @@ io.on("connection", socket => {
 
     //join match id as room
     socket.on('join', function(room){
+        console.log('Joining?');
         socket.join(room.toString());
         console.log("user joined " + room);
     });
@@ -40,10 +41,13 @@ server.listen(port, () => {
 });
 
 function RunQue(){
+    console.log('Run queue function');
     var matchedPlayersList = MatchMakingTick();
+    console.log(matchedPlayersList);
     if (!matchedPlayersList) return;
 
     for (let i = 0; i < matchedPlayersList.length; i++){
+        console.log('Run queue loop');
         if (matchedPlayersList.matchMode == matchModes.casual){
             var matchedPlayersData = {
                 matchId: matchedPlayersList[i].matchId,
@@ -52,6 +56,7 @@ function RunQue(){
             }
             io.to("queRoom").emit("matchReady", matchedPlayersData);
         } else{
+            console.log('match found, emit matchesfound');
             io.to("queRoom").emit("matchesFound", matchedPlayersList[i]);
         }
     }
@@ -114,9 +119,9 @@ app.post("/CasualMatchEnd", async (req, res) => {
 });
 
 app.post("/SendChatMessage", async (req, res) => {
-    var data = PostChatMessage();
-    if (data){
-        io.to(data.matchId).emit("chatMessage", data.userId, data.message);
+    var data = PostChatMessage(req, res);
+    if (data)
+{        io.to(data.matchId).emit("chatMessage", data.userId, data.message);
     }
 });
 
@@ -125,7 +130,13 @@ app.post("/SendChatMessage", async (req, res) => {
 app.get("/GetMatchInfo", GetMatchInfo);
 
 //que
-app.post("/PlayerEnterQue", PostEnterQue);
+app.post("/PlayerEnterQue", async (req, res) => {
+    console.log('Enter queue route');
+    console.log(req.body);
+    var data = PostEnterQue(req, res);
+    return data;
+});
+
 app.post("/PlayerLeaveQue", PostLeaveQue);
 
 app.post("/PlayerReady", async (req, res) => {

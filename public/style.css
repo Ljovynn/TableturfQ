@@ -42,6 +42,14 @@ h3 {
     padding: 20px;
 }
 
+#queue-matchmaking {
+    display: none;
+}
+
+#ranked-match-ready {
+    display: none;
+}
+
 /**** GAME PAGE STYLES ****/
 
 #ruleset, #match-score {

@@ -40,16 +40,20 @@ var matchingPlayersList = [];
 var recentlyMatchedPlayersList = [];
 
 export async function AddPlayerToQue(playerId, matchMode){
+    console.log('Adding ' + playerId + ' to queue');
     for (let i = 0; i < ques.length; i++){
-        if (ques[i].matchMode == matchMode) return await TryAddPlayerToQue(playerId);
+        if (ques[i].matchMode == matchModes[matchMode]) return await TryAddPlayerToQue(ques[i], playerId);
     }
     return false;
 }
 
 async function TryAddPlayerToQue(que, playerId){
+    console.log('Trying to add ' + playerId + ' to queue');
     if (FindIfPlayerInQue(playerId)) return false;
     
     if (FindIfPlayerInMatch(playerId)) return false;
+
+    console.log('Not in the queue or match already');
 
     var user = await GetUser(playerId);
     if (!user) return false;
@@ -67,15 +71,18 @@ async function TryAddPlayerToQue(que, playerId){
 
 //main matchmaking algorithm. once every n seconds
 export async function MatchMakingTick(){
-    CheckMatchmadePlayers();
+    //CheckMatchmadePlayers();
     CheckRecentlyMatchedPlayers();
     
     var result = [];
     for (let i = 0; i < ques.length; i++){
-        var matchedPlayers = QueTick(ques[i]);
+        var matchedPlayers = await QueTick(ques[i]);
         if (matchedPlayers) result.push(matchedPlayers);
     }
 
+    console.log('Match making tick');
+    console.log(result);
+    console.log(result.length);
     //set up match
     for (let i = 0; i < result.length; i++){
         if (result[i].matchMode == matchModes.casual){
@@ -83,10 +90,12 @@ export async function MatchMakingTick(){
             var match = await MakeNewMatch(result[i].players[0].id, result[i].players[1].id, result[i].matchMode);
             result[i].matchId = match.id;
         } else{
+            console.log('Matching players in rank queue');
             RemovePlayersFromQue(ques[1].queArr, result[i].players[0].id, result[i].players[1].id);
             matchingPlayersList.push(new MatchedPlayers(result[i].players[0].id, result[i].players[1].id, result[i].matchMode));
         }
     }
+    console.log(result);
     return result;
 }
 
@@ -96,7 +105,7 @@ async function QueTick(que){
     //set all players search range
     for (let i = 0; i < que.queArr.length; i++){
         var secondsPlayerWaited = (Date.now() - que.queArr[i].startedQue) / 1000;
-        que.queArr[i].eloSearchRange = Math.min(que.matchMode.queData.baseEloRange + (secondsPlayerWaited * que.matchMode.queData.eloGrowthPerSecond), maxEloRange);
+        que.queArr[i].eloSearchRange = Math.min(que.matchMode.queData.baseEloRange + (secondsPlayerWaited * que.matchMode.queData.eloGrowthPerSecond), que.matchMode.queData.maxEloRange);
     }
 
     return FindPlayersToMatch(que);
@@ -104,7 +113,7 @@ async function QueTick(que){
 
 function FindPlayersToMatch(que){
     for (let i = 0; i < que.queArr.length - 1; i++){
-        for (let j = i + 1; j < queArr.length; j++){
+        for (let j = i + 1; j < que.queArr.length; j++){
 
             //check if elo search ranges overlap
             if (que.queArr[i].baseSearchElo - que.queArr[i].eloSearchRange > que.queArr[j].baseSearchElo + que.queArr[j].eloSearchRange) continue;

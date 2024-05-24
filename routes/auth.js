@@ -31,7 +31,7 @@ export async function AuthDiscordRedirect(req, res){
             client_secret: process.env.CLIENT_SECRET,
             grant_type: "authorization_code",
             code: code.toString(),
-            redirect_uri: website_url + ":" + port + "/api/auth/discord/redirect",
+            redirect_uri: 'http://localhost:8080/api/auth/discord/redirect'//website_url + ":" + port + "/api/auth/discord/redirect",
         });
     
         const response = await axios.post(apiRouteOauth2Token,
@@ -67,7 +67,7 @@ export async function AuthDiscordRedirect(req, res){
     } catch(error){
         console.log(error);
         res.sendStatus(400);
-    };
+    }
 };
 
 async function StoreUserData(accessToken, refreshToken){

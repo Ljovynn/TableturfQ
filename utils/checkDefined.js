@@ -10,6 +10,7 @@ export function CheckUserDefined(req, res){
 
 export function CheckVariableDefined(variable, res){
     if (!variable){
+        console.log('Sending the 400 from CheckVariableDefined');
         res.sendStatus(400);
         return false;
     }
@@ -33,7 +34,8 @@ export function CheckIfString(str, res){
 }
 
 export function CheckIfRealMatchMode(matchMode, res){
-    if (!matchModes.contains(matchMode)){
+    if ( !Object.hasOwn(matchModes, matchMode) ){
+        console.log('Sending the 400 from CheckIfRealMatchMode');
         res.sendStatus(400);
         return false;
     }

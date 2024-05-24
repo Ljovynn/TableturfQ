@@ -114,6 +114,7 @@ export function PostChatMessage(req, res){
         if (!CheckIfString(message, res)) return;
 
         var matchId = UserSentChatMessage(userId, message);
+        console.log('Match ID: ' + matchId);
 
         if (matchId){
             res.sendStatus(201);

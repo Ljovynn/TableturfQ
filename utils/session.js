@@ -3,7 +3,7 @@ import cookieParser from 'cookie-parser';
 import dotenv from "dotenv";
 
 dotenv.config();
-const sessionSecret = dotenv.config.SESSION_SECRET;
+const sessionSecret = process.env.SESSION_SECRET;
 
 export async function SerializeSession(req, userId){
     //bruh ändra till userid inte discordid
