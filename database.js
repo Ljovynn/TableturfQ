@@ -2,7 +2,6 @@ import mysql from 'mysql2';
 import dotenv from 'dotenv';
 import { userRoles } from './public/constants/userData.js';
 import { FindPlayerPosInMatch } from './utils/matchUtils.js';
-import { json } from 'express';
 
 dotenv.config();
 
@@ -28,7 +27,7 @@ export async function GetMatch(matchId){
 
 export async function GetUser(userId){
     console.log('DB.js user id: ' + userId);
-    const [rows] = await pool.query(`SELECT * FROM users WHERE id = ?`, [userId]);
+    const [rows] = await pool.query(`SELECT *, (SELECT COUNT(*) FROM ban_list WHERE user_id = u.id) AS banned from users u WHERE id = ?`, [userId]);
     console.log(rows);
     if ( rows[0].id ) {
         console.log("id: " + rows[0].id); 
@@ -66,7 +65,8 @@ export async function GetUserLoginData(userId){
 }
 
 export async function GetUserData(userId){
-    const [rows] = await pool.query(`SELECT id, username, role, g2_rating, discord_id, created_at, banned FROM users WHERE id = ?`, [userId]);
+    const [rows] = await pool.query(`SELECT id, username, role, g2_rating, discord_id, created_at,
+    (SELECT COUNT(*) FROM ban_list WHERE user_id = u.id) AS banned FROM users u WHERE id = ?`, [userId]);
     return rows[0];
 }
 
@@ -179,6 +179,15 @@ export async function CreateSession(sessionId, expiresAt, data){
     await pool.query(`INSERT INTO sessions (id, expires_at, data) VALUES (?, ?, ?)`, [sessionId, expiresAt, data]);
 }
 
+export async function SuspendUser(userId, expiresAt){
+    await pool.query(`INSERT INTO ban_list (user_id, expires_at) VALUES (?, ?)`, [userId, expiresAt]);
+}
+
+export async function BanUser(userId){
+    await pool.query(`INSERT INTO ban_list (user_id) VALUES (?)`, [userId]);
+}
+
+
 //Update
 export async function SetMatchResult(match){
 
@@ -208,10 +217,6 @@ export async function SetUserDiscord(userId, discordId, discordAccessToken, disc
     await pool.query(`UPDATE users SET discord_id = ?, discord_access_token = ?, discord_refresh_token = ? WHERE id = ?`, [discordId, discordAccessToken, discordRefreshToken, userId]);
 }
 
-export async function SetUserBan(userId, banned){
-    await pool.query(`UPDATE users SET banned = ? WHERE id = ?`, [banned, userId]);
-}
-
 //delete
 
 /*export async function DeleteChatMessage(matchId, messageNumber){
@@ -229,4 +234,12 @@ export async function DeleteOldSessions(){
 export async function DeleteOldUnverifiedAccounts(ageThreshold){
     var cutoffDate = Date.now() - ageThreshold;
     await pool.query(`DELETE FROM users WHERE role = ? AND created_at < ?`, [userRoles.unverified, cutoffDate]);
+}
+
+export async function UnbanUser(userId){
+    await pool.query(`DELETE FROM ban_list WHERE user_id = ?`, [userId]);
+}
+
+export async function DeleteOldSuspensions(){
+    await pool.query(`DELETE FROM ban_list WHERE expires_at < ?`, [Date.now()]);
 }

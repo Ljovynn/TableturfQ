@@ -21,7 +21,7 @@ export async function PostEnterQue(req, res){
 
         if (!CheckVariableDefined(user, res)) return;
 
-        if (user.banned){
+        if (user.banned == 1){
             res.sendStatus(403);
             return;
         }

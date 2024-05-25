@@ -57,7 +57,7 @@ async function TryAddPlayerToQue(que, playerId){
 
     var user = await GetUser(playerId);
     if (!user) return false;
-    if (user.banned) return false;
+    if (user.banned == 1) return false;
     if (que.matchMode == matchModes.ranked){
         if (user.role == userRoles.unverified) return false;
     }
