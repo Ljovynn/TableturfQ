@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import path from 'path';
 
-import { GetUserByDiscordId, CreateUserWithDiscord } from '../database.js';
+import { GetUserByDiscordId, CreateUserWithDiscord, GetUserData } from '../database.js';
 import { SerializeSession } from '../utils/session.js';
 
 const apiRouteOauth2Token = "https://discord.com/api/v10/oauth2/token";
@@ -16,6 +16,18 @@ const website_url = process.env.URL;
 const port = process.env.PORT;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+export async function GetDiscordUser(userId){
+    const user = await GetUserData(userId);
+    if (!user) return;
+    console.log("Hej" + JSON.stringify(user));
+    try {
+        const response = await axios.get(`https://cdn.discordapp.com/avatars/${user.discord_id}/${user.discord_avatar_hash}.png`);
+        return response;
+    } catch (error){
+        console.log(error);
+    }
+}
 
 export async function AuthDiscordRedirect(req, res){
     const { code } = req.query;
@@ -81,7 +93,7 @@ async function StoreUserData(accessToken, refreshToken){
 
     var userId = await GetUserByDiscordId(response.data.id);
     if (!userId){
-        userId = await CreateUserWithDiscord(response.data.username, response.data.id, accessToken, refreshToken);
+        userId = await CreateUserWithDiscord(response.data.username, response.data.id, accessToken, refreshToken, response.data.avatar);
     }
     return userId;
 }

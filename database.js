@@ -25,21 +25,6 @@ export async function GetMatch(matchId){
     return rows[0];
 }
 
-export async function GetUser(userId){
-    console.log('DB.js user id: ' + userId);
-    const [rows] = await pool.query(`SELECT *, (SELECT COUNT(*) FROM ban_list WHERE user_id = u.id) AS banned from users u WHERE id = ?`, [userId]);
-    console.log(rows);
-    if ( rows[0].id ) {
-        console.log("id: " + rows[0].id); 
-        console.log('No insert id');
-        return rows[0].id;
-    } else {
-        console.log("insert id: " + rows[0].insertId); 
-        console.log('Insert id');
-        return rows[0].insertId;
-    }
-}
-
 export async function GetUserByDiscordId(discordId){
     const [rows] = await pool.query(`SELECT * FROM users WHERE discord_id = ?`, [discordId]);
     if (rows[0]){
@@ -60,12 +45,12 @@ export async function GetUserByDiscordId(discordId){
 }
 
 export async function GetUserLoginData(userId){
-    const [rows] = await pool.query(`SELECT discord_id, discord_access_token, discord_refresh_token FROM users WHERE id = ?`, [userId]);
+    const [rows] = await pool.query(`SELECT CAST(discord_id AS CHAR) discord_id, discord_access_token, discord_refresh_token FROM users WHERE id = ?`, [userId]);
     return rows[0];
 }
 
 export async function GetUserData(userId){
-    const [rows] = await pool.query(`SELECT id, username, role, g2_rating, discord_id, created_at,
+    const [rows] = await pool.query(`SELECT id, username, role, g2_rating, CAST(discord_id AS CHAR) discord_id, discord_avatar_hash, created_at,
     (SELECT COUNT(*) FROM ban_list WHERE user_id = u.id) AS banned FROM users u WHERE id = ?`, [userId]);
     return rows[0];
 }
@@ -78,7 +63,7 @@ export async function GetUserRankData(userId){
 export async function GetUserChatData(userIdArr){
     const rows = [];
     for (let i = 0; i < userIdArr.length; i++){
-        rows[i] = await pool.query(`SELECT id, username, role, discord_id FROM users WHERE id = ?`, [userIdArr[i]]);
+        rows[i] = await pool.query(`SELECT id, username, role, CAST(discord_id AS CHAR) discord_id FROM users WHERE id = ?`, [userIdArr[i]]);
     }
     return rows;
 }
@@ -169,9 +154,9 @@ export async function CreateUser(username)
     return result[0].insertId;
 }
 
-export async function CreateUserWithDiscord(username, discordId, discordAccessToken, discordRefreshToken){
-    const result = await pool.query(`INSERT INTO users (username, role, discord_id, discord_access_token, discord_refresh_token) VALUES (?, ?, ?, ?, ?)`,
-    [username, userRoles.verified, discordId, discordAccessToken, discordRefreshToken]);
+export async function CreateUserWithDiscord(username, discordId, discordAccessToken, discordRefreshToken, discordAvatarHash){
+    const result = await pool.query(`INSERT INTO users (username, role, discord_id, discord_access_token, discord_refresh_token, discord_avatar_hash) VALUES (?, ?, ?, ?, ?, ?)`,
+    [username, userRoles.verified, discordId, discordAccessToken, discordRefreshToken, discordAvatarHash]);
     return result[0].insertId;
 }
 

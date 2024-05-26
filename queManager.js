@@ -1,6 +1,6 @@
 import { matchModes } from "./public/constants/matchData.js";
 import { FindIfPlayerInMatch, MakeNewMatch } from "./matchManager.js";
-import { GetUser } from "./database.js";
+import { GetUserData } from "./database.js";
 import { userRoles } from "./public/constants/userData.js";
 
 const readyTimerGracePeriod = 1000 * 3;
@@ -55,7 +55,7 @@ async function TryAddPlayerToQue(que, playerId){
 
     console.log('Not in the queue or match already');
 
-    var user = await GetUser(playerId);
+    var user = await GetUserData(playerId);
     if (!user) return false;
     if (user.banned == 1) return false;
     if (que.matchMode == matchModes.ranked){

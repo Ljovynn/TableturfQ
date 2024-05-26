@@ -8,6 +8,7 @@ const sessionSecret = process.env.SESSION_SECRET;
 export async function SerializeSession(req, userId){
     //bruh ändra till userid inte discordid
     req.session.user = userId;
+    req.session.touch();
     //kanske måste ändra cookien till access tokens o sånt, inte bara id?
     //TODO: skapa bara om det inte redan finns en
     console.log("serialising session");

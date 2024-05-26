@@ -18,7 +18,7 @@ const port = process.env.PORT;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const matchmakingTickInterval = 3000;
+const matchmakingTickInterval = 3000 * 1000;
 
 const app = express();
 const server = createServer(app);
@@ -79,7 +79,7 @@ app.use(express.static('public',{extensions:['html']}));
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 
-import { AuthDiscordRedirect } from './routes/auth.js';
+import { AuthDiscordRedirect, GetDiscordUser } from './routes/auth.js';
 import { GetMatchInfo, PostChatMessage, PostGameWin, PostStagePick, PostStageStrikes } from './routes/match.js';
 import { MatchMakingTick } from "./queManager.js";
 import { PostEnterQue, PostLeaveQue, PostPlayerReady, GetUserQueData } from "./routes/que.js";
@@ -160,14 +160,22 @@ app.get("/GetQueData", GetUserQueData);
 
 //resolve dispute
 
+//user profile
+//todo
+
 app.get("/", async (req, res) => {
     res.end();
     console.log(req.session.user);
 });
 
 app.get("/testing", async (req, res) => {
-    res.end();
     console.log(req.session.user);
+    if (!req.session.user){
+        res.sendStatus(401);
+        return;
+    }
+    res.send(GetDiscordUser(req.session.user));
+    //res.sendStatus(200);
 });
 
 app.get("/login", async (req, res) => {
