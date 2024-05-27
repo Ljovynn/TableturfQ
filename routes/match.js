@@ -140,7 +140,11 @@ export async function GetMatchInfo(req, res){
     try {
         const matchId = req.body.matchId;
 
-        var user = GetCurrentUser(req);
+        var user = await GetCurrentUser(req);
+        if (!user) {
+            res.sendStatus(403);
+            return;
+        }
 
         if (!matchId){
             res.sendStatus(400); 
@@ -170,8 +174,8 @@ export async function GetMatchInfo(req, res){
         }
 
         var players = []
-        players[0] = await GetUserData(match.player1_id);
-        players[1] = await GetUserData(match.player2_id);
+        players[0] = await GetUserData(match.players[0].id);
+        players[1] = await GetUserData(match.players[1].id);
 
         //check if user has access
         if (matchHidden){
@@ -206,8 +210,10 @@ export async function GetMatchInfo(req, res){
             othersInChat: othersInChat
         };
     
-        res.status(200).send(data);
+        //res.status(200).send(data);
+        return data;
     } catch (err){
+        console.error(err);
         res.sendStatus(500);
     }
 };

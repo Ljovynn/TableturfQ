@@ -59,6 +59,8 @@ export function PostLeaveQue(req, res){
 export async function PostPlayerReady(req, res){
     try {
         const userId = req.session.user;
+        console.log('Post Player Ready function');
+
 
         if (!CheckUserDefined(req, res)) return;
 
@@ -71,6 +73,7 @@ export async function PostPlayerReady(req, res){
         res.sendStatus(403);
         return undefined;
     } catch (err){
+        console.error(err);
         res.sendStatus(500);
         return undefined;
     }

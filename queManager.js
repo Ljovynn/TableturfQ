@@ -40,7 +40,6 @@ var matchingPlayersList = [];
 var recentlyMatchedPlayersList = [];
 
 export async function AddPlayerToQue(playerId, matchMode){
-    console.log('Adding ' + playerId + ' to queue');
     for (let i = 0; i < ques.length; i++){
         if (ques[i].matchMode == matchModes[matchMode]) return await TryAddPlayerToQue(ques[i], playerId);
     }
@@ -48,12 +47,9 @@ export async function AddPlayerToQue(playerId, matchMode){
 }
 
 async function TryAddPlayerToQue(que, playerId){
-    console.log('Trying to add ' + playerId + ' to queue');
     if (FindIfPlayerInQue(playerId)) return false;
     
     if (FindIfPlayerInMatch(playerId)) return false;
-
-    console.log('Not in the queue or match already');
 
     var user = await GetUserData(playerId);
     if (!user) return false;
@@ -80,22 +76,17 @@ export async function MatchMakingTick(){
         if (matchedPlayers) result.push(matchedPlayers);
     }
 
-    console.log('Match making tick');
-    console.log(result);
-    console.log(result.length);
     //set up match
     for (let i = 0; i < result.length; i++){
         if (result[i].matchMode == matchModes.casual){
-            RemovePlayersFromQue(ques[0].queArr, result[i].players[0].id, result[i].players[1].id);
-            var match = await MakeNewMatch(result[i].players[0].id, result[i].players[1].id, result[i].matchMode);
+            RemovePlayersFromQue(ques[0].queArr, result[i].players[0], result[i].players[1]);
+            var match = await MakeNewMatch(result[i].players[0], result[i].players[1], result[i].matchMode);
             result[i].matchId = match.id;
         } else{
-            console.log('Matching players in rank queue');
-            RemovePlayersFromQue(ques[1].queArr, result[i].players[0].id, result[i].players[1].id);
-            matchingPlayersList.push(new MatchedPlayers(result[i].players[0].id, result[i].players[1].id, result[i].matchMode));
+            RemovePlayersFromQue(ques[1].queArr, result[i].players[0], result[i].players[1]);
+            matchingPlayersList.push(new MatchedPlayers(result[i].players[0], result[i].players[1], result[i].matchMode));
         }
     }
-    console.log(result);
     return result;
 }
 
@@ -229,6 +220,7 @@ export async function PlayerSentReady(playerId){
 
 async function CheckIfBothPlayersReady(matchingPlayersListIndex){
     var matchingPlayers = matchingPlayersList[matchingPlayersListIndex];
+    console.log('Check both players ready: ' + JSON.stringify(matchingPlayers));
     if (matchingPlayers.players[0].ready && matchingPlayers.players[1].ready){
         var match = await MakeNewMatch(matchingPlayers.players[0].id, matchingPlayers.players[1].id, matchingPlayers.matchMode);
         matchingPlayersList.splice(matchingPlayersListIndex, 1);
@@ -244,7 +236,7 @@ function FindPlayerPositionInMatchedPlayers(matchedPlayers, playerId){
 
 function SearchMatchedPlayersList(arr, playerId){
     for (let i = 0; i < arr.length; i++){
-        if (arr.players[0].id == playerId || arr.players[1].id == playerId) return i;
+        if (arr[i].players[0].id == playerId || arr[i].players[1].id == playerId) return i;
     }
     return -1;
 }

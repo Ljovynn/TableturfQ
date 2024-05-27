@@ -18,7 +18,7 @@ const port = process.env.PORT;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const matchmakingTickInterval = 3000 * 1000;
+const matchmakingTickInterval = 3000;
 
 const app = express();
 const server = createServer(app);
@@ -29,9 +29,7 @@ io.on("connection", socket => {
 
     //join match id as room
     socket.on('join', function(room){
-        console.log('Joining?');
         socket.join(room.toString());
-        console.log("user joined " + room);
     });
 });
 
@@ -41,13 +39,10 @@ server.listen(port, () => {
 });
 
 async function RunQue(){
-    console.log('Run queue function');
     var matchedPlayersList = await MatchMakingTick();
-    console.log(matchedPlayersList);
     if (!matchedPlayersList) return;
 
     for (let i = 0; i < matchedPlayersList.length; i++){
-        console.log('Run queue loop');
         if (matchedPlayersList.matchMode == matchModes.casual){
             var matchedPlayersData = {
                 matchId: matchedPlayersList[i].matchId,
@@ -56,7 +51,6 @@ async function RunQue(){
             }
             io.to("queRoom").emit("matchReady", matchedPlayersData);
         } else{
-            console.log('match found, emit matchesfound');
             io.to("queRoom").emit("matchesFound", matchedPlayersList[i]);
         }
     }
@@ -127,12 +121,13 @@ app.post("/SendChatMessage", async (req, res) => {
 
 //todo dispute
 
-app.get("/GetMatchInfo", GetMatchInfo);
+app.post("/GetMatchInfo", async (req, res) => {
+    var data = await GetMatchInfo(req, res);
+    res.send(data);
+});
 
 //que
 app.post("/PlayerEnterQue", async (req, res) => {
-    console.log('Enter queue route');
-    console.log(req.body);
     var data = PostEnterQue(req, res);
     return data;
 });
@@ -165,11 +160,9 @@ app.get("/GetQueData", GetUserQueData);
 
 app.get("/", async (req, res) => {
     res.end();
-    console.log(req.session.user);
 });
 
 app.get("/testing", async (req, res) => {
-    console.log(req.session.user);
     if (!req.session.user){
         res.sendStatus(401);
         return;

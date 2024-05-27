@@ -4,6 +4,7 @@ const casualUsername = document.getElementById('casual-username');
 const readyButton = document.getElementById('ranked-match-ready-button');
 const queueMatchmaking = document.getElementById('queue-matchmaking');
 const matchMakingReady = document.getElementById('ranked-match-ready');
+const queueTimer = document.getElementById('queue-timer');
 
 const socket = io();
 
@@ -17,10 +18,10 @@ joinCompetetive.addEventListener('click', async (e) => {
     if ( response == 201 ) {
         // Do queue frontend stuff
         alert('Successfully joined the queue!');
-        queueMatchmaking.style.display = 'block';
+        queueTimer.style.display = 'block';
         window.setInterval(updateTimer, 1000);
         // Socket matchfound code
-        matchMakingReady.style.display = 'block';
+        //matchMakingReady.style.display = 'block';
     } else {
         alert('There was a problem joining the queue. Please refresh and try again');
     }
@@ -47,6 +48,7 @@ readyButton.addEventListener('click', async (e) => {
     // Not sure if we need to send any data but we can leave it blank for now
 
     response = await postData('/PlayerReady');
+    console.log(response);
 
     // Redirect to the game room once the game is created
 });
@@ -64,7 +66,7 @@ var timer = 0;
 function updateTimer() {
     timer += 1;
     time = secondsToHMS(timer);
-    document.getElementById('queue-timer').innerHTML = 'Finding Match... ' + time;    
+    queueTimer.innerHTML = 'Finding Match... ' + time;    
 }
 
 function secondsToHMS(d) {
@@ -77,10 +79,21 @@ function secondsToHMS(d) {
     return ('0' + h).slice(-2) + ":" + ('0' + m).slice(-2) + ":" + ('0' + s).slice(-2);
 }
 
+// SOCKET JS
+
 socket.emit('join', 'queRoom');
 
 socket.on('matchesFound', (matchedPlayersData) => {
     console.log('Socket event match ready');
     console.log(matchedPlayersData);
-    window.location.href = '/game';
+    queueTimer.style.display = 'none';
+    matchMakingReady.style.display = 'block';
+    //window.location.href = '/game';
+});
+
+socket.on('matchReady', (matchedPlayersData) => {
+    console.log(matchedPlayersData);
+    const matchID = matchedPlayersData.matchId;
+    console.log('/game?matchID=' + matchID);
+    window.location.href = '/game?matchID=' + matchID;
 });
