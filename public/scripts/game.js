@@ -1,6 +1,9 @@
 // Create variables for all the elements we need to interact with
+const matchContainer = document.getElementById('match-container');
+const loading = document.getElementById('loading-message');
 const player1Name = document.getElementById('player1-name');
 const player2Name = document.getElementById('player2-name');
+const setLength = document.getElementById('set-length');
 const selectableStages = document.getElementsByClassName('stage-selectable');
 const strikeButton = document.getElementById('confirm-map-selection');
 const victoryButtons = document.getElementsByClassName('player-victory-button');
@@ -12,6 +15,14 @@ var players = [];
 
 var strikes = [];
 var strikeAmount = 1;
+
+// Just the map for set length -> best of N
+var bestOfSets = {
+    1: 1,
+    2: 3,
+    3: 5,
+    4: 7
+};
 
 const url = window.location.href;
 const searchParams = new URL(url).searchParams;
@@ -101,10 +112,17 @@ async function getMatchInfo(matchId) {
 async function setMatchInfo() {
     await getMatchInfo(matchId);
 
+    match = matchInfo.match;
     players = matchInfo.players;
+    console.log(match);
     console.log(players);
+    loading.style.display = 'none';
+    matchContainer.style.display = 'block';
     player1Name.innerHTML = player1Name.innerHTML + players[0].username;
     player2Name.innerHTML = player2Name.innerHTML + players[1].username;
+    // Set length will always be 
+    setLength.innerHTML = setLength.innerHTML + bestOfSets[match.mode.rulesetData.setLength] + ' games';
+
 }
 
 // Strike validation
