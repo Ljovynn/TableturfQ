@@ -4,6 +4,7 @@ const loading = document.getElementById('loading-message');
 const player1Name = document.getElementById('player1-name');
 const player2Name = document.getElementById('player2-name');
 const setLength = document.getElementById('set-length');
+const turnTimer = document.getElementById('timer-duration');
 const selectableStages = document.getElementsByClassName('stage-selectable');
 const strikeButton = document.getElementById('confirm-map-selection');
 const victoryButtons = document.getElementsByClassName('player-victory-button');
@@ -120,9 +121,8 @@ async function setMatchInfo() {
     matchContainer.style.display = 'block';
     player1Name.innerHTML = player1Name.innerHTML + players[0].username;
     player2Name.innerHTML = player2Name.innerHTML + players[1].username;
-    // Set length will always be 
     setLength.innerHTML = setLength.innerHTML + bestOfSets[match.mode.rulesetData.setLength] + ' games';
-
+    turnTimer.innerHTML = turnTimer.innerHTML + ( match.mode.rulesetData.turnTimer * 10 ) + ' seconds';
 }
 
 // Strike validation
