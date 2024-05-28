@@ -105,7 +105,7 @@ export async function PostCasualMatchEnd(req, res){
 }
 
 //message
-export function PostChatMessage(req, res){
+export async function PostChatMessage(req, res){
     try {
         const userId = req.session.user;
         const message = req.body.message;
@@ -114,7 +114,6 @@ export function PostChatMessage(req, res){
         if (!CheckIfString(message, res)) return;
 
         var matchId = UserSentChatMessage(userId, message);
-        console.log('Match ID: ' + matchId);
 
         if (matchId){
             res.sendStatus(201);

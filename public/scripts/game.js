@@ -8,9 +8,12 @@ const turnTimer = document.getElementById('timer-duration');
 const selectableStages = document.getElementsByClassName('stage-selectable');
 const strikeButton = document.getElementById('confirm-map-selection');
 const victoryButtons = document.getElementsByClassName('player-victory-button');
+const chatLog = document.getElementById('match-chat-log');
 const chatInput = document.getElementById('match-chat-input');
 const chatSend = document.getElementById('match-chat-button');
 
+var userID = 0;
+var user = {};
 var matchInfo = [];
 var players = [];
 
@@ -31,6 +34,8 @@ const entries = new URLSearchParams(searchParams).entries();
 const entriesArray = Array.from(entries);
 const matchId = entriesArray[0][1];
 console.log(matchId);
+
+const socket = io();
 
 setMatchInfo();
 
@@ -63,17 +68,20 @@ for (let victoryButton of victoryButtons ) {
 }
 
 // Chat send listener
-chatSend.addEventListener('click', (e) => {
+chatSend.addEventListener('click', async (e) => {
     var chatMessage = chatInput.value;
     console.log( 'Player is sending the message: ' + chatMessage );
 
     // Do front end validation/sanitization functions
     if ( validateChatMessage(chatMessage) ) {
-        data = { message: chatMessage };
-        response = postData('/SendChatMessage', data);
+        data = { userId: userID, message: chatMessage };
+        response = await postData('/SendChatMessage', data);
+        console.log('chat message send response: ' + response);
 
-        // If the message is accepted by the server
-        chatInput.value = '';
+        if ( response == 201 ) {
+            // If the message is accepted by the server
+            chatInput.value = '';
+        }
     } else {
         alert('Your message can\'t be sent. Please try again.');
     }
@@ -115,6 +123,8 @@ async function setMatchInfo() {
 
     match = matchInfo.match;
     players = matchInfo.players;
+    user = matchInfo.user;
+    userID = user.id;
     console.log(match);
     console.log(players);
     loading.style.display = 'none';
@@ -144,3 +154,33 @@ function validateChatMessage(chatMessage) {
 
     return true;
 }
+
+// SOCKET FUNCTIONS
+
+socket.emit('join', 'match' + matchId.toString());
+
+socket.on('chatMessage', (userId, chatMessage) => {
+    var sentByCurrentPlayer = false;
+    var senderName = '';
+    var chatString = '';
+
+    // Check if the incoming message is from the current user to set the sender color
+    if ( userId == user.id ) {
+        sentByCurrentPlayer = true;
+    }
+
+    // Get the sender username
+    if ( players[0].id == userId ) {
+        senderName = players[0].username;
+    } else if ( players[1].id == userId ) {
+        senderName = players[1].username;
+    } else {
+        // idk who sent this
+    }
+
+    chatString = '<div class="match-chat-message"><span class="match-chat-player ' + ( sentByCurrentPlayer ? 'match-chat-current-player' : 'match-chat-opponent-player') + '">' + senderName + ':&nbsp;</span>' + chatMessage + '</div>'
+
+    chatLog.insertAdjacentHTML( 'beforeend', chatString );
+
+    chatLog.scrollTop = chatLog.scrollHeight;
+});
