@@ -85,9 +85,10 @@ app.get('/api/auth/discord/redirect', AuthDiscordRedirect);
 
 //match
 app.post("/StrikeStages", async (req, res) => {
-    var data = PostStageStrikes();
+    console.log('Posted strikes');
+    var data = await PostStageStrikes(req, res);
     if (data){
-        io.to(data.matchId).emit("stageStrikes", data.stages);
+        io.to('match' + data.matchId).emit("stageStrikes", data.stages);
     }
 });
 

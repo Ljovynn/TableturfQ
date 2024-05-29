@@ -49,11 +49,12 @@ for (let stage of selectableStages ) {
         // Add/Remove stage from the list of strikes that will be sent off to the server when the confirm strikes button is selected
         var i = strikes.indexOf(stage.id);
         if ( i === -1 ) {
-            strikes.push(stage.id);
+            strikes.push( parseInt(stage.getAttribute('stage-value')) );
         } else {
             strikes.splice(i,1);
         }
         
+
     });
 }
 
@@ -88,22 +89,18 @@ chatSend.addEventListener('click', async (e) => {
 });
 
 // Confirm strikes/Select map to play on listener
-strikeButton.addEventListener('click', (e) => {
+strikeButton.addEventListener('click', async (e) => {
     console.log(strikes);
     if ( validateStrikes(strikes, strikeAmount) ) {
-        data = { strikes };
-        response = postData('/StrikeStages', data);
+        data = { stages: strikes };
+        response = await postData('/StrikeStages', data);
         console.log(response);
 
+        if ( response == 201 ) {
+            strikes = [];
+        }
+
         // If strikes are accepted
-        strikes = [];
-        var selectedStages = document.getElementsByClassName('stage-selected');
-        for (let stage of selectedStages ) {
-            // Change the classes to remove selected stage from eligible selections
-            stage.classList.remove('stage-selected');
-            stage.classList.remove('stage-selectable');
-            stage.classList.add('stage-stricken');
-        } 
     } else {
         alert('Invalid strikes. Please submit again.');
     }
@@ -126,8 +123,10 @@ async function setMatchInfo() {
     user = matchInfo.user;
     userID = user.id;
     chat = match.chat;
+    strikes = match.gamesArr.at(-1).strikes;
     console.log(match);
     console.log(players);
+    console.log(strikes);
     loading.style.display = 'none';
     matchContainer.style.display = 'block';
     player1Name.innerHTML = player1Name.innerHTML + players[0].username;
@@ -136,6 +135,7 @@ async function setMatchInfo() {
     turnTimer.innerHTML = turnTimer.innerHTML + ( match.mode.rulesetData.turnTimer * 10 ) + ' seconds';
 
     addChatMessages(chat);
+    setStrikes(strikes);
 }
 
 // Grab all messages associated with the game and add them to the chat log
@@ -162,6 +162,7 @@ function addMessage(userId, chatMessage) {
         senderName = players[1].username;
     } else {
         // idk who sent this
+        // probably for mods
     }
 
     chatString = '<div class="match-chat-message"><span class="match-chat-player ' + ( sentByCurrentPlayer ? 'match-chat-current-player' : 'match-chat-opponent-player') + '">' + senderName + ':&nbsp;</span>' + chatMessage + '</div>'
@@ -169,6 +170,19 @@ function addMessage(userId, chatMessage) {
     chatLog.insertAdjacentHTML( 'beforeend', chatString );
 
     chatLog.scrollTop = chatLog.scrollHeight;
+}
+
+function setStrikes(strikes) {
+    for (let strike of strikes ) {
+        console.log('striking ' + strike);
+        stage = document.querySelectorAll('[stage-value="' + strike + '"]')[0];
+        console.log(stage);
+        // Change the classes to remove selected stage from eligible selections
+        if ( stage.classList.contains('stage-selected') )
+            stage.classList.remove('stage-selected');
+        stage.classList.remove('stage-selectable');
+        stage.classList.add('stage-stricken');
+    }
 }
 
 // Strike validation
@@ -197,4 +211,9 @@ socket.emit('join', 'match' + matchId.toString());
 
 socket.on('chatMessage', (userId, chatMessage) => {
     addMessage(userId, chatMessage);
+});
+
+socket.on('stageStrikes', (strikes) => {
+    console.log('Striking stages');
+    setStrikes(strikes);
 });
