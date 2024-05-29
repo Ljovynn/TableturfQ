@@ -9,122 +9,113 @@
   <body class="body">
     <main class="main">
         <p id="loading-message">Loading...</p>
-        <div id="match-info">
-            <p id="players-list">Player 1 vs Player 2</p>
-            <p id="current-striker"></p>
-            <div id="ruleset">
-                <p id="set-length"><i class="fa-solid fa-gamepad"></i>&nbsp;: 5 games</p>
-                <p id="timer-duration"><i class="fa-solid fa-stopwatch"></i>&nbsp;: 50 seconds</p>
+        <div id="match-container">
+            <div id="match-info">
+                <p id="players-list">Player 1 vs Player 2</p>
+                <p id="current-striker"></p>
+                <div id="ruleset">
+                    <p id="set-length"><i class="fa-solid fa-gamepad"></i>&nbsp;: </p>
+                    <p id="timer-duration"><i class="fa-solid fa-stopwatch"></i>&nbsp;: </p>
+                </div>
             </div>
-        </div>
-        <div id="player-content">
-            <div id="player1-info" class="player-info">
-              <p id="player1-name"><i class="fa-brands fa-discord"></i>&nbsp;</p>
-              <span>Discord profile pic here I guess</span>
-              <p id="player1-score">Score: 0</p>
-              <button id="player1-victory-button" class="player-victory-button" value="player1">Mark as winner</button>
+            <div id="player-content">
+                <div id="player1-info" class="player-info">
+                  <p id="player1-name"><i class="fa-brands fa-discord"></i>&nbsp;</p>
+                  <span>Discord profile pic here I guess</span>
+                  <p id="player1-score">Score: 0</p>
+                  <button id="player1-victory-button" class="player-victory-button" value="player1">Mark as winner</button>
+                </div>
+                <div id="player2-info" class="player-info">
+                  <p id="player2-name"><i class="fa-brands fa-discord"></i>&nbsp;</p>
+                  <span>Discord profile pic here I guess</span>
+                  <p id="player2-score">Score: 0</p>
+                  <button id="player2-victory-button" class="player-victory-button" value="player2">Mark as winner</button>
+                </div>
             </div>
-            <div id="player2-info" class="player-info">
-              <p id="player2-name"><i class="fa-brands fa-discord"></i>&nbsp;</p>
-              <span>Discord profile pic here I guess</span>
-              <p id="player2-score">Score: 0</p>
-              <button id="player2-victory-button" class="player-victory-button" value="player2">Mark as winner</button>
+            <div id="match-chat-content">
+                <div id="match-chat-log"></div>
+                <div id="match-chat-inputs">
+                    <input type="text" id="match-chat-input" /><button id="match-chat-button">Send</button>
+                </div>
             </div>
-        </div>
-        <div id="match-chat-content">
-            <div id="match-chat-log">
-                <div class="match-chat-message"><span class="match-chat-player match-chat-current-player">zeb:&nbsp;</span>Hello!</div>
-                <div class="match-chat-message"><span class="match-chat-player match-chat-current-player">zeb:&nbsp;</span>I have a room up</div>
-                <div class="match-chat-message"><span class="match-chat-player match-chat-opponent-player">Ljovynn:&nbsp;</span>Hi</div>
-                <div class="match-chat-message"><span class="match-chat-player match-chat-opponent-player">Ljovynn:&nbsp;</span>gg</div>
-                <div class="match-chat-message"><span class="match-chat-player match-chat-current-player">zeb:&nbsp;</span>gg</div>
-                <div class="match-chat-message"><span class="match-chat-player match-chat-current-player">zeb:&nbsp;</span>gg</div>
-                <div class="match-chat-message"><span class="match-chat-player match-chat-opponent-player">Ljovynn:&nbsp;</span>gg</div>
-                <div class="match-chat-message"><span class="match-chat-player match-chat-opponent-player">Ljovynn:&nbsp;</span>gg</div>
-                <div class="match-chat-message"><span class="match-chat-player match-chat-current-player">zeb:&nbsp;</span>gg</div>
-                <div class="match-chat-message"><span class="match-chat-player match-chat-current-player">zeb:&nbsp;</span>This is just a pretty long message to test wordwrap lorem ipsum dolor sit amet consectitur is that how it goes?</div>
-            </div>
-            <div id="match-chat-inputs">
-                <input type="text" id="match-chat-input" /><button id="match-chat-button">Send</button>
-            </div>
-        </div>
-        <div id="stages-list" class="stages-list">
-                <div id="mainStreet" class="stage starter-stage stage-selectable">
-                    <h3>Main Street</h3>
-                    <img  src="./assets/images/Main-Street-Icon.png" />
-                </div>
-                <div id="thunderPoint" class="stage starter-stage stage-selectable">
-                    <h3>Thunder Point</h3>
-                    <img  src="./assets/images/Thunder-Point-Icon.png" />
-                </div>
-                <div id="xMarksTheGarden" class="stage stage-stricken">
-                    <h3>X Marks The Garden</h3>
-                    <img src="./assets/images/X-Marks-Icon.png" />
-                </div>
-                <div id="squareSquared" class="stage starter-stage stage-selectable">
-                    <h3>Square Squared</h3>
-                    <img  src="./assets/images/Square-Squared-Icon.png" />
-                </div>
-                <div id="lakefrontProperty" class="stage starter-stage stage-selectable">
-                    <h3>Lakefront Property</h3>
-                    <img  src="./assets/images/Lakefront-Icon.png" />
-                </div>
-                    <div id="doubleGemini" class="stage stage-stricken">
-                    <h3>Double Gemini</h3>
-                    <img  src="./assets/images/Double-Gemini-Icon.png" />
-                </div>
-                    <div id="riverDrift" class="stage starter-stage stage-selectable">
-                    <h3>River Drift</h3>
-                    <img src="./assets/images/River-Drift-Icon.png" />
-                </div>
-                    <div id="boxSeats" class="stage stage-stricken">
-                    <h3>Box Seats</h3>
-                    <img src="./assets/images/Box-Seats-Icon.png" />
-                </div>
-                <div id="girderForBattle" class="stage stage-stricken">
-                    <h3>Girder For Battle</h3>
-                    <img  src="./assets/images/Girder-Icon.png" />
-                </div>
-                <div id="maskMansion" class="stage stage-stricken">
-                    <h3>Mask Mansion</h3>
-                    <img  src="./assets/images/Mask-Mansion-Icon.png" />
-                </div>
+            <div id="stages-list" class="stages-list">
+                    <div id="mainStreet" stage-value="1" class="stage starter-stage stage-selectable">
+                        <h3>Main Street</h3>
+                        <img  src="./assets/images/Main-Street-Icon.png" />
+                    </div>
+                    <div id="thunderPoint" stage-value="2" class="stage starter-stage stage-selectable">
+                        <h3>Thunder Point</h3>
+                        <img  src="./assets/images/Thunder-Point-Icon.png" />
+                    </div>
+                    <div id="xMarksTheGarden" stage-value="3" class="stage stage-stricken">
+                        <h3>X Marks The Garden</h3>
+                        <img src="./assets/images/X-Marks-Icon.png" />
+                    </div>
+                    <div id="squareSquared" stage-value="4" class="stage starter-stage stage-selectable">
+                        <h3>Square Squared</h3>
+                        <img  src="./assets/images/Square-Squared-Icon.png" />
+                    </div>
+                    <div id="lakefrontProperty" stage-value="5" class="stage starter-stage stage-selectable">
+                        <h3>Lakefront Property</h3>
+                        <img  src="./assets/images/Lakefront-Icon.png" />
+                    </div>
+                        <div id="doubleGemini" stage-value="6" class="stage stage-stricken">
+                        <h3>Double Gemini</h3>
+                        <img  src="./assets/images/Double-Gemini-Icon.png" />
+                    </div>
+                        <div id="riverDrift" stage-value="7" class="stage starter-stage stage-selectable">
+                        <h3>River Drift</h3>
+                        <img src="./assets/images/River-Drift-Icon.png" />
+                    </div>
+                        <div id="boxSeats" stage-value="8" class="stage stage-stricken">
+                        <h3>Box Seats</h3>
+                        <img src="./assets/images/Box-Seats-Icon.png" />
+                    </div>
+                    <div id="girderForBattle" stage-value="9" class="stage stage-stricken">
+                        <h3>Girder For Battle</h3>
+                        <img  src="./assets/images/Girder-Icon.png" />
+                    </div>
+                    <div id="maskMansion" stage-value="10" class="stage stage-stricken">
+                        <h3>Mask Mansion</h3>
+                        <img  src="./assets/images/Mask-Mansion-Icon.png" />
+                    </div>
 
-                <div id="stickyThicket" class="stage stage-stricken">
-                    <h3>Sticky Thicket</h3>
-                    <img  src="./assets/images/Sticky-Thicket-Icon.png" />
+                    <div id="stickyThicket" stage-value="11" class="stage stage-stricken">
+                        <h3>Sticky Thicket</h3>
+                        <img  src="./assets/images/Sticky-Thicket-Icon.png" />
+                    </div>
+                    <div id="crackerSnap" stage-value="12" class="stage stage-stricken">
+                        <h3>Cracker Snap</h3>
+                        <img  src="./assets/images/Cracker-Snap-Icon.png" />
+                    </div>
+                    <div id="twoLaneSplattop" stage-value="13" class="stage stage-stricken">
+                        <h3>Two-Lane Splattop</h3>
+                        <img  src="./assets/images/Two-Lane-Icon.png" />
+                    </div>
+                    <div id="pedalToTheMedal" stage-value="14" class="stage stage-stricken">
+                        <h3>Pedal to the Metal</h3>
+                        <img  src="./assets/images/Pedal-Icon.png" />
+                    </div>
+                    <div id="overTheLine" stage-value="15" class="stage stage-stricken">
+                        <h3>Over the Line</h3>
+                        <img  src="./assets/images/Over-the-Line-Icon.png" />
+                    </div>
                 </div>
-                <div id="crackerSnap" class="stage stage-stricken">
-                    <h3>Cracker Snap</h3>
-                    <img  src="./assets/images/Cracker-Snap-Icon.png" />
+                <p id="game-messages">Please wait for your opponent.</p>
+                <div id="strike-content">
+                    <div id="strike-info"><span id="strike-amount">1</span> stage strike remaining.</div>
+                    <div>(Alternate text for final selection)Please select the stage to play on</div>
+                    <button id="confirm-map-selection">Confirm Strikes</button>
                 </div>
-                <div id="twoLaneSplattop" class="stage stage-stricken">
-                    <h3>Two-Lane Splattop</h3>
-                    <img  src="./assets/images/Two-Lane-Icon.png" />
-                </div>
-                <div id="pedalToTheMedal" class="stage stage-stricken">
-                    <h3>Pedal to the Metal</h3>
-                    <img  src="./assets/images/Pedal-Icon.png" />
-                </div>
-                <div id="overTheLine" class="stage stage-stricken">
-                    <h3>Over the Line</h3>
-                    <img  src="./assets/images/Over-the-Line-Icon.png" />
-                </div>
+            <div id="play-game">
+                <p id="game-info"></p>
+                <p></p>
             </div>
-            <p id="game-messages">Please wait for your opponent.</p>
-            <div id="strike-content">
-                <div id="strike-info"><span id="strike-amount">1</span> stage strike remaining.</div>
-                <div>(Alternate text for final selection)Please select the stage to play on</div>
-                <button id="confirm-map-selection">Confirm Strikes</button>
-            </div>
-        <div id="play-game">
-            <p id="game-info"></p>
-            <p></p>
+            <a id="requeue-button" href="/queue"><button>Queue Again</button></a>
         </div>
-        <a id="requeue-button" href="/queue"><button>Queue Again</button></a>
     </main>
   </body>
   <script type="text/javascript" src="./scripts/dataPOST.js"></script>
+  <script src="http://localhost:8080/socket.io/socket.io.js"></script>
   <script type="text/javascript" src="./scripts/game.js"></script>
-  <script src="/socket.io/socket.io.js"></script>
 </html>

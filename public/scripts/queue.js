@@ -88,7 +88,6 @@ socket.on('matchesFound', (matchedPlayersData) => {
     console.log(matchedPlayersData);
     queueTimer.style.display = 'none';
     matchMakingReady.style.display = 'block';
-    //window.location.href = '/game';
 });
 
 socket.on('matchReady', (matchedPlayersData) => {

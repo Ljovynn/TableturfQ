@@ -14,15 +14,21 @@ import { GetCurrentUser } from '../utils/userUtils.js';
 //Posts
 
 //stages
-export function PostStageStrikes(req, res){
+export async function PostStageStrikes(req, res){
+    console.log('Posting strikes!');
     try {
+        console.log(req.body.stages);
         const userId = req.session.user;
         const stages = req.body.stages;
+        console.log(userId);
+        console.log(stages);
 
         if (!CheckUserDefined(req, res)) return;
         if (!CheckIfArray(stages, res)) return;
 
         var matchId = PlayerSentStageStrikes(userId, stages);
+
+        console.log('Match id: ' + matchId);
 
         if (matchId){
             res.sendStatus(201);
@@ -34,6 +40,7 @@ export function PostStageStrikes(req, res){
         }
         res.sendStatus(403);
     } catch (err){
+        console.error(err);
         res.sendStatus(500);
     }
 };
@@ -105,7 +112,7 @@ export async function PostCasualMatchEnd(req, res){
 }
 
 //message
-export function PostChatMessage(req, res){
+export async function PostChatMessage(req, res){
     try {
         const userId = req.session.user;
         const message = req.body.message;
@@ -114,7 +121,6 @@ export function PostChatMessage(req, res){
         if (!CheckIfString(message, res)) return;
 
         var matchId = UserSentChatMessage(userId, message);
-        console.log('Match ID: ' + matchId);
 
         if (matchId){
             res.sendStatus(201);

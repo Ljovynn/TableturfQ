@@ -85,9 +85,10 @@ app.get('/api/auth/discord/redirect', AuthDiscordRedirect);
 
 //match
 app.post("/StrikeStages", async (req, res) => {
-    var data = PostStageStrikes();
+    console.log('Posted strikes');
+    var data = await PostStageStrikes(req, res);
     if (data){
-        io.to(data.matchId).emit("stageStrikes", data.stages);
+        io.to('match' + data.matchId).emit("stageStrikes", data.stages);
     }
 });
 
@@ -113,9 +114,9 @@ app.post("/CasualMatchEnd", async (req, res) => {
 });
 
 app.post("/SendChatMessage", async (req, res) => {
-    var data = PostChatMessage(req, res);
-    if (data)
-{        io.to(data.matchId).emit("chatMessage", data.userId, data.message);
+    var data = await PostChatMessage(req, res);
+    if (data) {
+        io.to('match' + data.matchId).emit("chatMessage", data.userId, data.message);
     }
 });
 

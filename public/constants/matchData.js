@@ -35,6 +35,22 @@ export const setLengths = Object.freeze({
     bo7: 4
 });
 
+export const turnTimer = Object.freeze({
+    unlimited: 0,
+    s10: 1,
+    s20: 2,
+    s30: 3,
+    s40: 4,
+    s50: 5,
+    s60: 6,
+    s70: 7,
+    s80: 8,
+    s90: 9,
+    s100: 10,
+    s110: 11,
+    s120: 12
+});
+
 export const disputeResolveOptions = Object.freeze({ 
     noChanges: 0, 
     revertLastChange: 1,
@@ -56,8 +72,9 @@ export function QueData(readyTimer, eloGrowthPerSecond, baseEloRange, maxEloRang
     this.maxEloStart = maxEloStart;
 }
 
-export function RulesetData(setLength, starterStagesArr, counterPickStagesArr, counterPickBans, DSR){
+export function RulesetData(setLength, turnTimer, starterStagesArr, counterPickStagesArr, counterPickBans, DSR){
     this.setLength = setLength;
+    this.turnTimer = turnTimer;
     this.starterStagesArr = starterStagesArr;
     this.counterPickStagesArr = counterPickStagesArr;
     this.counterPickBans = counterPickBans;
@@ -96,11 +113,11 @@ const currentRankedCounterpicks = [
 ];
 
 const rankedQueData = new QueData(20, 1, 100, 500, 500, 2500);
-const rankedRulesetData = new RulesetData(setLengths.bo5, currentRankedStarters, currentRankedCounterpicks, 3, true)
+const rankedRulesetData = new RulesetData(setLengths.bo5, turnTimer.s50, currentRankedStarters, currentRankedCounterpicks, 3, true)
 const rankedMatchMode = new MatchMode(rankedRulesetData, rankedQueData);
 
 const casualQueData = new QueData(0, 7, 300, 2000, 500, 2500);
-const casualRulesetData = new RulesetData(setLengths.unlimited, [], [], 0, false)
+const casualRulesetData = new RulesetData(setLengths.unlimited, turnTimer.unlimited, [], [], 0, false)
 const casualMatchMode = new MatchMode(casualRulesetData, casualQueData);
 
 export const matchModes = Object.freeze({ 
