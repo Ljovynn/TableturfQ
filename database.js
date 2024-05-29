@@ -2,6 +2,7 @@ import mysql from 'mysql2';
 import dotenv from 'dotenv';
 import { userRoles } from './public/constants/userData.js';
 import { FindPlayerPosInMatch } from './utils/matchUtils.js';
+import { settings } from './glicko2Manager.js';
 
 dotenv.config();
 
@@ -68,9 +69,11 @@ export async function GetUserChatData(userIdArr){
     return rows;
 }
 
-export async function GetUserMatchHistory(userId)
+export async function GetUserMatchHistory(userId, pageNumber)
 {
-    const [rows] = await pool.query(`SELECT * FROM matches WHERE player1_id = ? OR player2_id = ? ORDER BY id DESC`, [userId, userId]);
+    var hitsPerPage = 10;
+    var offset = (pageNumber - 1) * hitsPerPage;
+    const [rows] = await pool.query(`SELECT * FROM matches WHERE player1_id = ? OR player2_id = ? ORDER BY id DESC LIMIT ? OFFSET ?`, [userId, userId, hitsPerPage, offset]);
     return rows;
 }
 
@@ -81,23 +84,28 @@ export async function GetUserMatchCount(userId)
 }
 
 export async function GetMatchGames(matchId){
-    const [rows] = await pool.query(`SELECT * FROM games WHERE match_id = ? ORDER BY id`, [matchId])
+    const [rows] = await pool.query(`SELECT * FROM games WHERE match_id = ? ORDER BY id`, [matchId]);
     return rows;
 }
 
 export async function GetStageStrikes(gameId){
-    const [rows] = await pool.query(`SELECT * FROM stage_strikes WHERE game_id = ?`, [gameId])
+    const [rows] = await pool.query(`SELECT * FROM stage_strikes WHERE game_id = ?`, [gameId]);
     return rows;
 }
 
 export async function GetChatMessages(matchId){
-    const [rows] = await pool.query(`SELECT * FROM chat_messages WHERE match_id = ? ORDER BY message_number`, [matchId])
+    const [rows] = await pool.query(`SELECT * FROM chat_messages WHERE match_id = ? ORDER BY message_number`, [matchId]);
     return rows;
 }
 
 export async function GetSession(sessionId){
-    const [rows] = await pool.query(`SELECT * FROM sessions WHERE id = ?`, [sessionId])
+    const [rows] = await pool.query(`SELECT * FROM sessions WHERE id = ?`, [sessionId]);
     return rows[0];
+}
+
+export async function GetLeaderboard(){
+    const [rows] = await pool.query (`SELECT * from users u WHERE NOT EXISTS (SELECT * FROM ban_list WHERE user_id = u.id) order by g2_rating desc`);
+    return rows;
 }
 
 //Create
@@ -150,13 +158,13 @@ async function CreateCounterpickGameAndStrikes(match, gameNumber){
 
 export async function CreateUser(username)
 {
-    const result = await pool.query(`INSERT INTO users (username) VALUES (?)`, [username]);
+    const result = await pool.query(`INSERT INTO users (username, g2_rating, g2_rd, g2_vol) VALUES (?)`, [username, settings.rating, settings.rd, settings.vol]);
     return result[0].insertId;
 }
 
 export async function CreateUserWithDiscord(username, discordId, discordAccessToken, discordRefreshToken, discordAvatarHash){
-    const result = await pool.query(`INSERT INTO users (username, role, discord_id, discord_access_token, discord_refresh_token, discord_avatar_hash) VALUES (?, ?, ?, ?, ?, ?)`,
-    [username, userRoles.verified, discordId, discordAccessToken, discordRefreshToken, discordAvatarHash]);
+    const result = await pool.query(`INSERT INTO users (username, role, g2_rating, g2_rd, g2_vol, discord_id, discord_access_token, discord_refresh_token, discord_avatar_hash) VALUES (?, ?, ?, ?, ?, ?)`,
+    [username, userRoles.verified, settings.rating, settings.rd, settings.vol, discordId, discordAccessToken, discordRefreshToken, discordAvatarHash]);
     return result[0].insertId;
 }
 
