@@ -6,6 +6,8 @@ const player2Name = document.getElementById('player2-name');
 const setLength = document.getElementById('set-length');
 const turnTimer = document.getElementById('timer-duration');
 const selectableStages = document.getElementsByClassName('stage-selectable');
+const gameMessage = document.getElementById('game-messages');
+const strikeContent = document.getElementById('strike-content');
 const strikeButton = document.getElementById('confirm-map-selection');
 const victoryButtons = document.getElementsByClassName('player-victory-button');
 const chatLog = document.getElementById('match-chat-log');
@@ -17,8 +19,9 @@ var user = {};
 var matchInfo = [];
 var players = [];
 
-var strikes = [];
+var stageStrikes = [];
 var strikeAmount = 1;
+var currentStriker = 0;
 
 // Just the map for set length -> best of N
 var bestOfSets = {
@@ -47,14 +50,12 @@ for (let stage of selectableStages ) {
         stage.classList.toggle('stage-selected');
 
         // Add/Remove stage from the list of strikes that will be sent off to the server when the confirm strikes button is selected
-        var i = strikes.indexOf(stage.id);
+        var i = stageStrikes.indexOf(stage.id);
         if ( i === -1 ) {
-            strikes.push( parseInt(stage.getAttribute('stage-value')) );
+            stageStrikes.push( parseInt(stage.getAttribute('stage-value')) );
         } else {
-            strikes.splice(i,1);
+            stageStrikes.splice(i,1);
         }
-        
-
     });
 }
 
@@ -90,14 +91,14 @@ chatSend.addEventListener('click', async (e) => {
 
 // Confirm strikes/Select map to play on listener
 strikeButton.addEventListener('click', async (e) => {
-    console.log(strikes);
-    if ( validateStrikes(strikes, strikeAmount) ) {
-        data = { stages: strikes };
+    console.log(stageStrikes);
+    if ( validateStrikes(stageStrikes, strikeAmount) ) {
+        data = { stages: stageStrikes };
         response = await postData('/StrikeStages', data);
         console.log(response);
 
         if ( response == 201 ) {
-            strikes = [];
+            stageStrikes = [];
         }
 
         // If strikes are accepted
@@ -136,6 +137,9 @@ async function setMatchInfo() {
 
     addChatMessages(chat);
     setStrikes(strikes);
+    setStrikeAmount();
+    setCurrentStriker();
+    isPlayerStriker();
 }
 
 // Grab all messages associated with the game and add them to the chat log
@@ -183,6 +187,40 @@ function setStrikes(strikes) {
         stage.classList.remove('stage-selectable');
         stage.classList.add('stage-stricken');
     }
+    // Reset the local strike array after setting all the strikes
+    stageStrikes = [];
+}
+
+function setStrikeAmount() {
+    // Figure out the current strike amount
+    strikeableStages = document.getElementsByClassName('stage-selectable');
+    if ( strikeableStages.length == 4 ) {
+        strikeAmount = 2;
+    } else {
+        strikeAmount = 1;
+    }
+}
+
+function setCurrentStriker() {
+    strikeableStages = document.getElementsByClassName('stage-selectable');
+    if ( strikeableStages.length == 5 )
+        currentStriker = players[0].id;
+
+    if ( strikeableStages.length == 4 )
+        currentStriker = players[1].id;
+
+    if ( strikeableStages.length == 2 )
+        currentStriker = players[0].id;
+}
+
+function isPlayerStriker() {
+    if ( userID == currentStriker ) {
+        gameMessage.style.display = 'none';
+        strikeContent.style.display = 'block';
+    } else {
+        gameMessage.style.display = 'block';
+        strikeContent.style.display = 'none';
+    }
 }
 
 // Strike validation
@@ -216,4 +254,7 @@ socket.on('chatMessage', (userId, chatMessage) => {
 socket.on('stageStrikes', (strikes) => {
     console.log('Striking stages');
     setStrikes(strikes);
+    setStrikeAmount();
+    setCurrentStriker();
+    isPlayerStriker();
 });

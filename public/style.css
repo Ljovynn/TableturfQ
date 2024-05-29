@@ -154,6 +154,10 @@ h3 {
     margin: 10px 0;
 }
 
+#strike-content {
+    display: none;
+}
+
 /**** USER PROFILE ****/
 
 #user-info-section {
