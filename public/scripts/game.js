@@ -125,6 +125,7 @@ async function setMatchInfo() {
     players = matchInfo.players;
     user = matchInfo.user;
     userID = user.id;
+    chat = match.chat;
     console.log(match);
     console.log(players);
     loading.style.display = 'none';
@@ -133,6 +134,41 @@ async function setMatchInfo() {
     player2Name.innerHTML = player2Name.innerHTML + players[1].username;
     setLength.innerHTML = setLength.innerHTML + bestOfSets[match.mode.rulesetData.setLength] + ' games';
     turnTimer.innerHTML = turnTimer.innerHTML + ( match.mode.rulesetData.turnTimer * 10 ) + ' seconds';
+
+    addChatMessages(chat);
+}
+
+// Grab all messages associated with the game and add them to the chat log
+function addChatMessages(chat) {
+    for ( const message of chat ) {
+        addMessage(message['ownerId'], message['content']);
+    }
+}
+
+function addMessage(userId, chatMessage) {
+    var sentByCurrentPlayer = false;
+    var senderName = '';
+    var chatString = '';
+
+    // Check if the incoming message is from the current user to set the sender color
+    if ( userId == user.id ) {
+        sentByCurrentPlayer = true;
+    }
+
+    // Get the sender username
+    if ( players[0].id == userId ) {
+        senderName = players[0].username;
+    } else if ( players[1].id == userId ) {
+        senderName = players[1].username;
+    } else {
+        // idk who sent this
+    }
+
+    chatString = '<div class="match-chat-message"><span class="match-chat-player ' + ( sentByCurrentPlayer ? 'match-chat-current-player' : 'match-chat-opponent-player') + '">' + senderName + ':&nbsp;</span>' + chatMessage + '</div>'
+
+    chatLog.insertAdjacentHTML( 'beforeend', chatString );
+
+    chatLog.scrollTop = chatLog.scrollHeight;
 }
 
 // Strike validation
@@ -160,27 +196,5 @@ function validateChatMessage(chatMessage) {
 socket.emit('join', 'match' + matchId.toString());
 
 socket.on('chatMessage', (userId, chatMessage) => {
-    var sentByCurrentPlayer = false;
-    var senderName = '';
-    var chatString = '';
-
-    // Check if the incoming message is from the current user to set the sender color
-    if ( userId == user.id ) {
-        sentByCurrentPlayer = true;
-    }
-
-    // Get the sender username
-    if ( players[0].id == userId ) {
-        senderName = players[0].username;
-    } else if ( players[1].id == userId ) {
-        senderName = players[1].username;
-    } else {
-        // idk who sent this
-    }
-
-    chatString = '<div class="match-chat-message"><span class="match-chat-player ' + ( sentByCurrentPlayer ? 'match-chat-current-player' : 'match-chat-opponent-player') + '">' + senderName + ':&nbsp;</span>' + chatMessage + '</div>'
-
-    chatLog.insertAdjacentHTML( 'beforeend', chatString );
-
-    chatLog.scrollTop = chatLog.scrollHeight;
+    addMessage(userId, chatMessage);
 });
