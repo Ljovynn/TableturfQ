@@ -69,9 +69,8 @@ export async function GetUserChatData(userIdArr){
     return rows;
 }
 
-export async function GetUserMatchHistory(userId, pageNumber)
+export async function GetUserMatchHistory(userId, hitsPerPage, pageNumber)
 {
-    var hitsPerPage = 10;
     var offset = (pageNumber - 1) * hitsPerPage;
     const [rows] = await pool.query(`SELECT * FROM matches WHERE player1_id = ? OR player2_id = ? ORDER BY id DESC LIMIT ? OFFSET ?`, [userId, userId, hitsPerPage, offset]);
     return rows;

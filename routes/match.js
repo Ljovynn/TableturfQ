@@ -79,13 +79,20 @@ export async function PostGameWin(req, res){
         if (!CheckUserDefined(req, res)) return;
         if (!CheckVariableDefined(winnerId, res)) return;
 
-        var matchId = PlayerSentGameWin(userId, winnerId);
+        var matchData = await PlayerSentGameWin(userId, winnerId);
 
-        if (matchId){
+        if (matchData && matchData.matchId){
             res.sendStatus(201);
-            var data = {
-                matchId: matchId,
-                winnerId: winnerId
+            var data;
+            if (matchData.dispute){
+                data = {
+                    matchId: matchId
+                }
+            } else{
+                data = {
+                    matchId: matchId,
+                    winnerId: winnerId,
+                }
             }
             return data;
         }

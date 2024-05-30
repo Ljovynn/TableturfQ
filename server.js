@@ -99,6 +99,7 @@ app.post("/PickStage", async (req, res) => {
     }
 });
 
+//TODO: handle dispute by checking if winnerId is defined
 app.post("/WinGame", async (req, res) => {
     var data = PostGameWin();
     if (data){

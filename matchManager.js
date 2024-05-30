@@ -182,7 +182,13 @@ export function PlayerSentStagePick(playerId, stage){
 
 export async function PlayerSentGameWin(playerId, winnerId){
     var match = FindMatchWithPlayer(playerId);
+    var data = {
+        matchId,
+        dispute: false
+    }
     if (!match) return;
+
+    data.matchId = match.id;
 
     var playerPos = FindPlayerPosInMatch(match, playerId);
 
@@ -208,7 +214,8 @@ export async function PlayerSentGameWin(playerId, winnerId){
         match.players[0].gameConfirmed = false;
         match.players[1].gameConfirmed = false;
 
-        //TODO: dispute
+        match.status = matchStatuses.dispute;
+        data.dispute = true;
     }
 
     //check game verified
@@ -222,7 +229,7 @@ export async function PlayerSentGameWin(playerId, winnerId){
 
         if (CheckMatchWin(match, winnerId)){
             match.winnerId = winnerId;
-            if (await HandleMatchWin(match)) return true;
+            if (await HandleMatchWin(match)) return data;
             return false;
         } else{
             match.gamesArr.push(new Game());
@@ -230,7 +237,8 @@ export async function PlayerSentGameWin(playerId, winnerId){
             match.players[1].gameConfirmed = false;
         }
     }
-    return match.id;
+    
+    return data;
 }
 
 function CheckMatchWin(match, winnerId){
@@ -257,7 +265,7 @@ async function HandleMatchWin(match){
     if (!await FinishMatch(match)) return false;
 
     console.log("boutta apply elo");
-    if (!await ApplyMatchEloResults(match)) return false;
+    await ApplyMatchEloResults(match);
 
     return true;
 }
@@ -296,7 +304,14 @@ export async function ModSentChatMessage(matchId, userId, content){
 }
 
 export function PlayerSentMatchDispute(playerId){
+    var match = FindMatchWithPlayer(playerId);
 
+    if (!match) return false;
+
+    if (match.status == matchStatuses.dispute) return false;
+
+    match.status = matchStatuses.dispute;
+    return true;
 }
 
 export function ResolveMatchDispute(matchId, resolveOption){
