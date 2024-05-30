@@ -103,7 +103,7 @@ export async function GetSession(sessionId){
 }
 
 export async function GetLeaderboard(){
-    const [rows] = await pool.query (`SELECT * from users u WHERE NOT EXISTS (SELECT * FROM ban_list WHERE user_id = u.id) order by g2_rating desc`);
+    const [rows] = await pool.query (`SELECT id, username, role, g2_rating, CAST(discord_id AS CHAR) discord_id, discord_avatar_hash, created_at from users u WHERE NOT EXISTS (SELECT * FROM ban_list WHERE user_id = u.id) order by g2_rating desc`);
     return rows;
 }
 
