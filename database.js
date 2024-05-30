@@ -103,7 +103,8 @@ export async function GetSession(sessionId){
 }
 
 export async function GetLeaderboard(){
-    const [rows] = await pool.query (`SELECT id, username, role, g2_rating, CAST(discord_id AS CHAR) discord_id, discord_avatar_hash, created_at from users u WHERE NOT EXISTS (SELECT * FROM ban_list WHERE user_id = u.id) order by g2_rating desc`);
+    const [rows] = await pool.query (`SELECT id, username, role, g2_rating, CAST(discord_id AS CHAR) discord_id, discord_avatar_hash, created_at from users u WHERE NOT EXISTS
+    (SELECT * FROM ban_list WHERE user_id = u.id) order by g2_rating desc`);
     return rows;
 }
 
@@ -205,8 +206,9 @@ export async function SetUserRating(userId, rating, rd, vol){
     await pool.query(`UPDATE users SET g2_rating = ?, g2_rd = ?, g2_vol = ? WHERE id = ?`, [rating, rd, vol, userId]);
 }
 
-export async function SetUserDiscord(userId, discordId, discordAccessToken, discordRefreshToken){
-    await pool.query(`UPDATE users SET discord_id = ?, discord_access_token = ?, discord_refresh_token = ? WHERE id = ?`, [discordId, discordAccessToken, discordRefreshToken, userId]);
+export async function SetUserDiscord(userId, discordId, discordAccessToken, discordRefreshToken, discordAvatarHash){
+    await pool.query(`UPDATE users SET discord_id = ?, discord_access_token = ?, discord_refresh_token = ?, discord_avatar_hash = ? WHERE id = ?`, 
+    [discordId, discordAccessToken, discordRefreshToken, userId, discordAvatarHash]);
 }
 
 //delete
