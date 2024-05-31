@@ -11,8 +11,6 @@ import { MatchMakingTick } from "./queManager.js";
 
 dotenv.config();
 
-const website_url = process.env.URL;
-const sessionSecret = process.env.SESSION_SECRET;
 const port = process.env.PORT;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
