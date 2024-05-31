@@ -8,7 +8,6 @@ import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import path from 'path';
 
-
 import { GetUserByDiscordId, CreateUserWithDiscord } from '../database.js';
 
 const apiRouteOauth2Token = "https://discord.com/api/v10/oauth2/token";
@@ -17,6 +16,7 @@ const apiRouteUserInfo = "https://discord.com/api/v10/users/@me";
 dotenv.config();
 
 const website_url = process.env.URL;
+const sessionSecret = process.env.SESSION_SECRET;
 const port = process.env.PORT;
 const sessionSecret = process.env.SESSION_SECRET;
 
