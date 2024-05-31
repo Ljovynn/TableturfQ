@@ -36,6 +36,9 @@ await PlayerSentGameWin(1, 1);
 
 console.log(JSON.stringify(match));*/
 
+// zeb testing
+matches.push( new Match(7, 10, 3, matchModes.ranked) );
+
 export async function MakeNewMatch(player1Id, player2Id, matchMode){
 
     //randomize player positions
