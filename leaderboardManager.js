@@ -6,14 +6,11 @@ export async function UpdateLeaderboard(){
     leaderboard = await GetLeaderboard();
 }
 
-export function GetLeaderboardAtPos(minPos, hitCount){
-    var hits = [];
+export function GetLeaderboardAtPos(startPos, hitCount){
 
-    var endPos = Math.min(leaderboard.length, minPos + hitCount);
+    var endPos = Math.min(leaderboard.length, startPos + hitCount);
 
-    for (let i = 0; i < endPos; i++){
-        hits.push(leaderboard[i]);
-    }
+    var hits = leaderboard.slice(startPos, endPos);
 
     var data = {
         result: hits,

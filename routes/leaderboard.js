@@ -15,13 +15,21 @@ const sessionSecret = process.env.SESSION_SECRET;
 router.use(cookieParser(sessionSecret));
 router.use(DeserializeSession);
 
-//requests
+//post
 
-router.get('/GetLeaderboard', async (req, res) => {
+//req: startPos, hitCount
+router.post('/GetLeaderboard', async (req, res) => {
     try {
         var user = GetCurrentUser(req);
+        var startPos = req.startPos;
+        var hitCount = req.hitCount;
+        
+        if (!hitCount || !startPos){
+            res.sendStatus(400);
+            return;
+        }
 
-        var leaderboardData = GetLeaderboardAtPos();
+        var leaderboardData = GetLeaderboardAtPos(startPos, hitCount);
 
         var data = {
             user: user,
