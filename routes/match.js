@@ -32,20 +32,14 @@ router.use(DeserializeSession);
 
 //stages
 router.post("/StrikeStages", async (req, res) => {
-    console.log('Posting strikes!');
     try {
-        console.log(req.body.stages);
         const userId = req.session.user;
         const stages = req.body.stages;
-        console.log(userId);
-        console.log(stages);
 
         if (!CheckUserDefined(req, res)) return;
         if (!CheckIfArray(stages, res)) return;
 
         var matchId = PlayerSentStageStrikes(userId, stages);
-
-        console.log('Match id: ' + matchId);
 
         if (matchId){
             res.sendStatus(201);
@@ -100,12 +94,13 @@ router.post("/WinGame", async (req, res) => {
             if (matchData.dispute){
                 //TODO dispute
             } else{
-                SendSocketMessage(matchId, "gameWin", winnerId);
+                SendSocketMessage('match' + matchData.matchId, "gameWin", winnerId);
             }
             return;
         }
         res.sendStatus(403);
     } catch (err){
+        console.error(err);
         res.sendStatus(500);
     }
 });

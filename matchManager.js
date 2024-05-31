@@ -184,7 +184,8 @@ export function PlayerSentStagePick(playerId, stage){
 }
 
 export async function PlayerSentGameWin(playerId, winnerId){
-    var match = FindMatchWithPlayer(playerId);
+    var match = await FindMatchWithPlayer(playerId);
+    var matchId = 0;
     var data = {
         matchId,
         dispute: false

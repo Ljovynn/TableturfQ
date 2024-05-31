@@ -3,6 +3,11 @@ const matchContainer = document.getElementById('match-container');
 const loading = document.getElementById('loading-message');
 const player1Name = document.getElementById('player1-name');
 const player2Name = document.getElementById('player2-name');
+const player1VictoryButton = document.getElementById('player1-victory-button');
+const player2VictoryButton = document.getElementById('player2-victory-button');
+const player1Score = document.getElementById('player1-score');
+const player2Score = document.getElementById('player2-score');
+const playerScores = document.getElementsByClassName('player-score');
 const setLength = document.getElementById('set-length');
 const turnTimer = document.getElementById('timer-duration');
 const selectableStages = document.getElementsByClassName('stage-selectable');
@@ -81,8 +86,11 @@ for (let victoryButton of victoryButtons ) {
     victoryButton.addEventListener('click', (e) => {
         console.log('Marked victory for ' + victoryButton.value);
         // Send off the victory mark event for the selected player and wait for the other player to submit the victor
-        data = { gameWinner: victoryButton.value };
+        data = { winnerId: victoryButton.value };
         response = postData('/match/WinGame', data);
+        if ( response == 201 ) {
+            console.log('Winner was marked at least');
+        }
     });
 }
 
@@ -148,7 +156,11 @@ async function setMatchInfo() {
     loading.style.display = 'none';
     matchContainer.style.display = 'block';
     player1Name.innerHTML = player1Name.innerHTML + players[0].username;
+    player1VictoryButton.value = players[0].id;
+    player1Score.setAttribute('player-id', players[0].id);
     player2Name.innerHTML = player2Name.innerHTML + players[1].username;
+    player2VictoryButton.value = players[1].id;
+    player2Score.setAttribute('player-id', players[1].id);
     setLength.innerHTML = setLength.innerHTML + bestOfSets[match.mode.rulesetData.setLength] + ' games';
     turnTimer.innerHTML = turnTimer.innerHTML + ( match.mode.rulesetData.turnTimer * 10 ) + ' seconds';
 
@@ -193,8 +205,9 @@ function addMessage(userId, chatMessage) {
     chatLog.scrollTop = chatLog.scrollHeight;
 }
 
-function setStrikes(strikes) {
-    for (let strike of strikes ) {
+function setStrikes(receivedStrikes) {
+    for (let strike of receivedStrikes ) {
+        strikes.push(strike);
         console.log('striking ' + strike);
         stage = document.querySelectorAll('[stage-value="' + strike + '"]')[0];
         console.log(stage);
@@ -217,6 +230,9 @@ function setStrikeAmount() {
         strikeAmount = 1;
     }*/
     strikeAmount = (strikes.length + 1) % 4;
+    // Maybe I'm just dumb, I cannot get the mod logic to work correctly for the very last strike whether I count the amount of already stricken stages or the amount of stages remaining
+    if ( strikeableStages.length == 2 )
+        strikeAmount = 1;
     strikesRemaining = strikeAmount;
     strikeInfo.innerHTML = strikesRemaining + ' stage strike' + ( strikesRemaining == 1 ? '' : 's' ) + ' remaining.';
 }
@@ -262,6 +278,16 @@ function startGame() {
     }
 }
 
+function setWinner(winnerId) {
+    for (let score of playerScores ) {
+        console.log(score);
+        console.log(score.getAttribute('player-id'));
+        if ( score.getAttribute('player-id') == winnerId ) {
+            score.innerHTML = parseInt(score.innerHTML) + 1;
+        }
+    }
+}
+
 // Strike validation
 function validateStrikes(strikes, strikeAmount) {
     if ( strikes.length != strikeAmount ) {
@@ -290,9 +316,9 @@ socket.on('chatMessage', (userId, chatMessage) => {
     addMessage(userId, chatMessage);
 });
 
-socket.on('stageStrikes', (strikes) => {
+socket.on('stageStrikes', (receivedStrikes) => {
     console.log('Striking stages');
-    setStrikes(strikes);
+    setStrikes(receivedStrikes);
     setStrikeAmount();
     setCurrentStriker();
     isPlayerStriker();
@@ -300,4 +326,13 @@ socket.on('stageStrikes', (strikes) => {
     if (strikeableStages.length == 1) {
         startGame();
     }
+});
+
+socket.on('gameWin', (winnerId) => {
+    console.log('Player ' + winnerId + ' has won the game!!!');
+    setWinner(winnerId);
+    // Get the match info again to update the local match object
+    getMatchInfo(matchId);
+    // Start the next game
+    // Set winner to striker with 3 strikes
 });
