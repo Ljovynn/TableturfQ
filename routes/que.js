@@ -106,8 +106,7 @@ router.post("/PlayerReady", async (req, res) => {
 
 //res: user, quedata
 //quedata: matchmode, time when que started
-
-router.get('GetPlayerQueData', async (req, res) => {
+router.get('/GetPlayerQueData', async (req, res) => {
     try {
         var user = GetCurrentUser(req);
         if (!user){

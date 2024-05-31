@@ -8,6 +8,7 @@ import { CreateSocketConnection } from "./socketManager.js";
 import path from 'path';
 
 import { MatchMakingTick } from "./queManager.js";
+import { UpdateLeaderboard } from "./leaderboardManager.js";
 
 dotenv.config();
 
@@ -16,7 +17,8 @@ const sessionSecret = process.env.SESSION_SECRET;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const matchmakingTickInterval = 3000;
+const matchmakingTickInterval = 3 * 1000;
+const updateLeaderboardInterval = 5 * 60 * 1000;
 
 const app = express();
 const server = createServer(app);
@@ -25,13 +27,9 @@ CreateSocketConnection(server);
 
 server.listen(port, () => {
     console.log(`TableturfQ is up at port ${port}`);
-    setInterval(RunQue, matchmakingTickInterval);
+    setInterval(MatchMakingTick, matchmakingTickInterval);
+    setInterval(UpdateLeaderboard, updateLeaderboardInterval);
 });
-
-//TODO: refactor socket send to Que.js
-async function RunQue(){
-    await MatchMakingTick();
-}
 
 app.use(
     session({
@@ -51,10 +49,12 @@ app.use(express.json());
 import authRouter from './routes/auth.js';
 import matchRouter from './routes/match.js';
 import queRouter from './routes/que.js';
+import leaderboardRouter from './routes/leaderboard.js';
 
 app.use('/api/auth', authRouter);
 app.use('/match', matchRouter);
 app.use('/que', queRouter);
+app.use('/leaderboard', leaderboardRouter);
 
 //todo: mod stuff
 //resolve dispute
