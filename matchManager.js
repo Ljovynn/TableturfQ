@@ -317,6 +317,16 @@ export function PlayerSentMatchDispute(playerId){
     return true;
 }
 
+export function GetDisputedMatchList(){
+    var result = [];
+    for (let i = 0; i < matches.length; i++){
+        if (matches[i].status == matchStatuses.dispute){
+            result.push(matches[i]);
+        }
+    }
+    return result;
+}
+
 export function ResolveMatchDispute(matchId, resolveOption){
 
 }
