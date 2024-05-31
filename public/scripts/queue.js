@@ -13,7 +13,7 @@ joinCompetetive.addEventListener('click', async (e) => {
     data = { matchMode: 'ranked' }
 
     // Join the queue
-    response = await postData('/PlayerEnterQue', data);
+    response = await postData('/que/PlayerEnterQue', data);
     console.log('Response data: ' + JSON.stringify(response));
     if ( response == 201 ) {
         // Do queue frontend stuff
@@ -36,7 +36,7 @@ joinCasual.addEventListener('click', async (e) => {
     if (validateDisplayname(displayName)) {
         data = { matchMode: 'casual' }
         // Join the queue
-        response = await postData('/PlayerEnterQue', data);
+        response = await postData('/que/PlayerEnterQue', data);
     } else {
         alert('Please enter a valid display name.');
     }
@@ -47,7 +47,7 @@ readyButton.addEventListener('click', async (e) => {
 
     // Not sure if we need to send any data but we can leave it blank for now
 
-    response = await postData('/PlayerReady');
+    response = await postData('/que/PlayerReady');
     console.log(response);
 
     // Redirect to the game room once the game is created

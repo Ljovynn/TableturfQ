@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import cookieParser from "cookie-parser";
 import { DeserializeSession } from '../utils/session.js';
+import { SerializeSession } from '../utils/session.js';
 
 import axios from 'axios';
 import url from 'url';

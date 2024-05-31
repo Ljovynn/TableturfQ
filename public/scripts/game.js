@@ -9,6 +9,7 @@ const selectableStages = document.getElementsByClassName('stage-selectable');
 const gameMessage = document.getElementById('game-messages');
 const playingStage = document.getElementById('playing-stage');
 const currentStrikerName = document.getElementById('current-striker');
+const strikerSection = document.getElementById('striker-section');
 const strikeContent = document.getElementById('strike-content');
 const strikeInfo = document.getElementById('strike-info');
 const strikeButton = document.getElementById('confirm-map-selection');
@@ -81,7 +82,7 @@ for (let victoryButton of victoryButtons ) {
         console.log('Marked victory for ' + victoryButton.value);
         // Send off the victory mark event for the selected player and wait for the other player to submit the victor
         data = { gameWinner: victoryButton.value };
-        response = postData('/WinGame', data);
+        response = postData('/match/WinGame', data);
     });
 }
 
@@ -93,7 +94,7 @@ chatSend.addEventListener('click', async (e) => {
     // Do front end validation/sanitization functions
     if ( validateChatMessage(chatMessage) ) {
         data = { userId: userID, message: chatMessage };
-        response = await postData('/SendChatMessage', data);
+        response = await postData('/match/SendChatMessage', data);
         console.log('chat message send response: ' + response);
 
         if ( response == 201 ) {
@@ -110,7 +111,7 @@ strikeButton.addEventListener('click', async (e) => {
     console.log(stageStrikes);
     if ( validateStrikes(stageStrikes, strikeAmount) ) {
         data = { stages: stageStrikes };
-        response = await postData('/StrikeStages', data);
+        response = await postData('/match/StrikeStages', data);
         console.log(response);
 
         if ( response == 201 ) {
@@ -127,7 +128,7 @@ strikeButton.addEventListener('click', async (e) => {
 async function getMatchInfo(matchId) {
     data = {matchId: matchId};
     console.log(data);
-    result = await getData('/GetMatchInfo', data);
+    result = await getData('/match/GetMatchInfo', data);
     matchInfo = result;
     console.log(matchInfo);
 }
@@ -253,6 +254,7 @@ function isPlayerStriker() {
 function startGame() {
     playingStage.innerHTML = 'This game will be played on';
     playingStage.style.display = 'block';
+    strikerSection.style.display = 'none';
     strikeContent.style.display = 'none';
 
     for (let victoryButton of victoryButtons ) {
