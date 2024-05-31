@@ -57,8 +57,6 @@ app.use('/api/auth', authRouter);
 app.use('/match', matchRouter);
 app.use('/que', queRouter);
 
-app.get("/GetQueData", GetUserQueData);
-
 //todo: mod stuff
 //resolve dispute
 //user profile
