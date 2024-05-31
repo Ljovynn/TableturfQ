@@ -7,7 +7,6 @@ import url from 'url';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import path from 'path';
-import { DeserializeSession } from "./utils/session.js";
 
 
 import { GetUserByDiscordId, CreateUserWithDiscord } from '../database.js';
@@ -19,6 +18,7 @@ dotenv.config();
 
 const website_url = process.env.URL;
 const port = process.env.PORT;
+const sessionSecret = process.env.SESSION_SECRET;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 

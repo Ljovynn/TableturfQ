@@ -17,7 +17,13 @@ import { GetCurrentUser } from '../utils/userUtils.js';
 
 import { SendSocketMessage, SendEmptySocketMessage } from '../socketManager.js';
 
+import dotenv from 'dotenv';
+
 const router = Router();
+
+dotenv.config();
+
+const sessionSecret = process.env.SESSION_SECRET;
 
 router.use(cookieParser(sessionSecret));
 router.use(DeserializeSession);
@@ -77,7 +83,7 @@ router.post("/PickStage", async (req, res) => {
 //TODO: handle dispute by checking if winnerId is defined
 
 //winnerId
-Routerpost("/WinGame", async (req, res) => {
+router.post("/WinGame", async (req, res) => {
     try {
         const userId = req.session.user;
         const winnerId = req.body.winnerId;

@@ -11,7 +11,13 @@ import { GetCurrentUser } from "../utils/userUtils.js";
 
 import { SendSocketMessage } from "../socketManager.js";
 
+import dotenv from 'dotenv';
+
 const router = Router();
+
+dotenv.config();
+
+const sessionSecret = process.env.SESSION_SECRET;
 
 router.use(cookieParser(sessionSecret));
 router.use(DeserializeSession);
