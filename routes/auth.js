@@ -1,11 +1,16 @@
+import { Router } from 'express';
+import cookieParser from "cookie-parser";
+import { DeserializeSession } from '../utils/session.js';
+
 import axios from 'axios';
 import url from 'url';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import path from 'path';
+import { DeserializeSession } from "./utils/session.js";
 
-import { GetUserByDiscordId, CreateUserWithDiscord, GetUserData } from '../database.js';
-import { SerializeSession } from '../utils/session.js';
+
+import { GetUserByDiscordId, CreateUserWithDiscord } from '../database.js';
 
 const apiRouteOauth2Token = "https://discord.com/api/v10/oauth2/token";
 const apiRouteUserInfo = "https://discord.com/api/v10/users/@me";
@@ -17,19 +22,12 @@ const port = process.env.PORT;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-export async function GetDiscordUser(userId){
-    const user = await GetUserData(userId);
-    if (!user) return;
-    console.log("Hej" + JSON.stringify(user));
-    try {
-        const response = await axios.get(`https://cdn.discordapp.com/avatars/${user.discord_id}/${user.discord_avatar_hash}.png`);
-        return response;
-    } catch (error){
-        console.log(error);
-    }
-}
+const router = Router();
 
-export async function AuthDiscordRedirect(req, res){
+router.use(cookieParser(sessionSecret));
+router.use(DeserializeSession);
+
+router.get("/discord/redirect", async (req, res) => {
     const { code } = req.query;
 
     if (!code){
@@ -80,7 +78,9 @@ export async function AuthDiscordRedirect(req, res){
         console.log(error);
         res.sendStatus(400);
     }
-};
+});
+
+export default router;
 
 async function StoreUserData(accessToken, refreshToken){
     const response = await axios.get(apiRouteUserInfo, {

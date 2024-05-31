@@ -70,24 +70,31 @@ export async function MatchMakingTick(){
     //CheckMatchmadePlayers();
     CheckRecentlyMatchedPlayers();
     
-    var result = [];
+    var newlyMatchedPlayers = [];
     for (let i = 0; i < ques.length; i++){
         var matchedPlayers = await QueTick(ques[i]);
-        if (matchedPlayers) result.push(matchedPlayers);
+        if (matchedPlayers) newlyMatchedPlayers.push(matchedPlayers);
     }
 
     //set up match
-    for (let i = 0; i < result.length; i++){
-        if (result[i].matchMode == matchModes.casual){
-            RemovePlayersFromQue(ques[0].queArr, result[i].players[0], result[i].players[1]);
-            var match = await MakeNewMatch(result[i].players[0], result[i].players[1], result[i].matchMode);
-            result[i].matchId = match.id;
+    for (let i = 0; i < newlyMatchedPlayers.length; i++){
+        if (newlyMatchedPlayers[i].matchMode == matchModes.casual){
+            RemovePlayersFromQue(ques[0].queArr, newlyMatchedPlayers[i].players[0], newlyMatchedPlayers[i].players[1]);
+            var match = await MakeNewMatch(newlyMatchedPlayers[i].players[0], newlyMatchedPlayers[i].players[1], newlyMatchedPlayers[i].matchMode);
+
+            var matchedPlayersData = {
+                matchId: match.id,
+                player1Id: match.players[0].id,
+                player2Id: match.players[1].id
+            }
+            SendSocketMessage("queRoom", "matchReady", matchedPlayersData);
         } else{
-            RemovePlayersFromQue(ques[1].queArr, result[i].players[0], result[i].players[1]);
-            matchingPlayersList.push(new MatchedPlayers(result[i].players[0], result[i].players[1], result[i].matchMode));
+            RemovePlayersFromQue(ques[1].queArr, newlyMatchedPlayers[i].players[0], newlyMatchedPlayers[i].players[1]);
+            matchingPlayersList.push(new MatchedPlayers(newlyMatchedPlayers[i].players[0], newlyMatchedPlayers[i].players[1], newlyMatchedPlayers[i].matchMode));
+
+            SendSocketMessage("queRoom", "matchesFound", newlyMatchedPlayers[i]);
         }
     }
-    return result;
 }
 
 //algorithm for any singular que

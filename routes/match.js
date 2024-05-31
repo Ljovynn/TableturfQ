@@ -1,3 +1,7 @@
+import { Router } from 'express';
+import cookieParser from "cookie-parser";
+import { DeserializeSession } from '../utils/session.js';
+
 import { PlayerSentStageStrikes, PlayerSentStagePick, PlayerSentGameWin, PlayerSentCasualMatchEnd, 
     UserSentChatMessage, PlayerSentMatchDispute, ResolveMatchDispute } from '../matchManager.js';
 
@@ -11,10 +15,17 @@ import { CheckIfArray, CheckIfString, CheckUserDefined, CheckVariableDefined } f
 
 import { GetCurrentUser } from '../utils/userUtils.js';
 
+import { SendSocketMessage, SendEmptySocketMessage } from '../socketManager.js';
+
+const router = Router();
+
+router.use(cookieParser(sessionSecret));
+router.use(DeserializeSession);
+
 //Posts
 
 //stages
-export async function PostStageStrikes(req, res){
+router.post("/StrikeStages", async (req, res) => {
     console.log('Posting strikes!');
     try {
         console.log(req.body.stages);
@@ -32,21 +43,17 @@ export async function PostStageStrikes(req, res){
 
         if (matchId){
             res.sendStatus(201);
-            var data = {
-                matchId: matchId,
-                stages: stages
-            }
-            return data;
+            SendSocketMessage('match' + matchId, "stageStrikes", stages);
         }
         res.sendStatus(403);
     } catch (err){
         console.error(err);
         res.sendStatus(500);
     }
-};
+});
 
 //stage
-export function PostStagePick(req, res){
+router.post("/PickStage", async (req, res) => {
     try {
         const userId = req.session.user;
         const stage = req.body.stage;
@@ -58,20 +65,19 @@ export function PostStagePick(req, res){
 
         if (matchId){
             res.sendStatus(201);
-            var data = {
-                matchId: matchId,
-                stage: stage
-            }
-            return data;
+            SendSocketMessage(matchId, "stagePick", stage);
         }
         res.sendStatus(403);
     } catch (err){
         res.sendStatus(500);
     }
-}
+});
+
+
+//TODO: handle dispute by checking if winnerId is defined
 
 //winnerId
-export async function PostGameWin(req, res){
+Routerpost("/WinGame", async (req, res) => {
     try {
         const userId = req.session.user;
         const winnerId = req.body.winnerId;
@@ -89,10 +95,7 @@ export async function PostGameWin(req, res){
                     matchId: matchId
                 }
             } else{
-                data = {
-                    matchId: matchId,
-                    winnerId: winnerId,
-                }
+                SendSocketMessage(matchId, "gameWin", winnerId);
             }
             return data;
         }
@@ -100,9 +103,9 @@ export async function PostGameWin(req, res){
     } catch (err){
         res.sendStatus(500);
     }
-}
+});
 
-export async function PostCasualMatchEnd(req, res){
+router.post("/CasualMatchEnd", async (req, res) => {
     try {
         if (!CheckUserDefined(req, res)) return;
 
@@ -110,16 +113,18 @@ export async function PostCasualMatchEnd(req, res){
 
         if (matchId){
             res.sendStatus(201);
-            return matchId;
+            SendSocketMessage(matchId, "matchEnd");
         }
         res.sendStatus(403);
     } catch (err){
         res.sendStatus(500);
     }
-}
+});
+
+//todo dispute
 
 //message
-export async function PostChatMessage(req, res){
+router.post("/SendChatMessage", async (req, res) => {
     try {
         const userId = req.session.user;
         const message = req.body.message;
@@ -131,25 +136,20 @@ export async function PostChatMessage(req, res){
 
         if (matchId){
             res.sendStatus(201);
-            var data = {
-                matchId: matchId,
-                userId: userId,
-                message: message
-            }
-            return data;
+            var socketMessage = [userId, message];
+            SendSocketMessage('match' + data.matchId, "chatMessage", socketMessage);
         }
         res.sendStatus(403);
     } catch (err){
         res.sendStatus(500);
     }
-}
+});
 
 //requests
 
 //req: match id
 //res: user, match object, players, other users in chat
-
-export async function GetMatchInfo(req, res){
+router.post("/GetMatchInfo", async (req, res) => {
     try {
         const matchId = req.body.matchId;
 
@@ -224,9 +224,12 @@ export async function GetMatchInfo(req, res){
         };
     
         //res.status(200).send(data);
-        return data;
+        res.send(data);
     } catch (err){
         console.error(err);
         res.sendStatus(500);
     }
-};
+    
+});
+
+export default router;

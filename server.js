@@ -2,13 +2,12 @@ import express from "express";
 import session from "express-session";
 import dotenv from "dotenv";
 import url from "url";
-import cookieParser from "cookie-parser";
 import { createServer } from 'http';
 import { fileURLToPath } from 'url';
-import { Server } from "socket.io";
+import { CreateSocketConnection } from "./socketManager.js";
 import path from 'path';
 
-import { DeserializeSession } from "./utils/session.js";
+import { MatchMakingTick } from "./queManager.js";
 
 dotenv.config();
 
@@ -22,38 +21,17 @@ const matchmakingTickInterval = 3000;
 
 const app = express();
 const server = createServer(app);
-const io = new Server(server);
 
-io.on("connection", socket => {
-    //Not complete
-
-    //join match id as room
-    socket.on('join', function(room){
-        socket.join(room.toString());
-    });
-});
+CreateSocketConnection(server);
 
 server.listen(port, () => {
     console.log(`TableturfQ is up at port ${port}`);
     setInterval(RunQue, matchmakingTickInterval);
 });
 
+//TODO: refactor socket send to Que.js
 async function RunQue(){
-    var matchedPlayersList = await MatchMakingTick();
-    if (!matchedPlayersList) return;
-
-    for (let i = 0; i < matchedPlayersList.length; i++){
-        if (matchedPlayersList.matchMode == matchModes.casual){
-            var matchedPlayersData = {
-                matchId: matchedPlayersList[i].matchId,
-                player1Id: matchedPlayersList[i].players[0].id,
-                player2Id: matchedPlayersList[i].players[1].id
-            }
-            io.to("queRoom").emit("matchReady", matchedPlayersData);
-        } else{
-            io.to("queRoom").emit("matchesFound", matchedPlayersList[i]);
-        }
-    }
+    await MatchMakingTick();
 }
 
 app.use(
@@ -67,98 +45,23 @@ app.use(
         },
     })
 );
-app.use(cookieParser(sessionSecret));
-app.use(DeserializeSession);
 app.use(express.static('public',{extensions:['html']}));
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 
-import { AuthDiscordRedirect, GetDiscordUser } from './routes/auth.js';
-import { GetMatchInfo, PostChatMessage, PostGameWin, PostStagePick, PostStageStrikes } from './routes/match.js';
-import { MatchMakingTick } from "./queManager.js";
-import { PostEnterQue, PostLeaveQue, PostPlayerReady, GetUserQueData } from "./routes/que.js";
-import { match } from "assert";
-import { matchModes } from "./public/constants/matchData.js";
+import authRouter from './routes/auth.js';
+import matchRouter from './routes/match.js';
+import queRouter from './routes/que.js';
 
-//auth
-app.get('/api/auth/discord/redirect', AuthDiscordRedirect);
-
-//match
-app.post("/StrikeStages", async (req, res) => {
-    console.log('Posted strikes');
-    var data = await PostStageStrikes(req, res);
-    if (data){
-        io.to('match' + data.matchId).emit("stageStrikes", data.stages);
-    }
-});
-
-app.post("/PickStage", async (req, res) => {
-    var data = PostStagePick();
-    if (data){
-        io.to(data.matchId).emit("stagePick", data.stage);
-    }
-});
-
-//TODO: handle dispute by checking if winnerId is defined
-app.post("/WinGame", async (req, res) => {
-    var data = PostGameWin();
-    if (data){
-        io.to(data.matchId).emit("gameWin", data.winnerId);
-    }
-});
-
-app.post("/CasualMatchEnd", async (req, res) => {
-    var matchId = PostGameWin();
-    if (matchId){
-        io.to(data.matchId).emit("matchEnd");
-    }
-});
-
-app.post("/SendChatMessage", async (req, res) => {
-    var data = await PostChatMessage(req, res);
-    if (data) {
-        io.to('match' + data.matchId).emit("chatMessage", data.userId, data.message);
-    }
-});
-
-//todo dispute
-
-app.post("/GetMatchInfo", async (req, res) => {
-    var data = await GetMatchInfo(req, res);
-    res.send(data);
-});
-
-//que
-app.post("/PlayerEnterQue", async (req, res) => {
-    var data = PostEnterQue(req, res);
-    return data;
-});
-
-app.post("/PlayerLeaveQue", PostLeaveQue);
-
-app.post("/PlayerReady", async (req, res) => {
-    //if match created send socket
-    var match = await PostPlayerReady(req, res);
-    if (match){
-        var matchedPlayersData = {
-            matchId: match.id,
-            player1Id: match.players[0].id,
-            player2Id: match.players[1].id
-        }
-        io.to("queRoom").emit("matchReady", matchedPlayersData);
-    }
-});
+app.use('/api/auth', authRouter);
+app.use('/match', matchRouter);
+app.use('/que', queRouter);
 
 app.get("/GetQueData", GetUserQueData);
 
-//mod stuff
-
-//chat message
-
+//todo: mod stuff
 //resolve dispute
-
 //user profile
-//todo
 
 app.get("/", async (req, res) => {
     res.end();
@@ -169,7 +72,6 @@ app.get("/testing", async (req, res) => {
         res.sendStatus(401);
         return;
     }
-    res.send(GetDiscordUser(req.session.user));
     //res.sendStatus(200);
 });
 

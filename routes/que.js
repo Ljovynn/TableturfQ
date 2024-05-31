@@ -1,3 +1,7 @@
+import { Router } from 'express';
+import cookieParser from "cookie-parser";
+import { DeserializeSession } from '../utils/session.js';
+
 import { AddPlayerToQue, RemovePlayerFromQue, PlayerSentReady, FindIfPlayerInQue } from "../queManager.js";
 import { GetUserData } from "../database.js";
 
@@ -5,10 +9,17 @@ import { CheckIfRealMatchMode, CheckUserDefined, CheckVariableDefined } from "..
 
 import { GetCurrentUser } from "../utils/userUtils.js";
 
+import { SendSocketMessage } from "../socketManager.js";
+
+const router = Router();
+
+router.use(cookieParser(sessionSecret));
+router.use(DeserializeSession);
+
 //Posts
 
 //matchmode
-export async function PostEnterQue(req, res){
+router.post("/PlayerEnterQue", async (req, res) => {
     try {
         const userId = req.session.user;
         console.log(userId);
@@ -35,10 +46,10 @@ export async function PostEnterQue(req, res){
         console.log(err);
         res.sendStatus(500);
     }
-};
+});
 
 //matchMode
-export function PostLeaveQue(req, res){
+router.post("/PlayerLeaveQue", async (req, res) => {
     try {
         const userId = req.session.user;
         const matchMode = req.body.matchMode;
@@ -54,9 +65,10 @@ export function PostLeaveQue(req, res){
     } catch (err){
         res.sendStatus(500);
     }
-};
+});
 
-export async function PostPlayerReady(req, res){
+router.post("/PlayerReady", async (req, res) => {
+    //if match created send socket
     try {
         const userId = req.session.user;
         console.log('Post Player Ready function');
@@ -68,22 +80,27 @@ export async function PostPlayerReady(req, res){
 
         if (match){
             res.sendStatus(201);
-            return match;
+
+            var matchedPlayersData = {
+                matchId: match.id,
+                player1Id: match.players[0].id,
+                player2Id: match.players[1].id
+            }
+            SendSocketMessage("queRoom", "matchReady", matchedPlayersData);
         }
         res.sendStatus(403);
-        return undefined;
     } catch (err){
         console.error(err);
         res.sendStatus(500);
-        return undefined;
     }
-};
+});
 
 //Requests
 
 //res: user, quedata
 //quedata: matchmode, time when que started
-export function GetUserQueData(req, res){
+
+router.get('GetPlayerQueData', async (req, res) => {
     try {
         var user = GetCurrentUser(req);
         if (!user){
@@ -102,4 +119,6 @@ export function GetUserQueData(req, res){
     } catch (err){
         res.sendStatus(500);
     }
-}
+});
+
+export default router;
