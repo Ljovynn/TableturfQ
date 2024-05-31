@@ -154,7 +154,32 @@ h3 {
     margin: 10px 0;
 }
 
+#current-striker {
+    margin: 10px;
+}
+
 #strike-content {
+    display: none;
+}
+
+#strike-info {
+    margin: 10px;
+}
+
+#select-map-message {
+    display: none;
+}
+
+#playing-stage {
+    margin: 10px;
+    display: none;
+}
+
+.player-victory-button {
+    display: none;
+}
+
+#requeue-button {
     display: none;
 }
 

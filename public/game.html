@@ -12,7 +12,6 @@
         <div id="match-container">
             <div id="match-info">
                 <p id="players-list">Player 1 vs Player 2</p>
-                <p id="current-striker"></p>
                 <div id="ruleset">
                     <p id="set-length"><i class="fa-solid fa-gamepad"></i>&nbsp;: </p>
                     <p id="timer-duration"><i class="fa-solid fa-stopwatch"></i>&nbsp;: </p>
@@ -38,6 +37,7 @@
                     <input type="text" id="match-chat-input" /><button id="match-chat-button">Send</button>
                 </div>
             </div>
+            <p id="playing-stage"></p>
             <div id="stages-list" class="stages-list">
                     <div id="mainStreet" stage-value="1" class="stage starter-stage stage-selectable">
                         <h3>Main Street</h3>
@@ -101,10 +101,11 @@
                         <img  src="./assets/images/Over-the-Line-Icon.png" />
                     </div>
                 </div>
-                <p id="game-messages">Please wait for your opponent.</p>
                 <div id="strike-content">
-                    <div id="strike-info"><span id="strike-amount">1</span> stage strike remaining.</div>
-                    <div>(Alternate text for final selection)Please select the stage to play on</div>
+                    <p id="current-striker"></p>
+                    <p id="game-messages">Please wait for your opponent.</p>
+                    <p id="strike-info">1 stage strike remaining.</p>
+                    <p id="select-map-message">Please select the stage to play on.</p>
                     <button id="confirm-map-selection">Confirm Strikes</button>
                 </div>
             <div id="play-game">

@@ -7,7 +7,10 @@ const setLength = document.getElementById('set-length');
 const turnTimer = document.getElementById('timer-duration');
 const selectableStages = document.getElementsByClassName('stage-selectable');
 const gameMessage = document.getElementById('game-messages');
+const playingStage = document.getElementById('playing-stage');
+const currentStrikerName = document.getElementById('current-striker');
 const strikeContent = document.getElementById('strike-content');
+const strikeInfo = document.getElementById('strike-info');
 const strikeButton = document.getElementById('confirm-map-selection');
 const victoryButtons = document.getElementsByClassName('player-victory-button');
 const chatLog = document.getElementById('match-chat-log');
@@ -21,6 +24,7 @@ var players = [];
 
 var stageStrikes = [];
 var strikeAmount = 1;
+var strikesRemaining = strikeAmount;
 var currentStriker = 0;
 
 // Just the map for set length -> best of N
@@ -47,15 +51,27 @@ setMatchInfo();
 // Stage selection event listener
 for (let stage of selectableStages ) {
     stage.addEventListener('click', (e) => {
-        stage.classList.toggle('stage-selected');
+        // Prevent toggle for new stages when you have no strikes remaining for that round of striking
+        if ( strikesRemaining != 0 || stage.classList.contains('stage-selected') ) {
+            stage.classList.toggle('stage-selected');
+        }
+        stageValue = parseInt(stage.getAttribute('stage-value'));
 
         // Add/Remove stage from the list of strikes that will be sent off to the server when the confirm strikes button is selected
-        var i = stageStrikes.indexOf(stage.id);
+        var i = stageStrikes.indexOf( stageValue );
+        console.log(i);
         if ( i === -1 ) {
-            stageStrikes.push( parseInt(stage.getAttribute('stage-value')) );
+            // Don't go into negative strikes
+            if ( strikesRemaining > 0 ) {
+                strikesRemaining = strikesRemaining - 1;
+                stageStrikes.push( stageValue );
+            }
         } else {
+            strikesRemaining = strikesRemaining + 1;
             stageStrikes.splice(i,1);
         }
+
+        strikeInfo.innerHTML = strikesRemaining + ' stage strike' + ( strikesRemaining == 1 ? '' : 's' ) + ' remaining.';
     });
 }
 
@@ -194,23 +210,34 @@ function setStrikes(strikes) {
 function setStrikeAmount() {
     // Figure out the current strike amount
     strikeableStages = document.getElementsByClassName('stage-selectable');
-    if ( strikeableStages.length == 4 ) {
+    /*if ( strikeableStages.length == 4 ) {
         strikeAmount = 2;
     } else {
         strikeAmount = 1;
-    }
+    }*/
+    strikeAmount = (strikes.length + 1) % 4;
+    strikesRemaining = strikeAmount;
+    strikeInfo.innerHTML = strikesRemaining + ' stage strike' + ( strikesRemaining == 1 ? '' : 's' ) + ' remaining.';
 }
 
 function setCurrentStriker() {
     strikeableStages = document.getElementsByClassName('stage-selectable');
-    if ( strikeableStages.length == 5 )
+    if ( strikeableStages.length == 5 ) {
         currentStriker = players[0].id;
+        name = players[0].username;
+    }
 
-    if ( strikeableStages.length == 4 )
+    if ( strikeableStages.length == 4 ) {
         currentStriker = players[1].id;
+        name = players[1].username;
+    }
 
-    if ( strikeableStages.length == 2 )
+    if ( strikeableStages.length == 2 ) {
         currentStriker = players[0].id;
+        name = players[0].username;
+    }
+
+    currentStrikerName.innerHTML = name + ' is currently striking.';
 }
 
 function isPlayerStriker() {
@@ -220,6 +247,16 @@ function isPlayerStriker() {
     } else {
         gameMessage.style.display = 'block';
         strikeContent.style.display = 'none';
+    }
+}
+
+function startGame() {
+    playingStage.innerHTML = 'This game will be played on';
+    playingStage.style.display = 'block';
+    strikeContent.style.display = 'none';
+
+    for (let victoryButton of victoryButtons ) {
+        victoryButton.style.display = 'inline-block';
     }
 }
 
@@ -257,4 +294,8 @@ socket.on('stageStrikes', (strikes) => {
     setStrikeAmount();
     setCurrentStriker();
     isPlayerStriker();
+
+    if (strikeableStages.length == 1) {
+        startGame();
+    }
 });
