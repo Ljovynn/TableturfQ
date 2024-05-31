@@ -93,6 +93,7 @@ router.post("/PlayerReady", async (req, res) => {
                 player2Id: match.players[1].id
             }
             SendSocketMessage("queRoom", "matchReady", matchedPlayersData);
+            return;
         }
         res.sendStatus(403);
     } catch (err){

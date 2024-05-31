@@ -50,6 +50,7 @@ router.post("/StrikeStages", async (req, res) => {
         if (matchId){
             res.sendStatus(201);
             SendSocketMessage('match' + matchId, "stageStrikes", stages);
+            return;
         }
         res.sendStatus(403);
     } catch (err){
@@ -72,6 +73,7 @@ router.post("/PickStage", async (req, res) => {
         if (matchId){
             res.sendStatus(201);
             SendSocketMessage(matchId, "stagePick", stage);
+            return;
         }
         res.sendStatus(403);
     } catch (err){
@@ -95,15 +97,12 @@ router.post("/WinGame", async (req, res) => {
 
         if (matchData && matchData.matchId){
             res.sendStatus(201);
-            var data;
             if (matchData.dispute){
-                data = {
-                    matchId: matchId
-                }
+                //TODO dispute
             } else{
                 SendSocketMessage(matchId, "gameWin", winnerId);
             }
-            return data;
+            return;
         }
         res.sendStatus(403);
     } catch (err){
@@ -120,6 +119,7 @@ router.post("/CasualMatchEnd", async (req, res) => {
         if (matchId){
             res.sendStatus(201);
             SendSocketMessage(matchId, "matchEnd");
+            return;
         }
         res.sendStatus(403);
     } catch (err){
@@ -144,6 +144,7 @@ router.post("/SendChatMessage", async (req, res) => {
             res.sendStatus(201);
             var socketMessage = [userId, message];
             SendSocketMessage('match' + data.matchId, "chatMessage", socketMessage);
+            return;
         }
         res.sendStatus(403);
     } catch (err){
