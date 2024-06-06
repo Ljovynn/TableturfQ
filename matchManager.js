@@ -188,7 +188,8 @@ export async function PlayerSentGameWin(playerId, winnerId){
     var matchId = 0;
     var data = {
         matchId,
-        dispute: false
+        dispute: false,
+        confirmed: false
     }
     if (!match) return;
 
@@ -240,6 +241,8 @@ export async function PlayerSentGameWin(playerId, winnerId){
             match.players[0].gameConfirmed = false;
             match.players[1].gameConfirmed = false;
         }
+
+        data.confirmed = true;
     }
     
     return data;
