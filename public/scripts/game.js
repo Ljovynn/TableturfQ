@@ -10,7 +10,9 @@ const player2Score = document.getElementById('player2-score');
 const playerScores = document.getElementsByClassName('player-score');
 const setLength = document.getElementById('set-length');
 const turnTimer = document.getElementById('timer-duration');
+const stages = document.getElementsByClassName('stage');
 const selectableStages = document.getElementsByClassName('stage-selectable');
+const confirmationMessage = document.getElementById('confirmation-message');
 const gameMessage = document.getElementById('game-messages');
 const playingStage = document.getElementById('playing-stage');
 const currentStrikerName = document.getElementById('current-striker');
@@ -83,13 +85,18 @@ for (let stage of selectableStages ) {
 
 // Victory button click listener
 for (let victoryButton of victoryButtons ) {
-    victoryButton.addEventListener('click', (e) => {
+    victoryButton.addEventListener('click', async (e) => {
         console.log('Marked victory for ' + victoryButton.value);
         // Send off the victory mark event for the selected player and wait for the other player to submit the victor
         data = { winnerId: victoryButton.value };
-        response = postData('/match/WinGame', data);
+        response = await postData('/match/WinGame', data);
+        console.log(response);
         if ( response == 201 ) {
             console.log('Winner was marked at least');
+            confirmationMessage.innerHTML = 'Waiting for opponent to confirm the winner.';
+            confirmationMessage.style.display = 'block';
+            player1VictoryButton.style.display = 'none';
+            player2VictoryButton.style.display = 'none';
         }
     });
 }
@@ -167,7 +174,7 @@ async function setMatchInfo() {
     addChatMessages(chat);
     setStrikes(strikes);
     setStrikeAmount();
-    setCurrentStriker();
+    setCurrentStriker(0);
     isPlayerStriker();
 }
 
@@ -222,22 +229,28 @@ function setStrikes(receivedStrikes) {
 }
 
 function setStrikeAmount() {
-    // Figure out the current strike amount
-    strikeableStages = document.getElementsByClassName('stage-selectable');
-    /*if ( strikeableStages.length == 4 ) {
-        strikeAmount = 2;
+    if ( matchInfo.match.gamesArr.length == 1 ) {
+        // Figure out the current strike amount
+        strikeableStages = document.getElementsByClassName('stage-selectable');
+        /*if ( strikeableStages.length == 4 ) {
+            strikeAmount = 2;
+        } else {
+            strikeAmount = 1;
+        }*/
+        strikeAmount = (strikes.length + 1) % 4;
+        // Maybe I'm just dumb, I cannot get the mod logic to work correctly for the very last strike whether I count the amount of already stricken stages or the amount of stages remaining
+        if ( strikeableStages.length == 2 )
+            strikeAmount = 1;
+        strikesRemaining = strikeAmount;
+        strikeInfo.innerHTML = strikesRemaining + ' stage strike' + ( strikesRemaining == 1 ? '' : 's' ) + ' remaining.';
     } else {
-        strikeAmount = 1;
-    }*/
-    strikeAmount = (strikes.length + 1) % 4;
-    // Maybe I'm just dumb, I cannot get the mod logic to work correctly for the very last strike whether I count the amount of already stricken stages or the amount of stages remaining
-    if ( strikeableStages.length == 2 )
-        strikeAmount = 1;
-    strikesRemaining = strikeAmount;
-    strikeInfo.innerHTML = strikesRemaining + ' stage strike' + ( strikesRemaining == 1 ? '' : 's' ) + ' remaining.';
+        strikeAmount = 3;
+        strikesRemaining = strikeAmount;
+        strikeInfo.innerHTML = strikesRemaining + ' stage strike' + ( strikesRemaining == 1 ? '' : 's' ) + ' remaining.';
+    }
 }
 
-function setCurrentStriker() {
+function setCurrentStriker(userId) {
     strikeableStages = document.getElementsByClassName('stage-selectable');
     if ( strikeableStages.length == 5 ) {
         currentStriker = players[0].id;
@@ -288,6 +301,27 @@ function setWinner(winnerId) {
     }
 }
 
+async function gameReset(winnerId) {
+    playingStage.style.display = 'none';
+    confirmationMessage.style.display = 'none';
+    player1VictoryButton.style.display = 'none';
+    player2VictoryButton.style.display = 'none';
+    currentStriker = winnerId;
+    unstrikeAllMaps();
+    strikerSection.style.display = 'block';
+    strikeContent.style.display = 'block';
+    console.log('Reset');
+    console.log(matchInfo);
+    setStrikeAmount()
+}
+
+function unstrikeAllMaps() {
+    for ( let stage of stages ) {
+        stage.classList.remove('stage-stricken');
+        stage.classList.add('stage-selectable');
+     }
+}
+
 // Strike validation
 function validateStrikes(strikes, strikeAmount) {
     if ( strikes.length != strikeAmount ) {
@@ -320,7 +354,7 @@ socket.on('stageStrikes', (receivedStrikes) => {
     console.log('Striking stages');
     setStrikes(receivedStrikes);
     setStrikeAmount();
-    setCurrentStriker();
+    setCurrentStriker(0);
     isPlayerStriker();
 
     if (strikeableStages.length == 1) {
@@ -330,9 +364,20 @@ socket.on('stageStrikes', (receivedStrikes) => {
 
 socket.on('gameWin', (winnerId) => {
     console.log('Player ' + winnerId + ' has won the game!!!');
-    setWinner(winnerId);
+    console.log('Waiting for confirmation');
+    //setWinner(winnerId);
     // Get the match info again to update the local match object
-    getMatchInfo(matchId);
+    //getMatchInfo(matchId);
     // Start the next game
     // Set winner to striker with 3 strikes
+});
+
+socket.on('playerConfirmedWin', async (winnerId) => {
+    setWinner(winnerId);
+    // I guess check if the match is over before reseting the game state
+    await getMatchInfo(matchId);
+    await gameReset(winnerId);
+    isPlayerStriker();
+    //getMatchInfo(matchId);
+    //setMatchInfo(matchId);
 });
