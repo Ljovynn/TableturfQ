@@ -6,6 +6,8 @@ import { CheckIfString, CheckUserDefined } from '../utils/checkDefined.js';
 import { BanUser, GetUserBanAndRole, GetUserRole, SuspendUser } from '../database.js';
 import { userRoles } from '../public/constants/userData.js';
 
+import dotenv from 'dotenv';
+
 import { SendSocketMessage } from '../socketManager.js';
 import { RemovePlayerFromAnyQue } from '../queManager.js';
 import { HandleBannedPlayerInMatch } from '../matchManager.js';
@@ -94,13 +96,5 @@ router.post("/ModChatMessage", async (req, res) => {
         res.sendStatus(500);
     }
 });
-
-function CheckIfAdmin(userId){
-    var role = GetUserRole(userId);
-    if (role == userRoles.mod){
-        return true;
-    }
-    return false;
-}
 
 export default router;
