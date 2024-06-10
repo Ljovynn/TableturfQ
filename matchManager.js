@@ -188,7 +188,8 @@ export async function PlayerSentGameWin(playerId, winnerId){
     var data = {
         matchId,
         dispute: false,
-        confirmed: false
+        confirmed: false,
+        matchWin: false
     }
     if (!match) return;
 
@@ -234,6 +235,7 @@ export async function PlayerSentGameWin(playerId, winnerId){
 
         if (CheckMatchWin(match, winnerId)){
             match.winnerId = winnerId;
+            data.matchWin = true;
             if (await HandleMatchWin(match)) return data;
             return false;
         } else{
