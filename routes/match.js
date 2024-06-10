@@ -66,7 +66,7 @@ router.post("/PickStage", async (req, res) => {
 
         if (matchId){
             res.sendStatus(201);
-            SendSocketMessage(matchId, "stagePick", stage);
+            SendSocketMessage('match' + matchId, "stagePick", stage);
             return;
         }
         res.sendStatus(403);

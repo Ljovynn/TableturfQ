@@ -34,6 +34,7 @@ var stageStrikes = [];
 var strikeAmount = 1;
 var strikesRemaining = strikeAmount;
 var currentStriker = 0;
+var mapSelect = false;
 
 // Just the map for set length -> best of N
 var bestOfSets = {
@@ -57,29 +58,31 @@ setMatchInfo();
 // Set event listeners for interactable elements
 
 // Stage selection event listener
-for (let stage of selectableStages ) {
+for (let stage of stages ) {
     stage.addEventListener('click', (e) => {
-        // Prevent toggle for new stages when you have no strikes remaining for that round of striking
-        if ( strikesRemaining != 0 || stage.classList.contains('stage-selected') ) {
-            stage.classList.toggle('stage-selected');
-        }
-        stageValue = parseInt(stage.getAttribute('stage-value'));
-
-        // Add/Remove stage from the list of strikes that will be sent off to the server when the confirm strikes button is selected
-        var i = stageStrikes.indexOf( stageValue );
-        console.log(i);
-        if ( i === -1 ) {
-            // Don't go into negative strikes
-            if ( strikesRemaining > 0 ) {
-                strikesRemaining = strikesRemaining - 1;
-                stageStrikes.push( stageValue );
+        if ( stage.classList.contains('stage-selectable') ) {
+            // Prevent toggle for new stages when you have no strikes remaining for that round of striking
+            if ( strikesRemaining != 0 || stage.classList.contains('stage-selected') ) {
+                stage.classList.toggle('stage-selected');
             }
-        } else {
-            strikesRemaining = strikesRemaining + 1;
-            stageStrikes.splice(i,1);
-        }
+            stageValue = parseInt(stage.getAttribute('stage-value'));
 
-        strikeInfo.innerHTML = strikesRemaining + ' stage strike' + ( strikesRemaining == 1 ? '' : 's' ) + ' remaining.';
+            // Add/Remove stage from the list of strikes that will be sent off to the server when the confirm strikes button is selected
+            var i = stageStrikes.indexOf( stageValue );
+            console.log(i);
+            if ( i === -1 ) {
+                // Don't go into negative strikes
+                if ( strikesRemaining > 0 ) {
+                    strikesRemaining = strikesRemaining - 1;
+                    stageStrikes.push( stageValue );
+                }
+            } else {
+                strikesRemaining = strikesRemaining + 1;
+                stageStrikes.splice(i,1);
+            }
+
+            strikeInfo.innerHTML = strikesRemaining + ' stage strike' + ( strikesRemaining == 1 ? '' : 's' ) + ' remaining.';
+        }
     });
 }
 
@@ -125,8 +128,13 @@ chatSend.addEventListener('click', async (e) => {
 strikeButton.addEventListener('click', async (e) => {
     console.log(stageStrikes);
     if ( validateStrikes(stageStrikes, strikeAmount) ) {
-        data = { stages: stageStrikes };
-        response = await postData('/match/StrikeStages', data);
+        if ( !mapSelect ) {
+            data = { stages: stageStrikes };
+            response = await postData('/match/StrikeStages', data);
+        } else {
+            data = { stage: stageStrikes[0] };
+            response = await postData('/match/PickStage', data);
+        }
         console.log(response);
 
         if ( response == 201 ) {
@@ -174,7 +182,7 @@ async function setMatchInfo() {
     addChatMessages(chat);
     setStrikes(strikes);
     setStrikeAmount();
-    setCurrentStriker(0);
+    setCurrentStriker();
     isPlayerStriker();
 }
 
@@ -244,13 +252,21 @@ function setStrikeAmount() {
         strikesRemaining = strikeAmount;
         strikeInfo.innerHTML = strikesRemaining + ' stage strike' + ( strikesRemaining == 1 ? '' : 's' ) + ' remaining.';
     } else {
-        strikeAmount = 3;
+        // I think I can use the mod operation for this but 15 stages + 1 % 4 just equals 0?
+        if ( strikeableStages.length > 12 ) {
+            strikeAmount = 3;
+            strikeButton.innerHTML = 'Confirm Strikes';
+        } else {
+            strikeAmount = 1;
+            strikeButton.innerHTML = 'Select Map';
+            mapSelect = true;
+        }
         strikesRemaining = strikeAmount;
         strikeInfo.innerHTML = strikesRemaining + ' stage strike' + ( strikesRemaining == 1 ? '' : 's' ) + ' remaining.';
     }
 }
 
-function setCurrentStriker(userId) {
+function setCurrentStriker() {
     strikeableStages = document.getElementsByClassName('stage-selectable');
     if ( strikeableStages.length == 5 ) {
         currentStriker = players[0].id;
@@ -268,6 +284,20 @@ function setCurrentStriker(userId) {
     }
 
     currentStrikerName.innerHTML = name + ' is currently striking.';
+
+    // If 12 stages remain, just set it to the other player, we have to select the game
+    if ( strikeableStages.length == 12 ) {
+        if ( currentStriker == players[0].id ) {
+            currentStriker = players[1].id;
+            name = players[1].username;
+        } else {
+            currentStriker = players[0].id;
+            name = players[0].username;
+        }
+
+        currentStrikerName.innerHTML = name + ' is currently picking the map to play on.';
+        strikeInfo.innerHTML = 'Select the map to play on.';
+    }
 }
 
 function isPlayerStriker() {
@@ -277,6 +307,15 @@ function isPlayerStriker() {
     } else {
         gameMessage.style.display = 'block';
         strikeContent.style.display = 'none';
+    }
+}
+
+function setSelectedStage(selectedStage) {
+    // Just mark every stage that wasn't selected as stricken
+    for ( let stage of stages ) {
+        if ( parseInt(stage.getAttribute('stage-value')) != selectedStage ) {
+            stage.classList.add('stage-stricken');
+        }
     }
 }
 
@@ -302,6 +341,7 @@ function setWinner(winnerId) {
 }
 
 async function gameReset(winnerId) {
+    mapSelect = false;
     playingStage.style.display = 'none';
     confirmationMessage.style.display = 'none';
     player1VictoryButton.style.display = 'none';
@@ -312,10 +352,12 @@ async function gameReset(winnerId) {
     strikeContent.style.display = 'block';
     console.log('Reset');
     console.log(matchInfo);
-    setStrikeAmount()
+    setStrikeAmount();
+
 }
 
 function unstrikeAllMaps() {
+    strikes = [];
     for ( let stage of stages ) {
         stage.classList.remove('stage-stricken');
         stage.classList.add('stage-selectable');
@@ -354,12 +396,19 @@ socket.on('stageStrikes', (receivedStrikes) => {
     console.log('Striking stages');
     setStrikes(receivedStrikes);
     setStrikeAmount();
-    setCurrentStriker(0);
+    setCurrentStriker();
     isPlayerStriker();
 
     if (strikeableStages.length == 1) {
         startGame();
     }
+});
+
+socket.on('stagePick', (selectedStage) => {
+    console.log('Stage was selected!');
+    console.log(selectedStage);
+    setSelectedStage(selectedStage);
+    startGame();
 });
 
 socket.on('gameWin', (winnerId) => {
