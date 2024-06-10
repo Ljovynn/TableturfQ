@@ -21,11 +21,11 @@ export function ConvertDBMatchToMatch(matchData, gamesData, strikeData, chatMess
 
     match.gamesArr = [];
     for (let i = 0; i < gamesData.length; i++){
-        if (i != 0) match.gamesArr.push(new Game());
+        match.gamesArr.push(new Game());
 
         match.gamesArr[i].stage = gamesData[i].stage;
         if (gamesData[i].result != 0){
-            match.gamesArr[i].winnerId = match.players[gamesData[i].result - 1];
+            match.gamesArr[i].winnerId = match.players[gamesData[i].result - 1].id;
         }
 
         for (let j = 0; j < strikeData[i].length; j++){
