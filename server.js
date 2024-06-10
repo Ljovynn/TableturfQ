@@ -50,11 +50,13 @@ import authRouter from './routes/auth.js';
 import matchRouter from './routes/match.js';
 import queRouter from './routes/que.js';
 import leaderboardRouter from './routes/leaderboard.js';
+import adminRouter from './routes/admin.js';
 
 app.use('/api/auth', authRouter);
 app.use('/match', matchRouter);
 app.use('/que', queRouter);
 app.use('/leaderboard', leaderboardRouter);
+app.use('/admin', adminRouter);
 
 //todo: mod stuff
 //resolve dispute

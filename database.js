@@ -61,6 +61,21 @@ export async function GetUserRankData(userId){
     return rows[0];
 }
 
+export async function GetUserRole(userId){
+    const [rows] = await pool.query(`SELECT role FROM users WHERE id = ?`, [userId]);
+    return rows[0].role;
+}
+
+export async function GetUserBanState(userId){
+    const [rows] = await pool.query(`SELECT COUNT(*) AS banned FROM ban_list WHERE user_id = ?`, [userId]);
+    return rows[0].banned;
+}
+
+export async function GetUserBanAndRole(userId){
+    await pool.query(`SELECT role, (SELECT COUNT(*) FROM ban_list WHERE user_id = u.id) AS banned FROM users u WHERE id = ?`, [userId]);
+    return rows[0];
+}
+
 export async function GetUserChatData(userIdArr){
     const rows = [];
     for (let i = 0; i < userIdArr.length; i++){
