@@ -283,6 +283,8 @@ export async function PlayerSentCasualMatchEnd(playerId){
     var match = FindMatchWithPlayer(playerId);
     if (!match) return;
 
+    if (match.status == matchStatuses.dispute) return;
+
     if (!await FinishMatch(match)) return;
 
     return match.id;
@@ -311,15 +313,15 @@ export async function ModSentChatMessage(matchId, userId, content){
 export function PlayerSentMatchDispute(playerId){
     var match = FindMatchWithPlayer(playerId);
 
-    if (!match) return false;
+    if (!match) return;
 
-    if (match.status == matchStatuses.dispute) return false;
+    if (match.status == matchStatuses.dispute) return;
 
     match.status = matchStatuses.dispute;
-    return true;
+    return match.id;
 }
 
-export function GetDisputedMatchList(){
+export function GetDisputedMatchesList(){
     var result = [];
     for (let i = 0; i < matches.length; i++){
         if (matches[i].status == matchStatuses.dispute){

@@ -75,9 +75,6 @@ router.post("/PickStage", async (req, res) => {
     }
 });
 
-
-//TODO: handle dispute by checking if winnerId is defined
-
 //winnerId
 router.post("/WinGame", async (req, res) => {
     try {
@@ -92,7 +89,7 @@ router.post("/WinGame", async (req, res) => {
         if (matchData && matchData.matchId){
             res.sendStatus(201);
             if (matchData.dispute){
-                //TODO dispute
+                SendEmptySocketMessage('match' + matchData.matchId, "dispute");
             } else if (matchData.matchWin){
                 SendSocketMessage('match' + matchData.matchId, "matchWin", winnerId);
             } else if (matchData.confirmed){
@@ -117,7 +114,7 @@ router.post("/CasualMatchEnd", async (req, res) => {
 
         if (matchId){
             res.sendStatus(201);
-            SendEmptySocketMessage(matchId, "matchEnd");
+            SendEmptySocketMessage('match' + matchId, "matchEnd");
             return;
         }
         res.sendStatus(403);
@@ -126,7 +123,22 @@ router.post("/CasualMatchEnd", async (req, res) => {
     }
 });
 
-//todo dispute
+router.post("/Dispute", async (req, res) => {
+    try {
+        if (!CheckUserDefined(req, res)) return;
+
+        var matchId = PlayerSentMatchDispute(userId);
+
+        if (matchId){
+            res.sendStatus(201);
+            SendEmptySocketMessage('match' + matchId, "dispute");
+            return;
+        }
+        res.sendStatus(403);
+    } catch (err){
+        res.sendStatus(500);
+    }
+});
 
 //message
 router.post("/SendChatMessage", async (req, res) => {

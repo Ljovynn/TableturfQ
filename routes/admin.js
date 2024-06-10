@@ -10,7 +10,7 @@ import dotenv from 'dotenv';
 
 import { SendEmptySocketMessage, SendSocketMessage } from '../socketManager.js';
 import { RemovePlayerFromAnyQue } from '../queManager.js';
-import { FindMatch, HandleBannedPlayerInMatch, ResolveMatchDispute } from '../matchManager.js';
+import { GetDisputedMatchesList, HandleBannedPlayerInMatch, ResolveMatchDispute } from '../matchManager.js';
 import { disputeResolveOptions, matchModes } from '../public/constants/matchData.js';
 
 const router = Router();
@@ -22,7 +22,7 @@ const sessionSecret = process.env.SESSION_SECRET;
 router.use(cookieParser(sessionSecret));
 router.use(DeserializeSession);
 
-//Todo: resolve dispute, get disputed match list
+//Todo:  get disputed match list
 
 //posts
 
@@ -149,7 +149,7 @@ router.post("/ModChatMessage", async (req, res) => {
         const message = req.body.message;
 
         if (!CheckUserDefined(req, res)) return;
-        if (!CheckIfAdmin(userId)) return;
+        if (!CheckIfAdmin(req, res)) return;
         if (!CheckIfString(message, res)) return;
 
         if (UserSentChatMessage(matchId, userId, message)){
@@ -160,6 +160,22 @@ router.post("/ModChatMessage", async (req, res) => {
         }
 
         res.sendStatus(403);
+    } catch (err){
+        res.sendStatus(500);
+    }
+});
+
+//requests
+
+router.get('/GetDisputedMatchesList', async (req, res) => {
+    try {
+
+        if (!CheckUserDefined(req, res)) return;
+        if (!CheckIfAdmin(req, res)) return;
+
+        var data = GetDisputedMatchesList(user.id);
+
+        res.status(200).send(data);
     } catch (err){
         res.sendStatus(500);
     }
