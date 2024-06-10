@@ -47,6 +47,7 @@ var user = {};
 var matchInfo = [];
 var players = [];
 
+var strikes = [];
 var stageStrikes = [];
 var strikeAmount = 1;
 var strikesRemaining = strikeAmount;
@@ -181,26 +182,33 @@ async function setMatchInfo() {
     user = matchInfo.user;
     userID = user.id;
     chat = match.chat;
-    strikes = match.gamesArr.at(-1).strikes;
+    stageStrikes = match.gamesArr.at(-1).strikes;
     console.log(match);
     console.log(players);
+    console.log('strikes');
     console.log(strikes);
     loading.style.display = 'none';
     matchContainer.style.display = 'block';
-    player1Name.innerHTML = player1Name.innerHTML + players[0].username;
+    player1Name.innerHTML = players[0].username;
     player1VictoryButton.value = players[0].id;
     player1Score.setAttribute('player-id', players[0].id);
-    player2Name.innerHTML = player2Name.innerHTML + players[1].username;
+    player2Name.innerHTML = players[1].username;
     player2VictoryButton.value = players[1].id;
     player2Score.setAttribute('player-id', players[1].id);
-    setLength.innerHTML = setLength.innerHTML + bestOfSets[match.mode.rulesetData.setLength] + ' games';
-    turnTimer.innerHTML = turnTimer.innerHTML + ( match.mode.rulesetData.turnTimer * 10 ) + ' seconds';
+    setLength.innerHTML = bestOfSets[match.mode.rulesetData.setLength] + ' games';
+    turnTimer.innerHTML = ( match.mode.rulesetData.turnTimer * 10 ) + ' seconds';
 
     addChatMessages(chat);
-    setStrikes(strikes);
+    setScores();
+    setStages();
+    setStrikes(stageStrikes);
     setStrikeAmount();
     setCurrentStriker();
     isPlayerStriker();
+
+    if ( match.status == 1 ) {
+        startGame();
+    }
 }
 
 // Grab all messages associated with the game and add them to the chat log
@@ -237,12 +245,44 @@ function addMessage(userId, chatMessage) {
     chatLog.scrollTop = chatLog.scrollHeight;
 }
 
+function setScores() {
+    for (let score of playerScores ) {
+        score.innerHTML = 0
+    }
+
+    games = match.gamesArr;
+    for ( let game of games ) {
+        setWinner(game.winnerId);
+    }
+}
+
+function setStages() {
+    if (match.gamesArr.length > 1) {
+        currentStage = match.gamesArr.at(-1).stage;
+        for( let stage of stages ) {
+            // If the stage hasn't been selected, remove all stage-stricken classes first
+            // If the stage has been selected, strike everything except the selected stage
+            if ( !currentStage ) {
+                stage.classList.remove('stage-stricken');
+            } else {
+                if ( stage.getAttribute('stage-value') != currentStage ) {
+                    stage.classList.add('stage-stricken');
+                }
+            }
+            stage.classList.add('stage-selectable');
+        }
+    }
+}
+
 function setStrikes(receivedStrikes) {
+    console.log('received strikes');
+    console.log(receivedStrikes);
     for (let strike of receivedStrikes ) {
+        console.log('strike array: ' + JSON.stringify(strikes));
         strikes.push(strike);
-        console.log('striking ' + strike);
+        //console.log('striking ' + strike);
         stage = document.querySelectorAll('[stage-value="' + strike + '"]')[0];
-        console.log(stage);
+        //console.log(stage);
         // Change the classes to remove selected stage from eligible selections
         if ( stage.classList.contains('stage-selected') )
             stage.classList.remove('stage-selected');
@@ -269,6 +309,7 @@ function setStrikeAmount() {
         strikesRemaining = strikeAmount;
         strikeInfo.innerHTML = strikesRemaining + ' stage strike' + ( strikesRemaining == 1 ? '' : 's' ) + ' remaining.';
     } else {
+        strikeableStages = document.getElementsByClassName('stage-selectable');
         // I think I can use the mod operation for this but 15 stages + 1 % 4 just equals 0?
         if ( strikeableStages.length > 12 ) {
             strikeAmount = 3;
@@ -285,6 +326,7 @@ function setStrikeAmount() {
 
 function setCurrentStriker() {
     strikeableStages = document.getElementsByClassName('stage-selectable');
+    // TODO: Rewrite this whole function, this is horrible
     if ( strikeableStages.length == 5 ) {
         currentStriker = players[0].id;
         name = players[0].username;
@@ -298,6 +340,15 @@ function setCurrentStriker() {
     if ( strikeableStages.length == 2 ) {
         currentStriker = players[0].id;
         name = players[0].username;
+    }
+
+    if ( match.gamesArr.length > 1 ) {
+        currentStriker = match.gamesArr.at(-2).winnerId;
+        if ( currentStriker == players[0].id ) {
+            name = players[0].username;
+        } else {
+            name = players[1].username;
+        }
     }
 
     currentStrikerName.innerHTML = name + ' is currently striking.';
@@ -369,11 +420,13 @@ async function gameReset(winnerId) {
     strikeContent.style.display = 'block';
     console.log('Reset');
     console.log(matchInfo);
+    setScores();
     setStrikeAmount();
 
 }
 
 function gameFinish(winnerId) {
+    setScores();
     playingStage.style.display = 'none';
     player1VictoryButton.style.display = 'none';
     player2VictoryButton.style.display = 'none';
@@ -449,7 +502,7 @@ socket.on('stagePick', (selectedStage) => {
     startGame();
 });
 
-socket.on('gameWin', (winnerId) => {
+socket.on('playerConfirmedWin', (winnerId) => {
     console.log('Player ' + winnerId + ' has won the game!!!');
     console.log('Waiting for confirmation');
     //setWinner(winnerId);
@@ -459,10 +512,9 @@ socket.on('gameWin', (winnerId) => {
     // Set winner to striker with 3 strikes
 });
 
-socket.on('playerConfirmedWin', async (winnerId) => {
-    setWinner(winnerId);
+socket.on('gameWin', async (winnerId) => {
     // I guess check if the match is over before reseting the game state
-    await getMatchInfo(matchId);
+    await setMatchInfo();
     await gameReset(winnerId);
     isPlayerStriker();
     //getMatchInfo(matchId);
@@ -471,7 +523,6 @@ socket.on('playerConfirmedWin', async (winnerId) => {
 
 socket.on('matchWin', async (winnerId) => {
     console.log('Match win socket!');
-    setWinner(winnerId);
     //await getMatchInfo(matchId);
     gameFinish(winnerId);
     // Unhide return to queue button
