@@ -337,7 +337,7 @@ export async function ResolveMatchDispute(matchId, resolveOption){
 
     if (match.mode == matchModes.casual){
         match.status == matchStatuses.ingame;
-        return true;
+        return 'casual';
     }
 
     var currentGame = match.gamesArr[match.gamesArr.length - 1];
@@ -374,19 +374,23 @@ export async function ResolveMatchDispute(matchId, resolveOption){
             return HandleDisputeGameWin(match, 1);
         case disputeResolveOptions.matchWinPlayer1:
             match.winnerId = match.players[0].id;
-            if (await HandleMatchWin(match)) return true;
+            var result = { winnerId: match.winnerId }
+            if (await HandleMatchWin(match)) return result;
             return false;
         case disputeResolveOptions.matchWinPlayer2:
             match.winnerId = match.players[1].id;
-            if (await HandleMatchWin(match)) return true;
+            var result = { winnerId: match.winnerId }
+            if (await HandleMatchWin(match)) return result;
             return false;
-            break;
+        default:
+            return false;
     }
 }
 
 async function HandleDisputeGameWin(match, winnerIndex){
     var data = {
-        gameFinished: false
+        matchFinished: false,
+        winnerId: 0
     }
     var currentGame = match.gamesArr[match.gamesArr.length - 1];
 
@@ -398,8 +402,11 @@ async function HandleDisputeGameWin(match, winnerIndex){
     match.status = matchStatuses.stageSelection;
 
     if (CheckMatchWin(match, currentGame.winnerId)){
-        data.gameFinished = true;
         match.winnerId = currentGame.winnerId;
+
+        data.matchFinished = true;
+        data.winnerId = match.winnerId;
+
         if (await HandleMatchWin(match)) return data;
         return false;
     } else{

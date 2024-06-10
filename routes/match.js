@@ -117,7 +117,7 @@ router.post("/CasualMatchEnd", async (req, res) => {
 
         if (matchId){
             res.sendStatus(201);
-            SendSocketMessage(matchId, "matchEnd");
+            SendEmptySocketMessage(matchId, "matchEnd");
             return;
         }
         res.sendStatus(403);
