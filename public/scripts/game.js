@@ -1,6 +1,11 @@
 // Create variables for all the elements we need to interact with
+
+// General elements
 const matchContainer = document.getElementById('match-container');
 const loading = document.getElementById('loading-message');
+const requeueButton = document.getElementById('requeue-button');
+
+// Player elements
 const player1Name = document.getElementById('player1-name');
 const player2Name = document.getElementById('player2-name');
 const player1VictoryButton = document.getElementById('player1-victory-button');
@@ -8,22 +13,34 @@ const player2VictoryButton = document.getElementById('player2-victory-button');
 const player1Score = document.getElementById('player1-score');
 const player2Score = document.getElementById('player2-score');
 const playerScores = document.getElementsByClassName('player-score');
+const victoryButtons = document.getElementsByClassName('player-victory-button');
+
+// Match options
 const setLength = document.getElementById('set-length');
 const turnTimer = document.getElementById('timer-duration');
+
+// Stage elements
+const stageList = document.getElementById('stages-list');
 const stages = document.getElementsByClassName('stage');
 const selectableStages = document.getElementsByClassName('stage-selectable');
+const playingStage = document.getElementById('playing-stage');
+
+// Messages
 const confirmationMessage = document.getElementById('confirmation-message');
 const gameMessage = document.getElementById('game-messages');
-const playingStage = document.getElementById('playing-stage');
+
+// Strike elements
 const currentStrikerName = document.getElementById('current-striker');
 const strikerSection = document.getElementById('striker-section');
 const strikeContent = document.getElementById('strike-content');
 const strikeInfo = document.getElementById('strike-info');
 const strikeButton = document.getElementById('confirm-map-selection');
-const victoryButtons = document.getElementsByClassName('player-victory-button');
+
+// Chat elements
 const chatLog = document.getElementById('match-chat-log');
 const chatInput = document.getElementById('match-chat-input');
 const chatSend = document.getElementById('match-chat-button');
+
 
 var userID = 0;
 var user = {};
@@ -356,6 +373,27 @@ async function gameReset(winnerId) {
 
 }
 
+function gameFinish(winnerId) {
+    playingStage.style.display = 'none';
+    player1VictoryButton.style.display = 'none';
+    player2VictoryButton.style.display = 'none';
+    stageList.style.display = 'none';
+    strikerSection.style.display = 'block';
+    currentStrikerName.style.display = 'none';
+
+    if ( players[0].id == winnerId ) {
+        name = players[0].username;
+    } else {
+        name = players[1].username;
+    }
+
+    confirmationMessage.style.display = 'none';
+    gameMessage.style.display = 'block';
+
+    gameMessage.innerHTML = name + ' has won the match!';
+    requeueButton.style.display = 'block';
+}
+
 function unstrikeAllMaps() {
     strikes = [];
     for ( let stage of stages ) {
@@ -429,4 +467,13 @@ socket.on('playerConfirmedWin', async (winnerId) => {
     isPlayerStriker();
     //getMatchInfo(matchId);
     //setMatchInfo(matchId);
+});
+
+socket.on('matchWin', async (winnerId) => {
+    console.log('Match win socket!');
+    setWinner(winnerId);
+    //await getMatchInfo(matchId);
+    gameFinish(winnerId);
+    // Unhide return to queue button
+    // Do any final things
 });
