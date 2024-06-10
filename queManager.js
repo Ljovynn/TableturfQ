@@ -201,6 +201,18 @@ export function RemovePlayerFromQue(playerId, matchMode){
     return false;
 }
 
+export function RemovePlayerFromAnyQue(playerId){
+    for (let i = 0; i < ques.length; i++){
+        for (let j = 0; j < ques[i].queArr.length; i++){
+            if (ques[i].queArr[j].id == playerId){
+                ques[i].queArr.splice(j, 1);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 export function AddRecentlyMatchedPlayers(player1Id, player2Id, matchMode){
     //delete older data
     var index = SearchMatchedPlayersList(recentlyMatchedPlayersList, player1Id);

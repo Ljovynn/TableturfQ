@@ -53,13 +53,13 @@ export const turnTimer = Object.freeze({
 
 export const disputeResolveOptions = Object.freeze({ 
     noChanges: 0, 
-    revertLastChange: 1,
+    resetCurrentGame: 1,
     restartMatch: 2,
     cancelMatch: 3,
     gameWinPlayer1: 4,
     gameWinPlayer2: 5,
-    player1Win: 6,
-    player2Win: 7
+    matchWinPlayer1: 6,
+    matchWinPlayer2: 7
 });
 
 //add que variables here

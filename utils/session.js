@@ -1,4 +1,4 @@
-import { GetSession, CreateSession, DeleteSession} from '../database.js';
+import { GetSession, CreateSession, DeleteSession, GetUserBanAndRole} from '../database.js';
 import cookieParser from 'cookie-parser';
 import dotenv from "dotenv";
 
@@ -6,11 +6,9 @@ dotenv.config();
 const sessionSecret = process.env.SESSION_SECRET;
 
 export async function SerializeSession(req, userId){
-    //bruh ändra till userid inte discordid
     req.session.user = userId;
     req.session.touch();
-    //kanske måste ändra cookien till access tokens o sånt, inte bara id?
-    //TODO: skapa bara om det inte redan finns en
+
     console.log("serialising session");
     await CreateSession(req.sessionID, req.session.cookie.expires, JSON.stringify(userId));
 }
