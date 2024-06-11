@@ -2,12 +2,10 @@ import { Router } from 'express';
 import cookieParser from "cookie-parser";
 import { DeserializeSession } from '../utils/session.js';
 
-import { AddPlayerToQue, RemovePlayerFromQue, PlayerSentReady, FindIfPlayerInQue } from "../queManager.js";
+import { AddPlayerToQue, RemovePlayerFromQue, PlayerSentReady } from "../queManager.js";
 import { GetUserData } from "../database.js";
 
 import { CheckIfRealMatchMode, CheckUserDefined, CheckVariableDefined } from "../utils/checkDefined.js";
-
-import { GetCurrentUser } from "../utils/userUtils.js";
 
 import { SendSocketMessage } from "../socketManager.js";
 
@@ -98,30 +96,6 @@ router.post("/PlayerReady", async (req, res) => {
         res.sendStatus(403);
     } catch (err){
         console.error(err);
-        res.sendStatus(500);
-    }
-});
-
-//Requests
-
-//See if player is in que
-
-//res: user, quedata
-//quedata: matchmode, timestamp when que started
-router.get('/GetPlayerQueData', async (req, res) => {
-    try {
-        const userId = req.session.user;
-        if (!CheckUserDefined(req, res)) return;
-
-        var queData = FindIfPlayerInQue(userId);
-
-        if (!queData){
-            res.sendStatus(204);
-            return;
-        }
-
-        res.status(200).send(queData);
-    } catch (err){
         res.sendStatus(500);
     }
 });

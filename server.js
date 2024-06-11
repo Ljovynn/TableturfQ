@@ -51,12 +51,14 @@ import matchRouter from './routes/match.js';
 import queRouter from './routes/que.js';
 import leaderboardRouter from './routes/leaderboard.js';
 import adminRouter from './routes/admin.js';
+import userRouter from './routes/user.js';
 
 app.use('/api/auth', authRouter);
 app.use('/match', matchRouter);
 app.use('/que', queRouter);
 app.use('/leaderboard', leaderboardRouter);
 app.use('/admin', adminRouter);
+app.use('/user', userRouter);
 
 //todo: mod stuff
 //resolve dispute
@@ -72,9 +74,4 @@ app.get("/testing", async (req, res) => {
         return;
     }
     //res.sendStatus(200);
-});
-
-app.get("/login", async (req, res) => {
-    //check log in
-    //res.sendFile(join(__dirname, "index.html"));
 });

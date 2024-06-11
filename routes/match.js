@@ -3,8 +3,7 @@ import cookieParser from "cookie-parser";
 import { DeserializeSession } from '../utils/session.js';
 
 import { PlayerSentStageStrikes, PlayerSentStagePick, PlayerSentGameWin, PlayerSentCasualMatchEnd, 
-    UserSentChatMessage, PlayerSentMatchDispute, ResolveMatchDispute, 
-    FindMatchWithPlayer} from '../matchManager.js';
+    UserSentChatMessage, PlayerSentMatchDispute } from '../matchManager.js';
 
 import { FindMatch } from '../matchManager.js';
 
@@ -249,26 +248,6 @@ router.post("/GetMatchInfo", async (req, res) => {
         res.sendStatus(500);
     }
     
-});
-
-//See if player is in match
-
-//res: match id
-router.get('/GetPlayerMatchData', async (req, res) => {
-    try {
-        const userId = req.session.user;
-        if (!CheckUserDefined(req, res)) return;
-
-        var match = FindMatchWithPlayer(userId);
-
-        if (!match){
-            res.sendStatus(204);
-            return;
-        }
-        res.status(200).send(match.id);
-    } catch (err){
-        res.sendStatus(500);
-    }
 });
 
 export default router;

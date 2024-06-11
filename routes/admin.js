@@ -179,6 +179,8 @@ router.get('/GetDisputedMatchesList', async (req, res) => {
     }
 });
 
+export default router;
+
 async function CheckIfAdmin(req, res){
     var role = await GetUserRole(req.session.user);
     if (role == userRoles.mod){
@@ -187,6 +189,4 @@ async function CheckIfAdmin(req, res){
 
     res.sendStatus(403);
     return false;
-}
-
-export default router;
+};
