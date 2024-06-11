@@ -104,24 +104,23 @@ router.post("/PlayerReady", async (req, res) => {
 
 //Requests
 
+//See if player is in que
+
 //res: user, quedata
-//quedata: matchmode, time when que started
+//quedata: matchmode, timestamp when que started
 router.get('/GetPlayerQueData', async (req, res) => {
     try {
-        var user = GetCurrentUser(req);
-        if (!user){
-            res.sendStatus(401);
+        const userId = req.session.user;
+        if (!CheckUserDefined(req, res)) return;
+
+        var queData = FindIfPlayerInQue(userId);
+
+        if (!queData){
+            res.sendStatus(204);
             return;
         }
 
-        var queData = FindIfPlayerInQue(user.id);
-
-        var data = {
-            user: user,
-            queData: queData
-        }
-
-        res.status(200).send(data);
+        res.status(200).send(queData);
     } catch (err){
         res.sendStatus(500);
     }

@@ -9,7 +9,7 @@ import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import path from 'path';
 
-import { GetUserByDiscordId, CreateUserWithDiscord } from '../database.js';
+import { GetUserByDiscordId, CreateUserWithDiscord, DeleteAllUserSessions } from '../database.js';
 
 const apiRouteOauth2Token = "https://discord.com/api/v10/oauth2/token";
 const apiRouteUserInfo = "https://discord.com/api/v10/users/@me";
@@ -26,6 +26,18 @@ const router = Router();
 
 router.use(cookieParser(sessionSecret));
 router.use(DeserializeSession);
+
+router.post("/discord/logout", async (req, res) => {
+    try{
+        const userId = req.session.user;
+        if (!CheckUserDefined(req, res)) return;
+
+        await DeleteAllUserSessions(userId);
+        res.sendStatus(201);
+    } catch(error){
+        res.sendStatus(400);
+    }
+});
 
 router.get("/discord/redirect", async (req, res) => {
     const { code } = req.query;

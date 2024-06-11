@@ -236,6 +236,10 @@ export async function DeleteSession(sessionId){
     await pool.query(`DELETE FROM sessions WHERE id = ?`, [sessionId]);
 }
 
+export async function DeleteAllUserSessions(userId){
+    await pool.query(`DELETE FROM sessions WHERE data = ?`, [userId]);
+}
+
 export async function DeleteOldSessions(){
     await pool.query(`DELETE FROM sessions WHERE expires_at < ?`, [Date.now()]);
 }

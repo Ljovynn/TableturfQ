@@ -22,8 +22,6 @@ const sessionSecret = process.env.SESSION_SECRET;
 router.use(cookieParser(sessionSecret));
 router.use(DeserializeSession);
 
-//Todo:  get disputed match list
-
 //posts
 
 //matchId, resolveOption
