@@ -4,7 +4,6 @@ let io;
 var connected = false;
 
 export function CreateSocketConnection (server){
-    console.log("connectedd: " + connected);
     if (connected) return;
 
     io = new Server(server);

@@ -19,6 +19,8 @@ dotenv.config();
 const website_url = process.env.URL;
 const port = process.env.PORT;
 const sessionSecret = process.env.SESSION_SECRET;
+const clientId = process.env.CLIENT_ID;
+const clientSecret = process.env.CLIENT_SECRET;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -37,8 +39,8 @@ router.get("/discord/redirect", async (req, res) => {
 
     try{
         const formData = new url.URLSearchParams({
-            client_id: process.env.CLIENT_ID,
-            client_secret: process.env.CLIENT_SECRET,
+            client_id: clientId,
+            client_secret: clientSecret,
             grant_type: "authorization_code",
             code: code.toString(),
             redirect_uri: 'http://localhost:8080/api/auth/discord/redirect'//website_url + ":" + port + "/api/auth/discord/redirect",

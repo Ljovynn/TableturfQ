@@ -13,13 +13,6 @@ const pool = mysql.createPool({
     database: process.env.MYSQL_DATABASE
 }).promise()
 
-/*
-await GetUserByDiscordId(168290358470508544);
-var e = await GetUser(1);
-if (e){
-    console.log(JSON.stringify(e));
-}*/
-
 //Get
 export async function GetMatch(matchId){
     const [rows] = await pool.query(`SELECT * FROM matches WHERE id = ?`, [matchId]);
@@ -118,8 +111,8 @@ export async function GetSession(sessionId){
 }
 
 export async function GetLeaderboard(){
-    const [rows] = await pool.query (`SELECT id, username, role, g2_rating, CAST(discord_id AS CHAR) discord_id, discord_avatar_hash, created_at from users u WHERE NOT EXISTS
-    (SELECT * FROM ban_list WHERE user_id = u.id) order by g2_rating desc`);
+    const [rows] = await pool.query (`SELECT id, username, role, g2_rating, CAST(discord_id AS CHAR) discord_id, discord_avatar_hash, created_at FROM users u WHERE NOT EXISTS
+    (SELECT * FROM ban_list WHERE user_id = u.id) AND role != 0 ORDER BY g2_rating DESC`);
     return rows;
 }
 

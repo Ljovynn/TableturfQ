@@ -167,6 +167,7 @@ router.post("/SendChatMessage", async (req, res) => {
 
 //req: match id
 //res: user, match object, players, other users in chat
+//deleted accounts are undefined players
 router.post("/GetMatchInfo", async (req, res) => {
     try {
         const matchId = req.body.matchId;
@@ -205,8 +206,8 @@ router.post("/GetMatchInfo", async (req, res) => {
         }
 
         var players = []
-        players[0] = await GetUserData(match.players[0].id);
-        players[1] = await GetUserData(match.players[1].id);
+        if (match.players[0].id != 0) players[0] = await GetUserData(match.players[0].id);
+        if (match.players[1].id != 0) players[1] = await GetUserData(match.players[1].id);
 
         //check if user has access
         if (matchHidden){
