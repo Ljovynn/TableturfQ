@@ -50,16 +50,16 @@ router.post("/ResolveDispute", async (req, res) => {
             case disputeResolveOptions.gameWinPlayer2:
                 if (matchResolveData.matchFinished){
                     res.sendStatus(201);
-                    SendSocketMessage('match' + matchId, "matchWin", matchData.winnerId);
+                    SendSocketMessage('match' + matchId, "matchWin", matchResolveData.winnerId);
                 } else{
                     res.sendStatus(201);
-                    SendSocketMessage('match' + matchId, "gameWIn", matchData.winnerId);
+                    SendSocketMessage('match' + matchId, "gameWIn", matchResolveData.winnerId);
                 }
                 break;
             case disputeResolveOptions.matchWinPlayer1:
             case disputeResolveOptions.matchWinPlayer2:
                 res.sendStatus(201);
-                SendSocketMessage('match' + matchId, "matchWin", matchData.winnerId);
+                SendSocketMessage('match' + matchId, "matchWin", matchResolveData.winnerId);
                 break;
             case disputeResolveOptions.noChanges:
             case disputeResolveOptions.resetCurrentGame:
