@@ -63,11 +63,7 @@ export function BuildProfileEmbed(user, matchCount, lastPlayed){
         const noUserEmbed = {
 			color: embedColor,
 			title: 'TableturfQ Profile',
-			author: {
-				name: `<@${user.discord_id}>`,
-				icon_url: `https://cdn.discordapp.com/${user.discord_id}/${user.discord_avatar_hash}.png`,
-			},
-			fields: [{name: `<@${user.discord_id}> has no TableturfQ profile.`, value: '\u200B'}],
+			fields: [{name: `The selected user has no TableturfQ profile.`, value: '\u200B'}],
 		};
 		return noUserEmbed;
     }
@@ -79,7 +75,7 @@ export function BuildProfileEmbed(user, matchCount, lastPlayed){
 
     var profileFields = [ 
 	{
-        name: 'Rank',
+        name: 'Rating',
 		//Todo: insert rank emoji
         value: `**${Math.floor(user.g2_rating)}**`,
 		inline: false
