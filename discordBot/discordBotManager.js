@@ -1,17 +1,18 @@
 //todo: dispute message should show every disputed match 
 //leaderboard command, profile command
 
-import { Client, Collection, Events, GatewayIntentBits } from 'discord.js';
+import { Client, Collection, Events, EmbedBuilder, GatewayIntentBits } from 'discord.js';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import fs from 'node:fs';
 import path from 'path';
-import { GetDisputeLogChannel } from './discordBotVariables.js';
-import { connect } from 'http2';
+
+const embedColor = 8472775;
 
 dotenv.config();
 
 const token = process.env.TOKEN;
+const disputeChannelId = process.env.DISPUTE_CHANNEL_ID
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -70,27 +71,47 @@ export function StartDiscordBot(){
 
 export async function SendDisputeMessage(matchDisputes, sendNewMessage){
 	try {
-		var channelId = GetDisputeLogChannel();
+		var channelId = disputeChannelId;
 		if (!channelId) return;
 		const channel = await client.channels.fetch(channelId);
+		if (!channel) return;
 
 		if (!previousDisputeMessageId){
-			const message = await channel.send(BuildDisputeMessage(matchDisputes));
+			const message = await channel.send({ embeds: [BuildDisputeEmbed(matchDisputes)] });
 			previousDisputeMessageId = message.id;
 		} else if (sendNewMessage){
 			const previousMessage = await channel.messages.fetch(previousDisputeMessageId);
 			if (previousMessage) previousMessage.delete();
-			const message = await channel.send(BuildDisputeMessage(matchDisputes));
+			const message = await channel.send({ embeds: [BuildDisputeEmbed(matchDisputes)] });
 			previousDisputeMessageId = message.id;
 		} else{
 			const previousMessage = await channel.messages.fetch(previousDisputeMessageId);
-			if (previousMessage) previousMessage.edit(BuildDisputeMessage(matchDisputes));
+			if (previousMessage) previousMessage.edit({ embeds: [BuildDisputeEmbed(matchDisputes)] });
 		}
 	} catch (error){
 		console.log(error);
 	}
 }
 
-function BuildDisputeMessage(matchDisputes){
-	return "new dispute in match ${matchDisputes[0].id}";
+function BuildDisputeEmbed(matchDisputes){
+	var disputesFields = [];
+	var limit = Math.min(matchDisputes.length, 25);
+
+	for (let i = 0; i < limit; i++){
+		var dispute = {
+			name: `Match ${matchDisputes[i].id}`,
+			value: '[Link](https://google.com)',
+		}
+		disputesFields.push(dispute)
+	}
+
+	if (matchDisputes.length == 0) disputesFields.push({name: 'There are currently no disputes.', value: '\u200B'});
+
+	const disputeEmbed = {
+		color: embedColor,
+		title: 'Current disputes:',
+		fields: disputesFields,
+		timestamp: new Date().toISOString(),
+	};
+	return disputeEmbed;
 }

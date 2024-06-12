@@ -7,37 +7,25 @@ import { SendDisputeMessage } from "./discordBot/discordBotManager.js";
 
 var matches = [];
 
-/*var match = await MakeNewMatch(1, 2, matchModes.ranked);
-
-PlayerSentStageStrikes(1, [stages.thunderPoint]);
-PlayerSentStageStrikes(2, [stages.mainStreet, stages.lakefrontProperty]);
-PlayerSentStageStrikes(1, [stages.riverDrift]);
-
-await PlayerSentGameWin(1, 1);
-await PlayerSentGameWin(2, 1);
-
-PlayerSentStageStrikes(1, [stages.mainStreet, stages.crackerSnap, stages.boxSeats]);
-PlayerSentStagePick(2, stages.doubleGemini);
-await PlayerSentGameWin(2, 1);
-await PlayerSentGameWin(1, 1);
-
-PlayerSentStageStrikes(1, [stages.girderForBattle, stages.crackerSnap, stages.boxSeats]);
-PlayerSentStagePick(2, stages.lakefrontProperty);
-await PlayerSentGameWin(2, 2);
-await PlayerSentGameWin(1, 2);
-
-PlayerSentStageStrikes(2, [stages.thunderPoint, stages.pedalToTheMedal, stages.twoLaneSplattop]);
-PlayerSentStagePick(1, stages.lakefrontProperty);
-await PlayerSentGameWin(2, 1);
-
-await UserSentChatMessage(1, "Hej på dig leverpastej");
-await UserSentChatMessage(2, "Smaken är som röven klöven");
-await PlayerSentGameWin(1, 1);
-
-console.log(JSON.stringify(match));*/
-
 // zeb testing
 matches.push( new Match(7, 10, 3, matchModes.ranked) );
+
+//Ljovynn testing
+
+/*var m1 = new Match(1, 1, 2, matchModes.ranked);
+m1.status = matchStatuses.dispute;
+
+var m2 = new Match(2, 1, 2, matchModes.ranked);
+
+var m3 = new Match(3, 2, 3, matchModes.ranked);
+m3.status = matchStatuses.dispute;
+
+matches.push(m1);
+matches.push(m2);
+matches.push(m3);
+
+console.log(JSON.stringify(m1));
+console.log(matches.length);*/
 
 export async function MakeNewMatch(player1Id, player2Id, matchMode){
 

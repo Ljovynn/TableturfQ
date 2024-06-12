@@ -28,6 +28,15 @@ const sessionSecret = process.env.SESSION_SECRET;
 router.use(cookieParser(sessionSecret));
 router.use(DeserializeSession);
 
+/*router.get("/Test", async (req, res) => {
+    try {
+        SendDisputeMessage(GetDisputedMatchesList(), false);
+        res.sendStatus(200);
+    } catch (err){
+        res.sendStatus(500);
+    }
+});*/
+
 //Posts
 
 //stages
