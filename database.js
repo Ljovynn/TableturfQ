@@ -20,18 +20,12 @@ export async function GetMatch(matchId){
 }
 
 export async function GetUserByDiscordId(discordId){
-    const [rows] = await pool.query(`SELECT * FROM users WHERE discord_id = ?`, [discordId]);
+    const [rows] = await pool.query(`SELECT id, username, role, g2_rating, CAST(discord_id AS CHAR) discord_id, discord_avatar_hash, created_at FROM users u WHERE discord_id = ?`, [discordId]);
     if (rows[0]){
         console.log("databse found user with discord id " + discordId);
         console.log("insert id: " + rows[0].insertId); 
         console.log("id: " + rows[0].id);
-        if ( rows[0].id ) {
-            console.log('No insert id');
-            return rows[0].id;
-        } else {
-            console.log('Insert id');
-            return rows[0].insertId;
-        }
+        return rows[0]
     } else {
         console.log("databse did not find user with discord id " + discordId);
         return undefined;

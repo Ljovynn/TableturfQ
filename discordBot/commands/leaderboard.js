@@ -5,7 +5,7 @@ const hitsPerPage = 15;
 
 export const data = new SlashCommandBuilder()
     .setName('leaderboard')
-    .setDescription(`Get the current leaderboard (${hitsPerPage} players)`)
+    .setDescription(`Get the current leaderboard, listing (${hitsPerPage} players)`)
     .addIntegerOption(option =>
 		option.setName('start_position')
 			.setDescription('Where to start listing players')
