@@ -11,6 +11,7 @@ import { MatchMakingTick } from "./queManager.js";
 import { UpdateLeaderboard } from "./leaderboardManager.js";
 
 import { StartDiscordBot } from "./discordBot/discordBotManager.js";
+import { DeleteOldSessions, DeleteOldSuspensions, DeleteOldUnverifiedAccounts } from "./database.js";
 
 dotenv.config();
 
@@ -68,7 +69,6 @@ import queRouter from './routes/que.js';
 import leaderboardRouter from './routes/leaderboard.js';
 import adminRouter from './routes/admin.js';
 import userRouter from './routes/user.js';
-import { DeleteOldSessions, DeleteOldSuspensions, DeleteOldUnverifiedAccounts } from "./database.js";
 
 app.use('/api/auth', authRouter);
 app.use('/match', matchRouter);

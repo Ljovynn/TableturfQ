@@ -3,6 +3,8 @@ import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import fs from 'node:fs';
 import path from 'path';
+import { GetDisputeLogChannel } from './discordBotVariables.js';
+import { connect } from 'http2';
 
 dotenv.config();
 
@@ -17,11 +19,9 @@ client.commands = new Collection();
 const folderPath = path.join(__dirname, 'commands');
 const commandFolder = fs.readdirSync(folderPath);
 
-
 for (const file of commandFolder) {
 	//const filePath = path.join(folderPath, file);
     const filePath = `./commands/${file}`;
-    console.log(filePath);
 	let command = await import (filePath);
 	// Set a new item in the Collection with the key as the command name and the value as the exported module
     if ('data' in command && 'execute' in command) {
@@ -61,4 +61,16 @@ client.on(Events.InteractionCreate, async interaction => {
 
 export function StartDiscordBot(){
     client.login(token);
+}
+
+export async function SendDisputeMessage(match){
+	try {
+		var channelId = GetDisputeLogChannel();
+		if (!channelId) return;
+		const channel = await client.channels.fetch(channelId);
+
+		channel.send(`new dispute in match ${match.id}`);
+	} catch (error){
+		console.log(error);
+	}
 }

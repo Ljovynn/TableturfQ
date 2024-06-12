@@ -127,7 +127,7 @@ router.post("/Dispute", async (req, res) => {
     try {
         if (!CheckUserDefined(req, res)) return;
 
-        var matchId = PlayerSentMatchDispute(userId);
+        var matchId = await PlayerSentMatchDispute(userId);
 
         if (matchId){
             res.sendStatus(201);

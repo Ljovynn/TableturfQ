@@ -3,6 +3,7 @@ import { ApplyMatchEloResults } from "./glicko2Manager.js";
 import { CreateMatch, SetMatchResult } from "./database.js";
 import { FindPlayerPosInMatch } from "./utils/matchUtils.js";
 import { AddRecentlyMatchedPlayers } from "./queManager.js";
+import { SendDisputeMessage } from "./discordBot/discordBotManager.js";
 
 var matches = [];
 
@@ -217,10 +218,8 @@ export async function PlayerSentGameWin(playerId, winnerId){
         game.winnerId = winnerId;
     } else if (game.winnerId != winnerId){
         game.winnerId = 0;
-        match.players[0].gameConfirmed = false;
-        match.players[1].gameConfirmed = false;
 
-        match.status = matchStatuses.dispute;
+        await StartMatchDispute(match);
         data.dispute = true;
     }
 
@@ -310,15 +309,22 @@ export async function ModSentChatMessage(matchId, userId, content){
     return true;
 }
 
-export function PlayerSentMatchDispute(playerId){
+export async function PlayerSentMatchDispute(playerId){
     var match = FindMatchWithPlayer(playerId);
 
     if (!match) return;
 
     if (match.status == matchStatuses.dispute) return;
 
-    match.status = matchStatuses.dispute;
+    await StartMatchDispute(match);
     return match.id;
+}
+
+async function StartMatchDispute(match){
+    match.players[0].gameConfirmed = false;
+    match.players[1].gameConfirmed = false;
+    match.status = matchStatuses.dispute;
+    SendDisputeMessage(match);
 }
 
 export function GetDisputedMatchesList(){
@@ -343,8 +349,6 @@ export async function ResolveMatchDispute(matchId, resolveOption){
     }
 
     var currentGame = match.gamesArr[match.gamesArr.length - 1];
-    match.players[0].gameConfirmed = false;
-    match.players[1].gameConfirmed = false;
 
     switch (resolveOption){
         case disputeResolveOptions.noChanges:
