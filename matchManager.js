@@ -309,22 +309,22 @@ export async function ModSentChatMessage(matchId, userId, content){
     return true;
 }
 
-export async function PlayerSentMatchDispute(playerId){
+export function PlayerSentMatchDispute(playerId){
     var match = FindMatchWithPlayer(playerId);
 
     if (!match) return;
 
     if (match.status == matchStatuses.dispute) return;
 
-    await StartMatchDispute(match);
+    StartMatchDispute(match);
     return match.id;
 }
 
-async function StartMatchDispute(match){
+function StartMatchDispute(match){
     match.players[0].gameConfirmed = false;
     match.players[1].gameConfirmed = false;
     match.status = matchStatuses.dispute;
-    SendDisputeMessage(match);
+    SendDisputeMessage(GetDisputedMatchesList(), true);
 }
 
 export function GetDisputedMatchesList(){
@@ -345,6 +345,7 @@ export async function ResolveMatchDispute(matchId, resolveOption){
 
     if (match.mode == matchModes.casual){
         match.status == matchStatuses.ingame;
+        SendDisputeMessage(GetDisputedMatchesList(), false);
         return 'casual';
     }
 
@@ -355,24 +356,29 @@ export async function ResolveMatchDispute(matchId, resolveOption){
             //todo: check which status to revert to
             if (currentGame.stage == stages.unpicked){
                 match.status = matchStatuses.stageSelection;
+                SendDisputeMessage(GetDisputedMatchesList(), false);
                 return true;
             } else{
                 match.status = matchStatuses.ingame;
+                SendDisputeMessage(GetDisputedMatchesList(), false);
                 return true;
             }
         case disputeResolveOptions.resetCurrentGame:
             currentGame = new Game();
             match.status = matchStatuses.stageSelection;
+            SendDisputeMessage(GetDisputedMatchesList(), false);
             return true;
         case disputeResolveOptions.restartMatch:
             match.status = matchStatuses.stageSelection;
             match.gamesArr = [new Game()];
             match.players[0].unpickableStagesArr = [];
             match.players[1].unpickableStagesArr = [];
+            SendDisputeMessage(GetDisputedMatchesList(), false);
             return true;
         case disputeResolveOptions.cancelMatch:
             match.status = matchStatuses.noWinner;
             await (FinishMatch(match));
+            SendDisputeMessage(GetDisputedMatchesList(), false);
             return true;
         case disputeResolveOptions.gameWinPlayer1:
             return HandleDisputeGameWin(match, 0);
@@ -381,11 +387,13 @@ export async function ResolveMatchDispute(matchId, resolveOption){
         case disputeResolveOptions.matchWinPlayer1:
             match.winnerId = match.players[0].id;
             var result = { winnerId: match.winnerId }
+            SendDisputeMessage(GetDisputedMatchesList(), false);
             if (await HandleMatchWin(match)) return result;
             return false;
         case disputeResolveOptions.matchWinPlayer2:
             match.winnerId = match.players[1].id;
             var result = { winnerId: match.winnerId }
+            SendDisputeMessage(GetDisputedMatchesList(), false);
             if (await HandleMatchWin(match)) return result;
             return false;
         default:
@@ -420,6 +428,8 @@ async function HandleDisputeGameWin(match, winnerIndex){
         match.players[0].gameConfirmed = false;
         match.players[1].gameConfirmed = false;
     }
+
+    SendDisputeMessage(GetDisputedMatchesList(), false);
     return data;
 }
 

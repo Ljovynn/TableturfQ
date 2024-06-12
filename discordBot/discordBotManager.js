@@ -1,3 +1,6 @@
+//todo: dispute message should show every disputed match 
+//leaderboard command, profile command
+
 import { Client, Collection, Events, GatewayIntentBits } from 'discord.js';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
@@ -18,6 +21,8 @@ client.commands = new Collection();
 
 const folderPath = path.join(__dirname, 'commands');
 const commandFolder = fs.readdirSync(folderPath);
+
+var previousDisputeMessageId;
 
 for (const file of commandFolder) {
 	//const filePath = path.join(folderPath, file);
@@ -63,14 +68,29 @@ export function StartDiscordBot(){
     client.login(token);
 }
 
-export async function SendDisputeMessage(match){
+export async function SendDisputeMessage(matchDisputes, sendNewMessage){
 	try {
 		var channelId = GetDisputeLogChannel();
 		if (!channelId) return;
 		const channel = await client.channels.fetch(channelId);
 
-		channel.send(`new dispute in match ${match.id}`);
+		if (!previousDisputeMessageId){
+			const message = await channel.send(BuildDisputeMessage(matchDisputes));
+			previousDisputeMessageId = message.id;
+		} else if (sendNewMessage){
+			const previousMessage = await channel.messages.fetch(previousDisputeMessageId);
+			if (previousMessage) previousMessage.delete();
+			const message = await channel.send(BuildDisputeMessage(matchDisputes));
+			previousDisputeMessageId = message.id;
+		} else{
+			const previousMessage = await channel.messages.fetch(previousDisputeMessageId);
+			if (previousMessage) previousMessage.edit(BuildDisputeMessage(matchDisputes));
+		}
 	} catch (error){
 		console.log(error);
 	}
+}
+
+function BuildDisputeMessage(matchDisputes){
+	return "new dispute in match ${matchDisputes[0].id}";
 }
