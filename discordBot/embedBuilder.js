@@ -1,5 +1,16 @@
 const embedColor = 8472775;
 
+import dotenv from 'dotenv';
+import { DetailMinute } from '../utils/date.js';
+
+dotenv.config();
+
+const websiteURL = process.env.URL;
+const port = process.env.PORT;
+
+//Todo: clickable links: dispute, profile
+//Todo: insert rank emojis on leaderboard, profile
+
 export function BuildDisputeEmbed(matchDisputes){
 	var disputesFields = [];
 	var limit = Math.min(matchDisputes.length, 25);
@@ -7,7 +18,7 @@ export function BuildDisputeEmbed(matchDisputes){
 	for (let i = 0; i < limit; i++){
 		var dispute = {
 			name: `Match ${matchDisputes[i].id}`,
-			value: '[Link](https://google.com)',
+			value: `[Link](${websiteURL}: ${port}/user)`,
 		}
 		disputesFields.push(dispute)
 	}
@@ -18,30 +29,82 @@ export function BuildDisputeEmbed(matchDisputes){
 		color: embedColor,
 		title: 'Current disputes:',
 		fields: disputesFields,
-		timestamp: new Date().toISOString(),
+		timestamp: new Date().toDateString(),
 	};
 	return disputeEmbed;
 }
 
 export function BuildLeaderboardEmbed(leaderboard, startPosition, leaderboardSize){
-    var leaderboardsField = [ {
+    var leaderboardsFields = [ 
+	{
         name: '\u200B',
         value: ''},{ 
         name: 'Total players', 
-        value: `${leaderboardSize}`}
+        value: `${leaderboardSize}`
+		}
     ];
 
 	for (let i = 0; i < leaderboard.length; i++){
         //Todo: insert rank emoji
-		leaderboardsField[0].value += `\n${startPosition + i}. <@${leaderboard[i].discord_id}> **${Math.floor(leaderboard[i].g2_rating)}**`;
+		leaderboardsFields[0].value += `\n${startPosition + i}. <@${leaderboard[i].discord_id}> **${Math.floor(leaderboard[i].g2_rating)}**`;
 	}
-    leaderboardsField[0].value += '\u200B';
+    leaderboardsFields[0].value += '\u200B';
 
 	const leaderboardEmbed = {
 		color: embedColor,
 		title: `🏆 TableturfQ Leaderboard [${startPosition}-${startPosition + leaderboard.length - 1}] 🏆`,
-		fields: leaderboardsField,
-		timestamp: new Date().toISOString(),
+		fields: leaderboardsFields,
 	};
 	return leaderboardEmbed;
+}
+
+export function BuildProfileEmbed(user, matchCount, lastPlayed){
+	if (!user){
+        const noUserEmbed = {
+			color: embedColor,
+			title: 'TableturfQ Profile',
+			author: {
+				name: `<@${user.discord_id}>`,
+				icon_url: `https://cdn.discordapp.com/${user.discord_id}/${user.discord_avatar_hash}.png`,
+			},
+			fields: [{name: `<@${user.discord_id}> has no TableturfQ profile.`, value: '\u200B'}],
+		};
+		return noUserEmbed;
+    }
+
+	var lastPlayedValue = 'Never';
+	if (lastPlayed){
+		lastPlayedValue = DetailMinute(lastPlayed);
+	}
+
+    var profileFields = [ 
+	{
+        name: 'Rank',
+		//Todo: insert rank emoji
+        value: `**${Math.floor(user.g2_rating)}**`,
+		inline: false
+		},
+	{ 
+        name: 'Match count', 
+        value: `${matchCount}`,
+		inline: true
+		},
+	{
+		name: 'Last played',
+		value: lastPlayedValue,
+		inline: true
+		},
+    ];
+
+	const profileEmbed = {
+		color: embedColor,
+		title: 'TableturfQ Profile',
+		author: {
+			name: `${user.username}`,
+			icon_url: `https://cdn.discordapp.com/avatars/${user.discord_id}/${user.discord_avatar_hash}.png`,
+			url: `${websiteURL}:${port}/user`,
+		},
+		fields: profileFields,
+	};
+	return profileEmbed;
 }

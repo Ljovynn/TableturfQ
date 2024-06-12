@@ -16,7 +16,7 @@ const apiRouteUserInfo = "https://discord.com/api/v10/users/@me";
 
 dotenv.config();
 
-const website_url = process.env.URL;
+const websiteURL = process.env.URL;
 const port = process.env.PORT;
 const sessionSecret = process.env.SESSION_SECRET;
 const clientId = process.env.CLIENT_ID;
@@ -93,7 +93,7 @@ async function StoreUserData(accessToken, refreshToken){
 
     console.log(response.data);
 
-    var userId = await GetUserByDiscordId(response.data.id);
+    var userId = await GetUserByDiscordId(response.data.id).id;
     if (!userId){
         userId = await CreateUserWithDiscord(response.data.username, response.data.id, accessToken, refreshToken, response.data.avatar);
     }
