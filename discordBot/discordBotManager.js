@@ -6,8 +6,7 @@ import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import fs from 'node:fs';
 import path from 'path';
-
-const embedColor = 8472775;
+import { BuildDisputeEmbed } from './embedBuilder.js';
 
 dotenv.config();
 
@@ -91,27 +90,4 @@ export async function SendDisputeMessage(matchDisputes, sendNewMessage){
 	} catch (error){
 		console.log(error);
 	}
-}
-
-function BuildDisputeEmbed(matchDisputes){
-	var disputesFields = [];
-	var limit = Math.min(matchDisputes.length, 25);
-
-	for (let i = 0; i < limit; i++){
-		var dispute = {
-			name: `Match ${matchDisputes[i].id}`,
-			value: '[Link](https://google.com)',
-		}
-		disputesFields.push(dispute)
-	}
-
-	if (matchDisputes.length == 0) disputesFields.push({name: 'There are currently no disputes.', value: '\u200B'});
-
-	const disputeEmbed = {
-		color: embedColor,
-		title: 'Current disputes:',
-		fields: disputesFields,
-		timestamp: new Date().toISOString(),
-	};
-	return disputeEmbed;
 }

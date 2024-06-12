@@ -1,6 +1,6 @@
 import { GetLeaderboard } from "./database.js";
 
-var leaderboard = [];
+var leaderboard = await GetLeaderboard();
 
 export async function UpdateLeaderboard(){
     leaderboard = await GetLeaderboard();
@@ -14,7 +14,7 @@ export function GetLeaderboardAtPos(startPos, hitCount){
 
     var data = {
         result: hits,
-        length: leaderboard.length
+        totalPlayers: leaderboard.length
     }
 
     return data;
