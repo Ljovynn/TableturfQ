@@ -93,9 +93,12 @@ async function StoreUserData(accessToken, refreshToken){
 
     console.log(response.data);
 
-    var userId = await GetUserByDiscordId(response.data.id).id;
-    if (!userId){
+    var user = await GetUserByDiscordId(response.data.id);
+    var userId;
+    if (!user){
         userId = await CreateUserWithDiscord(response.data.username, response.data.id, accessToken, refreshToken, response.data.avatar);
+    } else {
+        userId = user.id;
     }
     return userId;
 }
