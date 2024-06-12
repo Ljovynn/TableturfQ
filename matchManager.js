@@ -9,6 +9,7 @@ var matches = [];
 
 // zeb testing
 matches.push( new Match(7, 10, 3, matchModes.ranked) );
+//matches.push( new Match(7, 10, 3, matchModes.casual) );
 
 //Ljovynn testing
 

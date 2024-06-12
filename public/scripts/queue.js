@@ -37,6 +37,18 @@ joinCasual.addEventListener('click', async (e) => {
         data = { matchMode: 'casual' }
         // Join the queue
         response = await postData('/que/PlayerEnterQue', data);
+        
+        if ( response == 201 ) {
+            // Do queue frontend stuff
+            alert('Successfully joined the queue!');
+            queueTimer.style.display = 'block';
+            window.setInterval(updateTimer, 1000);
+            // Socket matchfound code
+            //matchMakingReady.style.display = 'block';
+        } else {
+            alert('There was a problem joining the queue. Please refresh and try again');
+        }
+
     } else {
         alert('Please enter a valid display name.');
     }

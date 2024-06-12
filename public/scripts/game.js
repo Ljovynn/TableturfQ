@@ -1,3 +1,5 @@
+import { matchModes } from "../constants/matchData.js";
+
 // Create variables for all the elements we need to interact with
 
 // General elements
@@ -12,6 +14,7 @@ const player1VictoryButton = document.getElementById('player1-victory-button');
 const player2VictoryButton = document.getElementById('player2-victory-button');
 const player1Score = document.getElementById('player1-score');
 const player2Score = document.getElementById('player2-score');
+const scoreContainers = document.getElementsByClassName('score-container');
 const playerScores = document.getElementsByClassName('player-score');
 const victoryButtons = document.getElementsByClassName('player-victory-button');
 
@@ -42,10 +45,14 @@ const chatInput = document.getElementById('match-chat-input');
 const chatSend = document.getElementById('match-chat-button');
 
 
+var match;
 var userID = 0;
 var user = {};
 var matchInfo = [];
 var players = [];
+var chat = [];
+var games = [];
+var casualMatch = false;
 
 var strikes = [];
 var stageStrikes = [];
@@ -83,7 +90,7 @@ for (let stage of stages ) {
             if ( strikesRemaining != 0 || stage.classList.contains('stage-selected') ) {
                 stage.classList.toggle('stage-selected');
             }
-            stageValue = parseInt(stage.getAttribute('stage-value'));
+            var stageValue = parseInt(stage.getAttribute('stage-value'));
 
             // Add/Remove stage from the list of strikes that will be sent off to the server when the confirm strikes button is selected
             var i = stageStrikes.indexOf( stageValue );
@@ -109,8 +116,8 @@ for (let victoryButton of victoryButtons ) {
     victoryButton.addEventListener('click', async (e) => {
         console.log('Marked victory for ' + victoryButton.value);
         // Send off the victory mark event for the selected player and wait for the other player to submit the victor
-        data = { winnerId: victoryButton.value };
-        response = await postData('/match/WinGame', data);
+        var data = { winnerId: victoryButton.value };
+        var response = await postData('/match/WinGame', data);
         console.log(response);
         if ( response == 201 ) {
             console.log('Winner was marked at least');
@@ -129,8 +136,8 @@ chatSend.addEventListener('click', async (e) => {
 
     // Do front end validation/sanitization functions
     if ( validateChatMessage(chatMessage) ) {
-        data = { userId: userID, message: chatMessage };
-        response = await postData('/match/SendChatMessage', data);
+        var data = { userId: userID, message: chatMessage };
+        var response = await postData('/match/SendChatMessage', data);
         console.log('chat message send response: ' + response);
 
         if ( response == 201 ) {
@@ -146,6 +153,8 @@ chatSend.addEventListener('click', async (e) => {
 strikeButton.addEventListener('click', async (e) => {
     console.log(stageStrikes);
     if ( validateStrikes(stageStrikes, strikeAmount) ) {
+        var data = {};
+        var response;
         if ( !mapSelect ) {
             data = { stages: stageStrikes };
             response = await postData('/match/StrikeStages', data);
@@ -167,9 +176,9 @@ strikeButton.addEventListener('click', async (e) => {
 
 // Page functions
 async function getMatchInfo(matchId) {
-    data = {matchId: matchId};
+    var data = {matchId: matchId};
     console.log(data);
-    result = await getData('/match/GetMatchInfo', data);
+    var result = await getData('/match/GetMatchInfo', data);
     matchInfo = result;
     console.log(matchInfo);
 }
@@ -182,6 +191,11 @@ async function setMatchInfo() {
     user = matchInfo.user;
     userID = user.id;
     chat = match.chat;
+
+    if ( JSON.stringify(match.mode) === JSON.stringify(matchModes.casual) ) {
+        casualMatch = true;
+    }
+
     stageStrikes = match.gamesArr.at(-1).strikes;
     console.log(match);
     console.log(players);
@@ -199,15 +213,19 @@ async function setMatchInfo() {
     turnTimer.innerHTML = ( match.mode.rulesetData.turnTimer * 10 ) + ' seconds';
 
     addChatMessages(chat);
-    setScores();
-    setStages();
-    setStrikes(stageStrikes);
-    setStrikeAmount();
-    setCurrentStriker();
-    isPlayerStriker();
+    if ( !casualMatch ) {
+        setScores();
+        setStages();
+        setStrikes(stageStrikes);
+        setStrikeAmount();
+        setCurrentStriker();
+        isPlayerStriker();
 
-    if ( match.status == 1 ) {
-        startGame();
+        if ( match.status == 1 ) {
+            startGame();
+        }
+    } else {
+        setCasualGame();
     }
 }
 
@@ -258,7 +276,7 @@ function setScores() {
 
 function setStages() {
     if (match.gamesArr.length > 1) {
-        currentStage = match.gamesArr.at(-1).stage;
+        var currentStage = match.gamesArr.at(-1).stage;
         for( let stage of stages ) {
             // If the stage hasn't been selected, remove all stage-stricken classes first
             // If the stage has been selected, strike everything except the selected stage
@@ -281,7 +299,7 @@ function setStrikes(receivedStrikes) {
         console.log('strike array: ' + JSON.stringify(strikes));
         strikes.push(strike);
         //console.log('striking ' + strike);
-        stage = document.querySelectorAll('[stage-value="' + strike + '"]')[0];
+        var stage = document.querySelectorAll('[stage-value="' + strike + '"]')[0];
         //console.log(stage);
         // Change the classes to remove selected stage from eligible selections
         if ( stage.classList.contains('stage-selected') )
@@ -296,7 +314,7 @@ function setStrikes(receivedStrikes) {
 function setStrikeAmount() {
     if ( matchInfo.match.gamesArr.length == 1 ) {
         // Figure out the current strike amount
-        strikeableStages = document.getElementsByClassName('stage-selectable');
+        var strikeableStages = document.getElementsByClassName('stage-selectable');
         /*if ( strikeableStages.length == 4 ) {
             strikeAmount = 2;
         } else {
@@ -325,7 +343,7 @@ function setStrikeAmount() {
 }
 
 function setCurrentStriker() {
-    strikeableStages = document.getElementsByClassName('stage-selectable');
+    var strikeableStages = document.getElementsByClassName('stage-selectable');
     // TODO: Rewrite this whole function, this is horrible
     if ( strikeableStages.length == 5 ) {
         currentStriker = players[0].id;
@@ -385,6 +403,23 @@ function setSelectedStage(selectedStage) {
             stage.classList.add('stage-stricken');
         }
     }
+}
+
+function setCasualGame() {
+    stageList.style.display = 'none';
+    playingStage.style.display = 'none';
+    player1Score.style.display = 'none';
+    player2Score.style.display = 'none';
+    player1VictoryButton.style.display = 'none';
+    player2VictoryButton.style.display = 'none';
+    gameMessage.style.display = 'none';
+
+    for ( let scoreContainer of scoreContainers ) {
+        scoreContainer.style.display = 'none';
+    }
+
+    setLength.innerHTML = 'Unlimited games';
+    turnTimer.innerHTML = 'Players may choose timer duration';
 }
 
 function startGame() {
@@ -489,6 +524,8 @@ socket.on('stageStrikes', (receivedStrikes) => {
     setStrikeAmount();
     setCurrentStriker();
     isPlayerStriker();
+
+    var strikeableStages = document.getElementsByClassName('stage-selectable');
 
     if (strikeableStages.length == 1) {
         startGame();
