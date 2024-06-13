@@ -68,13 +68,16 @@ router.post("/DeleteUserLoginData", async (req, res) => {
 //user: id, username, role, g2_rating, discord_id, discord_avatar_hash, created_at, banned
 router.post("/GetUsers", async (req, res) => {
     try{
-        const userIdList = req.userIdList;
+        console.log('user list');
+        console.log(req.body.userIdList);
+        const userIdList = req.body.userIdList;
         if (!CheckIfArray(userIdList)) return;
 
-        const users = GetMultipleUserDatas(userIdList);
+        const users = await GetMultipleUserDatas(userIdList);
 
         res.status(200).send(users);
     } catch(error){
+        console.log(error);
         res.sendStatus(400);
     }
 });

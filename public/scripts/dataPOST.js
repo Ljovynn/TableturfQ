@@ -25,6 +25,7 @@ async function postData(url='', data={}) {
 }
 
 async function getData(url='', data={}) {
+    console.log('Get Data body: ' + JSON.stringify(data));
     try {
         return fetch(url, {
             method: 'POST',
@@ -41,7 +42,7 @@ async function getData(url='', data={}) {
             console.log('Promise response: ' + JSON.stringify(response) );
             return response.json();
         }).then(function(data) {
-            console.log('Promise data response: ' + data);
+            console.log('Promise data response: ' + JSON.stringify(data) );
             return data;
         });
     } catch (error) {

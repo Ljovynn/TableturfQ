@@ -1,4 +1,6 @@
 // User elements
+const loadingSection = document.getElementById('page-loading');
+const profileContent = document.getElementById('profile-content');
 const userDiscordName = document.getElementById('user-discord-name');
 const userDisplayNameContent = document.getElementById('user-in-game-name');
 const userDisplayName =  document.getElementById('user-in-game-name-value');
@@ -11,6 +13,8 @@ const editDisplayNameForm = document.getElementById('user-profile-edit-name-form
 const displayNameInput = document.getElementById('user-profile-name-input');
 const displayNameSubmit = document.getElementById('user-profile-name-submit');
 const editDisplayNameClose = document.getElementById('user-profile-edit-close');
+
+const matchHistory = document.getElementById('user-match-history');
 
 // Logout
 const logoutButton = document.getElementById('logout-button');
@@ -61,7 +65,7 @@ displayNameSubmit.addEventListener('click', (e) => {
 });
 
 logoutButton.addEventListener('click', async (e) => {
-    response = await postData('/user/Logout');
+    response = await postData('/user/DeleteUserLoginData');
     console.log(response);
     if ( response == 201 ) {
         window.location.href = '/';
@@ -77,6 +81,9 @@ async function getUserInfo() {
 
 async function setUserInfo() {
     userInfo = await getUserInfo();
+
+    loadingSection.style.display = 'none';
+    profileContent.style.display = 'block';
     console.log(userInfo);
 
     user = userInfo.user;
@@ -102,6 +109,38 @@ async function getMatchHistory() {
 
 async function setMatchHistory() {
     matches = await getMatchHistory();
+
+    for ( let match of matches ) {
+        let row = document.createElement('div');
+        row.classList.add('match-row');
+
+        let dateCell = document.createElement('div');
+        dateCell.classList.add('match-date');
+        dateCell.append(match.created_at);
+
+        let matchupCell = document.createElement('div');
+        players = await getMatchUsers( [match.player1_id, match.player2_id] );
+        console.log(players);
+        matchupCell.classList.add('matchup');
+        matchupCell.append(players[0].username + ' vs ' + players[1].username);
+
+        let outcomeCell = document.createElement('div');
+        outcomeCell.classList.add('match-outcome');
+        outcomeCell.append(match.result);
+
+        row.append(dateCell);
+        row.append(matchupCell);
+        row.append(outcomeCell);
+
+        matchHistory.append(row);
+    }
+}
+
+async function getMatchUsers(users) {
+    var data = { userIdList: users };
+    console.log(data);
+    var result = await getData('/user/GetUsers', data);
+    return result;
 }
 
 function validateDisplayName(newDisplayName) {

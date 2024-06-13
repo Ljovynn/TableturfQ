@@ -189,6 +189,10 @@ h3 {
 
 /**** USER PROFILE ****/
 
+#profile-content {
+    display: none;
+}
+
 #user-info-section {
     display: inline-block;
     width: 50%;
