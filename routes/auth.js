@@ -54,7 +54,6 @@ router.get("/discord/redirect", async (req, res) => {
             }
         );
         const {access_token, refresh_token} = response.data;
-        console.log("Access token: " + access_token);
     
         if (response.data) {
 
@@ -90,8 +89,6 @@ async function StoreUserData(accessToken, refreshToken){
             "Authorization": `Bearer ${accessToken}`,
         },
     });
-
-    console.log(response.data);
 
     var user = await GetUserByDiscordId(response.data.id);
     var userId;

@@ -167,7 +167,7 @@ export async function CreateUser(username)
 }
 
 export async function CreateUserWithDiscord(username, discordId, discordAccessToken, discordRefreshToken, discordAvatarHash){
-    const result = await pool.query(`INSERT INTO users (username, role, g2_rating, g2_rd, g2_vol, discord_id, discord_access_token, discord_refresh_token, discord_avatar_hash) VALUES (?, ?, ?, ?, ?, ?)`,
+    const result = await pool.query(`INSERT INTO users (username, role, g2_rating, g2_rd, g2_vol, discord_id, discord_access_token, discord_refresh_token, discord_avatar_hash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [username, userRoles.verified, settings.rating, settings.rd, settings.vol, discordId, discordAccessToken, discordRefreshToken, discordAvatarHash]);
     return result[0].insertId;
 }
@@ -212,7 +212,7 @@ export async function SetUserRating(userId, rating, rd, vol){
 
 export async function SetUserDiscord(userId, discordId, discordAccessToken, discordRefreshToken, discordAvatarHash){
     await pool.query(`UPDATE users SET discord_id = ?, discord_access_token = ?, discord_refresh_token = ?, discord_avatar_hash = ? WHERE id = ?`, 
-    [discordId, discordAccessToken, discordRefreshToken, userId, discordAvatarHash]);
+    [discordId, discordAccessToken, discordRefreshToken, discordAvatarHash, userId]);
 }
 
 export async function SetUserDiscordTokens(userId, discordAccessToken, discordRefreshToken){
