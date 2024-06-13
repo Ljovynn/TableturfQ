@@ -15,7 +15,10 @@ export async function SetupCards(){
         cards = JSON.parse(data);
 
         for (let i = 0; i < cards.length; i++){
-            cardNameList.push(cards[i].name);
+            cardNameList.push({
+                name: cards[i].name,
+                sanitizedName: SanitizeString(cards[i].name)
+            })
         }
     });
 }

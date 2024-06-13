@@ -41,7 +41,7 @@ export async function autocomplete(interaction){
 	const choices = GetCardNames();
     var filteredChoices = [];
     for (let i = 0; i < choices.length; i++){
-        if (SanitizeString(choices[i]).search(SanitizeString(focusedValue)) != -1) filteredChoices.push(choices[i]);
+        if (choices[i].sanitizedName.search(SanitizeString(focusedValue)) != -1) filteredChoices.push(choices[i].name);
         if (filteredChoices.length > 25) return;
     }
 	await interaction.respond(
