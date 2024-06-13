@@ -18,6 +18,10 @@ export function CheckVariableDefined(variable, res){
 }
 
 export function CheckIfArray(arr, res){
+    if (!arr) {
+        res.sendStatus(400);
+        return;
+    }
     if (!Array.isArray(arr)){
         res.sendStatus(400);
         return false;

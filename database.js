@@ -46,8 +46,8 @@ export async function GetUserData(userId){
 
 export async function GetMultipleUserDatas(userIdlist){
     const [rows] = await pool.query(`SELECT id, username, role, g2_rating, CAST(discord_id AS CHAR) discord_id, discord_avatar_hash, created_at,
-    (SELECT COUNT(*) FROM ban_list WHERE user_id = u.id) AS banned FROM users u WHERE id IN (?)`, [userIdlist.join()]);
-    return rows[0]; 
+    (SELECT COUNT(*) FROM ban_list WHERE user_id = u.id) AS banned FROM users u WHERE id IN (?)`, [userIdlist]);
+    return rows; 
 }
 
 export async function GetUserRankData(userId){

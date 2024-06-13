@@ -72,6 +72,10 @@ router.post("/GetUsers", async (req, res) => {
         console.log(req.body.userIdList);
         const userIdList = req.body.userIdList;
         if (!CheckIfArray(userIdList)) return;
+        if (userIdList.length == 0){
+            res.sendStatus(401);
+            return;
+        }
 
         const users = await GetMultipleUserDatas(userIdList);
 
