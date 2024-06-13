@@ -1,6 +1,3 @@
-//todo: dispute message should show every disputed match 
-//leaderboard command, profile command
-
 import { Client, Collection, Events, EmbedBuilder, GatewayIntentBits } from 'discord.js';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
@@ -25,7 +22,6 @@ const commandFolder = fs.readdirSync(folderPath);
 var previousDisputeMessageId;
 
 for (const file of commandFolder) {
-	//const filePath = path.join(folderPath, file);
     const filePath = `./commands/${file}`;
 	let command = await import (filePath);
 	// Set a new item in the Collection with the key as the command name and the value as the exported module
@@ -37,29 +33,40 @@ for (const file of commandFolder) {
 }
 
 client.once(Events.ClientReady, readyClient => {
-    //const channel = client.channels.cache.get('1219280066316337182');
-    //channel.send('content');
 	console.log(`Discord bot logged in as ${readyClient.user.tag}`);
 });
 
 client.on(Events.InteractionCreate, async interaction => {
-	if (!interaction.isChatInputCommand()) return;
+	if (interaction.isChatInputCommand()){
+		const command = interaction.client.commands.get(interaction.commandName);
 
-	const command = interaction.client.commands.get(interaction.commandName);
+		if (!command) {
+			console.error(`No command matching ${interaction.commandName} was found.`);
+			return;
+		}
 
-	if (!command) {
-		console.error(`No command matching ${interaction.commandName} was found.`);
-		return;
-	}
+		try {
+			await command.execute(interaction);
+		} catch (error) {
+			console.error(error);
+			if (interaction.replied || interaction.deferred) {
+				await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
+			} else {
+				await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+			}
+		}
+	} else if (interaction.isAutocomplete()){
+		const command = interaction.client.commands.get(interaction.commandName);
 
-	try {
-		await command.execute(interaction);
-	} catch (error) {
-		console.error(error);
-		if (interaction.replied || interaction.deferred) {
-			await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
-		} else {
-			await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+		if (!command) {
+			console.error(`No command matching ${interaction.commandName} was found.`);
+			return;
+		}
+
+		try {
+			await command.autocomplete(interaction);
+		} catch (error) {
+			console.error(error);
 		}
 	}
 });

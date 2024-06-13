@@ -104,3 +104,33 @@ export function BuildProfileEmbed(user, matchCount, lastPlayed){
 	};
 	return profileEmbed;
 }
+
+export function BuildCardEmbed(card, level){
+	if (!card){
+        const noCardEmbed = {
+			color: embedColor,
+			title: 'Error: Can\'t find card',
+		};
+		return noCardEmbed;
+    }
+
+	var cardTitle = card.name;
+
+	switch (level){
+		case 2: cardTitle += ' ★★';
+		break;
+		case 3: cardTitle += ' ★★★';
+		break;
+	}
+
+	cardTitle += ` [${card.id}]`;
+
+	const cardEmbed = {
+		color: embedColor,
+		title: cardTitle,
+		image: {
+			url: `https://leanny.github.io/splat3/images/tableturf_full/${card.id}-${level}.png`
+		},
+	};
+	return cardEmbed;
+}

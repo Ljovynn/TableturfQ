@@ -1,0 +1,1066 @@
+[
+    {
+        "id": "1",
+        "name": "Hero Shot"
+    },
+    {
+        "id": "2",
+        "name": "Sploosh-o-matic"
+    },
+    {
+        "id": "3",
+        "name": "Splattershot Jr."
+    },
+    {
+        "id": "4",
+        "name": "Splash-o-matic"
+    },
+    {
+        "id": "5",
+        "name": "Aerospray MG"
+    },
+    {
+        "id": "6",
+        "name": "Splattershot"
+    },
+    {
+        "id": "7",
+        "name": ".52 Gal"
+    },
+    {
+        "id": "8",
+        "name": "N-ZAP '85"
+    },
+    {
+        "id": "9",
+        "name": "Splattershot Pro"
+    },
+    {
+        "id": "10",
+        "name": ".96 Gal"
+    },
+    {
+        "id": "11",
+        "name": "Jet Squelcher"
+    },
+    {
+        "id": "12",
+        "name": "Luna Blaster"
+    },
+    {
+        "id": "13",
+        "name": "Blaster"
+    },
+    {
+        "id": "14",
+        "name": "Range Blaster"
+    },
+    {
+        "id": "15",
+        "name": "Clash Blaster"
+    },
+    {
+        "id": "16",
+        "name": "Rapid Blaster"
+    },
+    {
+        "id": "17",
+        "name": "Rapid Blaster Pro"
+    },
+    {
+        "id": "18",
+        "name": "L-3 Nozzlenose"
+    },
+    {
+        "id": "19",
+        "name": "H-3 Nozzlenose"
+    },
+    {
+        "id": "20",
+        "name": "Squeezer"
+    },
+    {
+        "id": "21",
+        "name": "Carbon Roller"
+    },
+    {
+        "id": "22",
+        "name": "Splat Roller"
+    },
+    {
+        "id": "23",
+        "name": "Dynamo Roller"
+    },
+    {
+        "id": "24",
+        "name": "Flingza Roller"
+    },
+    {
+        "id": "25",
+        "name": "Inkbrush"
+    },
+    {
+        "id": "26",
+        "name": "Octobrush"
+    },
+    {
+        "id": "27",
+        "name": "Classic Squiffer"
+    },
+    {
+        "id": "28",
+        "name": "Splat Charger"
+    },
+    {
+        "id": "29",
+        "name": "Splatterscope"
+    },
+    {
+        "id": "30",
+        "name": "E-liter 4K"
+    },
+    {
+        "id": "31",
+        "name": "E-liter 4K Scope"
+    },
+    {
+        "id": "32",
+        "name": "Bamboozler 14 Mk I"
+    },
+    {
+        "id": "33",
+        "name": "Goo Tuber"
+    },
+    {
+        "id": "34",
+        "name": "Slosher"
+    },
+    {
+        "id": "35",
+        "name": "Tri-Slosher"
+    },
+    {
+        "id": "36",
+        "name": "Sloshing Machine"
+    },
+    {
+        "id": "37",
+        "name": "Bloblobber"
+    },
+    {
+        "id": "38",
+        "name": "Explosher"
+    },
+    {
+        "id": "39",
+        "name": "Mini Splatling"
+    },
+    {
+        "id": "40",
+        "name": "Heavy Splatling"
+    },
+    {
+        "id": "41",
+        "name": "Hydra Splatling"
+    },
+    {
+        "id": "42",
+        "name": "Ballpoint Splatling"
+    },
+    {
+        "id": "43",
+        "name": "Nautilus 47"
+    },
+    {
+        "id": "44",
+        "name": "Dapple Dualies"
+    },
+    {
+        "id": "45",
+        "name": "Splat Dualies"
+    },
+    {
+        "id": "46",
+        "name": "Glooga Dualies"
+    },
+    {
+        "id": "47",
+        "name": "Dualie Squelchers"
+    },
+    {
+        "id": "48",
+        "name": "Dark Tetra Dualies"
+    },
+    {
+        "id": "49",
+        "name": "Splat Brella"
+    },
+    {
+        "id": "50",
+        "name": "Tenta Brella"
+    },
+    {
+        "id": "51",
+        "name": "Undercover Brella"
+    },
+    {
+        "id": "52",
+        "name": "Tri-Stringer"
+    },
+    {
+        "id": "53",
+        "name": "REEF-LUX 450"
+    },
+    {
+        "id": "54",
+        "name": "Splatana Stamper"
+    },
+    {
+        "id": "55",
+        "name": "Splatana Wiper"
+    },
+    {
+        "id": "56",
+        "name": "Splat Bomb"
+    },
+    {
+        "id": "57",
+        "name": "Suction Bomb"
+    },
+    {
+        "id": "58",
+        "name": "Burst Bomb"
+    },
+    {
+        "id": "59",
+        "name": "Sprinkler"
+    },
+    {
+        "id": "60",
+        "name": "Splash Wall"
+    },
+    {
+        "id": "61",
+        "name": "Fizzy Bomb"
+    },
+    {
+        "id": "62",
+        "name": "Curling Bomb"
+    },
+    {
+        "id": "63",
+        "name": "Autobomb"
+    },
+    {
+        "id": "64",
+        "name": "Squid Beakon"
+    },
+    {
+        "id": "65",
+        "name": "Point Sensor"
+    },
+    {
+        "id": "66",
+        "name": "Ink Mine"
+    },
+    {
+        "id": "67",
+        "name": "Toxic Mist"
+    },
+    {
+        "id": "68",
+        "name": "Angle Shooter"
+    },
+    {
+        "id": "69",
+        "name": "Torpedo"
+    },
+    {
+        "id": "70",
+        "name": "Trizooka"
+    },
+    {
+        "id": "71",
+        "name": "Big Bubbler"
+    },
+    {
+        "id": "72",
+        "name": "Zipcaster"
+    },
+    {
+        "id": "73",
+        "name": "Tenta Missiles"
+    },
+    {
+        "id": "74",
+        "name": "Ink Storm"
+    },
+    {
+        "id": "75",
+        "name": "Booyah Bomb"
+    },
+    {
+        "id": "76",
+        "name": "Wave Breaker"
+    },
+    {
+        "id": "77",
+        "name": "Ink Vac"
+    },
+    {
+        "id": "78",
+        "name": "Killer Wail 5.1"
+    },
+    {
+        "id": "79",
+        "name": "Inkjet"
+    },
+    {
+        "id": "80",
+        "name": "Ultra Stamp"
+    },
+    {
+        "id": "81",
+        "name": "Crab Tank"
+    },
+    {
+        "id": "82",
+        "name": "Reefslider"
+    },
+    {
+        "id": "83",
+        "name": "Triple Inkstrike"
+    },
+    {
+        "id": "84",
+        "name": "Tacticooler"
+    },
+    {
+        "id": "85",
+        "name": "Sheldon"
+    },
+    {
+        "id": "86",
+        "name": "Gnarly Eddy"
+    },
+    {
+        "id": "87",
+        "name": "Jel La Fleur"
+    },
+    {
+        "id": "88",
+        "name": "Mr. Coco"
+    },
+    {
+        "id": "89",
+        "name": "Harmony"
+    },
+    {
+        "id": "90",
+        "name": "Murch"
+    },
+    {
+        "id": "91",
+        "name": "Mr. Grizz"
+    },
+    {
+        "id": "92",
+        "name": "Marigold"
+    },
+    {
+        "id": "93",
+        "name": "Smallfry"
+    },
+    {
+        "id": "94",
+        "name": "Cuttlefish"
+    },
+    {
+        "id": "95",
+        "name": "Captain"
+    },
+    {
+        "id": "96",
+        "name": "Callie"
+    },
+    {
+        "id": "97",
+        "name": "Marie"
+    },
+    {
+        "id": "98",
+        "name": "Shiver"
+    },
+    {
+        "id": "99",
+        "name": "Frye"
+    },
+    {
+        "id": "100",
+        "name": "Big Man"
+    },
+    {
+        "id": "101",
+        "name": "Judd"
+    },
+    {
+        "id": "102",
+        "name": "Li'l Judd"
+    },
+    {
+        "id": "103",
+        "name": "SquidForce"
+    },
+    {
+        "id": "104",
+        "name": "Zink"
+    },
+    {
+        "id": "105",
+        "name": "Krak-On"
+    },
+    {
+        "id": "106",
+        "name": "Rockenberg"
+    },
+    {
+        "id": "107",
+        "name": "Zekko"
+    },
+    {
+        "id": "108",
+        "name": "Forge"
+    },
+    {
+        "id": "109",
+        "name": "Firefin"
+    },
+    {
+        "id": "110",
+        "name": "Skalop"
+    },
+    {
+        "id": "111",
+        "name": "Splash Mob"
+    },
+    {
+        "id": "112",
+        "name": "Inkline"
+    },
+    {
+        "id": "113",
+        "name": "Tentatek"
+    },
+    {
+        "id": "114",
+        "name": "Takoroka"
+    },
+    {
+        "id": "115",
+        "name": "Annaki"
+    },
+    {
+        "id": "116",
+        "name": "Enperry"
+    },
+    {
+        "id": "117",
+        "name": "Toni Kensa"
+    },
+    {
+        "id": "118",
+        "name": "Barazushi"
+    },
+    {
+        "id": "119",
+        "name": "Emberz"
+    },
+    {
+        "id": "120",
+        "name": "Octotrooper"
+    },
+    {
+        "id": "121",
+        "name": "Shielded Octotrooper"
+    },
+    {
+        "id": "122",
+        "name": "Twintacle Octotrooper"
+    },
+    {
+        "id": "123",
+        "name": "Octohopper"
+    },
+    {
+        "id": "124",
+        "name": "Octocopter"
+    },
+    {
+        "id": "125",
+        "name": "Octobomber"
+    },
+    {
+        "id": "126",
+        "name": "Octodisco"
+    },
+    {
+        "id": "127",
+        "name": "Octopod"
+    },
+    {
+        "id": "128",
+        "name": "Oversized Octopod"
+    },
+    {
+        "id": "129",
+        "name": "Tentakook"
+    },
+    {
+        "id": "130",
+        "name": "Octosniper"
+    },
+    {
+        "id": "131",
+        "name": "Octocommander"
+    },
+    {
+        "id": "132",
+        "name": "Octomissile"
+    },
+    {
+        "id": "133",
+        "name": "Octozeppelin"
+    },
+    {
+        "id": "134",
+        "name": "Squee-G"
+    },
+    {
+        "id": "135",
+        "name": "Octostamp"
+    },
+    {
+        "id": "136",
+        "name": "Amped Octostamp"
+    },
+    {
+        "id": "137",
+        "name": "Flooder"
+    },
+    {
+        "id": "138",
+        "name": "Octoballer"
+    },
+    {
+        "id": "139",
+        "name": "Octoling"
+    },
+    {
+        "id": "140",
+        "name": "DJ Octavio"
+    },
+    {
+        "id": "141",
+        "name": "Chum"
+    },
+    {
+        "id": "142",
+        "name": "Cohock"
+    },
+    {
+        "id": "143",
+        "name": "Snatcher"
+    },
+    {
+        "id": "144",
+        "name": "Steelhead"
+    },
+    {
+        "id": "145",
+        "name": "Steel Eel"
+    },
+    {
+        "id": "146",
+        "name": "Scrapper"
+    },
+    {
+        "id": "147",
+        "name": "Stinger"
+    },
+    {
+        "id": "148",
+        "name": "Maws"
+    },
+    {
+        "id": "149",
+        "name": "Drizzler"
+    },
+    {
+        "id": "150",
+        "name": "Flyfish"
+    },
+    {
+        "id": "151",
+        "name": "Fish Stick"
+    },
+    {
+        "id": "152",
+        "name": "Flipper-Flopper"
+    },
+    {
+        "id": "153",
+        "name": "Slammin' Lid"
+    },
+    {
+        "id": "154",
+        "name": "Big Shot"
+    },
+    {
+        "id": "155",
+        "name": "Goldie"
+    },
+    {
+        "id": "156",
+        "name": "Griller"
+    },
+    {
+        "id": "157",
+        "name": "Mothership"
+    },
+    {
+        "id": "158",
+        "name": "Mudmouth"
+    },
+    {
+        "id": "159",
+        "name": "Zapfish"
+    },
+    {
+        "id": "160",
+        "name": "Tower Control"
+    },
+    {
+        "id": "161",
+        "name": "Rainmaker"
+    },
+    {
+        "id": "162",
+        "name": "Power Clam"
+    },
+    {
+        "id": "163",
+        "name": "Custom Splattershot Jr."
+    },
+    {
+        "id": "164",
+        "name": "Aerospray RG"
+    },
+    {
+        "id": "165",
+        "name": "Tentatek Splatteershot"
+    },
+    {
+        "id": "166",
+        "name": "Forge Splattershot Pro"
+    },
+    {
+        "id": "167",
+        "name": "Splattershot Nova"
+    },
+    {
+        "id": "168",
+        "name": "Luna Blaster Neo"
+    },
+    {
+        "id": "169",
+        "name": "Carbon Roller Deco"
+    },
+    {
+        "id": "170",
+        "name": "Big Swig Roller"
+    },
+    {
+        "id": "171",
+        "name": "Inkbrush Nouveau"
+    },
+    {
+        "id": "172",
+        "name": "Snipewriter 5H"
+    },
+    {
+        "id": "173",
+        "name": "Slosher Deco"
+    },
+    {
+        "id": "174",
+        "name": "Zink Mini Splatling"
+    },
+    {
+        "id": "175",
+        "name": "Dapple Dualies Noueveau"
+    },
+    {
+        "id": "176",
+        "name": "Neo Sploosh-o-Matic"
+    },
+    {
+        "id": "177",
+        "name": "Neo Splash-o-Matic"
+    },
+    {
+        "id": "178",
+        "name": "N-ZAP '89"
+    },
+    {
+        "id": "179",
+        "name": ".96 Gal Deco"
+    },
+    {
+        "id": "180",
+        "name": "Custom Jet Squelcher"
+    },
+    {
+        "id": "181",
+        "name": "Clash Blaster Neo"
+    },
+    {
+        "id": "182",
+        "name": "Rapid Blaster Deco"
+    },
+    {
+        "id": "183",
+        "name": "L-3 Nozzlenose D"
+    },
+    {
+        "id": "184",
+        "name": "Krak-On Splat Roller"
+    },
+    {
+        "id": "185",
+        "name": "Z+F Splat Charger"
+    },
+    {
+        "id": "186",
+        "name": "Z+F Splatterscope"
+    },
+    {
+        "id": "187",
+        "name": "Tri-Slosher Nouveau"
+    },
+    {
+        "id": "188",
+        "name": "Kraken Royale"
+    },
+    {
+        "id": "189",
+        "name": "Super Chump"
+    },
+    {
+        "id": "190",
+        "name": "Shelly & Donny"
+    },
+    {
+        "id": "191",
+        "name": "Annie"
+    },
+    {
+        "id": "192",
+        "name": "Jelonzo"
+    },
+    {
+        "id": "193",
+        "name": "Fred Crumbs"
+    },
+    {
+        "id": "194",
+        "name": "Spyke"
+    },
+    {
+        "id": "195",
+        "name": "The Eel Deal - Frye"
+    },
+    {
+        "id": "196",
+        "name": "The Cold-Blooded Bandit - Shiver"
+    },
+    {
+        "id": "197",
+        "name": "Manta Storm - Big Man"
+    },
+    {
+        "id": "198",
+        "name": "Z+F"
+    },
+    {
+        "id": "199",
+        "name": "Annaki Splattershot Nova"
+    },
+    {
+        "id": "200",
+        "name": "Rapid Blaster Pro Deco"
+    },
+    {
+        "id": "201",
+        "name": "S-BLAST '92"
+    },
+    {
+        "id": "202",
+        "name": "H-3 Nozzlenose D"
+    },
+    {
+        "id": "203",
+        "name": "Big Swig Roller Express"
+    },
+    {
+        "id": "204",
+        "name": "Painbrush"
+    },
+    {
+        "id": "205",
+        "name": "Heavy Splatling Deco"
+    },
+    {
+        "id": "206",
+        "name": "Custom Dualie Squelchers"
+    },
+    {
+        "id": "207",
+        "name": "Light Tetra Dualies"
+    },
+    {
+        "id": "208",
+        "name": "Tenta Sorella Brella"
+    },
+    {
+        "id": "209",
+        "name": "Splatana Wiper Deco"
+    },
+    {
+        "id": "210",
+        "name": "Gold Dynamo Roller"
+    },
+    {
+        "id": "211",
+        "name": "Octobrush Nouveau"
+    },
+    {
+        "id": "212",
+        "name": "Custom Goo Tuber"
+    },
+    {
+        "id": "213",
+        "name": "Sloshing Machine Neo"
+    },
+    {
+        "id": "214",
+        "name": "Bloblobber Deco"
+    },
+    {
+        "id": "215",
+        "name": "Dread Wringer"
+    },
+    {
+        "id": "216",
+        "name": "Ballpoint Splatling Nouveau"
+    },
+    {
+        "id": "217",
+        "name": "Heavy Edit Splatling"
+    },
+    {
+        "id": "218",
+        "name": "Sorella Brella"
+    },
+    {
+        "id": "219",
+        "name": "Inkline Tri-Stringer"
+    },
+    {
+        "id": "220",
+        "name": "Cohozuna"
+    },
+    {
+        "id": "221",
+        "name": "Horrorboros"
+    },
+    {
+        "id": "222",
+        "name": "Custom Blaster"
+    },
+    {
+        "id": "223",
+        "name": "Foil Squeezer"
+    },
+    {
+        "id": "224",
+        "name": "Enperry Splat Dualies"
+    },
+    {
+        "id": "225",
+        "name": "Undercover Sorella Brella"
+    },
+    {
+        "id": "226",
+        "name": "REEF-LUX 450 Deco"
+    },
+    {
+        "id": "227",
+        "name": "Splatana Stamper Nouveau"
+    },
+    {
+        "id": "228",
+        "name": "Snipewriter 5B"
+    },
+    {
+        "id": "229",
+        "name": "S-BLAST '91"
+    },
+    {
+        "id": "230",
+        "name": "Painbrush Nouveau"
+    },
+    {
+        "id": "231",
+        "name": "Triple Splashdown"
+    },
+    {
+        "id": "232",
+        "name": "Splattercolor Screen"
+    },
+    {
+        "id": "233",
+        "name": "Order Dualies"
+    },
+    {
+        "id": "234",
+        "name": ".52 Gal Deco"
+    },
+    {
+        "id": "235",
+        "name": "Foil Flingza Roller"
+    },
+    {
+        "id": "236",
+        "name": "New Squiffer"
+    },
+    {
+        "id": "237",
+        "name": "Custom E-liter 4K"
+    },
+    {
+        "id": "238",
+        "name": "Custom E-liter 4K Scope"
+    },
+    {
+        "id": "239",
+        "name": "Custom Explosher"
+    },
+    {
+        "id": "240",
+        "name": "Dread Wringer D"
+    },
+    {
+        "id": "241",
+        "name": "Nautilus 79"
+    },
+    {
+        "id": "242",
+        "name": "Glooga Dualies Deco"
+    },
+    {
+        "id": "243",
+        "name": "Douser Dualies FF"
+    },
+    {
+        "id": "244",
+        "name": "Recycled Brella 24 Mk I"
+    },
+    {
+        "id": "245",
+        "name": "Flow"
+    },
+    {
+        "id": "246",
+        "name": "Jelfonzo"
+    },
+    {
+        "id": "247",
+        "name": "Bisk"
+    },
+    {
+        "id": "248",
+        "name": "Acht"
+    },
+    {
+        "id": "249",
+        "name": "Cipher"
+    },
+    {
+        "id": "250",
+        "name": "Pearl Drone"
+    },
+    {
+        "id": "251",
+        "name": "Pearl"
+    },
+    {
+        "id": "252",
+        "name": "Marina"
+    },
+    {
+        "id": "253",
+        "name": "Custom Range Blaster"
+    },
+    {
+        "id": "254",
+        "name": "Bamboozler 14 Mk II"
+    },
+    {
+        "id": "255",
+        "name": "Custom Hydra Splatling"
+    },
+    {
+        "id": "256",
+        "name": "Heavy Edit Splatling Nouveau"
+    },
+    {
+        "id": "257",
+        "name": "Custom Douser Dualies FF"
+    },
+    {
+        "id": "258",
+        "name": "Recycled Brella 24 Mk II"
+    },
+    {
+        "id": "259",
+        "name": "Wellstring V"
+    },
+    {
+        "id": "260",
+        "name": "Custom Wellstring V"
+    },
+    {
+        "id": "261",
+        "name": "Mint Decavitator"
+    },
+    {
+        "id": "262",
+        "name": "Charcoal Decavitator"
+    },
+    {
+        "id": "263",
+        "name": "Crusty Sean"
+    },
+    {
+        "id": "264",
+        "name": "The Ursine Anomaly - ＃03"
+    },
+    {
+        "id": "265",
+        "name": "Megalodontia"
+    },
+    {
+        "id": "266",
+        "name": "Overlorder"
+    }
+]

@@ -1,7 +1,6 @@
 import { SlashCommandBuilder } from "discord.js";
 import { BuildProfileEmbed } from "../embedBuilder.js";
 import { GetUserByDiscordId, GetUserMatchCount, GetUserMatchHistory } from "../../database.js";
-const hitsPerPage = 15;
 
 export const data = new SlashCommandBuilder()
     .setName('profile')

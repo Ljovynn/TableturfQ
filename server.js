@@ -46,6 +46,7 @@ server.listen(port, () => {
     setInterval(DeleteOldSuspensions, deleteOldSuspensionsInterval);
 
     StartDiscordBot();
+    SetupCards();
 });
 
 app.use(
@@ -69,6 +70,7 @@ import queRouter from './routes/que.js';
 import leaderboardRouter from './routes/leaderboard.js';
 import adminRouter from './routes/admin.js';
 import userRouter from './routes/user.js';
+import { SetupCards } from "./cards/cardManager.js";
 
 app.use('/api/auth', authRouter);
 app.use('/match', matchRouter);
