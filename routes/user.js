@@ -4,13 +4,13 @@ import { Router } from 'express';
 import cookieParser from "cookie-parser";
 import { DeserializeSession } from '../utils/session.js';
 
-import { CheckUserDefined } from '../utils/checkDefined.js';
+import { CheckUserDefined, CheckVariableDefined } from '../utils/checkDefined.js';
 import { GetCurrentUser } from '../utils/userUtils.js';
 
 import dotenv from 'dotenv';
 import { FindIfPlayerInQue } from '../queManager.js';
 import { FindIfPlayerInMatch } from '../matchManager.js';
-import { GetUserMatchHistory, SetUserDiscordTokens } from '../database.js';
+import { GetUserMatchHistory, SetUserDiscordTokens, DeleteAllUserSessions } from '../database.js';
 
 const router = Router();
 
@@ -29,8 +29,8 @@ router.use(DeserializeSession);
 //res: matchHistory (DB matches, not match objects)
 router.post("/GetUserMatchHistory", async (req, res) => {
     try{
-        const userId = req.userId;
-        const pageNumber = req.pageNumber;
+        const userId = req.session.user;
+        var pageNumber = req.pageNumber;
 
         if (!CheckVariableDefined(userId, res)) return;
         if (typeof(pageNumber) !== 'number' || pageNumber < 0){
@@ -41,6 +41,7 @@ router.post("/GetUserMatchHistory", async (req, res) => {
 
         res.status(200).send(matchHistory);
     } catch(error){
+        console.error(error);
         res.sendStatus(400);
     }
 });
@@ -54,6 +55,7 @@ router.post("/Logout", async (req, res) => {
         await SetUserDiscordTokens(userId, null, null);
         res.sendStatus(201);
     } catch(error){
+        console.error(error);
         res.sendStatus(400);
     }
 });
