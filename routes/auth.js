@@ -9,7 +9,7 @@ import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import path from 'path';
 
-import { GetUserByDiscordId, CreateUserWithDiscord } from '../database.js';
+import { GetUserByDiscordId, CreateUserWithDiscord, SetUserDiscord } from '../database.js';
 
 const apiRouteOauth2Token = "https://discord.com/api/v10/oauth2/token";
 const apiRouteUserInfo = "https://discord.com/api/v10/users/@me";
@@ -99,6 +99,7 @@ async function StoreUserData(accessToken, refreshToken){
         userId = await CreateUserWithDiscord(response.data.username, response.data.id, accessToken, refreshToken, response.data.avatar);
     } else {
         userId = user.id;
+        await SetUserDiscord(userId, response.data.id, accessToken, refreshToken, response.data.avatar); 
     }
     return userId;
 }

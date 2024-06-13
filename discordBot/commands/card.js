@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from "discord.js";
-import { BuildCardEmbed, BuildProfileEmbed } from "../embedBuilder.js";
+import { BuildCardEmbed } from "../embedBuilder.js";
 import { GetCardById, GetCardByName, GetCardNames } from "../../cards/cardManager.js";
 import { SanitizeString } from "../../utils/string.js";
 import { uniqueCards } from "../../cards/cardManager.js";
@@ -42,8 +42,8 @@ export async function autocomplete(interaction){
     var filteredChoices = [];
     for (let i = 0; i < choices.length; i++){
         if (SanitizeString(choices[i]).search(SanitizeString(focusedValue)) != -1) filteredChoices.push(choices[i]);
+        if (filteredChoices.length > 25) return;
     }
-    if (filteredChoices.length > 25) return;
 	await interaction.respond(
 		filteredChoices.map(choice => ({ name: choice, value: choice })),
 	);
