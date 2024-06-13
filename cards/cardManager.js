@@ -3,6 +3,8 @@ import { SanitizeString } from '../utils/string.js';
 
 var cards = [];
 
+export const uniqueCards = 266;
+
 //for autocomplete purposes
 var cardNameList = [];
 

@@ -18,8 +18,8 @@ client.commands = new Collection();
 
 var folderPath = path.join(__dirname, 'commands');
 const commandFolder = fs.readdirSync(folderPath);
-folderPath = path.join(__dirname, 'devCommands');
-const devCommandFolder = fs.readdirSync(folderPath);
+folderPath = path.join(__dirname, 'guildCommands');
+const guildCommandFolder = fs.readdirSync(folderPath);
 
 var previousDisputeMessageId;
 
@@ -34,8 +34,8 @@ for (const file of commandFolder) {
 	}
 }
 
-for (const file of devCommandFolder) {
-    const filePath = `./devCommands/${file}`;
+for (const file of guildCommandFolder) {
+    const filePath = `./guildCommands/${file}`;
 	let command = await import (filePath);
 	// Set a new item in the Collection with the key as the command name and the value as the exported module
     if ('data' in command && 'execute' in command) {

@@ -2,8 +2,7 @@ import { SlashCommandBuilder } from "discord.js";
 import { BuildCardEmbed, BuildProfileEmbed } from "../embedBuilder.js";
 import { GetCardById, GetCardByName, GetCardNames } from "../../cards/cardManager.js";
 import { SanitizeString } from "../../utils/string.js";
-
-const maxCards = 266;
+import { uniqueCards } from "../../cards/cardManager.js";
 
 export const data = new SlashCommandBuilder()
     .setName('card')
@@ -31,7 +30,7 @@ export const data = new SlashCommandBuilder()
                 .setDescription('The id')
                 .setRequired(true)
                 .setMinValue(1)
-                .setMaxValue(maxCards))
+                .setMaxValue(uniqueCards))
             .addIntegerOption(option =>
                 option.setName('level')
                 .setDescription('The upgrade level')
