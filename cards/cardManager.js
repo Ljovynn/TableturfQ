@@ -14,10 +14,13 @@ export async function SetupCards(){
     
         cards = JSON.parse(data);
 
-        for (let i = 0; i < cards.length; i++){
+        var sortedCards = cards;
+        sortedCards.sort((a, b) => a.name.localeCompare(b.name));
+
+        for (let i = 0; i < sortedCards.length; i++){
             cardNameList.push({
-                name: cards[i].name,
-                sanitizedName: SanitizeString(cards[i].name)
+                name: sortedCards[i].name,
+                sanitizedName: SanitizeString(sortedCards[i].name)
             })
         }
     });
