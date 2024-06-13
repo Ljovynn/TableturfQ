@@ -4,13 +4,13 @@ import { Router } from 'express';
 import cookieParser from "cookie-parser";
 import { DeserializeSession } from '../utils/session.js';
 
-import { CheckUserDefined } from '../utils/checkDefined.js';
+import { CheckIfArray, CheckUserDefined } from '../utils/checkDefined.js';
 import { GetCurrentUser } from '../utils/userUtils.js';
 
 import dotenv from 'dotenv';
 import { FindIfPlayerInQue } from '../queManager.js';
-import { FindIfPlayerInMatch } from '../matchManager.js';
-import { GetUserMatchHistory, SetUserDiscordTokens } from '../database.js';
+import { FindMatchWithPlayer } from '../matchManager.js';
+import { DeleteAllUserSessions, GetMultipleUserDatas, GetUserMatchHistory, SetUserDiscordTokens } from '../database.js';
 
 const router = Router();
 
@@ -45,14 +45,33 @@ router.post("/GetUserMatchHistory", async (req, res) => {
     }
 });
 
-router.post("/Logout", async (req, res) => {
+router.post("/DeleteUserLoginData", async (req, res) => {
     try{
         const userId = req.session.user;
+        console.log("user id: " + userId);
         if (!CheckUserDefined(req, res)) return;
 
         await DeleteAllUserSessions(userId);
         await SetUserDiscordTokens(userId, null, null);
+        req.session.user = undefined;
         res.sendStatus(201);
+    } catch(error){
+        console.log(error);
+        res.sendStatus(400);
+    }
+});
+
+//req: userIdList
+//res: users
+//user: id, username, role, g2_rating, discord_id, discord_avatar_hash, created_at, banned
+router.post("/GetUsers", async (req, res) => {
+    try{
+        const userIdList = req.userIdList;
+        if (!CheckIfArray(userIdList)) return;
+
+        const users = GetMultipleUserDatas(userIdList);
+
+        res.status(200).send(users);
     } catch(error){
         res.sendStatus(400);
     }
@@ -66,7 +85,6 @@ router.post("/Logout", async (req, res) => {
 //matchId: just the id of match player is in
 router.get("/GetUserInfo", async (req, res) => {
     try{
-
         var user = await GetCurrentUser(req);
         if (!user) {
             res.sendStatus(403);
@@ -74,7 +92,7 @@ router.get("/GetUserInfo", async (req, res) => {
         }
 
         var queData = FindIfPlayerInQue(user.id);
-        var matchId = FindIfPlayerInMatch(user.id);
+        var matchId = FindMatchWithPlayer(user.id);
 
         var data = {user, queData, matchId};
 

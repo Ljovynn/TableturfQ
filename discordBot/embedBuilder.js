@@ -76,8 +76,17 @@ export function BuildProfileEmbed(user, matchCount, lastPlayed){
     var profileFields = [ 
 	{
         name: 'Rating',
-		//Todo: insert rank emoji
         value: `**${Math.floor(user.g2_rating)}**`,
+		inline: true
+		},
+	{
+        name: 'Rank',
+        value: `**Rank not implemented**`,
+		inline: true
+		},
+	{
+        name: ' ',
+        value: ' ',
 		inline: false
 		},
 	{ 
@@ -99,6 +108,9 @@ export function BuildProfileEmbed(user, matchCount, lastPlayed){
 			name: `${user.username}`,
 			icon_url: `https://cdn.discordapp.com/avatars/${user.discord_id}/${user.discord_avatar_hash}.png`,
 			url: `${websiteURL}:${port}/user`,
+		},
+		thumbnail: { //add rank image here
+			url: 'https://leanny.github.io/splat3/images/zakka/Stc_Sti_MiniGame_RankAward_Lv06.png',
 		},
 		fields: profileFields,
 	};
