@@ -48,3 +48,26 @@ async function getData(url='', data={}) {
         console.error('Error:', error);
     }
 }
+
+async function fetchData(url='') {
+     try {
+        return fetch(url, {
+            mode: 'cors',
+            cache: 'no-cache',
+            credentials: 'same-origin',
+            headers: new Headers({
+                'Content-Type': 'application/json'
+            }),
+            redirect: 'follow',
+            referrerPolicy: 'no-referrer',
+        }).then(function(response) {
+            console.log('Promise response: ' + JSON.stringify(response) );
+            return response.json();
+        }).then(function(data) {
+            console.log('Promise data response: ' + data);
+            return data;
+        });
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
