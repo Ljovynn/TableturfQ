@@ -3,6 +3,8 @@ import dotenv from 'dotenv';
 import { userRoles } from './public/constants/userData.js';
 import { FindPlayerPosInMatch } from './utils/matchUtils.js';
 import { settings } from './glicko2Manager.js';
+import { TimestampStyles } from 'discord.js';
+import { ConvertJSDateToTimestamp } from './utils/date.js';
 
 dotenv.config();
 
@@ -233,12 +235,15 @@ export async function DeleteAllUserSessions(userId){
 }
 
 export async function DeleteOldSessions(){
-    await pool.query(`DELETE FROM sessions WHERE expires_at < ?`, [Date.now()]);
+    let timeStamp = ConvertJSDateToTimestamp(new Date());
+    await pool.query(`DELETE FROM sessions WHERE expires_at < ?`, [timeStamp]);
 }
 
 export async function DeleteOldUnverifiedAccounts(ageThreshold){
-    var cutoffDate = Date.now() - ageThreshold;
-    await pool.query(`DELETE FROM users WHERE role = ? AND created_at < ?`, [userRoles.unverified, cutoffDate]);
+    const cutoffDate = Date.now() - ageThreshold;
+    let timeStamp = ConvertJSDateToTimestamp(new Date(cutoffDate));
+    console.log(timeStamp);
+    await pool.query(`DELETE FROM users WHERE role = ? AND created_at < ?`, [userRoles.unverified, timeStamp]);
 }
 
 export async function UnbanUser(userId){
@@ -246,5 +251,6 @@ export async function UnbanUser(userId){
 }
 
 export async function DeleteOldSuspensions(){
-    await pool.query(`DELETE FROM ban_list WHERE expires_at < ?`, [Date.now()]);
+    let timeStamp = ConvertJSDateToTimestamp(new Date());
+    await pool.query(`DELETE FROM ban_list WHERE expires_at < ?`, [timeStamp]);
 }

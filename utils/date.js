@@ -19,3 +19,7 @@ export function DetailMinute(date){
     
     return result;
 }
+
+export function ConvertJSDateToTimestamp(date){
+    return date.toISOString().slice(0, 19).replace('T', ' ');
+}
