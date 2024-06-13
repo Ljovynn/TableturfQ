@@ -3,7 +3,6 @@ import dotenv from 'dotenv';
 import { userRoles } from './public/constants/userData.js';
 import { FindPlayerPosInMatch } from './utils/matchUtils.js';
 import { settings } from './glicko2Manager.js';
-import { TimestampStyles } from 'discord.js';
 import { ConvertJSDateToTimestamp } from './utils/date.js';
 
 dotenv.config();
