@@ -213,6 +213,11 @@ export async function SetUserDiscord(userId, discordId, discordAccessToken, disc
     [discordId, discordAccessToken, discordRefreshToken, userId, discordAvatarHash]);
 }
 
+export async function SetUserDiscordTokens(userId, discordAccessToken, discordRefreshToken){
+    await pool.query(`UPDATE users SET discord_access_token = ?, discord_refresh_token = ? WHERE id = ?`, 
+    [discordAccessToken, discordRefreshToken, userId]);
+}
+
 //delete
 
 /*export async function DeleteChatMessage(matchId, messageNumber){

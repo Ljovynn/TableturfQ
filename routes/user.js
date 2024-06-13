@@ -10,7 +10,7 @@ import { GetCurrentUser } from '../utils/userUtils.js';
 import dotenv from 'dotenv';
 import { FindIfPlayerInQue } from '../queManager.js';
 import { FindIfPlayerInMatch } from '../matchManager.js';
-import { GetUserMatchHistory } from '../database.js';
+import { GetUserMatchHistory, SetUserDiscordTokens } from '../database.js';
 
 const router = Router();
 
@@ -51,6 +51,7 @@ router.post("/Logout", async (req, res) => {
         if (!CheckUserDefined(req, res)) return;
 
         await DeleteAllUserSessions(userId);
+        await SetUserDiscordTokens(userId, null, null);
         res.sendStatus(201);
     } catch(error){
         res.sendStatus(400);
