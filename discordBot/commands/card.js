@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from "discord.js";
 import { BuildCardEmbed } from "../embedBuilder.js";
-import { GetCardById, GetCardByName, GetCardNames } from "../../cards/cardManager.js";
+import { GetCardById, GetCardByName, GetCards } from "../../cards/cardManager.js";
 import { SanitizeString } from "../../utils/string.js";
 import { uniqueCards } from "../../cards/cardManager.js";
 
@@ -38,7 +38,7 @@ export const data = new SlashCommandBuilder()
                 .setMaxValue(3)))
 export async function autocomplete(interaction){
     const focusedValue = interaction.options.getFocused();
-	const choices = GetCardNames();
+	const choices = GetCards();
     var filteredChoices = [];
     for (let i = 0; i < choices.length; i++){
         if (choices[i].sanitizedName.search(SanitizeString(focusedValue)) != -1) filteredChoices.push(choices[i].name);

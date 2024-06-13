@@ -1,24 +1,22 @@
 import fs from 'node:fs';
 import { SanitizeString } from '../utils/string.js';
 
-var cards = [];
-
 export const uniqueCards = 266;
 
-//for autocomplete purposes
-var cardNameList = [];
+//sorted alphabetically for autocomplete purposes
+var cards = [];
 
 export async function SetupCards(){
     fs.readFile('cards/cardData.json', 'utf-8', function (err, data) {
         if (err) throw err;
     
-        cards = JSON.parse(data);
+        var sortedCards = JSON.parse(data);
 
-        var sortedCards = cards;
         sortedCards.sort((a, b) => a.name.localeCompare(b.name));
 
         for (let i = 0; i < sortedCards.length; i++){
-            cardNameList.push({
+            cards.push({
+                id: sortedCards[i].id,
                 name: sortedCards[i].name,
                 sanitizedName: SanitizeString(sortedCards[i].name)
             })
@@ -35,9 +33,13 @@ export function GetCardByName(inputName){
 }
 
 export function GetCardById(inputId){
-    return cards[inputId - 1];
+    for (let i = 0; i < cards.length; i++){
+        if (cards[i].id == inputId){
+            return cards[i];
+        }
+    }
 }
 
-export function GetCardNames(){
-    return cardNameList;
+export function GetCards(){
+    return cards;
 }
