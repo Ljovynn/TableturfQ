@@ -462,6 +462,8 @@ async function gameReset(winnerId) {
 
 function gameFinish(winnerId) {
     setScores();
+    // Do this one last time to update the score when we can't get new match data
+    setWinner(winnerId);
     playingStage.style.display = 'none';
     player1VictoryButton.style.display = 'none';
     player2VictoryButton.style.display = 'none';

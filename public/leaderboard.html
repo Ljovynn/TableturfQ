@@ -13,46 +13,38 @@
             <h1>TableturfQ Leaderboard</h1>
         </header>
         <main class="main">
-            <div id="leader-board-options">
-                <div class="leader-board-options-section">
-                    <input id="leader-board-search" type="text" placeholder="Search for a player" />
-                    <input id="leader-board-search-button" type="button" value="Search" />
+            <div id="leaderboard-header">
+                <div class="leaderboard-header-section">
+                    <input id="leaderboard-search" type="text" placeholder="Search for a player" />
+                    <input id="leaderboard-search-button" type="button" value="Search" />
                 </div>
-                <div class="leader-board-options-section">
-                    <div id="leader-board-filter-label">Players per page</div>
-                    <select id="leader-board-page-amount">
+                <div class="leaderboard-header-section">
+                    <div id="leaderboard-filter-label">Players per page</div>
+                    <select id="leaderboard-page-amount">
                         <option value="10">10</option>
                         <option value="50">50</option>
                         <option value="100">100</option>
                         <option value="1000">1000</option>
                     </select>
                 </div>
+                <div class="leaderboard-header-section">
+                    <a class="page-prev">< Prev</a>
+                    <div id="leaderboard-header-divider" />
+                    <a class="page-next">Next ></a>
+                </div>
             </div>
-            <div id="leader-board">
-                <div class="leader-board-row">
-                    <div class="leader-board-placement">#</div>
-                    <div class="leader-board-name">Player Name</div>
-                    <div class="leader-board-ELO">ELO Rating</div>
-                    <div class="leader-board-rank">Rank</div>
+            <div id="leaderboard">
+                <div class="leaderboard-row">
+                    <div class="leaderboard-placement">#</div>
+                    <div class="leaderboard-name">Player Name</div>
+                    <div class="leaderboard-ELO">ELO Rating</div>
+                    <!--<div class="leaderboard-rank">Rank</div>-->
                 </div>
-                <div class="leader-board-row">
-                    <div class="leader-board-placement">#1</div>
-                    <div class="leader-board-name">Ljovynn</div>
-                    <div class="leader-board-ELO">2165</div>
-                    <div class="leader-board-rank">Legendary Duelist</div>
-                </div>
-                <div class="leader-board-row">
-                    <div class="leader-board-placement">#2</div>
-                    <div class="leader-board-name">Jackshainy</div>
-                    <div class="leader-board-ELO">2035</div>
-                    <div class="leader-board-rank">Legendary Duelist</div>
-                </div>
-                <div class="leader-board-row">
-                    <div class="leader-board-placement">#3</div>
-                    <div class="leader-board-name">AaronIsP1</div>
-                    <div class="leader-board-ELO">2014</div>
-                    <div class="leader-board-rank">Legendary Duelist</div>
-                </div>
+            </div>
+            <div id="leaderboard-footer">
+                <a class="page-prev">< Prev</a>
+                <div id="leaderboard-footer-divider" />
+                <a class="page-next">Next ></a>
             </div>
         </main>
     </body>

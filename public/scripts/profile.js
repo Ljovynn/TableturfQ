@@ -111,12 +111,14 @@ async function setMatchHistory() {
     matches = await getMatchHistory();
 
     for ( let match of matches ) {
+        console.log(match);
         let row = document.createElement('div');
         row.classList.add('match-row');
 
         let dateCell = document.createElement('div');
         dateCell.classList.add('match-date');
-        dateCell.append(match.created_at);
+        matchDate = match.created_at.split('T')[0];
+        dateCell.append(matchDate);
 
         let matchupCell = document.createElement('div');
         players = await getMatchUsers( [match.player1_id, match.player2_id] );
@@ -126,7 +128,31 @@ async function setMatchHistory() {
 
         let outcomeCell = document.createElement('div');
         outcomeCell.classList.add('match-outcome');
-        outcomeCell.append(match.result);
+        let outcome = '';
+        switch ( match.result ) {
+            case 0:
+            case 1:
+            case 2:
+                outcome = 'In Game';
+                break;
+            case 3:
+                // player 1 win
+                if ( players[0].id == userId )
+                    outcome = 'W';
+                else
+                    outcome = 'L';
+                break;
+            case 4:
+                // player 2 win
+                if ( players[0].id == userId )
+                    outcome = 'L';
+                else
+                    outcome = 'W';
+                break;
+            default:
+                break;
+        }
+        outcomeCell.append(outcome);
 
         row.append(dateCell);
         row.append(matchupCell);

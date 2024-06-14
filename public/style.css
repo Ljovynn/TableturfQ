@@ -272,19 +272,19 @@ h3 {
 
 /**** LEADERBOARD STYLES ****/
 
-#leader-board-options {
+#leaderboard-header {
     margin: 10px 10px 20px 10px;
 }
 
-.leader-board-options-section {
+.leaderboard-header-section {
     margin: 10px 5px;
 }
 
-#leader-board-filter-label {
+#leaderboard-filter-label {
     display: inline-block;
 }
 
-#leader-board {
+#leaderboard {
     display: block;
     width: 50%;
     margin: auto;
@@ -292,30 +292,45 @@ h3 {
 }
 
 
-#leader-board {
+#leaderboard {
     display: block;
     width: 50%;
     margin: auto;
+    margin-top: 15px;
+    margin-bottom: 20px;
     outline: 2px solid black;
 }
 
-.leader-board-row {
+.leaderboard-row {
     display: flex;
     outline: 1px solid black;
 }
 
-.leader-board-row div {
+.leaderboard-row div {
     width: 100%;
     padding: 10px 5px;
 }
 
+#leaderboard-footer {
+    display: block;
+}
+
+#leaderboard-header-divider, #leaderboard-footer-divider {
+    display: inline-block;
+    width: 10%;
+}
+
+.page-prev, .page-next {
+    cursor: pointer;
+}
+
 /**** MOBILE STLYES ****/
 @media only screen and (max-width: 600px) {
-    #leader-board {
+    #leaderboard {
         width: 100%;
     }
 
-    .leader-board-row {
+    .leaderboard-row {
         display: block;
     }
 
