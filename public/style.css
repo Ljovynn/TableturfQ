@@ -65,6 +65,12 @@ h3 {
     padding: 20px;
     border: 2px solid black;
     margin: 10px 10px 20px 10px;
+    width: 200px;
+}
+
+#player1-avatar, #player2-avatar {
+    width: 150px;
+    border-radius: 50%;
 }
 
 #confirmation-message {
