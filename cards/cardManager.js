@@ -15,11 +15,7 @@ export async function SetupCards(){
     
         var sortedCards = JSON.parse(data);
 
-        var jpSortedCards = sortedCards;
-
         sortedCards.sort((a, b) => a.name.localeCompare(b.name));
-
-        jpSortedCards.sort((a, b) => a.jpName.localeCompare(b.jpName, 'ja'));
 
         for (let i = 0; i < sortedCards.length; i++){
             enCards.push({
@@ -29,11 +25,13 @@ export async function SetupCards(){
             })
         }
 
-        for (let i = 0; i < jpSortedCards.length; i++){
+        sortedCards.sort((a, b) => a.jpName.localeCompare(b.jpName, 'ja'));
+
+        for (let i = 0; i < sortedCards.length; i++){
             jpCards.push({
-                id: jpSortedCards[i].id,
-                name: jpSortedCards[i].jpName,
-                sanitizedName: SanitizeString(jpSortedCards[i].jpName)
+                id: sortedCards[i].id,
+                name: sortedCards[i].jpName,
+                sanitizedName: SanitizeString(sortedCards[i].jpName)
             })
         }
     });
