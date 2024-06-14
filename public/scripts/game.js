@@ -10,6 +10,8 @@ const requeueButton = document.getElementById('requeue-button');
 // Player elements
 const player1Name = document.getElementById('player1-name');
 const player2Name = document.getElementById('player2-name');
+const player1Avatar = document.getElementById('player1-avatar');
+const player2Avatar = document.getElementById('player2-avatar');
 const player1VictoryButton = document.getElementById('player1-victory-button');
 const player2VictoryButton = document.getElementById('player2-victory-button');
 const player1Score = document.getElementById('player1-score');
@@ -192,6 +194,14 @@ async function setMatchInfo() {
     userID = user.id;
     chat = match.chat;
 
+    var player1DiscordId = players[0].discord_id;
+    var player1DiscordAvatar = players[0].discord_avatar_hash;
+    var player2DiscordId = players[1].discord_id;
+    var player2DiscordAvatar  = players[1].discord_avatar_hash;
+
+    var player1AvatarString = 'https://cdn.discordapp.com/avatars/' + player1DiscordId + '/' + player1DiscordAvatar + '.jpg';
+    var player2AvatarString = 'https://cdn.discordapp.com/avatars/' + player2DiscordId + '/' + player2DiscordAvatar + '.jpg';
+
     if ( JSON.stringify(match.mode) === JSON.stringify(matchModes.casual) ) {
         casualMatch = true;
     }
@@ -203,12 +213,17 @@ async function setMatchInfo() {
     console.log(strikes);
     loading.style.display = 'none';
     matchContainer.style.display = 'block';
+
     player1Name.innerHTML = players[0].username;
+    player1Avatar.src = player1AvatarString;
     player1VictoryButton.value = players[0].id;
     player1Score.setAttribute('player-id', players[0].id);
+
     player2Name.innerHTML = players[1].username;
+    player2Avatar.src = player2AvatarString;
     player2VictoryButton.value = players[1].id;
     player2Score.setAttribute('player-id', players[1].id);
+
     setLength.innerHTML = bestOfSets[match.mode.rulesetData.setLength] + ' games';
     turnTimer.innerHTML = ( match.mode.rulesetData.turnTimer * 10 ) + ' seconds';
 
@@ -231,12 +246,17 @@ async function setMatchInfo() {
 
 // Grab all messages associated with the game and add them to the chat log
 function addChatMessages(chat) {
+    console.log('Adding messages: ' + JSON.stringify(chat));
     for ( const message of chat ) {
-        addMessage(message['ownerId'], message['content']);
+        addMessage(message);
     }
 }
 
-function addMessage(userId, chatMessage) {
+function addMessage(chatData) {
+    var userId = chatData[0];
+    var chatMessage = chatData[1];
+    console.log(userId);
+    console.log(chatMessage);
     var sentByCurrentPlayer = false;
     var senderName = '';
     var chatString = '';
@@ -381,6 +401,8 @@ function setCurrentStriker() {
             name = players[0].username;
         }
 
+        setDSRStages(currentStriker);
+
         currentStrikerName.innerHTML = name + ' is currently picking the map to play on.';
         strikeInfo.innerHTML = 'Select the map to play on.';
     }
@@ -402,6 +424,29 @@ function setSelectedStage(selectedStage) {
         if ( parseInt(stage.getAttribute('stage-value')) != selectedStage ) {
             stage.classList.add('stage-stricken');
         }
+    }
+}
+
+function setDSRStages(currentStriker) {
+    var unpickableStages = [];
+    if ( players[0].id == currentStriker ) {
+        unpickableStages = match.players[0].unpickableStagesArr;
+    } else {
+        unpickableStages = match.players[1].unpickableStagesArr;
+    }
+
+    console.log(unpickableStages);
+
+    for ( let unpickableStage of unpickableStages ) {
+        console.log('Force striking ' + unpickableStage);
+        var stage = document.querySelectorAll('[stage-value="' + unpickableStage + '"]')[0];
+
+        //console.log(stage);
+        // Change the classes to remove selected stage from eligible selections
+        if ( stage.classList.contains('stage-selected') )
+            stage.classList.remove('stage-selected');
+        stage.classList.remove('stage-selectable');
+        stage.classList.add('stage-stricken');
     }
 }
 
@@ -516,8 +561,8 @@ function validateChatMessage(chatMessage) {
 
 socket.emit('join', 'match' + matchId.toString());
 
-socket.on('chatMessage', (userId, chatMessage) => {
-    addMessage(userId, chatMessage);
+socket.on('chatMessage', (chatData) => {
+    addMessage(chatData);
 });
 
 socket.on('stageStrikes', (receivedStrikes) => {
