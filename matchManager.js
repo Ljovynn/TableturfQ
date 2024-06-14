@@ -32,12 +32,13 @@ console.log(matches.length);*/
 
 //TODO
 export async function CancelOldMatches(cutoffTime){
+    var result = [];
     var cutoffDate = Date.now() - cutoffTime;
-    for (let i = 0; i < matches.length; i++){
-        //matches array sorted chronologically, can break here
-        if (matches[i].createdAt > cutoffDate) return;
+    for (let i = matches.length; i >= 0; i--){
+        if (matches[i].createdAt > cutoffDate) continue;
 
-        
+        matches[i].status = matchStatuses.noWinner;
+        if (await FinishMatch(matches[i])) result.push(matches[i].id);
     }
 }
 
@@ -288,6 +289,7 @@ export async function PlayerSentCasualMatchEnd(playerId){
 
     if (match.mode != matchModes.casual) return new ResponseData(false, casualMatchEndErrors.notCasual);
 
+    match.status = matchStatuses.noWinner;
     if (!await FinishMatch(match)) return new ResponseData(false, casualMatchEndErrors.databaseError);
 
     return new ResponseData(true, match.id);

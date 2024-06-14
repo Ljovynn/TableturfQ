@@ -231,6 +231,10 @@ export async function SetUserDiscordTokens(userId, discordAccessToken, discordRe
     await pool.query(`DELETE FROM chat_messages WHERE match_id = ? AND message_number = ?`, [matchId, messageNumber]);
 }*/
 
+export async function DeleteUnfinishedMatches(){
+    await pool.query(`DELETE FROM matches WHERE result = 0`);
+}
+
 export async function DeleteSession(sessionId){
     await pool.query(`DELETE FROM sessions WHERE id = ?`, [sessionId]);
 }
