@@ -33,6 +33,7 @@ export const casualMatchEndErrors = Object.freeze({
     noMatch: 'Player isn\'t in any match',
     inDispute: 'Match is in dispute',
     notCasual: 'Match isn\'t casual',
+    databaseError: 'Database error when finishing match'
 });
 
 export const chatMessageErrors = Object.freeze({ 
@@ -49,4 +50,6 @@ export const disputeErrors = Object.freeze({
 export const resolveErrors = Object.freeze({ 
     matchDoesntExist: 'Match is not active',
     notDisputed: 'Match is not in dispute',
+    databaseError: 'Database error when finishing match',
+    illegalResolveOption: 'Not a viable resolve option'
 });
