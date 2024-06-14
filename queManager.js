@@ -3,6 +3,8 @@ import { FindIfPlayerInMatch, MakeNewMatch } from "./matchManager.js";
 import { GetUserData } from "./database.js";
 import { userRoles } from "./public/constants/userData.js";
 import { SendSocketMessage } from "./socketManager.js";
+import { ResponseData } from "./public/Responses/ResponseData.js";
+import { enterQueErrors, readyUpErrors } from "./public/Responses/queErrors.js";
 
 const readyTimerGracePeriod = 1000 * 3;
 const alreadyMatchedPlayersTime = 1000 * 60 * 20;
@@ -44,26 +46,26 @@ export async function AddPlayerToQue(playerId, matchMode){
     for (let i = 0; i < ques.length; i++){
         if (ques[i].matchMode == matchModes[matchMode]) return await TryAddPlayerToQue(ques[i], playerId);
     }
-    return false;
+    return new ResponseData(false, enterQueErrors.illagelMatchMode);
 }
 
 async function TryAddPlayerToQue(que, playerId){
-    if (FindIfPlayerInQue(playerId)) return false;
+    if (FindIfPlayerInQue(playerId)) return new ResponseData(false, enterQueErrors.inQue);
     
-    if (FindIfPlayerInMatch(playerId)) return false;
+    if (FindIfPlayerInMatch(playerId)) return new ResponseData(false, enterQueErrors.inMatch);
 
     var user = await GetUserData(playerId);
-    if (!user) return false;
-    if (user.banned == 1) return false;
+    if (!user) return new ResponseData(false, enterQueErrors.noUser);
+    if (user.banned == 1) return new ResponseData(false, enterQueErrors.banned);
     if (que.matchMode == matchModes.ranked){
-        if (user.role == userRoles.unverified) return false;
+        if (user.role == userRoles.unverified) return new ResponseData(false, enterQueErrors.unverified);
     }
 
     var baseSearchElo = Math.max(user.g2_rating, que.matchMode.queData.minEloStart);
     baseSearchElo = Math.min(user.g2_rating, que.matchMode.queData.maxEloStart);
 
     que.queArr.push(new PlayerInQue(playerId, baseSearchElo));
-    return true;
+    return new ResponseData(true);
 }
 
 //main matchmaking algorithm. once every n seconds
@@ -232,10 +234,11 @@ function RemovePlayersFromQue(queArr, player1Id, player2Id){
 
 export async function PlayerSentReady(playerId){
     var index = SearchMatchedPlayersList(matchingPlayersList, playerId);
-    if (index == -1) return undefined;
+    if (index == -1) return new ResponseData(false, readyUpErrors.notMatched);
     var playerPos = FindPlayerPositionInMatchedPlayers(matchingPlayersList[index], playerId);
     matchingPlayersList[index].players[playerPos - 1].ready = true;
-    return await CheckIfBothPlayersReady(index);
+    var match = await CheckIfBothPlayersReady(index)
+    return new ResponseData(true, match);
 }
 
 async function CheckIfBothPlayersReady(matchingPlayersListIndex){

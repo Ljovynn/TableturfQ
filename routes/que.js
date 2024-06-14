@@ -32,24 +32,14 @@ router.post("/PlayerEnterQue", async (req, res) => {
         if (!CheckUserDefined(req, res)) return;
         if (!CheckIfRealMatchMode(matchMode, res)) return;
 
-        var user = await GetUserData(userId);
-        console.log('user: ' + JSON.stringify(user));
-
-        if (!CheckVariableDefined(user, res)) return;
-
-        if (user.banned == 1){
-            res.sendStatus(403);
-            return;
-        }
-
-        if (await AddPlayerToQue(userId, matchMode)){
+        var responseData = await AddPlayerToQue();
+        if (responseData.isSuccess){
             console.log('added to queue');
             res.sendStatus(201);
             return;
         }
 
-        console.log('could not add, error');
-        res.sendStatus(403);
+        res.status(403).send(responseData.data);
     } catch (err){
         console.log(err);
         res.sendStatus(500);
@@ -69,7 +59,7 @@ router.post("/PlayerLeaveQue", async (req, res) => {
             res.sendStatus(201);
             return;
         }
-        res.sendStatus(403);
+        res.status(403).send('Player already not in que');
     } catch (err){
         res.sendStatus(500);
     }
@@ -84,10 +74,12 @@ router.post("/PlayerReady", async (req, res) => {
 
         if (!CheckUserDefined(req, res)) return;
 
-        var match = await PlayerSentReady(userId);
+        var responseData = await PlayerSentReady(userId);
 
-        if (match){
+        if (responseData.isSuccess){
             res.sendStatus(201);
+
+            var match = responseData.data;
 
             var matchedPlayersData = {
                 matchId: match.id,
@@ -97,7 +89,7 @@ router.post("/PlayerReady", async (req, res) => {
             SendSocketMessage("queRoom", "matchReady", matchedPlayersData);
             return;
         }
-        res.sendStatus(403);
+        res.status(403).send(responseData.data);
     } catch (err){
         console.error(err);
         res.sendStatus(500);
