@@ -1,8 +1,8 @@
-const leaderBoard = document.getElementById('leader-board');
+const leaderBoard = document.getElementById('leaderboard');
 
-const searchInput = document.getElementById('leader-board-search');
-const searchButton = document.getElementById('leader-board-search-button');
-const pageFilter = document.getElementById('leader-board-page-amount');
+const searchInput = document.getElementById('leaderboard-search');
+const searchButton = document.getElementById('leaderboard-search-button');
+const pageFilter = document.getElementById('leaderboard-page-amount');
 const prevButtons = document.getElementsByClassName('page-prev');
 const nextButtons = document.getElementsByClassName('page-next');
 
@@ -93,18 +93,18 @@ async function setLeaderBoard(startPos, hitCount) {
 
     for ( let user of users ) {
         let row = document.createElement('div');
-        row.classList.add('leader-board-row');
+        row.classList.add('leaderboard-row');
 
         let placementCell = document.createElement('div');
-        placementCell.classList.add('leader-board-placement');
+        placementCell.classList.add('leaderboard-placement');
         placementCell.append(placement);
 
         let nameCell = document.createElement('div');
-        nameCell.classList.add('leader-board-name');
+        nameCell.classList.add('leaderboard-name');
         nameCell.append(user.username);
 
         let eloCell = document.createElement('div');
-        eloCell.classList.add('leader-board-ELO');
+        eloCell.classList.add('leaderboard-ELO');
         eloCell.append( (Math.round(user.g2_rating * 100) / 100).toFixed(2) );
 
         row.append(placementCell);
