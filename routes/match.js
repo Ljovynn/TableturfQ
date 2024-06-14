@@ -48,14 +48,14 @@ router.post("/StrikeStages", async (req, res) => {
         if (!CheckUserDefined(req, res)) return;
         if (!CheckIfArray(stages, res)) return;
 
-        var matchId = PlayerSentStageStrikes(userId, stages);
+        var responseData = PlayerSentStageStrikes(userId, stages);
 
-        if (matchId){
-            res.sendStatus(201);
-            SendSocketMessage('match' + matchId, "stageStrikes", stages);
+        if (responseData.isSuccess){
+            res. sendStatus(201);
+            SendSocketMessage('match' + responseData.data, "stageStrikes", stages);
             return;
         }
-        res.sendStatus(403);
+        res.status(403).send(responseData.data);
     } catch (err){
         console.error(err);
         res.sendStatus(500);
@@ -71,14 +71,14 @@ router.post("/PickStage", async (req, res) => {
         if (!CheckUserDefined(req, res)) return;
         if (!CheckVariableDefined(stage, res)) return;
 
-        var matchId = PlayerSentStagePick(userId, stage);
+        var responseData = PlayerSentStagePick(userId, stage);
 
-        if (matchId){
+        if (responseData.isSuccess){
             res.sendStatus(201);
-            SendSocketMessage('match' + matchId, "stagePick", stage);
+            SendSocketMessage('match' + responseData.data, "stagePick", stage);
             return;
         }
-        res.sendStatus(403);
+        res.status(403).send(responseData.data);
     } catch (err){
         res.sendStatus(500);
     }
@@ -93,10 +93,11 @@ router.post("/WinGame", async (req, res) => {
         if (!CheckUserDefined(req, res)) return;
         if (!CheckVariableDefined(winnerId, res)) return;
 
-        var matchData = await PlayerSentGameWin(userId, winnerId);
+        var responseData = await PlayerSentGameWin(userId, winnerId);
 
-        if (matchData && matchData.matchId){
+        if (responseData.isSuccess){
             res.sendStatus(201);
+            var matchData = responseData.data;
             if (matchData.dispute){
                 SendEmptySocketMessage('match' + matchData.matchId, "dispute");
             } else if (matchData.matchWin){
@@ -108,7 +109,7 @@ router.post("/WinGame", async (req, res) => {
             }
             return;
         }
-        res.sendStatus(403);
+        res.status(403).send(responseData.data);
     } catch (err){
         console.error(err);
         res.sendStatus(500);
@@ -119,14 +120,14 @@ router.post("/CasualMatchEnd", async (req, res) => {
     try {
         if (!CheckUserDefined(req, res)) return;
 
-        var matchId = PlayerSentCasualMatchEnd(userId);
+        var responseData = await PlayerSentCasualMatchEnd(userId);
 
-        if (matchId){
+        if (responseData.isSuccess){
             res.sendStatus(201);
-            SendEmptySocketMessage('match' + matchId, "matchEnd");
+            SendEmptySocketMessage('match' + responseData.data, "matchEnd");
             return;
         }
-        res.sendStatus(403);
+        res.status(403).send(responseData.data);
     } catch (err){
         res.sendStatus(500);
     }
@@ -136,14 +137,14 @@ router.post("/Dispute", async (req, res) => {
     try {
         if (!CheckUserDefined(req, res)) return;
 
-        var matchId = PlayerSentMatchDispute(userId);
+        var responseData = PlayerSentMatchDispute(userId);
 
-        if (matchId){
+        if (responseData.isSuccess){
             res.sendStatus(201);
-            SendEmptySocketMessage('match' + matchId, "dispute");
+            SendEmptySocketMessage('match' + responseData.data, "dispute");
             return;
         }
-        res.sendStatus(403);
+        res.status(403).send(responseData.data);
     } catch (err){
         res.sendStatus(500);
     }
@@ -158,15 +159,15 @@ router.post("/SendChatMessage", async (req, res) => {
         if (!CheckUserDefined(req, res)) return;
         if (!CheckIfString(message, res)) return;
 
-        var matchId = UserSentChatMessage(userId, message);
+        var responseData = UserSentChatMessage(userId, message);
 
-        if (matchId){
+        if (responseData.isSuccess){
             res.sendStatus(201);
             var socketMessage = [userId, message];
-            SendSocketMessage('match' + data.matchId, "chatMessage", socketMessage);
+            SendSocketMessage('match' + responseData.data.matchId, "chatMessage", socketMessage);
             return;
         }
-        res.sendStatus(403);
+        res.status(403).send(responseData.data);
     } catch (err){
         res.sendStatus(500);
     }
