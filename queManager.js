@@ -137,7 +137,7 @@ function FindPlayersToMatch(que){
 }
 
 //checks if timer has run out for any matchmade players
-function CheckMatchmadePlayers(){
+export function CheckMatchmadePlayers(){
     for (let i = matchingPlayersList.length - 1; i >= 0; i--){
         if (Date.now - matchingPlayersList[i].createdAt > matchingPlayersList[i].matchMode.queData.readyTimer + readyTimerGracePeriod){
             matchingPlayersList.splice(i, 1);
