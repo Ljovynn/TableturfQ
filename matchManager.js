@@ -20,21 +20,13 @@ m1.status = matchStatuses.dispute;
 
 var m2 = new Match(2, 1, 2, matchModes.ranked);
 
-var m3 = new Match(3, 2, 3, matchModes.ranked);
-m3.status = matchStatuses.dispute;
-
-matches.push(m1);
-matches.push(m2);
-matches.push(m3);
-
-console.log(JSON.stringify(m1));
-console.log(matches.length);*/
+var m3 = new Match(3, 2, 3, matchModes.ranked);*/
 
 //TODO
 export async function CancelOldMatches(cutoffTime){
     var result = [];
     var cutoffDate = Date.now() - cutoffTime;
-    for (let i = matches.length; i >= 0; i--){
+    for (let i = matches.length - 1; i >= 0; i--){
         if (matches[i].createdAt > cutoffDate) continue;
 
         matches[i].status = matchStatuses.noWinner;
