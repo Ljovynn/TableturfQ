@@ -49,8 +49,7 @@ for ( let prevButton of prevButtons ) {
 
 for ( let nextButton of nextButtons ) {
     nextButton.addEventListener( 'click', async (e) => {
-        // We have to check against total users and divide by pages
-        if ( hitCount + startPos < totalPlayers ) {
+        if ( hitCount + startPos <= totalPlayers ) {
             page++;
             console.log('page: ' + page);
             startPos = startPos + hitCount;
