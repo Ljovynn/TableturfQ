@@ -2,6 +2,7 @@ const embedColor = 8472775;
 
 import dotenv from 'dotenv';
 import { DetailMinute } from '../utils/date.js';
+import { GetRank } from '../public/constants/rankData.js';
 
 dotenv.config();
 
@@ -73,15 +74,17 @@ export function BuildProfileEmbed(user, matchCount, lastPlayed){
 		lastPlayedValue = DetailMinute(lastPlayed);
 	}
 
+	var rank = GetRank(user.g2_rating);
+
     var profileFields = [ 
 	{
         name: 'Rating',
-        value: `**${Math.floor(user.g2_rating)}**`,
+        value: `${Math.floor(user.g2_rating)}`,
 		inline: true
 		},
 	{
         name: 'Rank',
-        value: `**Rank not implemented**`,
+        value: `${rank.name}`,
 		inline: true
 		},
 	{
@@ -109,8 +112,8 @@ export function BuildProfileEmbed(user, matchCount, lastPlayed){
 			icon_url: `https://cdn.discordapp.com/avatars/${user.discord_id}/${user.discord_avatar_hash}.png`,
 			url: `${websiteURL}:${port}/user`,
 		},
-		thumbnail: { //add rank image here
-			url: 'https://leanny.github.io/splat3/images/zakka/Stc_Sti_MiniGame_RankAward_Lv06.png',
+		thumbnail: {
+			url: `${rank.imageURL}`,
 		},
 		fields: profileFields,
 	};
