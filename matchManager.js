@@ -310,7 +310,7 @@ export async function ModSentChatMessage(matchId, userId, content){
 
     var chatMessage = new ChatMessage(content, userId);
     match.chat.push(chatMessage);
-    return new ResponseData(true);
+    return new ResponseData(true, '');
 }
 
 export function PlayerSentMatchDispute(playerId){
@@ -361,29 +361,29 @@ export async function ResolveMatchDispute(matchId, resolveOption){
             if (currentGame.stage == stages.unpicked){
                 match.status = matchStatuses.stageSelection;
                 SendDisputeMessage(GetDisputedMatchesList(), false);
-                return new ResponseData(true);
+                return new ResponseData(true, '');
             } else{
                 match.status = matchStatuses.ingame;
                 SendDisputeMessage(GetDisputedMatchesList(), false);
-                return new ResponseData(true);
+                return new ResponseData(true, '');
             }
         case disputeResolveOptions.resetCurrentGame:
             currentGame = new Game();
             match.status = matchStatuses.stageSelection;
             SendDisputeMessage(GetDisputedMatchesList(), false);
-            return new ResponseData(true);
+            return new ResponseData(true, '');
         case disputeResolveOptions.restartMatch:
             match.status = matchStatuses.stageSelection;
             match.gamesArr = [new Game()];
             match.players[0].unpickableStagesArr = [];
             match.players[1].unpickableStagesArr = [];
             SendDisputeMessage(GetDisputedMatchesList(), false);
-            return new ResponseData(true);
+            return new ResponseData(true, '');
         case disputeResolveOptions.cancelMatch:
             match.status = matchStatuses.noWinner;
             await (FinishMatch(match));
             SendDisputeMessage(GetDisputedMatchesList(), false);
-            return new ResponseData(true);
+            return new ResponseData(true, '');
         case disputeResolveOptions.gameWinPlayer1:
             return HandleDisputeGameWin(match, 0);
         case disputeResolveOptions.gameWinPlayer2:

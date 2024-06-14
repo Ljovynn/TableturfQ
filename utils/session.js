@@ -1,4 +1,4 @@
-import { GetSession, CreateSession, DeleteSession, GetUserBanAndRole} from '../database.js';
+import { GetSession, CreateSession, DeleteSession } from '../database.js';
 import cookieParser from 'cookie-parser';
 import dotenv from "dotenv";
 
@@ -32,7 +32,6 @@ export async function DeserializeSession(req, res, next){
         req.session.user = undefined;
         console.log("session expired");
         await DeleteSession(sessionId);
-        req.session.user = undefined;
         console.log("session deleted");
         return next();
     }
