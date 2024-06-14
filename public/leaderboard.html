@@ -13,12 +13,12 @@
             <h1>TableturfQ Leaderboard</h1>
         </header>
         <main class="main">
-            <div id="leader-board-options">
-                <div class="leader-board-options-section">
+            <div id="leader-board-header">
+                <div class="leader-board-header-section">
                     <input id="leader-board-search" type="text" placeholder="Search for a player" />
                     <input id="leader-board-search-button" type="button" value="Search" />
                 </div>
-                <div class="leader-board-options-section">
+                <div class="leader-board-header-section">
                     <div id="leader-board-filter-label">Players per page</div>
                     <select id="leader-board-page-amount">
                         <option value="10">10</option>
@@ -26,6 +26,11 @@
                         <option value="100">100</option>
                         <option value="1000">1000</option>
                     </select>
+                </div>
+                <div class="leader-board-header-section">
+                    <a class="page-prev">< Prev</a>
+                    <div id="leader-board-header-divider" />
+                    <a class="page-next">Next ></a>
                 </div>
             </div>
             <div id="leader-board">
@@ -35,6 +40,11 @@
                     <div class="leader-board-ELO">ELO Rating</div>
                     <!--<div class="leader-board-rank">Rank</div>-->
                 </div>
+            </div>
+            <div id="leader-board-footer">
+                <a class="page-prev">< Prev</a>
+                <div id="leader-board-footer-divider" />
+                <a class="page-next">Next ></a>
             </div>
         </main>
     </body>

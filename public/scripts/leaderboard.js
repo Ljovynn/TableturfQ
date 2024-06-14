@@ -3,11 +3,17 @@ const leaderBoard = document.getElementById('leader-board');
 const searchInput = document.getElementById('leader-board-search');
 const searchButton = document.getElementById('leader-board-search-button');
 const pageFilter = document.getElementById('leader-board-page-amount');
+const prevButtons = document.getElementsByClassName('page-prev');
+const nextButtons = document.getElementsByClassName('page-next');
 
 var leaderBoardData;
+var startPos = 0;
+var hitCount = 10;
+var page = 0;
+var totalPlayers;
 
 // Defaults of startPos 0 and 15 hitcounts
-setLeaderBoard(0, 10);
+setLeaderBoard(startPos, hitCount);
 
 searchButton.addEventListener('click', (e) => {
     console.log('User is searching for the player: ' + searchInput.value);
@@ -25,16 +31,65 @@ searchButton.addEventListener('click', (e) => {
 
 pageFilter.addEventListener('change', (e) => {
     console.log('Changing the listed amount to ' + pageFilter.value);
-    var pageValue = pageFilter.value;
-
-    refreshLeaderBoard(0, pageValue);
+    hitCount = pageFilter.value;
+    // Reset startPos too?
+    refreshLeaderBoard(0, hitCount);
 });
 
+for ( let prevButton of prevButtons ) {
+    prevButton.addEventListener( 'click', async (e) => {
+        if ( page > 0 ) {
+            page--;
+            console.log('page: ' + page);
+            startPos = startPos - hitCount;
+            await refreshLeaderBoard(startPos, hitCount);
+        }
+    });
+}
+
+for ( let nextButton of nextButtons ) {
+    nextButton.addEventListener( 'click', async (e) => {
+        // We have to check against total users and divide by pages
+        if ( ( (page+1) * hitCount) + startPos < totalPlayers ) {
+            page++;
+            console.log('page: ' + page);
+            startPos = startPos + hitCount;
+            await refreshLeaderBoard(startPos, hitCount);
+        }
+    });
+}
+
 async function setLeaderBoard(startPos, hitCount) {
-    leaderBoardData = await getLeaderBoard(startPos, hitCount);
-    users = leaderBoardData.leaderboardData.result;
+    result = await getLeaderBoard(startPos, hitCount);
+    console.log(result.leaderboardData)
+    users = result.leaderboardData.result;
+    totalPlayers = result.leaderboardData.totalPlayers;
     console.log('users ' + JSON.stringify(users));
     var placement = 1 + startPos;
+
+    // If the current page is 0, hide the prev button, otherwise show it
+    if ( page == 0 ) {
+        for ( let prevButton of prevButtons ) {
+            prevButton.style.display = 'none';
+        }
+    } else {
+        for ( let prevButton of prevButtons ) {
+            prevButton.style.display = 'inline-block';
+        }
+    }
+
+    // If the startPos of the next page would be more than the totalPlayers, hide the next button
+    // Otherwise show it
+    if ( ( (page+1) * hitCount) + startPos > totalPlayers ) {
+        for ( let nextButton of nextButtons ) {
+            nextButton.style.display = 'none';
+        }
+    } else {
+        for ( let nextButton of nextButtons ) {
+            nextButton.style.display = 'inline-block';
+        }
+    }
+
 
     for ( let user of users ) {
         let row = document.createElement('div');
@@ -63,13 +118,18 @@ async function setLeaderBoard(startPos, hitCount) {
 }
 
 async function refreshLeaderBoard(startPos, hitCount) {
+    console.log('refreshing');
+    console.log('startPos: ' + startPos );
+    console.log('hitCount: ' + hitCount);
     leaderBoard.replaceChildren(leaderBoard.firstElementChild);
-
     setLeaderBoard(startPos, hitCount);
 }
 
 async function getLeaderBoard(startPos, hitCount) {
-    var data = { startPos: 0, hitCount: 15 }
+    console.log('querying');
+    console.log('startPos: ' + startPos );
+    console.log('hitCount: ' + hitCount);
+    var data = { startPos: startPos, hitCount: hitCount }
     var result = await getData('/leaderboard/GetLeaderboard', data);
     console.log(result);
     return result;

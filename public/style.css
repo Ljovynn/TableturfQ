@@ -272,11 +272,11 @@ h3 {
 
 /**** LEADERBOARD STYLES ****/
 
-#leader-board-options {
+#leader-board-header {
     margin: 10px 10px 20px 10px;
 }
 
-.leader-board-options-section {
+.leader-board-header-section {
     margin: 10px 5px;
 }
 
@@ -296,6 +296,8 @@ h3 {
     display: block;
     width: 50%;
     margin: auto;
+    margin-top: 15px;
+    margin-bottom: 20px;
     outline: 2px solid black;
 }
 
@@ -307,6 +309,19 @@ h3 {
 .leader-board-row div {
     width: 100%;
     padding: 10px 5px;
+}
+
+#leader-board-footer {
+    display: block;
+}
+
+#leader-board-header-divider, #leader-board-footer-divider {
+    display: inline-block;
+    width: 10%;
+}
+
+.page-prev, .page-next {
+    cursor: pointer;
 }
 
 /**** MOBILE STLYES ****/
