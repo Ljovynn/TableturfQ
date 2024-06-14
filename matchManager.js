@@ -32,6 +32,7 @@ export async function CancelOldMatches(cutoffTime){
         matches[i].status = matchStatuses.noWinner;
         if (await FinishMatch(matches[i])) result.push(matches[i].id);
     }
+    return result;
 }
 
 export async function MakeNewMatch(player1Id, player2Id, matchMode){
