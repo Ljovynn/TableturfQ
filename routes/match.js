@@ -164,7 +164,7 @@ router.post("/SendChatMessage", async (req, res) => {
         if (responseData.isSuccess){
             res.sendStatus(201);
             var socketMessage = [userId, message];
-            SendSocketMessage('match' + responseData.data.matchId, "chatMessage", socketMessage);
+            SendSocketMessage('match' + responseData.data, "chatMessage", socketMessage);
             return;
         }
         res.status(403).send(responseData.data);
