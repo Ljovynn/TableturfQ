@@ -33,6 +33,7 @@ router.post("/PlayerEnterQue", async (req, res) => {
         if (!CheckIfRealMatchMode(matchMode, res)) return;
 
         var user = await GetUserData(userId);
+        console.log('user: ' + JSON.stringify(user));
 
         if (!CheckVariableDefined(user, res)) return;
 
@@ -42,9 +43,12 @@ router.post("/PlayerEnterQue", async (req, res) => {
         }
 
         if (await AddPlayerToQue(userId, matchMode)){
+            console.log('added to queue');
             res.sendStatus(201);
             return;
         }
+
+        console.log('could not add, error');
         res.sendStatus(403);
     } catch (err){
         console.log(err);

@@ -16,7 +16,6 @@ var totalPlayers;
 setLeaderBoard(startPos, hitCount);
 
 searchButton.addEventListener('click', (e) => {
-    console.log('User is searching for the player: ' + searchInput.value);
     var searchValue = searchInput.value;
 
     if ( validateSeach(searchValue) ) {
@@ -30,7 +29,6 @@ searchButton.addEventListener('click', (e) => {
 });
 
 pageFilter.addEventListener('change', (e) => {
-    console.log('Changing the listed amount to ' + pageFilter.value);
     hitCount = pageFilter.value;
     // Reset startPos too?
     refreshLeaderBoard(0, hitCount);
@@ -40,7 +38,6 @@ for ( let prevButton of prevButtons ) {
     prevButton.addEventListener( 'click', async (e) => {
         if ( page > 0 ) {
             page--;
-            console.log('page: ' + page);
             startPos = startPos - hitCount;
             await refreshLeaderBoard(startPos, hitCount);
         }
@@ -51,7 +48,6 @@ for ( let nextButton of nextButtons ) {
     nextButton.addEventListener( 'click', async (e) => {
         if ( hitCount + startPos <= totalPlayers ) {
             page++;
-            console.log('page: ' + page);
             startPos = startPos + hitCount;
             await refreshLeaderBoard(startPos, hitCount);
         }
@@ -60,10 +56,8 @@ for ( let nextButton of nextButtons ) {
 
 async function setLeaderBoard(startPos, hitCount) {
     result = await getLeaderBoard(startPos, hitCount);
-    console.log(result.leaderboardData)
     users = result.leaderboardData.result;
     totalPlayers = result.leaderboardData.totalPlayers;
-    console.log('users ' + JSON.stringify(users));
     var placement = 1 + startPos;
 
     // If the current page is 0, hide the prev button, otherwise show it
@@ -79,7 +73,7 @@ async function setLeaderBoard(startPos, hitCount) {
 
     // If the startPos of the next page would be more than the totalPlayers, hide the next button
     // Otherwise show it
-    if ( ( (page+1) * hitCount) + startPos > totalPlayers ) {
+    if ( hitCount + startPos >= totalPlayers ) {
         for ( let nextButton of nextButtons ) {
             nextButton.style.display = 'none';
         }
@@ -117,20 +111,13 @@ async function setLeaderBoard(startPos, hitCount) {
 }
 
 async function refreshLeaderBoard(startPos, hitCount) {
-    console.log('refreshing');
-    console.log('startPos: ' + startPos );
-    console.log('hitCount: ' + hitCount);
     leaderBoard.replaceChildren(leaderBoard.firstElementChild);
     setLeaderBoard(startPos, hitCount);
 }
 
 async function getLeaderBoard(startPos, hitCount) {
-    console.log('querying');
-    console.log('startPos: ' + startPos );
-    console.log('hitCount: ' + hitCount);
     var data = { startPos: startPos, hitCount: hitCount }
     var result = await getData('/leaderboard/GetLeaderboard', data);
-    console.log(result);
     return result;
 }
 
