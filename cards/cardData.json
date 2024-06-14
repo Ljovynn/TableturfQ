@@ -1,1066 +1,1332 @@
 [
     {
         "id": "1",
-        "name": "Hero Shot"
+        "name": "Hero Shot",
+        "jpName": "ヒーローシューター"
     },
     {
         "id": "2",
-        "name": "Sploosh-o-matic"
+        "name": "Sploosh-o-matic",
+        "jpName": "ボールドマーカー"
     },
     {
         "id": "3",
-        "name": "Splattershot Jr."
+        "name": "Splattershot Jr.",
+        "jpName": "わかばシューター"
     },
     {
         "id": "4",
-        "name": "Splash-o-matic"
+        "name": "Splash-o-matic",
+        "jpName": "シャープマーカー"
     },
     {
         "id": "5",
-        "name": "Aerospray MG"
+        "name": "Aerospray MG",
+        "jpName": "プロモデラーMG"
     },
     {
         "id": "6",
-        "name": "Splattershot"
+        "name": "Splattershot",
+        "jpName": "スプラシューター"
     },
     {
         "id": "7",
-        "name": ".52 Gal"
+        "name": ".52 Gal",
+        "jpName": ".52ガロン"
     },
     {
         "id": "8",
-        "name": "N-ZAP '85"
+        "name": "N-ZAP '85",
+        "jpName": "N-ZAP85"
     },
     {
         "id": "9",
-        "name": "Splattershot Pro"
+        "name": "Splattershot Pro",
+        "jpName": "プライムシューター"
     },
     {
         "id": "10",
-        "name": ".96 Gal"
+        "name": ".96 Gal",
+        "jpName": ".96ガロン"
     },
     {
         "id": "11",
-        "name": "Jet Squelcher"
+        "name": "Jet Squelcher",
+        "jpName": "ジェットスイーパー"
     },
     {
         "id": "12",
-        "name": "Luna Blaster"
+        "name": "Luna Blaster",
+        "jpName": "ノヴァブラスター"
     },
     {
         "id": "13",
-        "name": "Blaster"
+        "name": "Blaster",
+        "jpName": "ホットブラスター"
     },
     {
         "id": "14",
-        "name": "Range Blaster"
+        "name": "Range Blaster",
+        "jpName": "ロングブラスター"
     },
     {
         "id": "15",
-        "name": "Clash Blaster"
+        "name": "Clash Blaster",
+        "jpName": "クラッシュブラスター"
     },
     {
         "id": "16",
-        "name": "Rapid Blaster"
+        "name": "Rapid Blaster",
+        "jpName": "ラピッドブラスター"
     },
     {
         "id": "17",
-        "name": "Rapid Blaster Pro"
+        "name": "Rapid Blaster Pro",
+        "jpName": "Rブラスターエリート"
     },
     {
         "id": "18",
-        "name": "L-3 Nozzlenose"
+        "name": "L-3 Nozzlenose",
+        "jpName": "L3リールガン"
     },
     {
         "id": "19",
-        "name": "H-3 Nozzlenose"
+        "name": "H-3 Nozzlenose",
+        "jpName": "H3リールガン"
     },
     {
         "id": "20",
-        "name": "Squeezer"
+        "name": "Squeezer",
+        "jpName": "ボトルガイザー"
     },
     {
         "id": "21",
-        "name": "Carbon Roller"
+        "name": "Carbon Roller",
+        "jpName": "カーボンローラー"
     },
     {
         "id": "22",
-        "name": "Splat Roller"
+        "name": "Splat Roller",
+        "jpName": "スプラローラー"
     },
     {
         "id": "23",
-        "name": "Dynamo Roller"
+        "name": "Dynamo Roller",
+        "jpName": "ダイナモローラー"
     },
     {
         "id": "24",
-        "name": "Flingza Roller"
+        "name": "Flingza Roller",
+        "jpName": "ヴァリアブルローラー"
     },
     {
         "id": "25",
-        "name": "Inkbrush"
+        "name": "Inkbrush",
+        "jpName": "パブロ"
     },
     {
         "id": "26",
-        "name": "Octobrush"
+        "name": "Octobrush",
+        "jpName": "ホクサイ"
     },
     {
         "id": "27",
-        "name": "Classic Squiffer"
+        "name": "Classic Squiffer",
+        "jpName": "スクイックリンα"
     },
     {
         "id": "28",
-        "name": "Splat Charger"
+        "name": "Splat Charger",
+        "jpName": "スプラチャージャー"
     },
     {
         "id": "29",
-        "name": "Splatterscope"
+        "name": "Splatterscope",
+        "jpName": "スプラスコープ"
     },
     {
         "id": "30",
-        "name": "E-liter 4K"
+        "name": "E-liter 4K",
+        "jpName": "リッター4K"
     },
     {
         "id": "31",
-        "name": "E-liter 4K Scope"
+        "name": "E-liter 4K Scope",
+        "jpName": "4Kスコープ"
     },
     {
         "id": "32",
-        "name": "Bamboozler 14 Mk I"
+        "name": "Bamboozler 14 Mk I",
+        "jpName": "14式竹筒銃・甲"
     },
     {
         "id": "33",
-        "name": "Goo Tuber"
+        "name": "Goo Tuber",
+        "jpName": "ソイチューバー"
     },
     {
         "id": "34",
-        "name": "Slosher"
+        "name": "Slosher",
+        "jpName": "バケットスロッシャー"
     },
     {
         "id": "35",
-        "name": "Tri-Slosher"
+        "name": "Tri-Slosher",
+        "jpName": "ヒッセン"
     },
     {
         "id": "36",
-        "name": "Sloshing Machine"
+        "name": "Sloshing Machine",
+        "jpName": "スクリュースロッシャー"
     },
     {
         "id": "37",
-        "name": "Bloblobber"
+        "name": "Bloblobber",
+        "jpName": "オーバーフロッシャー"
     },
     {
         "id": "38",
-        "name": "Explosher"
+        "name": "Explosher",
+        "jpName": "エクスプロッシャー"
     },
     {
         "id": "39",
-        "name": "Mini Splatling"
+        "name": "Mini Splatling",
+        "jpName": "スプラスピナー"
     },
     {
         "id": "40",
-        "name": "Heavy Splatling"
+        "name": "Heavy Splatling",
+        "jpName": "バレルスピナー"
     },
     {
         "id": "41",
-        "name": "Hydra Splatling"
+        "name": "Hydra Splatling",
+        "jpName": "ハイドラント"
     },
     {
         "id": "42",
-        "name": "Ballpoint Splatling"
+        "name": "Ballpoint Splatling",
+        "jpName": "クーゲルシュライバー"
     },
     {
         "id": "43",
-        "name": "Nautilus 47"
+        "name": "Nautilus 47",
+        "jpName": "ノーチラス47"
     },
     {
         "id": "44",
-        "name": "Dapple Dualies"
+        "name": "Dapple Dualies",
+        "jpName": "スパッタリー"
     },
     {
         "id": "45",
-        "name": "Splat Dualies"
+        "name": "Splat Dualies",
+        "jpName": "スプラマニューバー"
     },
     {
         "id": "46",
-        "name": "Glooga Dualies"
+        "name": "Glooga Dualies",
+        "jpName": "ケルビン525"
     },
     {
         "id": "47",
-        "name": "Dualie Squelchers"
+        "name": "Dualie Squelchers",
+        "jpName": "デュアルスイーパー"
     },
     {
         "id": "48",
-        "name": "Dark Tetra Dualies"
+        "name": "Dark Tetra Dualies",
+        "jpName": "クアッドホッパーブラック"
     },
     {
         "id": "49",
-        "name": "Splat Brella"
+        "name": "Splat Brella",
+        "jpName": "パラシェルター"
     },
     {
         "id": "50",
-        "name": "Tenta Brella"
+        "name": "Tenta Brella",
+        "jpName": "キャンピングシェルター"
     },
     {
         "id": "51",
-        "name": "Undercover Brella"
+        "name": "Undercover Brella",
+        "jpName": "スパイガジェット"
     },
     {
         "id": "52",
-        "name": "Tri-Stringer"
+        "name": "Tri-Stringer",
+        "jpName": "トライストリンガー"
     },
     {
         "id": "53",
-        "name": "REEF-LUX 450"
+        "name": "REEF-LUX 450",
+        "jpName": "LACT-450"
     },
     {
         "id": "54",
-        "name": "Splatana Stamper"
+        "name": "Splatana Stamper",
+        "jpName": "ジムワイパー"
     },
     {
         "id": "55",
-        "name": "Splatana Wiper"
+        "name": "Splatana Wiper",
+        "jpName": "ドライブワイパー"
     },
     {
         "id": "56",
-        "name": "Splat Bomb"
+        "name": "Splat Bomb",
+        "jpName": "スプラッシュボム"
     },
     {
         "id": "57",
-        "name": "Suction Bomb"
+        "name": "Suction Bomb",
+        "jpName": "キューバンボム"
     },
     {
         "id": "58",
-        "name": "Burst Bomb"
+        "name": "Burst Bomb",
+        "jpName": "クイックボム"
     },
     {
         "id": "59",
-        "name": "Sprinkler"
+        "name": "Sprinkler",
+        "jpName": "スプリンクラー"
     },
     {
         "id": "60",
-        "name": "Splash Wall"
+        "name": "Splash Wall",
+        "jpName": "スプラッシュシールド"
     },
     {
         "id": "61",
-        "name": "Fizzy Bomb"
+        "name": "Fizzy Bomb",
+        "jpName": "タンサンボム"
     },
     {
         "id": "62",
-        "name": "Curling Bomb"
+        "name": "Curling Bomb",
+        "jpName": "カーリングボム"
     },
     {
         "id": "63",
-        "name": "Autobomb"
+        "name": "Autobomb",
+        "jpName": "ロボットボム"
     },
     {
         "id": "64",
-        "name": "Squid Beakon"
+        "name": "Squid Beakon",
+        "jpName": "ジャンプビーコン"
     },
     {
         "id": "65",
-        "name": "Point Sensor"
+        "name": "Point Sensor",
+        "jpName": "ポイントセンサー"
     },
     {
         "id": "66",
-        "name": "Ink Mine"
+        "name": "Ink Mine",
+        "jpName": "トラップ"
     },
     {
         "id": "67",
-        "name": "Toxic Mist"
+        "name": "Toxic Mist",
+        "jpName": "ポイズンミスト"
     },
     {
         "id": "68",
-        "name": "Angle Shooter"
+        "name": "Angle Shooter",
+        "jpName": "ラインマーカー"
     },
     {
         "id": "69",
-        "name": "Torpedo"
+        "name": "Torpedo",
+        "jpName": "トーピード"
     },
     {
         "id": "70",
-        "name": "Trizooka"
+        "name": "Trizooka",
+        "jpName": "ウルトラショット"
     },
     {
         "id": "71",
-        "name": "Big Bubbler"
+        "name": "Big Bubbler",
+        "jpName": "グレートバリア"
     },
     {
         "id": "72",
-        "name": "Zipcaster"
+        "name": "Zipcaster",
+        "jpName": "ショクワンダー"
     },
     {
         "id": "73",
-        "name": "Tenta Missiles"
+        "name": "Tenta Missiles",
+        "jpName": "マルチミサイル"
     },
     {
         "id": "74",
-        "name": "Ink Storm"
+        "name": "Ink Storm",
+        "jpName": "アメフラシ"
     },
     {
         "id": "75",
-        "name": "Booyah Bomb"
+        "name": "Booyah Bomb",
+        "jpName": "ナイスダマ"
     },
     {
         "id": "76",
-        "name": "Wave Breaker"
+        "name": "Wave Breaker",
+        "jpName": "ホップソナー"
     },
     {
         "id": "77",
-        "name": "Ink Vac"
+        "name": "Ink Vac",
+        "jpName": "キューインキ"
     },
     {
         "id": "78",
-        "name": "Killer Wail 5.1"
+        "name": "Killer Wail 5.1",
+        "jpName": "メガホンレーザー5.1ch"
     },
     {
         "id": "79",
-        "name": "Inkjet"
+        "name": "Inkjet",
+        "jpName": "ジェットパック"
     },
     {
         "id": "80",
-        "name": "Ultra Stamp"
+        "name": "Ultra Stamp",
+        "jpName": "ウルトラハンコ"
     },
     {
         "id": "81",
-        "name": "Crab Tank"
+        "name": "Crab Tank",
+        "jpName": "カニタンク"
     },
     {
         "id": "82",
-        "name": "Reefslider"
+        "name": "Reefslider",
+        "jpName": "サメライド"
     },
     {
         "id": "83",
-        "name": "Triple Inkstrike"
+        "name": "Triple Inkstrike",
+        "jpName": "トリプルトルネード"
     },
     {
         "id": "84",
-        "name": "Tacticooler"
+        "name": "Tacticooler",
+        "jpName": "エナジースタンド"
     },
     {
         "id": "85",
-        "name": "Sheldon"
+        "name": "Sheldon",
+        "jpName": "ブキチ"
     },
     {
         "id": "86",
-        "name": "Gnarly Eddy"
+        "name": "Gnarly Eddy",
+        "jpName": "オームラ"
     },
     {
         "id": "87",
-        "name": "Jel La Fleur"
+        "name": "Jel La Fleur",
+        "jpName": "ハナガサ"
     },
     {
         "id": "88",
-        "name": "Mr. Coco"
+        "name": "Mr. Coco",
+        "jpName": "ヤシガニさん"
     },
     {
         "id": "89",
-        "name": "Harmony"
+        "name": "Harmony",
+        "jpName": "パル子"
     },
     {
         "id": "90",
-        "name": "Murch"
+        "name": "Murch",
+        "jpName": "スパイキー"
     },
     {
         "id": "91",
-        "name": "Mr. Grizz"
+        "name": "Mr. Grizz",
+        "jpName": "クマサン"
     },
     {
         "id": "92",
-        "name": "Marigold"
+        "name": "Marigold",
+        "jpName": "マザー"
     },
     {
         "id": "93",
-        "name": "Smallfry"
+        "name": "Smallfry",
+        "jpName": "コジャケ"
     },
     {
         "id": "94",
-        "name": "Cuttlefish"
+        "name": "Cuttlefish",
+        "jpName": "アタリメ"
     },
     {
         "id": "95",
-        "name": "Captain"
+        "name": "Captain",
+        "jpName": "司令"
     },
     {
         "id": "96",
-        "name": "Callie"
+        "name": "Callie",
+        "jpName": "アオリ"
     },
     {
         "id": "97",
-        "name": "Marie"
+        "name": "Marie",
+        "jpName": "ホタル"
     },
     {
         "id": "98",
-        "name": "Shiver"
+        "name": "Shiver",
+        "jpName": "フウカ"
     },
     {
         "id": "99",
-        "name": "Frye"
+        "name": "Frye",
+        "jpName": "ウツホ"
     },
     {
         "id": "100",
-        "name": "Big Man"
+        "name": "Big Man",
+        "jpName": "マンタロー"
     },
     {
         "id": "101",
-        "name": "Judd"
+        "name": "Judd",
+        "jpName": "ジャッジくん"
     },
     {
         "id": "102",
-        "name": "Li'l Judd"
+        "name": "Li'l Judd",
+        "jpName": "コジャッジくん"
     },
     {
         "id": "103",
-        "name": "SquidForce"
+        "name": "SquidForce",
+        "jpName": "バトロイカ"
     },
     {
         "id": "104",
-        "name": "Zink"
+        "name": "Zink",
+        "jpName": "アイロニック"
     },
     {
         "id": "105",
-        "name": "Krak-On"
+        "name": "Krak-On",
+        "jpName": "クラーゲス"
     },
     {
         "id": "106",
-        "name": "Rockenberg"
+        "name": "Rockenberg",
+        "jpName": "ロッケンベルグ"
     },
     {
         "id": "107",
-        "name": "Zekko"
+        "name": "Zekko",
+        "jpName": "エゾッコ"
     },
     {
         "id": "108",
-        "name": "Forge"
+        "name": "Forge",
+        "jpName": "フォーリマ"
     },
     {
         "id": "109",
-        "name": "Firefin"
+        "name": "Firefin",
+        "jpName": "ホッコリー"
     },
     {
         "id": "110",
-        "name": "Skalop"
+        "name": "Skalop",
+        "jpName": "ホタックス"
     },
     {
         "id": "111",
-        "name": "Splash Mob"
+        "name": "Splash Mob",
+        "jpName": "ジモン"
     },
     {
         "id": "112",
-        "name": "Inkline"
+        "name": "Inkline",
+        "jpName": "シグレニ"
     },
     {
         "id": "113",
-        "name": "Tentatek"
+        "name": "Tentatek",
+        "jpName": "アロメ"
     },
     {
         "id": "114",
-        "name": "Takoroka"
+        "name": "Takoroka",
+        "jpName": "ヤコ"
     },
     {
         "id": "115",
-        "name": "Annaki"
+        "name": "Annaki",
+        "jpName": "アナアキ"
     },
     {
         "id": "116",
-        "name": "Enperry"
+        "name": "Enperry",
+        "jpName": "エンペリー"
     },
     {
         "id": "117",
-        "name": "Toni Kensa"
+        "name": "Toni Kensa",
+        "jpName": "タタキケンサキ"
     },
     {
         "id": "118",
-        "name": "Barazushi"
+        "name": "Barazushi",
+        "jpName": "バラズシ"
     },
     {
         "id": "119",
-        "name": "Emberz"
+        "name": "Emberz",
+        "jpName": "シチリン"
     },
     {
         "id": "120",
-        "name": "Octotrooper"
+        "name": "Octotrooper",
+        "jpName": "タコトルーパー"
     },
     {
         "id": "121",
-        "name": "Shielded Octotrooper"
+        "name": "Shielded Octotrooper",
+        "jpName": "タテタコトルーパー"
     },
     {
         "id": "122",
-        "name": "Twintacle Octotrooper"
+        "name": "Twintacle Octotrooper",
+        "jpName": "バイタコトルーパー"
     },
     {
         "id": "123",
-        "name": "Octohopper"
+        "name": "Octohopper",
+        "jpName": "タコホッパー"
     },
     {
         "id": "124",
-        "name": "Octocopter"
+        "name": "Octocopter",
+        "jpName": "タコプター"
     },
     {
         "id": "125",
-        "name": "Octobomber"
+        "name": "Octobomber",
+        "jpName": "ボムタコプター"
     },
     {
         "id": "126",
-        "name": "Octodisco"
+        "name": "Octodisco",
+        "jpName": "タコミラーボール"
     },
     {
         "id": "127",
-        "name": "Octopod"
+        "name": "Octopod",
+        "jpName": "タコポッド"
     },
     {
         "id": "128",
-        "name": "Oversized Octopod"
+        "name": "Oversized Octopod",
+        "jpName": "大容量タコポッド"
     },
     {
         "id": "129",
-        "name": "Tentakook"
+        "name": "Tentakook",
+        "jpName": "スタコラー"
     },
     {
         "id": "130",
-        "name": "Octosniper"
+        "name": "Octosniper",
+        "jpName": "タコスナイパー"
     },
     {
         "id": "131",
-        "name": "Octocommander"
+        "name": "Octocommander",
+        "jpName": "タココマンダー"
     },
     {
         "id": "132",
-        "name": "Octomissile"
+        "name": "Octomissile",
+        "jpName": "タコミサイル"
     },
     {
         "id": "133",
-        "name": "Octozeppelin"
+        "name": "Octozeppelin",
+        "jpName": "タコッペリン号"
     },
     {
         "id": "134",
-        "name": "Squee-G"
+        "name": "Squee-G",
+        "jpName": "インクリーナー"
     },
     {
         "id": "135",
-        "name": "Octostamp"
+        "name": "Octostamp",
+        "jpName": "タコスタンプ"
     },
     {
         "id": "136",
-        "name": "Amped Octostamp"
+        "name": "Amped Octostamp",
+        "jpName": "ビートタコスタンプ"
     },
     {
         "id": "137",
-        "name": "Flooder"
+        "name": "Flooder",
+        "jpName": "タコドーザー"
     },
     {
         "id": "138",
-        "name": "Octoballer"
+        "name": "Octoballer",
+        "jpName": "タコストライク"
     },
     {
         "id": "139",
-        "name": "Octoling"
+        "name": "Octoling",
+        "jpName": "タコゾネス"
     },
     {
         "id": "140",
-        "name": "DJ Octavio"
+        "name": "DJ Octavio",
+        "jpName": "DJタコワサ将軍"
     },
     {
         "id": "141",
-        "name": "Chum"
+        "name": "Chum",
+        "jpName": "シャケ"
     },
     {
         "id": "142",
-        "name": "Cohock"
+        "name": "Cohock",
+        "jpName": "ドスコイ"
     },
     {
         "id": "143",
-        "name": "Snatcher"
+        "name": "Snatcher",
+        "jpName": "タマヒロイ"
     },
     {
         "id": "144",
-        "name": "Steelhead"
+        "name": "Steelhead",
+        "jpName": "バクダン"
     },
     {
         "id": "145",
-        "name": "Steel Eel"
+        "name": "Steel Eel",
+        "jpName": "ヘビ"
     },
     {
         "id": "146",
-        "name": "Scrapper"
+        "name": "Scrapper",
+        "jpName": "テッパン"
     },
     {
         "id": "147",
-        "name": "Stinger"
+        "name": "Stinger",
+        "jpName": "タワー"
     },
     {
         "id": "148",
-        "name": "Maws"
+        "name": "Maws",
+        "jpName": "モグラ"
     },
     {
         "id": "149",
-        "name": "Drizzler"
+        "name": "Drizzler",
+        "jpName": "コウモリ"
     },
     {
         "id": "150",
-        "name": "Flyfish"
+        "name": "Flyfish",
+        "jpName": "カタパッド"
     },
     {
         "id": "151",
-        "name": "Fish Stick"
+        "name": "Fish Stick",
+        "jpName": "ハシラ"
     },
     {
         "id": "152",
-        "name": "Flipper-Flopper"
+        "name": "Flipper-Flopper",
+        "jpName": "ダイバー"
     },
     {
         "id": "153",
-        "name": "Slammin' Lid"
+        "name": "Slammin' Lid",
+        "jpName": "ナベブタ"
     },
     {
         "id": "154",
-        "name": "Big Shot"
+        "name": "Big Shot",
+        "jpName": "テッキュウ"
     },
     {
         "id": "155",
-        "name": "Goldie"
+        "name": "Goldie",
+        "jpName": "キンシャケ"
     },
     {
         "id": "156",
-        "name": "Griller"
+        "name": "Griller",
+        "jpName": "グリル"
     },
     {
         "id": "157",
-        "name": "Mothership"
+        "name": "Mothership",
+        "jpName": "ハコビヤ"
     },
     {
         "id": "158",
-        "name": "Mudmouth"
+        "name": "Mudmouth",
+        "jpName": "ドロシャケ"
     },
     {
         "id": "159",
-        "name": "Zapfish"
+        "name": "Zapfish",
+        "jpName": "デンチナマズ"
     },
     {
         "id": "160",
-        "name": "Tower Control"
+        "name": "Tower Control",
+        "jpName": "ガチヤグラ"
     },
     {
         "id": "161",
-        "name": "Rainmaker"
+        "name": "Rainmaker",
+        "jpName": "ガチホコ"
     },
     {
         "id": "162",
-        "name": "Power Clam"
+        "name": "Power Clam",
+        "jpName": "ガチアサリ"
     },
     {
         "id": "163",
-        "name": "Custom Splattershot Jr."
+        "name": "Custom Splattershot Jr.",
+        "jpName": "もみじシューター"
     },
     {
         "id": "164",
-        "name": "Aerospray RG"
+        "name": "Aerospray RG",
+        "jpName": "プロモデラーRG"
     },
     {
         "id": "165",
-        "name": "Tentatek Splatteershot"
+        "name": "Tentatek Splatteershot",
+        "jpName": "スプラシューターコラボ"
     },
     {
         "id": "166",
-        "name": "Forge Splattershot Pro"
+        "name": "Forge Splattershot Pro",
+        "jpName": "プライムシューターコラボ"
     },
     {
         "id": "167",
-        "name": "Splattershot Nova"
+        "name": "Splattershot Nova",
+        "jpName": "スペースシューター"
     },
     {
         "id": "168",
-        "name": "Luna Blaster Neo"
+        "name": "Luna Blaster Neo",
+        "jpName": "ノヴァブラスターネオ"
     },
     {
         "id": "169",
-        "name": "Carbon Roller Deco"
+        "name": "Carbon Roller Deco",
+        "jpName": "カーボンローラーデコ"
     },
     {
         "id": "170",
-        "name": "Big Swig Roller"
+        "name": "Big Swig Roller",
+        "jpName": "ワイドローラー"
     },
     {
         "id": "171",
-        "name": "Inkbrush Nouveau"
+        "name": "Inkbrush Nouveau",
+        "jpName": "パブロ・ヒュー"
     },
     {
         "id": "172",
-        "name": "Snipewriter 5H"
+        "name": "Snipewriter 5H",
+        "jpName": "R-PEN/5H"
     },
     {
         "id": "173",
-        "name": "Slosher Deco"
+        "name": "Slosher Deco",
+        "jpName": "バケットスロッシャーデコ"
     },
     {
         "id": "174",
-        "name": "Zink Mini Splatling"
+        "name": "Zink Mini Splatling",
+        "jpName": "スプラスピナーコラボ"
     },
     {
         "id": "175",
-        "name": "Dapple Dualies Noueveau"
+        "name": "Dapple Dualies Noueveau",
+        "jpName": "スパッタリー・ヒュー"
     },
     {
         "id": "176",
-        "name": "Neo Sploosh-o-Matic"
+        "name": "Neo Sploosh-o-Matic",
+        "jpName": "ボールドマーカーネオ"
     },
     {
         "id": "177",
-        "name": "Neo Splash-o-Matic"
+        "name": "Neo Splash-o-Matic",
+        "jpName": "シャープマーカーネオ"
     },
     {
         "id": "178",
-        "name": "N-ZAP '89"
+        "name": "N-ZAP '89",
+        "jpName": "N-ZAP89"
     },
     {
         "id": "179",
-        "name": ".96 Gal Deco"
+        "name": ".96 Gal Deco",
+        "jpName": ".96ガロンデコ"
     },
     {
         "id": "180",
-        "name": "Custom Jet Squelcher"
+        "name": "Custom Jet Squelcher",
+        "jpName": "ジェットスイーパーカスタム"
     },
     {
         "id": "181",
-        "name": "Clash Blaster Neo"
+        "name": "Clash Blaster Neo",
+        "jpName": "クラッシュブラスターネオ"
     },
     {
         "id": "182",
-        "name": "Rapid Blaster Deco"
+        "name": "Rapid Blaster Deco",
+        "jpName": "ラピッドブラスターデコ"
     },
     {
         "id": "183",
-        "name": "L-3 Nozzlenose D"
+        "name": "L-3 Nozzlenose D",
+        "jpName": "L3リールガンD"
     },
     {
         "id": "184",
-        "name": "Krak-On Splat Roller"
+        "name": "Krak-On Splat Roller",
+        "jpName": "スプラローラーコラボ"
     },
     {
         "id": "185",
-        "name": "Z+F Splat Charger"
+        "name": "Z+F Splat Charger",
+        "jpName": "スプラチャージャーコラボ"
     },
     {
         "id": "186",
-        "name": "Z+F Splatterscope"
+        "name": "Z+F Splatterscope",
+        "jpName": "スプラスコープコラボ"
     },
     {
         "id": "187",
-        "name": "Tri-Slosher Nouveau"
+        "name": "Tri-Slosher Nouveau",
+        "jpName": "ヒッセン・ヒュー"
     },
     {
         "id": "188",
-        "name": "Kraken Royale"
+        "name": "Kraken Royale",
+        "jpName": "テイオウイカ"
     },
     {
         "id": "189",
-        "name": "Super Chump"
+        "name": "Super Chump",
+        "jpName": "デコイチラシ"
     },
     {
         "id": "190",
-        "name": "Shelly & Donny"
+        "name": "Shelly & Donny",
+        "jpName": "マメブキチ&ツブブキチ"
     },
     {
         "id": "191",
-        "name": "Annie"
+        "name": "Annie",
+        "jpName": "アネモ"
     },
     {
         "id": "192",
-        "name": "Jelonzo"
+        "name": "Jelonzo",
+        "jpName": "エチゼン"
     },
     {
         "id": "193",
-        "name": "Fred Crumbs"
+        "name": "Fred Crumbs",
+        "jpName": "アジオ"
     },
     {
         "id": "194",
-        "name": "Spyke"
+        "name": "Spyke",
+        "jpName": "ダウニー"
     },
     {
         "id": "195",
-        "name": "The Eel Deal - Frye"
+        "name": "The Eel Deal - Frye",
+        "jpName": "踊るギャングスターウツホ"
     },
     {
         "id": "196",
-        "name": "The Cold-Blooded Bandit - Shiver"
+        "name": "The Cold-Blooded Bandit - Shiver",
+        "jpName": "サメ使いのフウカ"
     },
     {
         "id": "197",
-        "name": "Manta Storm - Big Man"
+        "name": "Manta Storm - Big Man",
+        "jpName": "ふしぎせいぶつマンタロー"
     },
     {
         "id": "198",
-        "name": "Z+F"
+        "name": "Z+F",
+        "jpName": "エゾッコリー"
     },
     {
         "id": "199",
-        "name": "Annaki Splattershot Nova"
+        "name": "Annaki Splattershot Nova",
+        "jpName": "スペースシューターコラボ"
     },
     {
         "id": "200",
-        "name": "Rapid Blaster Pro Deco"
+        "name": "Rapid Blaster Pro Deco",
+        "jpName": "Rブラスターエリートデコ"
     },
     {
         "id": "201",
-        "name": "S-BLAST '92"
+        "name": "S-BLAST '92",
+        "jpName": "S-BLAST92"
     },
     {
         "id": "202",
-        "name": "H-3 Nozzlenose D"
+        "name": "H-3 Nozzlenose D",
+        "jpName": "H3リールガンD"
     },
     {
         "id": "203",
-        "name": "Big Swig Roller Express"
+        "name": "Big Swig Roller Express",
+        "jpName": "ワイドローラーコラボ"
     },
     {
         "id": "204",
-        "name": "Painbrush"
+        "name": "Painbrush",
+        "jpName": "フィンセント"
     },
     {
         "id": "205",
-        "name": "Heavy Splatling Deco"
+        "name": "Heavy Splatling Deco",
+        "jpName": "バレルスピナーデコ"
     },
     {
         "id": "206",
-        "name": "Custom Dualie Squelchers"
+        "name": "Custom Dualie Squelchers",
+        "jpName": "デュアルスイーパーカスタム"
     },
     {
         "id": "207",
-        "name": "Light Tetra Dualies"
+        "name": "Light Tetra Dualies",
+        "jpName": "クアッドホッパーホワイト"
     },
     {
         "id": "208",
-        "name": "Tenta Sorella Brella"
+        "name": "Tenta Sorella Brella",
+        "jpName": "キャンピングシェルターソレーラ"
     },
     {
         "id": "209",
-        "name": "Splatana Wiper Deco"
+        "name": "Splatana Wiper Deco",
+        "jpName": "ドライブワイパーデコ"
     },
     {
         "id": "210",
-        "name": "Gold Dynamo Roller"
+        "name": "Gold Dynamo Roller",
+        "jpName": "ダイナモローラーテスラ"
     },
     {
         "id": "211",
-        "name": "Octobrush Nouveau"
+        "name": "Octobrush Nouveau",
+        "jpName": "ホクサイ・ヒュー"
     },
     {
         "id": "212",
-        "name": "Custom Goo Tuber"
+        "name": "Custom Goo Tuber",
+        "jpName": "ソイチューバーカスタム"
     },
     {
         "id": "213",
-        "name": "Sloshing Machine Neo"
+        "name": "Sloshing Machine Neo",
+        "jpName": "スクリュースロッシャーネオ"
     },
     {
         "id": "214",
-        "name": "Bloblobber Deco"
+        "name": "Bloblobber Deco",
+        "jpName": "オーバーフロッシャーデコ"
     },
     {
         "id": "215",
-        "name": "Dread Wringer"
+        "name": "Dread Wringer",
+        "jpName": "モップリン"
     },
     {
         "id": "216",
-        "name": "Ballpoint Splatling Nouveau"
+        "name": "Ballpoint Splatling Nouveau",
+        "jpName": "クーゲルシュライバー・ヒュー"
     },
     {
         "id": "217",
-        "name": "Heavy Edit Splatling"
+        "name": "Heavy Edit Splatling",
+        "jpName": "イグザミナー"
     },
     {
         "id": "218",
-        "name": "Sorella Brella"
+        "name": "Sorella Brella",
+        "jpName": "パラシェルターソレーラ"
     },
     {
         "id": "219",
-        "name": "Inkline Tri-Stringer"
+        "name": "Inkline Tri-Stringer",
+        "jpName": "トライストリンガーコラボ"
     },
     {
         "id": "220",
-        "name": "Cohozuna"
+        "name": "Cohozuna",
+        "jpName": "ヨコヅナ"
     },
     {
         "id": "221",
-        "name": "Horrorboros"
+        "name": "Horrorboros",
+        "jpName": "タツ"
     },
     {
         "id": "222",
-        "name": "Custom Blaster"
+        "name": "Custom Blaster",
+        "jpName": "ホットブラスターカスタム"
     },
     {
         "id": "223",
-        "name": "Foil Squeezer"
+        "name": "Foil Squeezer",
+        "jpName": "ボトルガイザーフォイル"
     },
     {
         "id": "224",
-        "name": "Enperry Splat Dualies"
+        "name": "Enperry Splat Dualies",
+        "jpName": "スプラマニューバーコラボ"
     },
     {
         "id": "225",
-        "name": "Undercover Sorella Brella"
+        "name": "Undercover Sorella Brella",
+        "jpName": "スパイガジェットソレーラ"
     },
     {
         "id": "226",
-        "name": "REEF-LUX 450 Deco"
+        "name": "REEF-LUX 450 Deco",
+        "jpName": "LACT-450デコ"
     },
     {
         "id": "227",
-        "name": "Splatana Stamper Nouveau"
+        "name": "Splatana Stamper Nouveau",
+        "jpName": "ジムワイパー・ヒュー"
     },
     {
         "id": "228",
-        "name": "Snipewriter 5B"
+        "name": "Snipewriter 5B",
+        "jpName": "R-PEN/5B"
     },
     {
         "id": "229",
-        "name": "S-BLAST '91"
+        "name": "S-BLAST '91",
+        "jpName": "S-BLAST91"
     },
     {
         "id": "230",
-        "name": "Painbrush Nouveau"
+        "name": "Painbrush Nouveau",
+        "jpName": "フィンセント・ヒュー"
     },
     {
         "id": "231",
-        "name": "Triple Splashdown"
+        "name": "Triple Splashdown",
+        "jpName": "ウルトラチャクチ"
     },
     {
         "id": "232",
-        "name": "Splattercolor Screen"
+        "name": "Splattercolor Screen",
+        "jpName": "スミナガシート"
     },
     {
         "id": "233",
-        "name": "Order Dualies"
+        "name": "Order Dualies",
+        "jpName": "オーダーマニューバー"
     },
     {
         "id": "234",
-        "name": ".52 Gal Deco"
+        "name": ".52 Gal Deco",
+        "jpName": ".52ガロンデコ"
     },
     {
         "id": "235",
-        "name": "Foil Flingza Roller"
+        "name": "Foil Flingza Roller",
+        "jpName": "ヴァリアブルローラーフォイル"
     },
     {
         "id": "236",
-        "name": "New Squiffer"
+        "name": "New Squiffer",
+        "jpName": "スクイックリンβ"
     },
     {
         "id": "237",
-        "name": "Custom E-liter 4K"
+        "name": "Custom E-liter 4K",
+        "jpName": "リッター4Kカスタム"
     },
     {
         "id": "238",
-        "name": "Custom E-liter 4K Scope"
+        "name": "Custom E-liter 4K Scope",
+        "jpName": "4Kスコープカスタム"
     },
     {
         "id": "239",
-        "name": "Custom Explosher"
+        "name": "Custom Explosher",
+        "jpName": "エクスプロッシャーカスタム"
     },
     {
         "id": "240",
-        "name": "Dread Wringer D"
+        "name": "Dread Wringer D",
+        "jpName": "モップリンD"
     },
     {
         "id": "241",
-        "name": "Nautilus 79"
+        "name": "Nautilus 79",
+        "jpName": "ノーチラス79"
     },
     {
         "id": "242",
-        "name": "Glooga Dualies Deco"
+        "name": "Glooga Dualies Deco",
+        "jpName": "ケルビン525デコ"
     },
     {
         "id": "243",
-        "name": "Douser Dualies FF"
+        "name": "Douser Dualies FF",
+        "jpName": "ガエンFF"
     },
     {
         "id": "244",
-        "name": "Recycled Brella 24 Mk I"
+        "name": "Recycled Brella 24 Mk I",
+        "jpName": "24式張替傘・甲"
     },
     {
         "id": "245",
-        "name": "Flow"
+        "name": "Flow",
+        "jpName": "ミウラ"
     },
     {
         "id": "246",
-        "name": "Jelfonzo"
+        "name": "Jelfonzo",
+        "jpName": "ビゼン"
     },
     {
         "id": "247",
-        "name": "Bisk"
+        "name": "Bisk",
+        "jpName": "シガニー"
     },
     {
         "id": "248",
-        "name": "Acht"
+        "name": "Acht",
+        "jpName": "ミズタ"
     },
     {
         "id": "249",
-        "name": "Cipher"
+        "name": "Cipher",
+        "jpName": "ユメエビ"
     },
     {
         "id": "250",
-        "name": "Pearl Drone"
+        "name": "Pearl Drone",
+        "jpName": "ヒメドローン"
     },
     {
         "id": "251",
-        "name": "Pearl"
+        "name": "Pearl",
+        "jpName": "ヒメ"
     },
     {
         "id": "252",
-        "name": "Marina"
+        "name": "Marina",
+        "jpName": "イイダ"
     },
     {
         "id": "253",
-        "name": "Custom Range Blaster"
+        "name": "Custom Range Blaster",
+        "jpName": "ロングブラスターカスタム"
     },
     {
         "id": "254",
-        "name": "Bamboozler 14 Mk II"
+        "name": "Bamboozler 14 Mk II",
+        "jpName": "14式竹筒銃・乙"
     },
     {
         "id": "255",
-        "name": "Custom Hydra Splatling"
+        "name": "Custom Hydra Splatling",
+        "jpName": "ハイドラントカスタム"
     },
     {
         "id": "256",
-        "name": "Heavy Edit Splatling Nouveau"
+        "name": "Heavy Edit Splatling Nouveau",
+        "jpName": "イグザミナー・ヒュー"
     },
     {
         "id": "257",
-        "name": "Custom Douser Dualies FF"
+        "name": "Custom Douser Dualies FF",
+        "jpName": "ガエンFFカスタム"
     },
     {
         "id": "258",
-        "name": "Recycled Brella 24 Mk II"
+        "name": "Recycled Brella 24 Mk II",
+        "jpName": "24式張替傘・乙"
     },
     {
         "id": "259",
-        "name": "Wellstring V"
+        "name": "Wellstring V",
+        "jpName": "フルイドV"
     },
     {
         "id": "260",
-        "name": "Custom Wellstring V"
+        "name": "Custom Wellstring V",
+        "jpName": "フルイドVカスタム"
     },
     {
         "id": "261",
-        "name": "Mint Decavitator"
+        "name": "Mint Decavitator",
+        "jpName": "デンタルワイパーミント"
     },
     {
         "id": "262",
-        "name": "Charcoal Decavitator"
+        "name": "Charcoal Decavitator",
+        "jpName": "デンタルワイパースミ"
     },
     {
         "id": "263",
-        "name": "Crusty Sean"
+        "name": "Crusty Sean",
+        "jpName": "ロブ"
     },
     {
         "id": "264",
-        "name": "The Ursine Anomaly - ＃03"
+        "name": "The Ursine Anomaly - ＃03",
+        "jpName": "実験体熊三号"
     },
     {
         "id": "265",
-        "name": "Megalodontia"
+        "name": "Megalodontia",
+        "jpName": "ジョー"
     },
     {
         "id": "266",
-        "name": "Overlorder"
+        "name": "Overlorder",
+        "jpName": "オーダコ"
     }
 ]

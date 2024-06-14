@@ -138,6 +138,15 @@ export function BuildCardEmbed(card, level){
 		break;
 	}
 
+	var tempFooter = null;
+	//temp solution for missing JP cards
+	if (level == 4 && card.id > 209){
+		level = 1;
+		tempFooter = {
+		text: '日本語カードが見つかりません。代わりに英語カードを表示',
+		}
+	}
+
 	cardTitle += ` [${card.id}]`;
 
 	const cardEmbed = {
@@ -146,6 +155,7 @@ export function BuildCardEmbed(card, level){
 		image: {
 			url: `https://leanny.github.io/splat3/images/tableturf_full/${card.id}-${level}.png`
 		},
+		footer: tempFooter,
 	};
 	return cardEmbed;
 }

@@ -5,40 +5,30 @@ import { SanitizeString } from "../../utils/string.js";
 import { uniqueCards } from "../../cards/cardManager.js";
 
 export const data = new SlashCommandBuilder()
-    .setName('card')
-    .setDescription('Get any tableturf card')
+    .setName('jpcard')
+    .setDescription('Get any japanese tableturf card')
     .addSubcommand(subCommand => 
         subCommand
             .setName('by_name')
-            .setDescription('Get a card by name')
+            .setDescription('名前でカードを取得する')
             .addStringOption(option =>
                 option.setName('name')
-                .setDescription('The card')
+                .setDescription('カード')
                 .setRequired(true)
-                .setAutocomplete(true))
-            .addIntegerOption(option =>
-                option.setName('level')
-                .setDescription('The upgrade level')
-                .setMinValue(1)
-                .setMaxValue(3)))
+                .setAutocomplete(true)))
     .addSubcommand(subCommand => 
         subCommand
             .setName('by_id')
-            .setDescription('Get a card by id')
+            .setDescription('IDでカードを手に入れる')
             .addIntegerOption(option =>
                 option.setName('id')
-                .setDescription('The id')
+                .setDescription('ID')
                 .setRequired(true)
                 .setMinValue(1)
-                .setMaxValue(uniqueCards))
-            .addIntegerOption(option =>
-                option.setName('level')
-                .setDescription('The upgrade level')
-                .setMinValue(1)
-                .setMaxValue(3)))
+                .setMaxValue(uniqueCards)))
 export async function autocomplete(interaction){
     const focusedValue = interaction.options.getFocused();
-	const choices = GetCardListByLanguage('en');
+	const choices = GetCardListByLanguage('ja');
     var filteredChoices = [];
     for (let i = 0; i < choices.length; i++){
         if (choices[i].sanitizedName.search(SanitizeString(focusedValue)) != -1) filteredChoices.push(choices[i].name);
@@ -54,14 +44,13 @@ export async function autocomplete(interaction){
 export async function execute(interaction) { 
     const inputName = interaction.options.getString('name');
     const inputId = interaction.options.getInteger('id');
-    const level = interaction.options.getInteger('level') ?? 1;
 
     var card;
     if (inputName){
-        card = GetCardByName(inputName, 'en');
+        card = GetCardByName(inputName, 'ja');
     } else{
-        card = GetCardById(inputId, 'en');
+        card = GetCardById(inputId, 'ja');
     }
 
-    await interaction.reply({ embeds: [BuildCardEmbed(card, level)] });
+    await interaction.reply({ embeds: [BuildCardEmbed(card, 4)] });
 }

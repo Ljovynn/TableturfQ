@@ -18,8 +18,6 @@ client.commands = new Collection();
 
 var folderPath = path.join(__dirname, 'commands');
 const commandFolder = fs.readdirSync(folderPath);
-folderPath = path.join(__dirname, 'guildCommands');
-const guildCommandFolder = fs.readdirSync(folderPath);
 
 var previousDisputeMessageId;
 
@@ -33,6 +31,9 @@ for (const file of commandFolder) {
 		console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
 	}
 }
+
+folderPath = path.join(__dirname, 'guildCommands');
+const guildCommandFolder = fs.readdirSync(folderPath);
 
 for (const file of guildCommandFolder) {
     const filePath = `./guildCommands/${file}`;
