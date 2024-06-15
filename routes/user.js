@@ -12,7 +12,7 @@ import dotenv from 'dotenv';
 import { FindIfPlayerInQue } from '../queManager.js';
 import { FindMatchWithPlayer } from '../matchManager.js';
 import { DeleteAllUserSessions, GetMultipleUserDatas, GetUserMatchHistory, SetUserDiscordTokens } from '../database.js';
-import { definitionErrors } from '../public/Responses/requestErrors.js';
+import { definitionErrors, userErrors } from '../public/Responses/requestErrors.js';
 
 const router = Router();
 
@@ -34,7 +34,7 @@ router.post("/GetUserMatchHistory", async (req, res) => {
         const userId = req.session.user;
         var pageNumber = req.pageNumber;
 
-        if (typeof(userId) !== 'number') return res.status(400).send(definitionErrors.userNotDefined);
+        if (typeof(userId) !== 'number') return SetResponse(res, definitionErrors.userNotDefined);
         if (typeof(pageNumber) !== 'number' || pageNumber < 0){
             pageNumber = 1;
         }
@@ -51,7 +51,7 @@ router.post("/GetUserMatchHistory", async (req, res) => {
 router.post("/DeleteUserLoginData", async (req, res) => {
     try{
         const userId = req.session.user;
-        if (!CheckUserDefined(req)) return res.status(401).send(userErrors.notLoggedIn);
+        if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
 
         await DeleteAllUserSessions(userId);
         await SetUserDiscordTokens(userId, null, null);
@@ -71,7 +71,7 @@ router.post("/GetUsers", async (req, res) => {
         console.log('user list');
         console.log(req.body.userIdList);
         const userIdList = req.body.userIdList;
-        if (!CheckIfArray(userIdList) || userIdList.length == 0) return res.status(400).send(definitionErrors.userNotDefined);
+        if (!CheckIfArray(userIdList) || userIdList.length == 0) return SetResponse(res, definitionErrors.userNotDefined);
 
         const users = await GetMultipleUserDatas(userIdList);
 
@@ -91,7 +91,7 @@ router.post("/GetUsers", async (req, res) => {
 router.get("/GetUserInfo", async (req, res) => {
     try{
         var user = await GetCurrentUser(req);
-        if (!user) return res.status(401).send(userErrors.notLoggedIn);
+        if (!user) return SetResponse(res, userErrors.notLoggedIn);
 
         var queData = FindIfPlayerInQue(user.id);
         var matchId = FindMatchWithPlayer(user.id);

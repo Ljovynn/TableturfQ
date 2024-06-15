@@ -5,7 +5,7 @@ import { FindPlayerPosInMatch } from "./utils/matchUtils.js";
 import { AddRecentlyMatchedPlayers } from "./queManager.js";
 import { SendDisputeMessage } from "./discordBot/discordBotManager.js";
 import { ResponseData } from "./public/Responses/ResponseData.js";
-import { casualMatchEndErrors, chatMessageErrors, disputeErrors, gameWinErrors, matchCreatingErrors, resolveErrors, stagePickErrors, stageStrikeErrors } from "./public/Responses/matchErrors.js";
+import { casualMatchEndErrors, chatMessageErrors, disputeErrors, gameWinErrors, databaseErrors, resolveErrors, stagePickErrors, stageStrikeErrors, nullErrors } from "./public/Responses/matchErrors.js";
 import { HasBadWords } from "./utils/string.js";
 
 var matches = [];
@@ -55,7 +55,7 @@ export async function MakeNewMatch(player1Id, player2Id, matchMode){
     }
 
     const matchId = await CreateMatch(player1Id, player2Id, isRanked);
-    if (!matchId) return new ResponseData(500, matchCreatingErrors.databaseError);
+    if (!matchId) return databaseErrors.matchCreateError;
 
     var match = new Match(matchId, player1Id, player2Id, matchMode);
     matches.push(match);
@@ -64,11 +64,11 @@ export async function MakeNewMatch(player1Id, player2Id, matchMode){
 
 export function PlayerSentStageStrikes(playerId, stages){
     var match = FindMatchWithPlayer(playerId);
-    if (!match) return new ResponseData(400, stageStrikeErrors.noMatch);
+    if (!match) return nullErrors.noMatch;
 
     var playerPos = FindPlayerPosInMatch(match, playerId);
 
-    if (match.status != matchStatuses.stageSelection) return new ResponseData(400, stageStrikeErrors.wrongStatus);
+    if (match.status != matchStatuses.stageSelection) return stageStrikeErrors.wrongStatus;
 
     var strikeResponse;
     if (match.gamesArr.length == 1){
@@ -88,24 +88,24 @@ function StarterStrikeLogic(match, playerPos, stages){
         correctStagesLength = 1;
     }
 
-    if (stages.length != correctStagesLength) return new ResponseData(400, stageStrikeErrors.stageAmountIncorrect);
+    if (stages.length != correctStagesLength) return stageStrikeErrors.stageAmountIncorrect;
 
     //Check if current player
     if ((game.strikes.length + 1) % 4 < 2){
-        if (playerPos == 2) return new ResponseData(400, stageStrikeErrors.wrongPlayer);
+        if (playerPos == 2) return stageStrikeErrors.wrongPlayer;
     } else{
-        if (playerPos == 1) return new ResponseData(400, stageStrikeErrors.wrongPlayer);
+        if (playerPos == 1) return stageStrikeErrors.wrongPlayer;
     }
 
     //check each stage
     var alreadySentStages = [];
     for (let i = 0; i < stages.length; i++){
-        if (!stageList.includes(stages[i])) return new ResponseData(400, stageStrikeErrors.stageNotInStagelist);
+        if (!stageList.includes(stages[i])) return stageStrikeErrors.stageNotInStagelist;
 
-        if (alreadySentStages.includes(stages[i])) return new ResponseData(400, stageStrikeErrors.stageAlreadyStriked);
+        if (alreadySentStages.includes(stages[i])) return stageStrikeErrors.stageAlreadyStriked;
         alreadySentStages.push(stages[i]);
 
-        if (game.strikes.includes(stages[i])) return new ResponseData(400, stageStrikeErrors.stageAlreadyStriked);
+        if (game.strikes.includes(stages[i])) return stageStrikeErrors.stageAlreadyStriked;
     }
 
     for (let i = 0; i < stages.length; i++){
@@ -133,21 +133,21 @@ function CounterpickStrikingLogic(match, playerId, playerPos, stages){
     const stageList = match.mode.rulesetData.counterPickStagesArr;
     var game = match.gamesArr[match.gamesArr.length - 1];
 
-    if (stages.length != match.mode.rulesetData.counterPickBans) return new ResponseData(400, stageStrikeErrors.stageAmountIncorrect);
+    if (stages.length != match.mode.rulesetData.counterPickBans) return stageStrikeErrors.stageAmountIncorrect;
 
-    if (match.gamesArr[match.gamesArr.length - 2].winnerId != playerId) return new ResponseData(400, wrongPlayer);
+    if (match.gamesArr[match.gamesArr.length - 2].winnerId != playerId) return stageStrikeErrors.wrongPlayer;
 
     var alreadySentStages = [];
     //for each stage
     for (let i = 0; i < stages.length; i++){
-        if (!stageList.includes(stages[i])) return new ResponseData(400, stageStrikeErrors.stageNotInStagelist);
+        if (!stageList.includes(stages[i])) return stageStrikeErrors.stageNotInStagelist;
 
-        if (alreadySentStages.includes(stages[i])) return new ResponseData(400, stageStrikeErrors.stageAlreadyStriked);
+        if (alreadySentStages.includes(stages[i])) return stageStrikeErrors.stageAlreadyStriked;
         alreadySentStages.push(stages[i]);
 
-        if (match.players[playerPos % 2].unpickableStagesArr.includes(stages[i])) return new ResponseData(400, stageStrikeErrors.DSRunpickable);
+        if (match.players[playerPos % 2].unpickableStagesArr.includes(stages[i])) return stageStrikeErrors.DSRunpickable;
 
-        if (game.strikes.includes(stages[i])) return new ResponseData(400, stageStrikeErrors.stageAlreadyStriked);
+        if (game.strikes.includes(stages[i])) return stageStrikeErrors.stageAlreadyStriked;
     }
 
     for (let i = 0; i < stages.length; i++){
@@ -158,23 +158,23 @@ function CounterpickStrikingLogic(match, playerId, playerPos, stages){
 
 export function PlayerSentStagePick(playerId, stage){
     var match = FindMatchWithPlayer(playerId);
-    if (!match) return new ResponseData(false, stagePickErrors.noMatch);
+    if (!match) return nullErrors.noMatch;
 
     var playerPos = FindPlayerPosInMatch(match, playerId);
 
-    if (match.status != matchStatuses.stageSelection) return new ResponseData(400, stagePickErrors.wrongStatus);
+    if (match.status != matchStatuses.stageSelection) return stagePickErrors.wrongStatus;
 
-    if (!match.mode.rulesetData.counterPickStagesArr.includes(stage)) return new ResponseData(400, stagePickErrors.stageNotInStagelist);
+    if (!match.mode.rulesetData.counterPickStagesArr.includes(stage)) return stagePickErrors.stageNotInStagelist;
 
-    if (match.players[playerPos - 1].unpickableStagesArr.includes(stage)) return new ResponseData(400, stagePickErrors.DSRunpickable);
+    if (match.players[playerPos - 1].unpickableStagesArr.includes(stage)) return stagePickErrors.DSRunpickable;
 
-    if (match.gamesArr[match.gamesArr.length - 2].winnerId == playerId) return new ResponseData(400, stagePickErrors.wrongPlayer);
+    if (match.gamesArr[match.gamesArr.length - 2].winnerId == playerId) return stagePickErrors.wrongPlayer;
 
     var game = match.gamesArr[match.gamesArr.length - 1];
 
-    if (game.strikes.length < match.mode.rulesetData.counterPickBans) return new ResponseData(400, stagePickErrors.notEnoughStrikes);
+    if (game.strikes.length < match.mode.rulesetData.counterPickBans) return stagePickErrors.notEnoughStrikes;
 
-    if (game.strikes.includes(stage)) return new ResponseData(400, stagePickErrors.stageStriked)
+    if (game.strikes.includes(stage)) return stagePickErrors.stageStriked;
 
     game.stage = stage;
     match.status = matchStatuses.ingame;
@@ -189,22 +189,20 @@ export async function PlayerSentGameWin(playerId, winnerId){
         confirmed: false,
         matchWin: false
     }
-    if (!match) return new ResponseData(400, gameWinErrors.noMatch);
+    if (!match) return nullErrors.noMatch;
 
     data.matchId = match.id;
 
     var playerPos = FindPlayerPosInMatch(match, playerId);
 
-    if (match.mode == matchModes.casual) return new ResponseData(400, gameWinErrors.casual);
-    if (match.status != matchStatuses.ingame) return new ResponseData(400, gameWinErrors.wrongStatus);
+    if (match.mode == matchModes.casual) return gameWinErrors.casual;
+    if (match.status != matchStatuses.ingame) return gameWinErrors.wrongStatus;
 
     var winnerPos;
     if (match.players[0].id == winnerId){
         winnerPos = 1;
-    } else if (match.players[1].id == winnerId){
-        winnerPos = 2;
     } else{
-        return;
+        winnerPos = 2;
     }
 
     match.players[playerPos - 1].gameConfirmed = true;
@@ -233,7 +231,7 @@ export async function PlayerSentGameWin(playerId, winnerId){
             match.winnerId = winnerId;
             data.matchWin = true;
             if (await HandleMatchWin(match)) return new ResponseData(201, data);
-            return new ResponseData(500, gameWinErrors.databaseError);
+            return databaseErrors.matchFinishError;
         } else{
             match.gamesArr.push(new Game());
             match.players[0].gameConfirmed = false;
@@ -277,23 +275,23 @@ async function HandleMatchWin(match){
 
 export async function PlayerSentCasualMatchEnd(playerId){
     var match = FindMatchWithPlayer(playerId);
-    if (!match) return new ResponseData(400, casualMatchEndErrors.noMatch);
+    if (!match) return nullErrors.noMatch;
 
-    if (match.status == matchStatuses.dispute) return new ResponseData(400, casualMatchEndErrors.inDispute);
+    if (match.status == matchStatuses.dispute) return casualMatchEndErrors.inDispute;
 
-    if (match.mode != matchModes.casual) return new ResponseData(400, casualMatchEndErrors.notCasual);
+    if (match.mode != matchModes.casual) return casualMatchEndErrors.notCasual;
 
     match.status = matchStatuses.noWinner;
-    if (!await FinishMatch(match)) return new ResponseData(500, casualMatchEndErrors.databaseError);
+    if (!await FinishMatch(match)) return databaseErrors.matchFinishError;
 
-    return new ResponseData(true, match.id);
+    return new ResponseData(201, match.id);
 }
 
 export function UserSentChatMessage(playerId, content){
     var match = FindMatchWithPlayer(playerId);
-    if (!match) return new ResponseData(400, chatMessageErrors.noMatch);
+    if (!match) return nullErrors.noMatch;
 
-    if (HasBadWords(content)) return new ResponseData(400, chatMessageErrors.badWords);
+    if (HasBadWords(content)) return chatMessageErrors.badWords;
 
     var chatMessage = new ChatMessage(content, playerId);
     match.chat.push(chatMessage);
@@ -303,9 +301,9 @@ export function UserSentChatMessage(playerId, content){
 //trust server that its a mod and verified user
 export async function ModSentChatMessage(matchId, userId, content){
     var match = FindMatch(matchId);
-    if (!match) return new ResponseData(400, chatMessageErrors.matchDoesntExist);
+    if (!match) return nullErrors.matchDoesntExist;
 
-    if (HasBadWords(content)) return new ResponseData(400, chatMessageErrors.badWords);
+    if (HasBadWords(content)) return chatMessageErrors.badWords;
 
     var chatMessage = new ChatMessage(content, userId);
     match.chat.push(chatMessage);
@@ -315,9 +313,9 @@ export async function ModSentChatMessage(matchId, userId, content){
 export function PlayerSentMatchDispute(playerId){
     var match = FindMatchWithPlayer(playerId);
 
-    if (!match) return new ResponseData(400, disputeErrors.noMatch);
+    if (!match) return nullErrors.noMatch;
 
-    if (match.status == matchStatuses.dispute) return new ResponseData(400, disputeErrors.alreadyDispute);
+    if (match.status == matchStatuses.dispute) return disputeErrors.alreadyDispute;
 
     StartMatchDispute(match);
     return new ResponseData(201, match.id);
@@ -342,9 +340,9 @@ export function GetDisputedMatchesList(){
 
 export async function ResolveMatchDispute(matchId, resolveOption){
     var match = FindMatch(matchId);
-    if (!match) return new ResponseData(400, resolveErrors.matchDoesntExist);
+    if (!match) return nullErrors.matchDoesntExist;
 
-    if (match.status != matchStatuses.dispute) return new ResponseData(400, resolveErrors.notDisputed);
+    if (match.status != matchStatuses.dispute) return resolveErrors.notDisputed;
 
     if (match.mode == matchModes.casual){
         match.status == matchStatuses.ingame;
@@ -392,15 +390,15 @@ export async function ResolveMatchDispute(matchId, resolveOption){
             var result = { winnerId: match.winnerId }
             SendDisputeMessage(GetDisputedMatchesList(), false);
             if (await HandleMatchWin(match)) return new ResponseData(201, result);
-            return new ResponseData(500, resolveErrors.databaseError);
+            return databaseErrors.matchFinishError;
         case disputeResolveOptions.matchWinPlayer2:
             match.winnerId = match.players[1].id;
             var result = { winnerId: match.winnerId }
             SendDisputeMessage(GetDisputedMatchesList(), false);
             if (await HandleMatchWin(match)) return new ResponseData(201, result);
-            return new ResponseData(500, resolveErrors.databaseError);
+            return databaseErrors.matchFinishError;
         default:
-            return new ResponseData(400, resolveErrors.illegalResolveOption);
+            return resolveErrors.illegalResolveOption;
     }
 }
 

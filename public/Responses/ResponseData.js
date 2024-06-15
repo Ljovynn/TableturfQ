@@ -1,5 +1,5 @@
 export function ResponseData(responseCode, data = ''){
-    this.responseCode = responseCode;
+    this.code = responseCode;
     this.data = data;
 }
 
@@ -8,4 +8,8 @@ export function ResponseSucceeded(responseCode){
         return true;
     }
     return false;
+}
+
+export function SetResponse(res, responseData){
+    return res.status(responseData.code).send(responseData.data);
 }

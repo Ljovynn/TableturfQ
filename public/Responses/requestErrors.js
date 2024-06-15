@@ -1,24 +1,27 @@
+import { ResponseData } from "./ResponseData.js";
+
 export const userErrors = Object.freeze({ 
-    notLoggedIn: 'User isn\'t logged in',
-    notAdmin: 'User is not an admin',
-    banned: 'User is banned',
-    unverified: 'User is not discord verified',
-    noAccess: 'User has no access',
+
+    notLoggedIn: new ResponseData(401, 'User not logged in'),
+    notAdmin: new ResponseData(403, 'User is not an admin'),
+    banned: new ResponseData(403, 'User is banned'),
+    unverified: new ResponseData(403, 'User is not discord verified'),
+    noAccess: new ResponseData(403, 'User has no access'),
 });
 
 export const definitionErrors = Object.freeze({ 
-    stageUndefined: 'No stage submitted',
-    stagesUndefined: 'No stages submitted',
-    matchUndefined: 'No match id submitted',
-    matchModeUndefined: 'No match mode submitted',
-    resolveOptionUndefined: 'No resolve option submitted',
-    bannedUserUndefined: 'No user to ban submitted',
-    unbannedUserUndefined: 'No user to ubnan submitted',
-    userNotDefined: 'No user account exists with this ID',
-    chatMessageUndefined: 'No chat message submitted',
-    winnerUndefined: 'No winner ID submitted',
+    stageUndefined: new ResponseData(400, 'No stage submitted'),
+    stagesUndefined: new ResponseData(400, 'No stages submitted'),
+    matchUndefined: new ResponseData(400, 'No match id submitted'),
+    matchModeUndefined: new ResponseData(400, 'No match mode submitted'),
+    resolveOptionUndefined: new ResponseData(400, 'No resolve option submitted'),
+    bannedUserUndefined: new ResponseData(400, 'No user to ban submitted'),
+    unbannedUserUndefined: new ResponseData(400, 'No user to ubnan submitted'),
+    userNotDefined: new ResponseData(404, 'No user account exists with this ID'),
+    chatMessageUndefined: new ResponseData(400, 'No chat message submitted'),
+    winnerUndefined: new ResponseData(400, 'No winner ID submitted'),
 });
 
 export const nullErrors = Object.freeze({
-    noMatch: 'No match found',
+    noMatch: new ResponseData(404, 'No match found'),
 });
