@@ -6,6 +6,7 @@ import { AddRecentlyMatchedPlayers } from "./queManager.js";
 import { SendDisputeMessage } from "./discordBot/discordBotManager.js";
 import { ResponseData } from "./public/Responses/ResponseData.js";
 import { casualMatchEndErrors, chatMessageErrors, disputeErrors, gameWinErrors, matchCreatingErrors, resolveErrors, stagePickErrors, stageStrikeErrors } from "./public/Responses/matchErrors.js";
+import { HasBadWords } from "./utils/string.js";
 
 var matches = [];
 
@@ -290,8 +291,9 @@ export async function PlayerSentCasualMatchEnd(playerId){
 
 export function UserSentChatMessage(playerId, content){
     var match = FindMatchWithPlayer(playerId);
-
     if (!match) return new ResponseData(400, chatMessageErrors.noMatch);
+
+    if (HasBadWords(content)) return new ResponseData(400, chatMessageErrors.badWords);
 
     var chatMessage = new ChatMessage(content, playerId);
     match.chat.push(chatMessage);
@@ -302,6 +304,8 @@ export function UserSentChatMessage(playerId, content){
 export async function ModSentChatMessage(matchId, userId, content){
     var match = FindMatch(matchId);
     if (!match) return new ResponseData(400, chatMessageErrors.matchDoesntExist);
+
+    if (HasBadWords(content)) return new ResponseData(400, chatMessageErrors.badWords);
 
     var chatMessage = new ChatMessage(content, userId);
     match.chat.push(chatMessage);

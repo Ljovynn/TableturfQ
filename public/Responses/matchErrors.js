@@ -38,7 +38,8 @@ export const casualMatchEndErrors = Object.freeze({
 
 export const chatMessageErrors = Object.freeze({ 
     noMatch: 'Player isn\'t in any match',
-    matchDoesntExist: 'Match is not active'
+    matchDoesntExist: 'Match is not active',
+    badWords: 'Message includes a blacklisted word',
 });
 
 export const disputeErrors = Object.freeze({ 
