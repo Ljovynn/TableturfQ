@@ -46,26 +46,26 @@ export async function AddPlayerToQue(playerId, matchMode){
     for (let i = 0; i < ques.length; i++){
         if (ques[i].matchMode == matchModes[matchMode]) return await TryAddPlayerToQue(ques[i], playerId);
     }
-    return new ResponseData(false, enterQueErrors.illagelMatchMode);
+    return new ResponseData(400, enterQueErrors.illagelMatchMode);
 }
 
 async function TryAddPlayerToQue(que, playerId){
-    if (FindIfPlayerInQue(playerId)) return new ResponseData(false, enterQueErrors.inQue);
+    if (FindIfPlayerInQue(playerId)) return new ResponseData(400, enterQueErrors.inQue);
     
-    if (FindIfPlayerInMatch(playerId)) return new ResponseData(false, enterQueErrors.inMatch);
+    if (FindIfPlayerInMatch(playerId)) return new ResponseData(400, enterQueErrors.inMatch);
 
     var user = await GetUserData(playerId);
-    if (!user) return new ResponseData(false, enterQueErrors.noUser);
-    if (user.banned == 1) return new ResponseData(false, enterQueErrors.banned);
+    if (!user) return new ResponseData(401, enterQueErrors.noUser);
+    if (user.banned == 1) return new ResponseData(403, enterQueErrors.banned);
     if (que.matchMode == matchModes.ranked){
-        if (user.role == userRoles.unverified) return new ResponseData(false, enterQueErrors.unverified);
+        if (user.role == userRoles.unverified) return new ResponseData(403, enterQueErrors.unverified);
     }
 
     var baseSearchElo = Math.max(user.g2_rating, que.matchMode.queData.minEloStart);
     baseSearchElo = Math.min(user.g2_rating, que.matchMode.queData.maxEloStart);
 
     que.queArr.push(new PlayerInQue(playerId, baseSearchElo));
-    return new ResponseData(true);
+    return new ResponseData(201);
 }
 
 //main matchmaking algorithm. once every n seconds
@@ -234,11 +234,11 @@ function RemovePlayersFromQue(queArr, player1Id, player2Id){
 
 export async function PlayerSentReady(playerId){
     var index = SearchMatchedPlayersList(matchingPlayersList, playerId);
-    if (index == -1) return new ResponseData(false, readyUpErrors.notMatched);
+    if (index == -1) return new ResponseData(400, readyUpErrors.notMatched);
     var playerPos = FindPlayerPositionInMatchedPlayers(matchingPlayersList[index], playerId);
     matchingPlayersList[index].players[playerPos - 1].ready = true;
     var match = await CheckIfBothPlayersReady(index)
-    return new ResponseData(true, match);
+    return new ResponseData(201, match);
 }
 
 async function CheckIfBothPlayersReady(matchingPlayersListIndex){

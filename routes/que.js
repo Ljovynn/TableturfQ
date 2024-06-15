@@ -1,13 +1,12 @@
 import { Router } from 'express';
 import cookieParser from "cookie-parser";
 import { DeserializeSession } from '../utils/session.js';
-
 import { AddPlayerToQue, RemovePlayerFromQue, PlayerSentReady } from "../queManager.js";
-import { GetUserData } from "../database.js";
-
-import { CheckIfRealMatchMode, CheckUserDefined, CheckVariableDefined } from "../utils/checkDefined.js";
-
+import { CheckUserDefined } from "../utils/checkDefined.js";
 import { SendSocketMessage } from "../socketManager.js";
+import { definitionErrors } from '../public/Responses/requestErrors.js';
+import { matchModes } from '../public/constants/matchData.js';
+import { ResponseSucceeded } from '../public/Responses/ResponseData.js';
 
 import dotenv from 'dotenv';
 
@@ -29,17 +28,14 @@ router.post("/PlayerEnterQue", async (req, res) => {
         console.log(userId);
         const matchMode = req.body.matchMode;
 
-        if (!CheckUserDefined(req, res)) return;
-        if (!CheckIfRealMatchMode(matchMode, res)) return;
+        if (!CheckUserDefined(req)) return res.status(401).send(userErrors.notLoggedIn);
+        if (!Object.hasOwn(matchModes, matchMode)) return res.status(401).send(definitionErrors.matchModeUndefined);
 
         var responseData = await AddPlayerToQue();
-        if (responseData.isSuccess){
-            console.log('added to queue');
-            res.sendStatus(201);
-            return;
-        }
+        if (!ResponseSucceeded(responseData.responseCode)) return res.status(responseData.responseCode).send(responseData.data);
 
-        res.status(403).send(responseData.data);
+        console.log('added to queue');
+        res.sendStatus(responseData.responseCode);
     } catch (err){
         console.log(err);
         res.sendStatus(500);
@@ -52,8 +48,8 @@ router.post("/PlayerLeaveQue", async (req, res) => {
         const userId = req.session.user;
         const matchMode = req.body.matchMode;
 
-        if (!CheckUserDefined(req, res)) return;
-        if (!CheckIfRealMatchMode(matchMode)) return;
+        if (!CheckUserDefined(req)) return res.status(401).send(userErrors.notLoggedIn);
+        if (!Object.hasOwn(matchModes, matchMode)) return res.status(401).send(definitionErrors.matchModeUndefined);
 
         if (RemovePlayerFromQue(userId, matchMode)){
             res.sendStatus(201);
@@ -72,24 +68,20 @@ router.post("/PlayerReady", async (req, res) => {
         console.log('Post Player Ready function');
 
 
-        if (!CheckUserDefined(req, res)) return;
+        if (!CheckUserDefined(req)) return res.status(401).send(userErrors.notLoggedIn);
 
         var responseData = await PlayerSentReady(userId);
+        if (!ResponseSucceeded(responseData.responseCode)) return res.status(responseData.responseCode).send(responseData.data);
+        res.sendStatus(responseData.responseCode);
 
-        if (responseData.isSuccess){
-            res.sendStatus(201);
+        var match = responseData.data;
 
-            var match = responseData.data;
-
-            var matchedPlayersData = {
-                matchId: match.id,
-                player1Id: match.players[0].id,
-                player2Id: match.players[1].id
-            }
-            SendSocketMessage("queRoom", "matchReady", matchedPlayersData);
-            return;
+        var matchedPlayersData = {
+            matchId: match.id,
+            player1Id: match.players[0].id,
+            player2Id: match.players[1].id
         }
-        res.status(403).send(responseData.data);
+        SendSocketMessage("queRoom", "matchReady", matchedPlayersData);
     } catch (err){
         console.error(err);
         res.sendStatus(500);

@@ -59,9 +59,7 @@ export function GetCardListByLanguage(language){
     switch (language){
     case 'ja':
         return jpCards;
-        break;
     default:
         return enCards;
-        break;
     }
 }

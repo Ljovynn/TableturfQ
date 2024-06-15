@@ -19,7 +19,7 @@ const sessionSecret = process.env.SESSION_SECRET;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const matchmakingTickInterval = 3 * 1000;
+const matchmakingTickInterval = 5 * 1000;
 const checkMatchmadePlayersInterval = 60 * 1000;
 const cancelLongMatchesInterval = 3 * 60 * 1000;
 const updateLeaderboardInterval = 5 * 60 * 1000;

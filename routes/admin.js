@@ -2,7 +2,7 @@ import { Router } from 'express';
 import cookieParser from "cookie-parser";
 import { DeserializeSession } from '../utils/session.js';
 
-import { CheckIfString, CheckUserDefined } from '../utils/checkDefined.js';
+import { CheckUserDefined } from '../utils/checkDefined.js';
 import { BanUser, GetUserBanAndRole, GetUserRole, SuspendUser, UnbanUser } from '../database.js';
 import { userRoles } from '../public/constants/userData.js';
 
@@ -10,8 +10,10 @@ import dotenv from 'dotenv';
 
 import { SendEmptySocketMessage, SendSocketMessage } from '../socketManager.js';
 import { RemovePlayerFromAnyQue } from '../queManager.js';
-import { GetDisputedMatchesList, HandleBannedPlayerInMatch, ResolveMatchDispute } from '../matchManager.js';
+import { GetDisputedMatchesList, HandleBannedPlayerInMatch, ModSentChatMessage, ResolveMatchDispute, UserSentChatMessage } from '../matchManager.js';
 import { disputeResolveOptions, matchModes } from '../public/constants/matchData.js';
+import { ResponseData, ResponseSucceeded } from '../public/Responses/ResponseData.js';
+import { definitionErrors, userErrors } from '../public/Responses/requestErrors.js';
 
 const router = Router();
 
@@ -30,15 +32,16 @@ router.post("/ResolveDispute", async (req, res) => {
         const matchId = req.session.matchId;
         const resolveOption = req.session.resolveOption;
 
-        if (!CheckUserDefined(req, res)) return;
-        if (!await CheckIfAdmin(req, res)) return;
+        if (typeof(matchId) !== 'number') return res.status(400).send(definitionErrors.matchUndefined);
+        if (typeof(resolveOption) !== 'number') return res.status(400).send(definitionErrors.resolveOptionUndefined);
 
-        var matchResolveData = await ResolveMatchDispute(matchId, resolveOption);
-        if (matchResolveData == false){
-            res.sendStatus(403);
-            return;
-        } else if (matchResolveData == 'casual'){
-            res.sendStatus(201);
+        var userError = await CheckIfNotAdmin(req);
+        if (userError) return res.status(userError.responseCode).send(userError.data);
+
+        var responseData = await ResolveMatchDispute(matchId, resolveOption);
+        if (!ResponseSucceeded(responseData.responseCode)) return res.status(responseData.responseCode).send(responseData.data);
+        if (responseData.data === 'casual'){
+            res.sendStatus(responseData.responseCode);
             SendSocketMessage('match' + matchId, "resolveDispute", disputeResolveOptions.noChanges);
             return;
         }
@@ -46,24 +49,24 @@ router.post("/ResolveDispute", async (req, res) => {
         switch (resolveOption){
             case disputeResolveOptions.gameWinPlayer1:
             case disputeResolveOptions.gameWinPlayer2:
-                if (matchResolveData.matchFinished){
-                    res.sendStatus(201);
-                    SendSocketMessage('match' + matchId, "matchWin", matchResolveData.winnerId);
+                if (responseData.data.matchFinished){
+                    res.sendStatus(responseData.responseCode);
+                    SendSocketMessage('match' + matchId, "matchWin", responseData.data.winnerId);
                 } else{
-                    res.sendStatus(201);
-                    SendSocketMessage('match' + matchId, "gameWIn", matchResolveData.winnerId);
+                    res.sendStatus(responseData.responseCode);
+                    SendSocketMessage('match' + matchId, "gameWIn", responseData.data.winnerId);
                 }
                 break;
             case disputeResolveOptions.matchWinPlayer1:
             case disputeResolveOptions.matchWinPlayer2:
-                res.sendStatus(201);
-                SendSocketMessage('match' + matchId, "matchWin", matchResolveData.winnerId);
+                res.sendStatus(responseData.responseCode);
+                SendSocketMessage('match' + matchId, "matchWin", responseData.data.winnerId);
                 break;
             case disputeResolveOptions.noChanges:
             case disputeResolveOptions.resetCurrentGame:
             case disputeResolveOptions.restartMatch:
             case disputeResolveOptions.cancelMatch:
-                res.sendStatus(201);
+                res.sendStatus(responseData.responseCode);
                 SendSocketMessage('match' + matchId, "resolveDispute", resolveOption);
                 break;
             default:
@@ -81,26 +84,22 @@ router.post("/BanUser", async (req, res) => {
         const bannedUserId = req.session.bannedUserId;
         const expiresAt = req.body.expiresAt;
 
-        if (!CheckUserDefined(req, res)) return;
-        if (!await CheckIfAdmin(req, res)) return;
+        if (typeof(bannedUserId) !== 'number') return res.status(400).send(definitionErrors.bannedUserUndefined);
+
+        var userError = await CheckIfNotAdmin(req);
+        if (userError) return res.status(userError.responseCode).send(userError.data);
 
         var bannedUser = await GetUserBanAndRole(bannedUserId);
 
-        if (!bannedUser){
-            res.sendStatus(400);
-            return;
-        }
-
-        if (bannedUser.role == userRoles.mod){
-            res.sendStatus(403);
-            return;
-        }
+        if (!bannedUser) return res.status(400).send(definitionErrors.userNotDefined);
 
         if (!expiresAt){
             BanUser(bannedUserId);
         } else{
             SuspendUser(bannedUserId, expiresAt);
         }
+        console.log(`User ID ${bannedUserId} was banned by admin ID ${req.session.user}`);
+
         RemovePlayerFromAnyQue(bannedUserId);
         var matchData = await HandleBannedPlayerInMatch(bannedUserId);
 
@@ -126,12 +125,14 @@ router.post("/UnbanUser", async (req, res) => {
     try {
         const unbannedUserId = req.session.unbannedUserId;
 
-        if (!CheckUserDefined(req, res)) return;
-        if (!await CheckIfAdmin(req, res)) return;
+        if (typeof(unbannedUserId) !== 'number') return res.status(400).send(definitionErrors.unbannedUserUndefined);
+
+        var userError = await CheckIfNotAdmin(req);
+        if (userError) return res.status(userError.responseCode).send(userError.data);
 
         await UnbanUser(unbannedUserId);
 
-        res.sendStatus(200);
+        res.sendStatus(201);
         return;
         
     } catch (err){
@@ -146,18 +147,18 @@ router.post("/ModChatMessage", async (req, res) => {
         const matchId = req.session.matchId;
         const message = req.body.message;
 
-        if (!CheckUserDefined(req, res)) return;
-        if (!CheckIfAdmin(req, res)) return;
-        if (!CheckIfString(message, res)) return;
+        if (typeof(matchId) !== 'number') return res.status(400).send(definitionErrors.matchUndefined);
+        if (typeof(message) !== 'string') return res.status(400).send(definitionErrors.chatMessageUndefined);
 
-        if (UserSentChatMessage(matchId, userId, message)){
-            res.sendStatus(201);
-            var socketMessage = [userId, message];
-            SendSocketMessage('match' + data.matchId, "chatMessage", socketMessage);
-            return;
-        }
+        var userError = await CheckIfNotAdmin(req);
+        if (userError) return res.status(userError.responseCode).send(userError.data);
 
-        res.sendStatus(403);
+        var responseData = ModSentChatMessage(matchId, userId, message)
+        if (!ResponseSucceeded(responseData.responseCode)) return res.status(responseData.responseCode).send(responseData.data);
+
+        res.sendStatus(responseData.responseCode);
+        var socketMessage = [userId, message];
+        SendSocketMessage('match' + data.matchId, "chatMessage", socketMessage);
     } catch (err){
         res.sendStatus(500);
     }
@@ -167,9 +168,8 @@ router.post("/ModChatMessage", async (req, res) => {
 
 router.get('/GetDisputedMatchesList', async (req, res) => {
     try {
-
-        if (!CheckUserDefined(req, res)) return;
-        if (!CheckIfAdmin(req, res)) return;
+        var userError = await CheckIfNotAdmin(req);
+        if (userError) return res.status(userError.responseCode).send(userError.data);
 
         var data = GetDisputedMatchesList(user.id);
 
@@ -181,12 +181,10 @@ router.get('/GetDisputedMatchesList', async (req, res) => {
 
 export default router;
 
-async function CheckIfAdmin(req, res){
+async function CheckIfNotAdmin(req){
+    if (!CheckUserDefined(req)) return new ResponseData(401, userErrors.notLoggedIn);
     var role = await GetUserRole(req.session.user);
-    if (role == userRoles.mod){
-        return true;
+    if (role != userRoles.mod){
+        return new ResponseData(403, userErrors.notAdmin);
     }
-
-    res.sendStatus(403);
-    return false;
 };

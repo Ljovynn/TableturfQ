@@ -39,10 +39,7 @@ export function BuildLeaderboardEmbed(leaderboard, startPosition, leaderboardSiz
     var leaderboardsFields = [ 
 	{
         name: '\u200B',
-        value: ''},{ 
-        name: 'Total players', 
-        value: `${leaderboardSize}`
-		}
+        value: ''},
     ];
 
 	for (let i = 0; i < leaderboard.length; i++){
@@ -55,6 +52,9 @@ export function BuildLeaderboardEmbed(leaderboard, startPosition, leaderboardSiz
 		color: embedColor,
 		title: `🏆 TableturfQ Leaderboard [${startPosition}-${startPosition + leaderboard.length - 1}] 🏆`,
 		fields: leaderboardsFields,
+		footer: {
+		text: `Total players: ${leaderboardSize}`,
+		}
 	};
 	return leaderboardEmbed;
 }

@@ -211,6 +211,10 @@ export async function SetMatchResult(match){
     await pool.query(`INSERT INTO chat_messages (match_id, message_number, owner_id, content) VALUES ?`, [chatData.map(msg => [msg[0], msg[1], msg[2], msg[3]])]);
 }
 
+export async function SetUserRole(userId, role){
+    await pool.query(`UPDATE users SET role = ? WHERE id = ?`, [role, userId]);
+}
+
 export async function SetUserRating(userId, rating, rd, vol){
     await pool.query(`UPDATE users SET g2_rating = ?, g2_rd = ?, g2_vol = ? WHERE id = ?`, [rating, rd, vol, userId]);
 }
@@ -257,6 +261,11 @@ export async function DeleteOldUnverifiedAccounts(ageThreshold){
 
 export async function UnbanUser(userId){
     await pool.query(`DELETE FROM ban_list WHERE user_id = ?`, [userId]);
+
+    var role = await GetUserRole(userId);
+    if (role === userRoles.mod){
+        await SetUserRole(userId, userRoles.verified);
+    }
 }
 
 export async function DeleteOldSuspensions(){

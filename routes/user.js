@@ -5,13 +5,14 @@ import cookieParser from "cookie-parser";
 import { DeserializeSession } from '../utils/session.js';
 
 
-import { CheckIfArray, CheckUserDefined, CheckVariableDefined } from '../utils/checkDefined.js';
+import { CheckIfArray, CheckUserDefined } from '../utils/checkDefined.js';
 import { GetCurrentUser } from '../utils/userUtils.js';
 
 import dotenv from 'dotenv';
 import { FindIfPlayerInQue } from '../queManager.js';
 import { FindMatchWithPlayer } from '../matchManager.js';
 import { DeleteAllUserSessions, GetMultipleUserDatas, GetUserMatchHistory, SetUserDiscordTokens } from '../database.js';
+import { definitionErrors } from '../public/Responses/requestErrors.js';
 
 const router = Router();
 
@@ -33,7 +34,7 @@ router.post("/GetUserMatchHistory", async (req, res) => {
         const userId = req.session.user;
         var pageNumber = req.pageNumber;
 
-        if (!CheckVariableDefined(userId, res)) return;
+        if (typeof(userId) !== 'number') return res.status(400).send(definitionErrors.userNotDefined);
         if (typeof(pageNumber) !== 'number' || pageNumber < 0){
             pageNumber = 1;
         }
@@ -50,8 +51,7 @@ router.post("/GetUserMatchHistory", async (req, res) => {
 router.post("/DeleteUserLoginData", async (req, res) => {
     try{
         const userId = req.session.user;
-        console.log("user id: " + userId);
-        if (!CheckUserDefined(req, res)) return;
+        if (!CheckUserDefined(req)) return res.status(401).send(userErrors.notLoggedIn);
 
         await DeleteAllUserSessions(userId);
         await SetUserDiscordTokens(userId, null, null);
@@ -71,11 +71,7 @@ router.post("/GetUsers", async (req, res) => {
         console.log('user list');
         console.log(req.body.userIdList);
         const userIdList = req.body.userIdList;
-        if (!CheckIfArray(userIdList)) return;
-        if (userIdList.length == 0){
-            res.sendStatus(401);
-            return;
-        }
+        if (!CheckIfArray(userIdList) || userIdList.length == 0) return res.status(400).send(definitionErrors.userNotDefined);
 
         const users = await GetMultipleUserDatas(userIdList);
 
@@ -95,10 +91,7 @@ router.post("/GetUsers", async (req, res) => {
 router.get("/GetUserInfo", async (req, res) => {
     try{
         var user = await GetCurrentUser(req);
-        if (!user) {
-            res.sendStatus(403);
-            return;
-        }
+        if (!user) return res.status(401).send(userErrors.notLoggedIn);
 
         var queData = FindIfPlayerInQue(user.id);
         var matchId = FindMatchWithPlayer(user.id);
