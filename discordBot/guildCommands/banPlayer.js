@@ -1,11 +1,6 @@
-import { SlashCommandBuilder } from "discord.js";
+import { SlashCommandBuilder, PermissionFlagsBits } from "discord.js";
 import { BanUser, GetUserByDiscordId, SuspendUser } from "../../database.js";
 import { BuildBanEmbed } from "../embedBuilder.js";
-
-import dotenv from 'dotenv';
-
-dotenv.config();
-const adminRole = process.env.DISCORD_ADMIN_ROLL_ID;
 
 const banLengths = {
     '1 day': 24 * 60 * 60 * 1000,
@@ -19,6 +14,7 @@ const banLengths = {
 export const data = new SlashCommandBuilder()
     .setName('qban')
     .setDescription('Ban a player from TableturfQ')
+    .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers)
     .addSubcommand(subCommand => 
         subCommand
             .setName('by_discord')
