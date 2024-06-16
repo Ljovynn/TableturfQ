@@ -4,9 +4,9 @@ import { DeserializeSession } from '../utils/session.js';
 import { AddPlayerToQue, RemovePlayerFromQue, PlayerSentReady } from "../queManager.js";
 import { CheckUserDefined } from "../utils/checkDefined.js";
 import { SendSocketMessage } from "../socketManager.js";
-import { definitionErrors, userErrors } from '../public/Responses/requestErrors.js';
+import { definitionErrors, userErrors } from '../Responses/requestErrors.js';
 import { matchModes } from '../public/constants/matchData.js';
-import { ResponseSucceeded } from '../public/Responses/ResponseData.js';
+import { ResponseSucceeded } from '../Responses/ResponseData.js';
 
 import dotenv from 'dotenv';
 

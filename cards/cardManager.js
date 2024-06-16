@@ -9,10 +9,13 @@ var enCards = [];
 //sorted alphabetically too
 var jpCards = [];
 
-export async function SetupCards(){
+SetupCards();
+
+async function SetupCards(){
     fs.readFile('cards/cardData.json', 'utf-8', function (err, data) {
         if (err) throw err;
     
+        console.log("setting up cards");
         var sortedCards = JSON.parse(data);
 
         sortedCards.sort((a, b) => a.name.localeCompare(b.name));

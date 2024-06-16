@@ -1,4 +1,4 @@
-export function ResponseData(responseCode, data = ''){
+export function ResponseData(responseCode, data = null){
     this.code = responseCode;
     this.data = data;
 }

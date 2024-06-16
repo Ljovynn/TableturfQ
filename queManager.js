@@ -3,8 +3,8 @@ import { FindIfPlayerInMatch, MakeNewMatch } from "./matchManager.js";
 import { GetUserData } from "./database.js";
 import { userRoles } from "./public/constants/userData.js";
 import { SendSocketMessage } from "./socketManager.js";
-import { ResponseData } from "./public/Responses/ResponseData.js";
-import { enterQueErrors, readyUpErrors } from "./public/Responses/queErrors.js";
+import { ResponseData } from "./Responses/ResponseData.js";
+import { enterQueErrors, readyUpErrors } from "./Responses/queErrors.js";
 
 const readyTimerGracePeriod = 1000 * 3;
 const alreadyMatchedPlayersTime = 1000 * 60 * 20;

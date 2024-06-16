@@ -117,6 +117,12 @@ export async function GetLeaderboard(){
     return rows;
 }
 
+export async function GetFutureEvents(){
+    let timeStamp = ConvertJSDateToTimestamp(new Date());
+    const [rows] = await pool.query(`SELECT * FROM events WHERE date > ? ORDER BY date ASC`, [timeStamp]);
+    return rows;
+}
+
 //Create
 
 export async function CreateMatch(player1Id, player2Id, isRanked){
@@ -179,6 +185,11 @@ export async function CreateUserWithDiscord(username, discordId, discordAccessTo
 
 export async function CreateSession(sessionId, expiresAt, data){
     await pool.query(`INSERT INTO sessions (id, expires_at, data) VALUES (?, ?, ?)`, [sessionId, expiresAt, data]);
+}
+
+export async function CreateEvent(name, description, iconSrc, date){
+    var event = await pool.query(`INSERT INTO events (name, description, icon_src, date) VALUES (?, ?, ?, ?)`, [name, description, iconSrc, date]);
+    return event.id;
 }
 
 export async function SuspendUser(userId, expiresAt){
@@ -255,8 +266,11 @@ export async function DeleteOldSessions(){
 export async function DeleteOldUnverifiedAccounts(ageThreshold){
     const cutoffDate = Date.now() - ageThreshold;
     let timeStamp = ConvertJSDateToTimestamp(new Date(cutoffDate));
-    console.log(timeStamp);
     await pool.query(`DELETE FROM users WHERE role = ? AND created_at < ?`, [userRoles.unverified, timeStamp]);
+}
+
+export async function DeleteEvent(eventId){
+    await pool.query(`DELETE FROM events WHERE id = ?`, [eventId]);
 }
 
 export async function UnbanUser(userId){

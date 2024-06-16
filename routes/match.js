@@ -18,8 +18,8 @@ import { GetCurrentUser } from '../utils/userUtils.js';
 import { SendSocketMessage, SendEmptySocketMessage } from '../socketManager.js';
 
 import dotenv from 'dotenv';
-import { definitionErrors, nullErrors, userErrors } from '../public/Responses/requestErrors.js';
-import { ResponseSucceeded, SetResponse } from '../public/Responses/ResponseData.js';
+import { definitionErrors, nullErrors, userErrors } from '../Responses/requestErrors.js';
+import { ResponseSucceeded, SetResponse } from '../Responses/ResponseData.js';
 
 const router = Router();
 

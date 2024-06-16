@@ -1,7 +1,6 @@
 import { ResponseData } from "./ResponseData.js";
 
 export const userErrors = Object.freeze({ 
-
     notLoggedIn: new ResponseData(401, 'User not logged in'),
     notAdmin: new ResponseData(403, 'User is not an admin'),
     banned: new ResponseData(403, 'User is banned'),

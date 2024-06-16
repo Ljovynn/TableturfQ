@@ -12,7 +12,7 @@ import dotenv from 'dotenv';
 import { FindIfPlayerInQue } from '../queManager.js';
 import { FindMatchWithPlayer } from '../matchManager.js';
 import { DeleteAllUserSessions, GetMultipleUserDatas, GetUserMatchHistory, SetUserDiscordTokens } from '../database.js';
-import { definitionErrors, userErrors } from '../public/Responses/requestErrors.js';
+import { definitionErrors, userErrors } from '../Responses/requestErrors.js';
 
 const router = Router();
 

@@ -4,8 +4,8 @@ import { CreateMatch, SetMatchResult } from "./database.js";
 import { FindPlayerPosInMatch } from "./utils/matchUtils.js";
 import { AddRecentlyMatchedPlayers } from "./queManager.js";
 import { SendDisputeMessage } from "./discordBot/discordBotManager.js";
-import { ResponseData } from "./public/Responses/ResponseData.js";
-import { casualMatchEndErrors, chatMessageErrors, disputeErrors, gameWinErrors, databaseErrors, resolveErrors, stagePickErrors, stageStrikeErrors, nullErrors } from "./public/Responses/matchErrors.js";
+import { ResponseData } from "./Responses/ResponseData.js";
+import { casualMatchEndErrors, chatMessageErrors, disputeErrors, gameWinErrors, databaseErrors, resolveErrors, stagePickErrors, stageStrikeErrors, nullErrors } from "./Responses/matchErrors.js";
 import { HasBadWords } from "./utils/string.js";
 
 var matches = [];

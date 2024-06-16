@@ -12,8 +12,8 @@ import { SendEmptySocketMessage, SendSocketMessage } from '../socketManager.js';
 import { RemovePlayerFromAnyQue } from '../queManager.js';
 import { GetDisputedMatchesList, HandleBannedPlayerInMatch, ModSentChatMessage, ResolveMatchDispute, UserSentChatMessage } from '../matchManager.js';
 import { disputeResolveOptions, matchModes } from '../public/constants/matchData.js';
-import { ResponseSucceeded, SetResponse } from '../public/Responses/ResponseData.js';
-import { definitionErrors, userErrors } from '../public/Responses/requestErrors.js';
+import { ResponseSucceeded, SetResponse } from '../Responses/ResponseData.js';
+import { definitionErrors, userErrors } from '../Responses/requestErrors.js';
 
 const router = Router();
 
