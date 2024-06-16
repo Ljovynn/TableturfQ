@@ -159,3 +159,58 @@ export function BuildCardEmbed(card, level){
 	};
 	return cardEmbed;
 }
+
+export function BuildBanEmbed(id, isSuccess, banLengthString){
+	if (isSuccess){
+		var field;
+		if (banLengthString == null){
+			field = {
+			name: `Successfully banned user with TableturfQ id **${id}**.`,
+			value: 'The ban is permanent.',
+			}
+		} else {
+			field = {
+			name: `Successfully suspended user with TableturfQ id **${id}**.`,
+			value: `The ban lasts for ${banLengthString}.`,
+		}
+		}
+		const banEmbed = {
+			color: embedColor,
+			title: 'Ban successful',
+			fields: [ field ],
+		};
+		return banEmbed;
+	}
+	const banFailedEmbed = {
+		color: embedColor,
+		title: 'Ban failed',
+		fields: [ {
+			name: `Failed to ban user with TableturfQ id ${id}. Error message:`,
+			value: banLengthString,
+		},],
+	};
+	return banFailedEmbed;
+}
+
+export function BuildUnbanEmbed(id, isSuccess, errorMsg = 'No error defined.'){
+	if (isSuccess){
+		const unbanEmbed = {
+			color: embedColor,
+			title: 'Ban successful',
+			fields: [{
+				name: `Successfully unbanned user with TableturfQ id **${id}**.`,
+				value: 'Good for them.',
+			}],
+		};
+		return unbanEmbed;
+	}
+	const unbanFailedEmbed = {
+		color: embedColor,
+		title: 'Unban failed',
+		fields: [ {
+			name: `Failed to unban user with TableturfQ id ${id}. Error message:`,
+			value: errorMsg,
+		},],
+	};
+	return unbanFailedEmbed;
+}

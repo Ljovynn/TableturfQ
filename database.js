@@ -57,12 +57,12 @@ export async function GetUserRankData(userId){
 
 export async function GetUserRole(userId){
     const [rows] = await pool.query(`SELECT role FROM users WHERE id = ?`, [userId]);
-    return rows[0].role;
+    if (rows[0]) return rows[0].role;
 }
 
 export async function GetUserBanState(userId){
     const [rows] = await pool.query(`SELECT COUNT(*) AS banned FROM ban_list WHERE user_id = ?`, [userId]);
-    return rows[0].banned;
+    if (rows[0]) return rows[0].banned;
 }
 
 export async function GetUserBanAndRole(userId){
@@ -88,7 +88,7 @@ export async function GetUserMatchHistory(userId, hitsPerPage, pageNumber)
 export async function GetUserMatchCount(userId)
 {
     const [count] = await pool.query(`SELECT COUNT(*) AS matchCount FROM matches WHERE player1_id = ? OR player2_id = ?`, [userId, userId]);
-    return count[0].matchCount;
+    if (count[0]) return count[0].matchCount;
 }
 
 export async function GetMatchGames(matchId){
@@ -192,8 +192,13 @@ export async function CreateEvent(name, description, iconSrc, date){
     return event.id;
 }
 
-export async function SuspendUser(userId, expiresAt){
-    await pool.query(`INSERT INTO ban_list (user_id, expires_at) VALUES (?, ?)`, [userId, expiresAt]);
+export async function SuspendUser(userId, banLength){
+    console.log("banLength: " + banLength);
+    const unbanDate = Date.now() + banLength;
+    console.log("unbandate: " + unbanDate);
+    let timeStamp = ConvertJSDateToTimestamp(new Date(unbanDate));
+    console.log("timeStamp: " + timeStamp);
+    await pool.query(`INSERT INTO ban_list (user_id, expires_at) VALUES (?, ?)`, [userId, timeStamp]);
 }
 
 export async function BanUser(userId){
@@ -277,6 +282,7 @@ export async function UnbanUser(userId){
     await pool.query(`DELETE FROM ban_list WHERE user_id = ?`, [userId]);
 
     var role = await GetUserRole(userId);
+    if (!role) return;
     if (role === userRoles.mod){
         await SetUserRole(userId, userRoles.verified);
     }

@@ -82,13 +82,14 @@ router.post("/ResolveDispute", async (req, res) => {
     }
 });
 
-//bannedUserId, expiresAt (optional)
+//bannedUserId, banLength (optional)
 router.post("/BanUser", async (req, res) => {
     try {
         const bannedUserId = req.session.bannedUserId;
-        const expiresAt = req.body.expiresAt;
+        const banLength = req.body.expiresAt;
 
         if (typeof(bannedUserId) !== 'number') return SetResponse(res, definitionErrors.bannedUserUndefined);
+        if (typeof(banLength) !== 'number' && typeof(banLength) !== 'undefined') return SetResponse(res, definitionErrors.banLengthWrongFormat);
 
         var userError = await CheckIfNotAdmin(req);
         if (userError) return SetResponse(res, userError);
@@ -97,10 +98,10 @@ router.post("/BanUser", async (req, res) => {
 
         if (!bannedUser) return SetResponse(res, definitionErrors.userNotDefined);
 
-        if (!expiresAt){
+        if (!banLength){
             BanUser(bannedUserId);
         } else{
-            SuspendUser(bannedUserId, expiresAt);
+            SuspendUser(bannedUserId, banLength);
         }
         console.log(`User ID ${bannedUserId} was banned by admin ID ${req.session.user}`);
 
