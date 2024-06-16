@@ -187,7 +187,8 @@ export async function PlayerSentGameWin(playerId, winnerId){
         matchId,
         dispute: false,
         confirmed: false,
-        matchWin: false
+        matchWin: false,
+        newPlayerRatings
     }
     if (!match) return nullErrors.noMatch;
 
@@ -230,7 +231,8 @@ export async function PlayerSentGameWin(playerId, winnerId){
         if (CheckMatchWin(match, winnerId)){
             match.winnerId = winnerId;
             data.matchWin = true;
-            if (await HandleMatchWin(match)) return new ResponseData(201, data);
+            data.newPlayerRatings = await HandleMatchWin(match);
+            if (data.newPlayerRatings) return new ResponseData(201, data);
             return databaseErrors.matchFinishError;
         } else{
             match.gamesArr.push(new Game());
@@ -268,9 +270,7 @@ async function HandleMatchWin(match){
     if (!await FinishMatch(match)) return false;
 
     console.log("boutta apply elo");
-    await ApplyMatchEloResults(match);
-
-    return true;
+    return await ApplyMatchEloResults(match);
 }
 
 export async function PlayerSentCasualMatchEnd(playerId){
@@ -389,13 +389,15 @@ export async function ResolveMatchDispute(matchId, resolveOption){
             match.winnerId = match.players[0].id;
             var result = { winnerId: match.winnerId }
             SendDisputeMessage(GetDisputedMatchesList(), false);
-            if (await HandleMatchWin(match)) return new ResponseData(201, result);
+            result.newPlayerRatings = await HandleMatchWin(match);
+            if (result.newPlayerRatings) return new ResponseData(201, result);
             return databaseErrors.matchFinishError;
         case disputeResolveOptions.matchWinPlayer2:
             match.winnerId = match.players[1].id;
             var result = { winnerId: match.winnerId }
             SendDisputeMessage(GetDisputedMatchesList(), false);
-            if (await HandleMatchWin(match)) return new ResponseData(201, result);
+            result.newPlayerRatings = await HandleMatchWin(match);
+            if (result.newPlayerRatings) return new ResponseData(201, result);
             return databaseErrors.matchFinishError;
         default:
             return resolveErrors.illegalResolveOption;
@@ -405,7 +407,8 @@ export async function ResolveMatchDispute(matchId, resolveOption){
 async function HandleDisputeGameWin(match, winnerIndex){
     var data = {
         matchFinished: false,
-        winnerId: 0
+        winnerId: 0,
+        newPlayerRatings
     }
     var currentGame = match.gamesArr[match.gamesArr.length - 1];
 
@@ -421,8 +424,8 @@ async function HandleDisputeGameWin(match, winnerIndex){
 
         data.matchFinished = true;
         data.winnerId = match.winnerId;
-
-        if (await HandleMatchWin(match)) return data;
+        data.newPlayerRatings = await HandleMatchWin(match);
+        if (data.newPlayerRatings) return data;
         return false;
     } else{
         match.gamesArr.push(new Game());
@@ -439,7 +442,8 @@ export async function HandleBannedPlayerInMatch(playerId){
     var result = {
         matchId: null,
         mode: null,
-        winnerId: null
+        winnerId: null,
+        newPlayerRatings
     }
     var match = FindMatchWithPlayer(playerId);
     if (!match) return;
@@ -452,7 +456,7 @@ export async function HandleBannedPlayerInMatch(playerId){
         var otherPos = (playerPos + 1) % 2;
         match.winnerId = match.players[otherPos].id;
         result.winnerId = match.winnerId;
-        (await HandleMatchWin(match));
+        result.newPlayerRatings = await HandleMatchWin(match);
     }
     result.matchId = match.id;
     result.mode = match.mode;

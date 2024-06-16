@@ -97,7 +97,8 @@ router.post("/WinGame", async (req, res) => {
         if (matchData.dispute){
             SendEmptySocketMessage('match' + matchData.matchId, "dispute");
         } else if (matchData.matchWin){
-            SendSocketMessage('match' + matchData.matchId, "matchWin", winnerId);
+            var data = [winnerId, matchData.newPlayerRatings]
+            SendSocketMessage('match' + matchData.matchId, "matchWin", data);
         } else if (matchData.confirmed){
             SendSocketMessage('match' + matchData.matchId, "gameWin", winnerId);
         } else{

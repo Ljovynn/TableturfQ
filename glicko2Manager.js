@@ -15,6 +15,7 @@ export var settings = {
     vol : 0.06
   };
 
+//returns newPlayer1Rating, newPlayer2Rating
 export async function ApplyMatchEloResults(match){
 
   //get rank data
@@ -42,9 +43,17 @@ export async function ApplyMatchEloResults(match){
   ranking.addResult(player1, player2, matchResult);
   ranking.calculatePlayersRatings();
 
-  //update database
-  await SetUserRating(match.players[0].id, player1.getRating(), player1.getRd(), player1.getVol());
-  await SetUserRating(match.players[1].id, player2.getRating(), player2.getRd(), player2.getVol());
+  var newPlayer1Rating = player1.getRating();
+  var newPlayer2Rating = player2.getRating();
 
-  return true;
+  //update database
+  await SetUserRating(match.players[0].id, newPlayer1Rating, player1.getRd(), player1.getVol());
+  await SetUserRating(match.players[1].id, newPlayer2Rating, player2.getRd(), player2.getVol());
+
+  var data = {
+    newPlayer1Rating,
+    newPlayer2Rating
+  }
+
+  return data;
 }

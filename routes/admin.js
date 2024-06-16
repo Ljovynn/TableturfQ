@@ -40,6 +40,7 @@ router.post("/ResolveDispute", async (req, res) => {
 
         var responseData = await ResolveMatchDispute(matchId, resolveOption);
         if (!ResponseSucceeded(responseData.responseCode)) return SetResponse(res, responseData);
+        var matchData = responseData.data;
 
         if (responseData.data === 'casual'){
             res.sendStatus(responseData.responseCode);
@@ -52,16 +53,18 @@ router.post("/ResolveDispute", async (req, res) => {
             case disputeResolveOptions.gameWinPlayer2:
                 if (responseData.data.matchFinished){
                     res.sendStatus(responseData.responseCode);
-                    SendSocketMessage('match' + matchId, "matchWin", responseData.data.winnerId);
+                    var data = [matchData.winnerId, matchData.newPlayerRatings]
+                    SendSocketMessage('match' + matchId, "matchWin", data);
                 } else{
                     res.sendStatus(responseData.responseCode);
-                    SendSocketMessage('match' + matchId, "gameWIn", responseData.data.winnerId);
+                    SendSocketMessage('match' + matchId, "gameWIn", matchData.winnerId);
                 }
                 break;
             case disputeResolveOptions.matchWinPlayer1:
             case disputeResolveOptions.matchWinPlayer2:
                 res.sendStatus(responseData.responseCode);
-                SendSocketMessage('match' + matchId, "matchWin", responseData.data.winnerId);
+                var data = [matchData.winnerId, matchData.newPlayerRatings]
+                SendSocketMessage('match' + matchId, "matchWin", data);
                 break;
             case disputeResolveOptions.noChanges:
             case disputeResolveOptions.resetCurrentGame:
@@ -109,7 +112,8 @@ router.post("/BanUser", async (req, res) => {
                 SendEmptySocketMessage(matchData.matchId, "matchEnd");
                 break;
             case matchModes.ranked:
-                SendSocketMessage('match' + matchData.matchId, "matchWin", matchData.winnerId);
+                var data = [matchData.winnerId, matchData.newPlayerRatings]
+                SendSocketMessage('match' + matchData.matchId, "matchWin", data);
                 break;
         }
 
