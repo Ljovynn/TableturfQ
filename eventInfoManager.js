@@ -21,7 +21,6 @@ async function EventManagerSetup(){
     for (let i = 0; i < futureEventData.length; i++){
         events.push(new Event(futureEventData[i].id, futureEventData[i].name, futureEventData[i].description, futureEventData[i].icon_src, futureEventData[i].date));
     }
-    console.log("Events: " + JSON.stringify(events));
 }
 
 export function DeletePastEvents(){

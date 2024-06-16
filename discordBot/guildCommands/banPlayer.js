@@ -2,6 +2,11 @@ import { SlashCommandBuilder } from "discord.js";
 import { BanUser, GetUserByDiscordId, SuspendUser } from "../../database.js";
 import { BuildBanEmbed } from "../embedBuilder.js";
 
+import dotenv from 'dotenv';
+
+dotenv.config();
+const adminRole = process.env.DISCORD_ADMIN_ROLL_ID;
+
 const banLengths = {
     '1 day': 24 * 60 * 60 * 1000,
     '1 week': 7 * 24 * 60 * 60 * 1000,

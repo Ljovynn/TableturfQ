@@ -1,10 +1,11 @@
-import { SlashCommandBuilder } from "discord.js";
+import { SlashCommandBuilder, PermissionFlagsBits } from "discord.js";
 import { BuildUnbanEmbed } from "../embedBuilder.js";
 import { GetUserByDiscordId, UnbanUser } from "../../database.js";
 
 export const data = new SlashCommandBuilder()
     .setName('qpardon')
     .setDescription('Unban a player from TableturfQ')
+    .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers)
     .addSubcommand(subCommand => 
         subCommand
             .setName('by_discord')
