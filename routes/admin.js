@@ -151,7 +151,7 @@ router.post("/UnbanUser", async (req, res) => {
 router.post("/ModChatMessage", async (req, res) => {
     try {
         const userId = req.session.user;
-        const matchId = req.session.matchId;
+        const matchId = req.body.matchId;
         const message = req.body.message;
 
         if (typeof(matchId) !== 'number') return SetResponse(res, definitionErrors.matchUndefined);
@@ -160,13 +160,15 @@ router.post("/ModChatMessage", async (req, res) => {
         var userError = await CheckIfNotAdmin(req);
         if (userError) return res.status(userError.code).send(userError.data);
 
-        var responseData = ModSentChatMessage(matchId, userId, message)
-        if (!ResponseSucceeded(responseData.responseCode)) return SetResponse(res, responseData);
+        var responseData = await ModSentChatMessage(matchId, userId, message)
+        console.log(responseData);
+        if (!ResponseSucceeded(responseData.code)) return SetResponse(res, responseData);
 
-        res.sendStatus(responseData.responseCode);
+        res.sendStatus(responseData.code);
         var socketMessage = [userId, message];
         SendSocketMessage('match' + data.matchId, "chatMessage", socketMessage);
     } catch (err){
+        console.error(err);
         res.sendStatus(500);
     }
 });

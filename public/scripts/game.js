@@ -145,8 +145,14 @@ chatSend.addEventListener('click', async (e) => {
 
     // Do front end validation/sanitization functions
     if ( validateChatMessage(chatMessage) ) {
-        var data = { userId: userID, message: chatMessage };
-        var response = await postData('/match/SendChatMessage', data);
+        var data;
+        if ( matchInfo.user.role == 2 ) {
+            data = { matchId: parseInt(matchId), message: chatMessage };
+            var response = await postData('/admin/ModChatMessage', data);
+        } else {
+            data = { userId: userID, message: chatMessage };
+            var response = await postData('/match/SendChatMessage', data);
+        }
         console.log('chat message send response: ' + response);
 
         if ( response == 201 ) {
@@ -274,6 +280,7 @@ function addChatMessages(chat) {
 }
 
 function addMessage(chatData) {
+    console.log('Addming message');
     var userId = chatData.ownerId;
     var chatMessage = chatData.content;
     console.log(userId);
@@ -295,6 +302,10 @@ function addMessage(chatData) {
     } else if ( players[1].id == userId ) {
         senderName = players[1].username;
     } else {
+        // Admin message
+        if ( matchInfo.user.id == userId && matchInfo.user.role == 2 ) {
+            senderName = matchInfo.user.username + ' (Admin)';
+        }
         // idk who sent this
         // probably for mods
     }
