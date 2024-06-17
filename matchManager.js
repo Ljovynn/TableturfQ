@@ -436,7 +436,7 @@ async function HandleDisputeGameWin(match, winnerIndex){
     }
 
     SendDisputeMessage(GetDisputedMatchesList(), false);
-    return data;
+    return new ResponseData(201, data);
 }
 
 //förlust på ranked, ta bort casual
