@@ -76,6 +76,7 @@ async function addDisputedMatch(match, players) {
 	console.log(scores);
 	let row = document.createElement('div');
     row.classList.add('disputed-match-row');
+    row.setAttribute('id', 'disputed-match-row-' + match.id);
 
     let playersCell = document.createElement('div');
     playersCell.classList.add('admin-disputed-match-players');
@@ -130,6 +131,10 @@ async function setListeners() {
 		        var data = { matchId: parseInt(matchId), resolveOption: parseInt(resolveOption.value) };
 		        var response = await postData('/admin/ResolveDispute', data);
 		        console.log(response);
+		        if ( response == 201 ) {
+		        	var disputedRow = document.getElementById('disputed-match-row-' + matchId);
+		        	disputedRow.remove();
+		        }
 	    });
 	}
 }

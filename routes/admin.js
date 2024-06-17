@@ -39,11 +39,11 @@ router.post("/ResolveDispute", async (req, res) => {
         if (userError) return SetResponse(res, userError);
 
         var responseData = await ResolveMatchDispute(matchId, resolveOption);
-        if (!ResponseSucceeded(responseData.responseCode)) return SetResponse(res, responseData);
+        if (!ResponseSucceeded(responseData.code)) return SetResponse(res, responseData);
         var matchData = responseData.data;
 
         if (responseData.data === 'casual'){
-            res.sendStatus(responseData.responseCode);
+            res.sendStatus(responseData.code);
             SendSocketMessage('match' + matchId, "resolveDispute", disputeResolveOptions.noChanges);
             return;
         }
@@ -52,17 +52,17 @@ router.post("/ResolveDispute", async (req, res) => {
             case disputeResolveOptions.gameWinPlayer1:
             case disputeResolveOptions.gameWinPlayer2:
                 if (responseData.data.matchFinished){
-                    res.sendStatus(responseData.responseCode);
+                    res.sendStatus(responseData.code);
                     var data = [matchData.winnerId, matchData.newPlayerRatings]
                     SendSocketMessage('match' + matchId, "matchWin", data);
                 } else{
-                    res.sendStatus(responseData.responseCode);
-                    SendSocketMessage('match' + matchId, "gameWIn", matchData.winnerId);
+                    res.sendStatus(responseData.code);
+                    SendSocketMessage('match' + matchId, "gameWin", matchData.winnerId);
                 }
                 break;
             case disputeResolveOptions.matchWinPlayer1:
             case disputeResolveOptions.matchWinPlayer2:
-                res.sendStatus(responseData.responseCode);
+                res.sendStatus(responseData.code);
                 var data = [matchData.winnerId, matchData.newPlayerRatings]
                 SendSocketMessage('match' + matchId, "matchWin", data);
                 break;
@@ -70,7 +70,7 @@ router.post("/ResolveDispute", async (req, res) => {
             case disputeResolveOptions.resetCurrentGame:
             case disputeResolveOptions.restartMatch:
             case disputeResolveOptions.cancelMatch:
-                res.sendStatus(responseData.responseCode);
+                res.sendStatus(responseData.code);
                 SendSocketMessage('match' + matchId, "resolveDispute", resolveOption);
                 break;
             default:

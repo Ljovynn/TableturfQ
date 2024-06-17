@@ -624,5 +624,11 @@ socket.on('matchWin', async (winnerId) => {
 socket.on('dispute', async () => {
     alert('There has been a dispute in match results. Please wait for an admin to resolve the issue.');
     await setMatchInfo();
+    confirmationMessage.innerHTML = 'Please wait for an admin to resolve the match dispute.';
     console.log(match);
+});
+
+socket.on('resolveDispute', async () => {
+    alert('An admin has resolved the current match dispute.');
+    await setMatchInfo();
 });

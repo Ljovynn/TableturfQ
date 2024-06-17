@@ -11,8 +11,14 @@ import { HasBadWords } from "./utils/string.js";
 var matches = [];
 
 // zeb testing
-matches.push( new Match(12, 10, 3, matchModes.ranked) );
+//matches.push( new Match(12, 10, 3, matchModes.ranked) );
 //matches.push( new Match(7, 10, 3, matchModes.casual) );
+var m1 = new Match(7, 3, 4, matchModes.ranked);
+m1.status = matchStatuses.dispute;
+matches.push(m1);
+
+var m2 = new Match(8, 1, 2, matchModes.ranked);
+matches.push(m2);
 
 //Ljovynn testing
 
@@ -407,14 +413,23 @@ export async function ResolveMatchDispute(matchId, resolveOption){
 }
 
 async function HandleDisputeGameWin(match, winnerIndex){
+    var newPlayerRatings;
     var data = {
         matchFinished: false,
         winnerId: 0,
         newPlayerRatings
     }
     var currentGame = match.gamesArr[match.gamesArr.length - 1];
+    var winnerPos;
 
     currentGame.winnerId = match.players[winnerIndex].id;
+
+     if (match.players[0].id == currentGame.winnerId){
+        winnerPos = 1;
+    } else{
+        winnerPos = 2;
+    }
+
     if (match.mode.rulesetData.dsr){
         match.players[winnerPos - 1].unpickableStagesArr.push(currentGame.stage);
     }
