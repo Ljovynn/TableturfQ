@@ -5,12 +5,7 @@ import { userRoles } from "./public/constants/userData.js";
 import { SendSocketMessage } from "./socketManager.js";
 import { ResponseData } from "./Responses/ResponseData.js";
 import { enterQueErrors, readyUpErrors } from "./Responses/queErrors.js";
-
-var queAvailible = true;
-
-export function GetQueAvailible(){
-    return queAvailible;
-}
+import { GetQueAvailible } from "./queEnabled.js";
 
 const readyTimerGracePeriod = 1000 * 3;
 const alreadyMatchedPlayersTime = 1000 * 60 * 20;
@@ -49,11 +44,11 @@ var matchingPlayersList = [];
 var recentlyMatchedPlayersList = [];
 
 export async function AddPlayerToQue(playerId, matchMode){
-    if (!queAvailible) return enterQueErrors.queUnavailible;
+    if (!GetQueAvailible()) return enterQueErrors.queUnavailible;
     for (let i = 0; i < ques.length; i++){
         if (ques[i].matchMode == matchModes[matchMode]) return await TryAddPlayerToQue(ques[i], playerId);
     }
-    return enterQueErrors.illagelMatchMode;
+    return enterQueErrors.illegalMatchMode;
 }
 
 async function TryAddPlayerToQue(que, playerId){
@@ -268,8 +263,4 @@ function SearchMatchedPlayersList(arr, playerId){
         if (arr[i].players[0].id == playerId || arr[i].players[1].id == playerId) return i;
     }
     return -1;
-}
-
-export function SetQueAvailible(availible){
-    queAvailible = availible;
 }

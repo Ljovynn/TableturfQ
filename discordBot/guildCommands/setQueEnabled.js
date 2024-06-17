@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from "discord.js";
-//import { SetQueAvailible } from "../../queManager.js";
+import { SetQueAvailible } from "../../queEnabled.js";
 import { embedColor } from '../constants.js';
 
 export const data = new SlashCommandBuilder()
@@ -12,7 +12,7 @@ export const data = new SlashCommandBuilder()
 export async function execute(interaction) { 
     const setEnabled = interaction.options.getBoolean('enable');
 
-    //SetQueAvailible(setEnabled);
+    SetQueAvailible(setEnabled);
 
     const embed = {
 		color: embedColor,
