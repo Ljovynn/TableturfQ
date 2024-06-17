@@ -29,8 +29,8 @@ router.use(DeserializeSession);
 //matchId, resolveOption
 router.post("/ResolveDispute", async (req, res) => {
     try {
-        const matchId = req.session.matchId;
-        const resolveOption = req.session.resolveOption;
+        const matchId = req.body.matchId;
+        const resolveOption = req.body.resolveOption;
 
         if (typeof(matchId) !== 'number') return SetResponse(res, definitionErrors.matchUndefined);
         if (typeof(resolveOption) !== 'number') return SetResponse(res, definitionErrors.resolveOptionUndefined);
@@ -78,6 +78,7 @@ router.post("/ResolveDispute", async (req, res) => {
         }
         
     } catch (err){
+        console.error(err);
         res.sendStatus(500);
     }
 });
@@ -174,13 +175,15 @@ router.post("/ModChatMessage", async (req, res) => {
 
 router.get('/GetDisputedMatchesList', async (req, res) => {
     try {
+        var userId = req.session.user;
         var userError = await CheckIfNotAdmin(req);
         if (userError) return SetResponse(res, userError);
 
-        var data = GetDisputedMatchesList(user.id);
+        var data = GetDisputedMatchesList(userId);
 
         res.status(200).send(data);
     } catch (err){
+        console.error(err);
         res.sendStatus(500);
     }
 });

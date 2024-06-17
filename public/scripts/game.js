@@ -620,3 +620,9 @@ socket.on('matchWin', async (winnerId) => {
     // Unhide return to queue button
     // Do any final things
 });
+
+socket.on('dispute', async () => {
+    alert('There has been a dispute in match results. Please wait for an admin to resolve the issue.');
+    await setMatchInfo();
+    console.log(match);
+});

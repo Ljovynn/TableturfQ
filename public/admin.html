@@ -7,6 +7,19 @@
   </head>
   <body class="body">
     <main class="main">
+      <p id="admin-loading">Loading...</p>
+      <div id="admin-disputed-matches">
+        <p>Disputed Matches</p>
+        <div id="admin-disputed-matches-list">
+          <div class="disputed-match-row">
+            <div class="admin-disputed-match-players">Matchup (score)</div>
+            <div class="admin-disputed-match-action">Action</div>
+          </div>
+        </div>
+      </div>
     </main>
   </body>
+  <script type="text/javascript" src="./scripts/dataPOST.js"></script>
+    <script src="http://localhost:8080/socket.io/socket.io.js"></script>
+    <script type="module" src="./scripts/admin.js"></script>
 </html>

@@ -341,3 +341,36 @@ h3 {
     }
 
 }
+
+/**** ADMIN STYLES ****/
+#admin-disputed-matches {
+    display: none;
+}
+
+#admin-disputed-matches-list {
+    display: block;
+    width: 50%;
+    margin: auto;
+    outline: 2px solid black;
+}
+
+.disputed-match-row {
+    display: flex;
+    outline: 1px solid black;
+}
+
+.admin-disputed-match-players {
+    display: block;
+    width: 100%;
+    padding: 10px 5px;
+}
+
+.admin-disputed-match-action {
+    display: inline-block;
+    width: 100%;
+    padding: 10px 5px;
+}
+
+.admin-dispute-resolve {
+    margin: 0px 5px;
+}
