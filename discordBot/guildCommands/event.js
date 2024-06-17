@@ -2,6 +2,7 @@ import { SlashCommandBuilder, PermissionFlagsBits } from "discord.js";
 import { CheckIfEventExistsById, DeleteEventById, SetNewEvent } from "../../eventInfoManager.js";
 import { BuildSimpleEmbed } from "../utils/embed.js";
 import { embedColor } from "../constants.js";
+import { DetailMinute } from "../../utils/date.js";
 
 export const data = new SlashCommandBuilder()
     .setName('event')
@@ -74,7 +75,10 @@ export async function execute(interaction) {
         title: `Event ${name} added`,
         fields: [ {
             name: `Event ID: ${newEventId}`,
-            value: ' ',
+            value: description,
+        },{
+            name: 'Date:',
+            value: DetailMinute(new Date(date * 1000)),
         }],
         thumbnail: {
 			url: iconSrc,
