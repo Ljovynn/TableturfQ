@@ -49,13 +49,21 @@ export function GetUpcomingEventInfos(){
 }
 
 export async function SetNewEvent(name, description, iconSrc, date){
-    var eventId = await CreateEvent(name, description, iconSrc, date);
+    try {
+        var eventId = await CreateEvent(name, description, iconSrc, date);
 
-    var event = new Event(eventId, name, description, iconSrc, date);
-    events.push(event);
-    events.sort((a, b) => a.date - b.date);
+        var event = new Event(eventId, name, description, iconSrc, date);
+        events.push(event);
+        events.sort((a, b) => a.date - b.date);
 
-    return eventId;
+        return eventId;
+    } catch(error){
+        return error.message;
+    }
+}
+
+export function CheckIfEventExistsById(eventId){
+    return events.some((x) => x.id == eventId);
 }
 
 export async function DeleteEventById(eventId){

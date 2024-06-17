@@ -3,6 +3,7 @@ import { GetUserByDiscordId, GetUserMatchCount, GetUserMatchHistory } from "../.
 import { GetRank } from "../../public/constants/rankData.js";
 import { DetailMinute } from "../../utils/date.js";
 import { embedColor } from '../constants.js';
+import { BuildSimpleEmbed } from "../utils/embed.js";
 
 import dotenv from 'dotenv';
 
@@ -16,7 +17,7 @@ export const data = new SlashCommandBuilder()
     .setDescription('Get the profile of any player')
     .addUserOption(option =>
 		option.setName('user')
-			.setDescription('The user to get the profile from. Leave blank for your own profile.'))
+			.setDescription('The user'))
 
 export async function execute(interaction) { 
     const discordUser = interaction.options.getUser('user') ?? interaction.user;
@@ -26,11 +27,7 @@ export async function execute(interaction) {
     var matchCount;
 
     if (!user){
-        const noUserEmbed = {
-			color: embedColor,
-			title: 'TableturfQ Profile',
-			fields: [{name: `The selected user has no TableturfQ profile.`, value: '\u200B'}],
-		};
+        const noUserEmbed = BuildSimpleEmbed('TableturfQ Profile', `The selected user has no TableturfQ profile.`, '\u200B');
         await interaction.reply({ embeds: [noUserEmbed] });
 		return;        
     }

@@ -8,7 +8,7 @@ export const data = new SlashCommandBuilder()
     .setDescription(`Get the current leaderboard, listing ${hitsPerPage} players`)
     .addIntegerOption(option =>
 		option.setName('position')
-			.setDescription('Where to start listing players')
+			.setDescription('Starting position')
             .setMinValue(1))
 
 export async function execute(interaction) { 
