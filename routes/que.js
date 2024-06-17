@@ -31,7 +31,7 @@ router.post("/PlayerEnterQue", async (req, res) => {
         if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
         if (!Object.hasOwn(matchModes, matchMode)) return SetResponse(res, definitionErrors.matchModeUndefined);
 
-        var responseData = await AddPlayerToQue();
+        var responseData = await AddPlayerToQue(userId, matchMode);
         if (!ResponseSucceeded(responseData.code)) return SetResponse(res, responseData);
 
         console.log('added to queue');
