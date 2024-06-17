@@ -188,16 +188,14 @@ export async function CreateSession(sessionId, expiresAt, data){
 }
 
 export async function CreateEvent(name, description, iconSrc, date){
-    var event = await pool.query(`INSERT INTO events (name, description, icon_src, date) VALUES (?, ?, ?, ?)`, [name, description, iconSrc, date]);
-    return event.id;
+    let timeStamp = ConvertJSDateToTimestamp(new Date(date * 1000));
+    var event = await pool.query(`INSERT INTO events (name, description, icon_src, date) VALUES (?, ?, ?, ?)`, [name, description, iconSrc, timeStamp]);
+    return event[0].insertId;
 }
 
 export async function SuspendUser(userId, banLength){
-    console.log("banLength: " + banLength);
     const unbanDate = Date.now() + banLength;
-    console.log("unbandate: " + unbanDate);
     let timeStamp = ConvertJSDateToTimestamp(new Date(unbanDate));
-    console.log("timeStamp: " + timeStamp);
     await pool.query(`INSERT INTO ban_list (user_id, expires_at) VALUES (?, ?)`, [userId, timeStamp]);
 }
 

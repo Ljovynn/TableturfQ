@@ -6,22 +6,22 @@ import { uniqueCards } from "../../cards/cardManager.js";
 
 export const data = new SlashCommandBuilder()
     .setName('jpcard')
-    .setDescription('Get any japanese tableturf card')
+    .setDescription('ナワバトラーカードを手に入れる')
     .addSubcommand(subCommand => 
         subCommand
-            .setName('name')
+            .setName('byname')
             .setDescription('名前でカードを取得する')
             .addStringOption(option =>
-                option.setName('inputname')
+                option.setName('name')
                 .setDescription('カード')
                 .setRequired(true)
                 .setAutocomplete(true)))
     .addSubcommand(subCommand => 
         subCommand
-            .setName('id')
+            .setName('byid')
             .setDescription('IDでカードを手に入れる')
             .addIntegerOption(option =>
-                option.setName('inputid')
+                option.setName('id')
                 .setDescription('ID')
                 .setRequired(true)
                 .setMinValue(1)
@@ -42,13 +42,14 @@ export async function autocomplete(interaction){
 }
 
 export async function execute(interaction) { 
-    const inputName = interaction.options.getString('inputname');
-    const inputId = interaction.options.getInteger('inputid');
-
     var card;
-    if (inputName){
+
+    const subCommand = interaction.options.getSubcommand();
+    if (subCommand === 'byname'){
+        const inputName = interaction.options.getString('name');
         card = GetCardByName(inputName, 'ja');
     } else{
+        const inputId = interaction.options.getInteger('id');
         card = GetCardById(inputId, 'ja');
     }
 

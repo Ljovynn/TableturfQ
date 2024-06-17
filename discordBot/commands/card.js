@@ -9,10 +9,10 @@ export const data = new SlashCommandBuilder()
     .setDescription('Get any tableturf card')
     .addSubcommand(subCommand => 
         subCommand
-            .setName('name')
+            .setName('byname')
             .setDescription('Get a card by name')
             .addStringOption(option =>
-                option.setName('inputname')
+                option.setName('name')
                 .setDescription('The card')
                 .setRequired(true)
                 .setAutocomplete(true))
@@ -23,11 +23,11 @@ export const data = new SlashCommandBuilder()
                 .setMaxValue(3)))
     .addSubcommand(subCommand => 
         subCommand
-            .setName('id')
+            .setName('byid')
             .setDescription('Get a card by id')
             .addIntegerOption(option =>
-                option.setName('inputid')
-                .setDescription('The id')
+                option.setName('id')
+                .setDescription('The ID')
                 .setRequired(true)
                 .setMinValue(1)
                 .setMaxValue(uniqueCards))
@@ -52,16 +52,17 @@ export async function autocomplete(interaction){
 }
 
 export async function execute(interaction) { 
-    const inputName = interaction.options.getString('inputname');
-    const inputId = interaction.options.getInteger('inputid');
-    const level = interaction.options.getInteger('level') ?? 1;
-
     var card;
-    if (inputName){
+
+    const subCommand = interaction.options.getSubcommand();
+    if (subCommand === 'byname'){
+        const inputName = interaction.options.getString('name');
         card = GetCardByName(inputName, 'en');
     } else{
+        const inputId = interaction.options.getInteger('id');
         card = GetCardById(inputId, 'en');
     }
+    const level = interaction.options.getInteger('level') ?? 1;
 
     await interaction.reply({ embeds: [BuildCardEmbed(card, level)] });
 }

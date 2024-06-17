@@ -460,7 +460,7 @@ export async function HandleBannedPlayerInMatch(playerId){
         matchId: null,
         mode: null,
         winnerId: null,
-        newPlayerRatings
+        newPlayerRatings: null,
     }
     var match = FindMatchWithPlayer(playerId);
     if (!match) return;
