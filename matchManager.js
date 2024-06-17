@@ -44,7 +44,7 @@ export async function MakeNewMatch(player1Id, player2Id, matchMode){
     //disabled for testing purposes
     /*
     var tempName;
-    let r = Math.floor(Math.random() * 2);
+    let r = Math.floor(Math.random() * 2);c
     if (r == 1){
         let tempName = player1Id;
         player1Id = player2Id;
@@ -61,7 +61,7 @@ export async function MakeNewMatch(player1Id, player2Id, matchMode){
 
     var match = new Match(matchId, player1Id, player2Id, matchMode);
     matches.push(match);
-    return new ResponseData(201, match);
+    return match;
 }
 
 export function PlayerSentStageStrikes(playerId, stages){
