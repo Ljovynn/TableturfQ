@@ -19,7 +19,7 @@ export function BuildDisputeEmbed(matchDisputes){
 	for (let i = 0; i < limit; i++){
 		var dispute = {
 			name: `Match ${matchDisputes[i].id}`,
-			value: `[Link](${websiteURL}: ${port}/user)`,
+			value: `[Link](${websiteURL}:${port}/user)`,
 		}
 		disputesFields.push(dispute)
 	}
@@ -30,7 +30,7 @@ export function BuildDisputeEmbed(matchDisputes){
 		color: embedColor,
 		title: 'Current disputes:',
 		fields: disputesFields,
-		timestamp: new Date().toDateString(),
+		timestamp: new Date().toISOString(),
 	};
 	return disputeEmbed;
 }
@@ -196,7 +196,7 @@ export function BuildUnbanEmbed(id, isSuccess, errorMsg = 'No error defined.'){
 	if (isSuccess){
 		const unbanEmbed = {
 			color: embedColor,
-			title: 'Ban successful',
+			title: 'Unban successful',
 			fields: [{
 				name: `Successfully unbanned user with TableturfQ id **${id}**.`,
 				value: 'Good for them.',

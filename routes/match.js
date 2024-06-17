@@ -30,12 +30,14 @@ const sessionSecret = process.env.SESSION_SECRET;
 router.use(cookieParser(sessionSecret));
 router.use(DeserializeSession);
 
-/*router.get("/Test", async (req, res) => {
+/*import { SendDisputeMessage } from '../discordBot/discordBotManager.js';
+import { GetDisputedMatchesList } from '../matchManager.js';
+router.get("/Test", async (req, res) => {
     try {
-        SendDisputeMessage(GetDisputedMatchesList(), false);
+        SendDisputeMessage(GetDisputedMatchesList(), true);
         res.sendStatus(200);
     } catch (err){
-        res.sendStatus(500);
+        res.status(500).send(err.message);
     }
 });*/
 

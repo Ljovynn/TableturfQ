@@ -18,10 +18,12 @@ matches.push( new Match(12, 10, 3, matchModes.ranked) );
 
 /*var m1 = new Match(1, 1, 2, matchModes.ranked);
 m1.status = matchStatuses.dispute;
-
 var m2 = new Match(2, 1, 2, matchModes.ranked);
-
-var m3 = new Match(3, 2, 3, matchModes.ranked);*/
+var m3 = new Match(3, 2, 3, matchModes.ranked);
+m3.status = matchStatuses.dispute;
+matches.push(m1);
+matches.push(m2);
+matches.push(m3);*/
 
 //TODO
 export async function CancelOldMatches(cutoffTime){

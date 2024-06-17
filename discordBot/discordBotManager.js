@@ -99,14 +99,13 @@ export async function SendDisputeMessage(matchDisputes, sendNewMessage){
 		if (!previousDisputeMessageId){
 			const message = await channel.send({ embeds: [BuildDisputeEmbed(matchDisputes)] });
 			previousDisputeMessageId = message.id;
-		} else if (sendNewMessage){
-			const previousMessage = await channel.messages.fetch(previousDisputeMessageId);
-			if (previousMessage) previousMessage.delete();
-			const message = await channel.send({ embeds: [BuildDisputeEmbed(matchDisputes)] });
-			previousDisputeMessageId = message.id;
 		} else{
 			const previousMessage = await channel.messages.fetch(previousDisputeMessageId);
-			if (previousMessage) previousMessage.edit({ embeds: [BuildDisputeEmbed(matchDisputes)] });
+			if (previousMessage) previousMessage.edit({ embeds: [BuildDisputeEmbed(matchDisputes)] })
+		}
+		if (sendNewMessage){
+			const tempMessage = await channel.send('ping');
+			await tempMessage.delete();
 		}
 	} catch (error){
 		console.log(error);
