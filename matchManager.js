@@ -182,15 +182,15 @@ export function PlayerSentStagePick(playerId, stage){
     match.status = matchStatuses.ingame;
     return new ResponseData(201, match.id);
 }
+
 export async function PlayerSentGameWin(playerId, winnerId){
     var match = await FindMatchWithPlayer(playerId);
-    var matchId = 0;
     var data = {
-        matchId,
+        matchId: undefined,
         dispute: false,
         confirmed: false,
         matchWin: false,
-        newPlayerRatings
+        newPlayerRatings: undefined
     }
     if (!match) return nullErrors.noMatch;
 
