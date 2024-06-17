@@ -6,7 +6,8 @@ export const enterQueErrors = Object.freeze({
     noUser: new ResponseData(404, 'Can\'t find user'),
     banned: new ResponseData(403, 'User is banned'),
     unverified: new ResponseData(403, 'User is unverified'),
-    illagelMatchMode: new ResponseData(400, 'Not a viable match mode')
+    illagelMatchMode: new ResponseData(400, 'Not a viable match mode'),
+    queUnavailible: new ResponseData(403, 'Que is unavailible'),
 });
 
 export const readyUpErrors = Object.freeze({ 

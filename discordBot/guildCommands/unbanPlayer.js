@@ -1,6 +1,6 @@
 import { SlashCommandBuilder, PermissionFlagsBits } from "discord.js";
-import { BuildUnbanEmbed } from "../embedBuilder.js";
 import { GetUserByDiscordId, UnbanUser } from "../../database.js";
+import { embedColor } from '../constants.js';
 
 export const data = new SlashCommandBuilder()
     .setName('qpardon')
@@ -8,7 +8,7 @@ export const data = new SlashCommandBuilder()
     .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers)
     .addSubcommand(subCommand => 
         subCommand
-            .setName('by_discord')
+            .setName('discord')
             .setDescription('Unban a player by their discord user')
             .addUserOption(option =>
                 option.setName('user')
@@ -16,7 +16,7 @@ export const data = new SlashCommandBuilder()
                 .setRequired(true)))
     .addSubcommand(subCommand => 
         subCommand
-            .setName('by_id')
+            .setName('ttbqid')
             .setDescription('Unban a player by their TableturfQ ID')
             .addIntegerOption(option =>
                 option.setName('id')
@@ -30,7 +30,16 @@ export async function execute(interaction) {
     if (user){
         const DBuser = await GetUserByDiscordId(user.id);
         if (!DBuser){
-            await interaction.reply({ embeds: [BuildUnbanEmbed(id, false, `Discord user <@${user.id}> has no TableturfQ account.`)] });
+            const unbanFailedEmbed = {
+                color: embedColor,
+                title: 'Unban failed',
+                fields: [ {
+                    name: `Failed to unban user with TableturfQ id ${id}. Error message:`,
+                    value: `Discord user <@${user.id}> has no TableturfQ account.`,
+                },],
+            };
+
+            await interaction.reply({ embeds: [unbanFailedEmbed] });
             return;
         }
         id = DBuser.id;
@@ -41,9 +50,26 @@ export async function execute(interaction) {
     try{
         await UnbanUser(id);
     } catch(error){
-        await interaction.reply({ embeds: [BuildUnbanEmbed(id, false, error.message)] });
-        return;
+        const unbanFailedEmbed = {
+            color: embedColor,
+            title: 'Unban failed',
+            fields: [ {
+                name: `Failed to unban user with TableturfQ id ${id}. Error message:`,
+                value: error.message,
+            },],
+        };
+
+        await interaction.reply({embeds: [unbanFailedEmbed] });
     }
 
-    await interaction.reply({ embeds: [BuildUnbanEmbed(id, true)] });
+    const unbanEmbed = {
+        color: embedColor,
+        title: 'Unban successful',
+        fields: [{
+            name: `Successfully unbanned user with TableturfQ id **${id}**.`,
+            value: 'Good for them.',
+        }],
+    };
+
+    await interaction.reply({ embeds: [unbanEmbed] });
 }

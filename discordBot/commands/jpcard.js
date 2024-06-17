@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from "discord.js";
-import { BuildCardEmbed } from "../embedBuilder.js";
+import { BuildCardEmbed } from "./card.js";
 import { GetCardById, GetCardByName, GetCardListByLanguage } from "../../cards/cardManager.js";
 import { SanitizeString } from "../../utils/string.js";
 import { uniqueCards } from "../../cards/cardManager.js";
@@ -9,19 +9,19 @@ export const data = new SlashCommandBuilder()
     .setDescription('Get any japanese tableturf card')
     .addSubcommand(subCommand => 
         subCommand
-            .setName('by_name')
+            .setName('name')
             .setDescription('名前でカードを取得する')
             .addStringOption(option =>
-                option.setName('name')
+                option.setName('inputname')
                 .setDescription('カード')
                 .setRequired(true)
                 .setAutocomplete(true)))
     .addSubcommand(subCommand => 
         subCommand
-            .setName('by_id')
+            .setName('id')
             .setDescription('IDでカードを手に入れる')
             .addIntegerOption(option =>
-                option.setName('id')
+                option.setName('inputid')
                 .setDescription('ID')
                 .setRequired(true)
                 .setMinValue(1)
@@ -42,8 +42,8 @@ export async function autocomplete(interaction){
 }
 
 export async function execute(interaction) { 
-    const inputName = interaction.options.getString('name');
-    const inputId = interaction.options.getInteger('id');
+    const inputName = interaction.options.getString('inputname');
+    const inputId = interaction.options.getInteger('inputid');
 
     var card;
     if (inputName){

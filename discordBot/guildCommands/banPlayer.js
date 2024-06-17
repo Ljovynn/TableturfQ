@@ -1,6 +1,6 @@
 import { SlashCommandBuilder, PermissionFlagsBits } from "discord.js";
 import { BanUser, GetUserByDiscordId, SuspendUser } from "../../database.js";
-import { BuildBanEmbed } from "../embedBuilder.js";
+import { embedColor } from '../constants.js';
 
 const banLengths = {
     '1 day': 24 * 60 * 60 * 1000,
@@ -17,7 +17,7 @@ export const data = new SlashCommandBuilder()
     .setDefaultMemberPermissions(PermissionFlagsBits.BanMembers)
     .addSubcommand(subCommand => 
         subCommand
-            .setName('by_discord')
+            .setName('discord')
             .setDescription('Ban a player by their discord user')
             .addUserOption(option =>
                 option.setName('user')
@@ -36,7 +36,7 @@ export const data = new SlashCommandBuilder()
 		    )))
     .addSubcommand(subCommand => 
         subCommand
-            .setName('by_id')
+            .setName('ttbqid')
             .setDescription('Ban a player by their TableturfQ ID')
             .addIntegerOption(option =>
                 option.setName('id')
@@ -64,7 +64,15 @@ export async function execute(interaction) {
     if (user){
         const DBuser = await GetUserByDiscordId(user.id);
         if (!DBuser){
-            await interaction.reply({ embeds: [BuildBanEmbed(id, false, `Discord user <@${user.id}> has no TableturfQ account.`)] });
+            const banFailedEmbed = {
+                color: embedColor,
+                title: 'Ban failed',
+                fields: [ {
+                    name: `Failed to ban user. Error message:`,
+                    value: `Discord user <@${user.id}> has no TableturfQ account.`,
+                },],
+            };
+            await interaction.reply({ embeds: [banFailedEmbed] });
             return;
         }
         id = DBuser.id;
@@ -74,14 +82,38 @@ export async function execute(interaction) {
 
     try{
         if (banLengthObject){
-        await SuspendUser(id, banLengths[banLength]);
+            await SuspendUser(id, banLengths[banLength]);
+            const banEmbed = {
+		        color: embedColor,
+		        title: 'Ban successful',
+		        fields: [ {
+                    name: `Successfully suspended user with TableturfQ id **${id}**.`,
+                    value: `The ban lasts for ${banLength}.`,
+                }],
+	        };
+            await interaction.reply({ embeds: [banEmbed] });
         } else{
-        await BanUser(id);
+            await BanUser(id);
+            const banEmbed = {
+		        color: embedColor,
+		        title: 'Ban successful',
+		        fields: [ {
+                    name: `Successfully banned user with TableturfQ id **${id}**.`,
+                    value: 'The ban is permanent.',
+                }],
+	        };
+            await interaction.reply({ embeds: [banEmbed] });
     }
     } catch(error){
-        await interaction.reply({ embeds: [BuildBanEmbed(id, false, error)] });
+        const banFailedEmbed = {
+            color: embedColor,
+            title: 'Ban failed',
+            fields: [ {
+                name: `Failed to ban user with TableturfQ id ${id}. Error message:`,
+                value: error.message,
+            },],
+        };
+        await interaction.reply({ embeds: [banFailedEmbed] });
         return;
     }
-
-    await interaction.reply({ embeds: [BuildBanEmbed(id, true, banLength)] });
 }

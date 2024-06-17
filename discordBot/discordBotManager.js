@@ -1,14 +1,16 @@
-import { Client, Collection, Events, EmbedBuilder, GatewayIntentBits } from 'discord.js';
+import { Client, Collection, Events, GatewayIntentBits } from 'discord.js';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import fs from 'node:fs';
 import path from 'path';
-import { BuildDisputeEmbed } from './embedBuilder.js';
+import { embedColor } from './constants.js';
 
 dotenv.config();
 
 const token = process.env.TOKEN;
 const disputeChannelId = process.env.DISPUTE_CHANNEL_ID
+const websiteURL = process.env.URL;
+const port = process.env.PORT;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -96,12 +98,32 @@ export async function SendDisputeMessage(matchDisputes, sendNewMessage){
 		const channel = await client.channels.fetch(channelId);
 		if (!channel) return;
 
+		//build embed
+		var disputesFields = [];
+		var limit = Math.min(matchDisputes.length, 25);
+
+		for (let i = 0; i < limit; i++){
+		var dispute = {
+			name: `Match ${matchDisputes[i].id}`,
+			value: `[Link](${websiteURL}:${port}/user)`,
+		}
+		disputesFields.push(dispute)
+		}
+		if (matchDisputes.length == 0) disputesFields.push({name: 'There are currently no disputes.', value: '\u200B'});
+
+		const disputeEmbed = {
+		color: embedColor,
+		title: 'Current disputes:',
+		fields: disputesFields,
+		timestamp: new Date().toISOString(),
+		};
+
 		if (!previousDisputeMessageId){
-			const message = await channel.send({ embeds: [BuildDisputeEmbed(matchDisputes)] });
+			const message = await channel.send({ embeds: [disputeEmbed] });
 			previousDisputeMessageId = message.id;
 		} else{
 			const previousMessage = await channel.messages.fetch(previousDisputeMessageId);
-			if (previousMessage) previousMessage.edit({ embeds: [BuildDisputeEmbed(matchDisputes)] })
+			if (previousMessage) previousMessage.edit({ embeds: [disputeEmbed] })
 		}
 		if (sendNewMessage){
 			const tempMessage = await channel.send('ping');

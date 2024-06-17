@@ -6,6 +6,12 @@ import { SendSocketMessage } from "./socketManager.js";
 import { ResponseData } from "./Responses/ResponseData.js";
 import { enterQueErrors, readyUpErrors } from "./Responses/queErrors.js";
 
+var queAvailible = true;
+
+export function GetQueAvailible(){
+    return queAvailible;
+}
+
 const readyTimerGracePeriod = 1000 * 3;
 const alreadyMatchedPlayersTime = 1000 * 60 * 20;
 
@@ -43,22 +49,22 @@ var matchingPlayersList = [];
 var recentlyMatchedPlayersList = [];
 
 export async function AddPlayerToQue(playerId, matchMode){
+    if (!queAvailible) return enterQueErrors.queUnavailible;
     for (let i = 0; i < ques.length; i++){
         if (ques[i].matchMode == matchModes[matchMode]) return await TryAddPlayerToQue(ques[i], playerId);
     }
-    return new ResponseData(400, enterQueErrors.illagelMatchMode);
+    return enterQueErrors.illagelMatchMode;
 }
 
 async function TryAddPlayerToQue(que, playerId){
-    if (FindIfPlayerInQue(playerId)) return new ResponseData(400, enterQueErrors.inQue);
-    
-    if (FindIfPlayerInMatch(playerId)) return new ResponseData(400, enterQueErrors.inMatch);
+    if (FindIfPlayerInQue(playerId)) return enterQueErrors.inQue;
+    if (FindIfPlayerInMatch(playerId)) return enterQueErrors.inMatch; 
 
     var user = await GetUserData(playerId);
-    if (!user) return new ResponseData(401, enterQueErrors.noUser);
-    if (user.banned == 1) return new ResponseData(403, enterQueErrors.banned);
+    if (!user) return enterQueErrors.noUser;
+    if (user.banned == 1) return enterQueErrors.banned;
     if (que.matchMode == matchModes.ranked){
-        if (user.role == userRoles.unverified) return new ResponseData(403, enterQueErrors.unverified);
+        if (user.role == userRoles.unverified) return enterQueErrors.unverified;
     }
 
     var baseSearchElo = Math.max(user.g2_rating, que.matchMode.queData.minEloStart);
@@ -234,7 +240,7 @@ function RemovePlayersFromQue(queArr, player1Id, player2Id){
 
 export async function PlayerSentReady(playerId){
     var index = SearchMatchedPlayersList(matchingPlayersList, playerId);
-    if (index == -1) return new ResponseData(400, readyUpErrors.notMatched);
+    if (index == -1) return readyUpErrors.notMatched;
     var playerPos = FindPlayerPositionInMatchedPlayers(matchingPlayersList[index], playerId);
     matchingPlayersList[index].players[playerPos - 1].ready = true;
     var match = await CheckIfBothPlayersReady(index)
@@ -262,4 +268,8 @@ function SearchMatchedPlayersList(arr, playerId){
         if (arr[i].players[0].id == playerId || arr[i].players[1].id == playerId) return i;
     }
     return -1;
+}
+
+export function SetQueAvailible(availible){
+    queAvailible = availible;
 }
