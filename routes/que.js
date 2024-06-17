@@ -74,6 +74,8 @@ router.post("/PlayerReady", async (req, res) => {
         if (!ResponseSucceeded(responseData.code)) return SetResponse(res, responseData);
         res.sendStatus(responseData.code);
 
+        if (!responseData.data) return;
+
         var match = responseData.data;
 
         var matchedPlayersData = {
