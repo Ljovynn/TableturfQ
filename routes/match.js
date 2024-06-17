@@ -153,7 +153,7 @@ router.post("/SendChatMessage", async (req, res) => {
         if (!ResponseSucceeded(responseData.code)) return SetResponse(res, responseData);
 
         res.sendStatus(responseData.code);
-        var socketMessage = [userId, message];
+        var socketMessage = {ownerId: userId, content: message};
         SendSocketMessage('match' + responseData.data, "chatMessage", socketMessage);
     } catch (err){
         res.sendStatus(500);
@@ -168,6 +168,8 @@ router.post("/SendChatMessage", async (req, res) => {
 router.post("/GetMatchInfo", async (req, res) => {
     try {
         const matchId = req.body.matchId;
+        console.log('match id: ' + matchId);
+        console.log(typeof(matchId));
 
         if (typeof(matchId) !== 'number') return SetResponse(res, definitionErrors.matchUndefined);
 

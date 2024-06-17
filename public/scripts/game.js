@@ -118,7 +118,7 @@ for (let victoryButton of victoryButtons ) {
     victoryButton.addEventListener('click', async (e) => {
         console.log('Marked victory for ' + victoryButton.value);
         // Send off the victory mark event for the selected player and wait for the other player to submit the victor
-        var data = { winnerId: victoryButton.value };
+        var data = { winnerId: parseInt(victoryButton.value) };
         var response = await postData('/match/WinGame', data);
         console.log(response);
         if ( response == 201 ) {
@@ -178,7 +178,7 @@ strikeButton.addEventListener('click', async (e) => {
 
 // Page functions
 async function getMatchInfo(matchId) {
-    var data = {matchId: matchId};
+    var data = {matchId: parseInt(matchId)};
     console.log(data);
     var result = await getData('/match/GetMatchInfo', data);
     matchInfo = result;
@@ -246,20 +246,27 @@ async function setMatchInfo() {
 
 // Grab all messages associated with the game and add them to the chat log
 function addChatMessages(chat) {
+    var amountMessages = chatLog.childElementCount;
     console.log('Adding messages: ' + JSON.stringify(chat));
+    var i = 1;
     for ( const message of chat ) {
-        addMessage(message);
+        if ( i > amountMessages ) {
+            addMessage(message);
+        }
+        i++;
     }
 }
 
 function addMessage(chatData) {
-    var userId = chatData[0];
-    var chatMessage = chatData[1];
+    var userId = chatData.ownerId;
+    var chatMessage = chatData.content;
     console.log(userId);
     console.log(chatMessage);
     var sentByCurrentPlayer = false;
     var senderName = '';
     var chatString = '';
+    console.log('players');
+    console.log(players);
 
     // Check if the incoming message is from the current user to set the sender color
     if ( userId == user.id ) {
@@ -562,6 +569,7 @@ function validateChatMessage(chatMessage) {
 socket.emit('join', 'match' + matchId.toString());
 
 socket.on('chatMessage', (chatData) => {
+    console.log(chatData);
     addMessage(chatData);
 });
 

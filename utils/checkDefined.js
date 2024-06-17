@@ -1,8 +1,10 @@
 export function CheckUserDefined(req){
+    console.log(!req.session);
+    console.log(!req.session.user);
     if (!req.session || !req.session.user){
-        return true;
+        return false;
     }
-    return false;
+    return true;
 }
 
 export function CheckIfArray(arr, res){

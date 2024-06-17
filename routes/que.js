@@ -6,7 +6,7 @@ import { CheckUserDefined } from "../utils/checkDefined.js";
 import { SendSocketMessage } from "../socketManager.js";
 import { definitionErrors, userErrors } from '../Responses/requestErrors.js';
 import { matchModes } from '../public/constants/matchData.js';
-import { ResponseSucceeded } from '../Responses/ResponseData.js';
+import { ResponseSucceeded, SetResponse } from '../Responses/ResponseData.js';
 
 import dotenv from 'dotenv';
 
