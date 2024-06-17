@@ -174,13 +174,15 @@ router.post("/ModChatMessage", async (req, res) => {
 
 router.get('/GetDisputedMatchesList', async (req, res) => {
     try {
+        var userId = req.session.user;
         var userError = await CheckIfNotAdmin(req);
         if (userError) return SetResponse(res, userError);
 
-        var data = GetDisputedMatchesList(user.id);
+        var data = GetDisputedMatchesList(userId);
 
         res.status(200).send(data);
     } catch (err){
+        console.error(err);
         res.sendStatus(500);
     }
 });

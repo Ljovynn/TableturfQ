@@ -168,8 +168,6 @@ router.post("/SendChatMessage", async (req, res) => {
 router.post("/GetMatchInfo", async (req, res) => {
     try {
         const matchId = req.body.matchId;
-        console.log('match id: ' + matchId);
-        console.log(typeof(matchId));
 
         if (typeof(matchId) !== 'number') return SetResponse(res, definitionErrors.matchUndefined);
 

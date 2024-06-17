@@ -38,6 +38,20 @@
                     <input type="text" id="match-chat-input" /><button id="match-chat-button">Send</button>
                 </div>
             </div>
+            <div id="admin-content">
+                <p>Dispute Options</p>
+                <select id="admin-dispute-options">
+                    <option value="0">No change</option>
+                    <option vlaue="1">Reset Current Game</option>
+                    <option value="2">Restart Match</option>
+                    <option value="3">Cancel Match</option>
+                    <option value="4">Player 1 Wins Current Game</option>
+                    <option value="5">Player 2 Wins Current Game</option>
+                    <option value="6">Player 1 Wins Match</option>
+                    <option value="7">Player 2 Wins Match</option>
+                </select>
+                <button id="admin-resolve-dispute">Resolve Dispute</button>
+            </div>
             <p id="playing-stage"></p>
             <div id="stages-list" class="stages-list">
                     <div id="mainStreet" stage-value="1" class="stage starter-stage stage-selectable">

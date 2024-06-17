@@ -1,6 +1,4 @@
 export function CheckUserDefined(req){
-    console.log(!req.session);
-    console.log(!req.session.user);
     if (!req.session || !req.session.user){
         return false;
     }
