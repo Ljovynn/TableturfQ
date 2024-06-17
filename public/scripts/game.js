@@ -20,6 +20,11 @@ const scoreContainers = document.getElementsByClassName('score-container');
 const playerScores = document.getElementsByClassName('player-score');
 const victoryButtons = document.getElementsByClassName('player-victory-button');
 
+// Admin
+const adminContent = document.getElementById('admin-content');
+const adminDisputeOptions = document.getElementById('admin-dispute-options');
+const adminResolveButton = document.getElementById('admin-resolve-dispute');
+
 // Match options
 const setLength = document.getElementById('set-length');
 const turnTimer = document.getElementById('timer-duration');
@@ -80,7 +85,9 @@ console.log(matchId);
 
 const socket = io();
 
-setMatchInfo();
+await setMatchInfo();
+// check if the match is in dispute on pageload for admins that come to check chat
+await showAdminDispute();
 
 // Set event listeners for interactable elements
 
@@ -173,6 +180,15 @@ strikeButton.addEventListener('click', async (e) => {
         // If strikes are accepted
     } else {
         alert('Invalid strikes. Please submit again.');
+    }
+});
+
+adminResolveButton.addEventListener('click', async (e) => {
+    var data = { matchId: parseInt(matchId), resolveOption: parseInt(adminDisputeOptions.value) };
+    var response = await postData('/admin/ResolveDispute', data);
+    console.log(response);
+    if ( response == 201 ) {
+        adminContent.style.display = 'none';
     }
 });
 
@@ -509,6 +525,7 @@ async function gameReset(winnerId) {
     console.log(matchInfo);
     setScores();
     setStrikeAmount();
+    setCurrentStriker();
 
 }
 
@@ -542,6 +559,12 @@ function unstrikeAllMaps() {
         stage.classList.remove('stage-stricken');
         stage.classList.add('stage-selectable');
      }
+}
+
+function showAdminDispute() {
+    if ( matchInfo.user.role == 2 && match.status == 2 ) {
+        adminContent.style.display = 'block';
+    }
 }
 
 // Strike validation
@@ -624,6 +647,7 @@ socket.on('matchWin', async (winnerId) => {
 socket.on('dispute', async () => {
     alert('There has been a dispute in match results. Please wait for an admin to resolve the issue.');
     await setMatchInfo();
+    await showAdminDispute();
     confirmationMessage.innerHTML = 'Please wait for an admin to resolve the match dispute.';
     console.log(match);
 });

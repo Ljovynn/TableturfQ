@@ -193,6 +193,10 @@ h3 {
     display: none;
 }
 
+#admin-content {
+    display: none;
+}
+
 /**** USER PROFILE ****/
 
 #profile-content {
