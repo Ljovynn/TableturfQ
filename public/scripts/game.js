@@ -94,28 +94,30 @@ await showModDispute();
 // Stage selection event listener
 for (let stage of stages ) {
     stage.addEventListener('click', (e) => {
-        if ( stage.classList.contains('stage-selectable') ) {
-            // Prevent toggle for new stages when you have no strikes remaining for that round of striking
-            if ( strikesRemaining != 0 || stage.classList.contains('stage-selected') ) {
-                stage.classList.toggle('stage-selected');
-            }
-            var stageValue = parseInt(stage.getAttribute('stage-value'));
-
-            // Add/Remove stage from the list of strikes that will be sent off to the server when the confirm strikes button is selected
-            var i = stageStrikes.indexOf( stageValue );
-            console.log(i);
-            if ( i === -1 ) {
-                // Don't go into negative strikes
-                if ( strikesRemaining > 0 ) {
-                    strikesRemaining = strikesRemaining - 1;
-                    stageStrikes.push( stageValue );
+        if ( currentStriker == userID ) {
+            if ( stage.classList.contains('stage-selectable') ) {
+                // Prevent toggle for new stages when you have no strikes remaining for that round of striking
+                if ( strikesRemaining != 0 || stage.classList.contains('stage-selected') ) {
+                    stage.classList.toggle('stage-selected');
                 }
-            } else {
-                strikesRemaining = strikesRemaining + 1;
-                stageStrikes.splice(i,1);
-            }
+                var stageValue = parseInt(stage.getAttribute('stage-value'));
 
-            strikeInfo.innerHTML = strikesRemaining + ' stage strike' + ( strikesRemaining == 1 ? '' : 's' ) + ' remaining.';
+                // Add/Remove stage from the list of strikes that will be sent off to the server when the confirm strikes button is selected
+                var i = stageStrikes.indexOf( stageValue );
+                console.log(i);
+                if ( i === -1 ) {
+                    // Don't go into negative strikes
+                    if ( strikesRemaining > 0 ) {
+                        strikesRemaining = strikesRemaining - 1;
+                        stageStrikes.push( stageValue );
+                    }
+                } else {
+                    strikesRemaining = strikesRemaining + 1;
+                    stageStrikes.splice(i,1);
+                }
+
+                strikeInfo.innerHTML = strikesRemaining + ' stage strike' + ( strikesRemaining == 1 ? '' : 's' ) + ' remaining.';
+            }
         }
     });
 }
@@ -509,6 +511,10 @@ function startGame() {
     playingStage.style.display = 'block';
     strikerSection.style.display = 'none';
     strikeContent.style.display = 'none';
+
+    var selectedStage = document.getElementsByClassName('stage-selected');
+    if ( selectedStage.length > 0 )
+        selectedStage[0].classList.remove('stage-selected');
 
     for (let victoryButton of victoryButtons ) {
         victoryButton.style.display = 'inline-block';
