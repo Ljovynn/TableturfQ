@@ -87,7 +87,7 @@ const socket = io();
 
 await setMatchInfo();
 // check if the match is in dispute on pageload for admins that come to check chat
-await showAdminDispute();
+await showModDispute();
 
 // Set event listeners for interactable elements
 
@@ -279,8 +279,9 @@ function addChatMessages(chat) {
     }
 }
 
-function addMessage(chatData) {
+async function addMessage(chatData) {
     console.log('Addming message');
+    console.log(chatData);
     var userId = chatData.ownerId;
     var chatMessage = chatData.content;
     console.log(userId);
@@ -302,10 +303,12 @@ function addMessage(chatData) {
     } else if ( players[1].id == userId ) {
         senderName = players[1].username;
     } else {
+        var modUser = await getModUser([userId]);
         // Admin message
-        if ( matchInfo.user.id == userId && matchInfo.user.role == 2 ) {
+        /*if ( matchInfo.user.id == userId && matchInfo.user.role == 2 ) {
             senderName = matchInfo.user.username + ' (Admin)';
-        }
+        }*/
+        senderName = modUser[0].username + ' (Moderator)';
         // idk who sent this
         // probably for mods
     }
@@ -572,10 +575,16 @@ function unstrikeAllMaps() {
      }
 }
 
-function showAdminDispute() {
+function showModDispute() {
     if ( matchInfo.user.role == 2 && match.status == 2 ) {
         adminContent.style.display = 'block';
     }
+}
+
+async function getModUser(users) {
+    var data = { userIdList: users };
+    var result = await getData('/user/GetUsers', data);
+    return result;
 }
 
 // Strike validation
@@ -656,14 +665,14 @@ socket.on('matchWin', async (winnerId) => {
 });
 
 socket.on('dispute', async () => {
-    alert('There has been a dispute in match results. Please wait for an admin to resolve the issue.');
+    alert('There has been a dispute in match results. Please wait for a mod to resolve the issue.');
     await setMatchInfo();
-    await showAdminDispute();
-    confirmationMessage.innerHTML = 'Please wait for an admin to resolve the match dispute.';
+    await showModDispute();
+    confirmationMessage.innerHTML = 'Please wait for a mod to resolve the match dispute.';
     console.log(match);
 });
 
 socket.on('resolveDispute', async () => {
-    alert('An admin has resolved the current match dispute.');
+    alert('An mod has resolved the current match dispute.');
     await setMatchInfo();
 });

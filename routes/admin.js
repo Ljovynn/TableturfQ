@@ -165,7 +165,7 @@ router.post("/ModChatMessage", async (req, res) => {
         if (!ResponseSucceeded(responseData.code)) return SetResponse(res, responseData);
 
         res.sendStatus(responseData.code);
-        var socketMessage = [userId, message];
+        var socketMessage = {ownerId: userId, content: message};
         SendSocketMessage('match' + matchId, "chatMessage", socketMessage);
     } catch (err){
         console.error(err);
