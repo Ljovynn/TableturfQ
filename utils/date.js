@@ -1,7 +1,7 @@
 export function DetailMinute(date){
     var result = date.getUTCFullYear() + '-';
 
-    var month = date.getUTCMonth();
+    var month = date.getUTCMonth() + 1;
     if (month < 10) result += '0';
     result += month + '-';
     

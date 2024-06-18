@@ -12,7 +12,7 @@ import { UpdateLeaderboard } from "./leaderboardManager.js";
 import { StartDiscordBot } from "./discordBot/discordBotManager.js";
 import { DeleteOldSessions, DeleteOldSuspensions, DeleteOldUnverifiedAccounts, DeleteUnfinishedMatches } from "./database.js";
 import { CancelOldMatches } from "./matchManager.js";
-import { DeletePastEvents } from "./eventInfoManager.js";
+import { DeletePastAnnouncements } from "./announcementManager.js";
 
 dotenv.config();
 
@@ -28,7 +28,7 @@ const updateLeaderboardInterval = 5 * 60 * 1000;
 const deleteOldUnverifiedUsersInterval = 24 * 60 * 60 * 1000;
 const deleteOldSuspensionsInterval = 60 * 60 * 1000;
 const deleteOldSessionsInterval = 24 * 60 * 60 * 1000;
-const deleteOldEventsInterval = 2 * 60 * 60 * 1000;
+const deleteOldAnnouncementsInterval = 2 * 60 * 60 * 1000;
 
 //Todo: test if account deletion when user is in match messes anything
 const unverifiedUserDeletionThreshold = 7 * 24 * 60 * 60 * 1000;
@@ -61,8 +61,8 @@ server.listen(port, () => {
     //sessions
     setInterval(DeleteOldSessions, deleteOldSessionsInterval);
 
-    //events
-    setInterval(DeletePastEvents, deleteOldEventsInterval);*/
+    //announcements
+    setInterval(DeletePastAnnouncements, deleteOldAnnouncementsInterval);*/
 
     StartDiscordBot();
 
@@ -97,7 +97,7 @@ import queRouter from './routes/que.js';
 import leaderboardRouter from './routes/leaderboard.js';
 import adminRouter from './routes/admin.js';
 import userRouter from './routes/user.js';
-import eventRouter from './routes/eventInfo.js';
+import announcementRouter from './routes/announcementInfo.js';
 
 app.use('/api/auth', authRouter);
 app.use('/match', matchRouter);
@@ -105,7 +105,7 @@ app.use('/que', queRouter);
 app.use('/leaderboard', leaderboardRouter);
 app.use('/admin', adminRouter);
 app.use('/user', userRouter);
-app.use('/eventInfo', eventRouter);
+app.use('/announcementInfo', announcementRouter);
 
 //todo: mod stuff
 //resolve dispute

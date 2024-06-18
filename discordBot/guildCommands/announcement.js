@@ -1,20 +1,20 @@
 import { SlashCommandBuilder, PermissionFlagsBits } from "discord.js";
-import { CheckIfEventExistsById, DeleteEventById, SetNewEvent } from "../../eventInfoManager.js";
+import { CheckIfAnnouncementExistsById, DeleteAnnouncementById, SetNewAnnouncement } from "../../announcementManager.js";
 import { BuildSimpleEmbed } from "../utils/embed.js";
 import { embedColor } from "../constants.js";
 import { DetailMinute } from "../../utils/date.js";
 
 export const data = new SlashCommandBuilder()
-    .setName('event')
-    .setDescription('Add or remove event info')
+    .setName('announcement')
+    .setDescription('Add or remove announcement info')
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
     .addSubcommand(subCommand => 
         subCommand
             .setName('add')
-            .setDescription('Add event info')
+            .setDescription('Add announcement info')
             .addStringOption(option =>
-		        option.setName('name')
-			        .setDescription('The name')
+		        option.setName('title')
+			        .setDescription('The title')
                     .setRequired(true))
             .addStringOption(option =>
                 option.setName('description')
@@ -25,60 +25,70 @@ export const data = new SlashCommandBuilder()
                     .setDescription('The UNIX timestamp date')
                     .setMinValue(1)
                     .setRequired(true))
+            .addBooleanOption(option =>
+                option.setName('isevent')
+                    .setDescription('Is it an event?')
+                    .setRequired(true))
             .addStringOption(option =>
                 option.setName('iconsrc')
                     .setDescription('The URL for the icon source')))
     .addSubcommand(subCommand => 
         subCommand
             .setName('remove')
-            .setDescription('Remove event info')
+            .setDescription('Remove announcement info')
             .addIntegerOption(option =>
 		        option.setName('id')
-			        .setDescription('The event ID')
+			        .setDescription('The announcement ID')
                     .setRequired(true)
                     .setMinValue(1)))
 export async function execute(interaction) { 
     const subCommand = interaction.options.getSubcommand();
-
-    //remove event
+    
+    //remove announcement
     if (subCommand === 'remove'){
         const id = interaction.options.getInteger('id');
-        if (!CheckIfEventExistsById(id)){
-            const errorEmbed = BuildSimpleEmbed('Event removal failed', 'Error message:', `No event found with id **${id}**`);
+        if (!CheckIfAnnouncementExistsById(id)){
+            const errorEmbed = BuildSimpleEmbed('Announcement removal failed', 'Error message:', `No Announcement found with id **${id}**`);
             await interaction.reply({ embeds: [errorEmbed] });
             return;
         }
-        await DeleteEventById(id);
+        await DeleteAnnouncementById(id);
         
-        const removeEmbed = BuildSimpleEmbed('Successfully removed event', `Removed event with id ${id}`, '\u200B');
+        const removeEmbed = BuildSimpleEmbed('Successfully removed Announcement', `Removed Announcement with id ${id}`, '\u200B');
         await interaction.reply({ embeds: [removeEmbed] });
         return;
     }
 
-    //add event
-    const name = interaction.options.getString('name');
+    //add announcement
+    const title = interaction.options.getString('title');
     const description = interaction.options.getString('description');
     const iconSrc = interaction.options.getString('iconsrc', false);
     const date = interaction.options.getInteger('date');
+    const isEvent = interaction.options.getBoolean('isevent');
 
-    var newEventId = await SetNewEvent(name, description, iconSrc, date);
+    var newAnnouncementId = await SetNewAnnouncement(title, description, iconSrc, date, isEvent);
 
     //if error
-    if (typeof(newEventId) === 'string'){
-        const errorEmbed = BuildSimpleEmbed('Event failed to be added', 'Error message:', newEventId);
+    if (typeof(newAnnouncementId) === 'string'){
+        const errorEmbed = BuildSimpleEmbed('Announcement failed to be added', 'Error message:', newAnnouncementId);
         await interaction.reply({ embeds: [errorEmbed] });
         return;
     }
 
+    var announcmentCalled = 'Announcement';
+    if (isEvent){
+        announcmentCalled = 'Event';
+    }
+
     const embed = {
         color: embedColor,
-        title: `Event ${name} added`,
+        title: `${announcmentCalled} ${title} added`,
         fields: [ {
-            name: `Event ID: ${newEventId}`,
+            name: `Announcement ID: ${newAnnouncementId}`,
             value: description,
         },{
             name: 'Date:',
-            value: DetailMinute(new Date(date * 1000)),
+            value: `${DetailMinute(new Date(date * 1000))} UTC`,
         }],
         thumbnail: {
 			url: iconSrc,

@@ -117,9 +117,9 @@ export async function GetLeaderboard(){
     return rows;
 }
 
-export async function GetFutureEvents(){
+export async function GetFutureAnnouncements(){
     let timeStamp = ConvertJSDateToTimestamp(new Date());
-    const [rows] = await pool.query(`SELECT * FROM events WHERE date > ? ORDER BY date ASC`, [timeStamp]);
+    const [rows] = await pool.query(`SELECT * FROM announcements WHERE date > ? ORDER BY date ASC`, [timeStamp]);
     return rows;
 }
 
@@ -187,10 +187,10 @@ export async function CreateSession(sessionId, expiresAt, data){
     await pool.query(`INSERT INTO sessions (id, expires_at, data) VALUES (?, ?, ?)`, [sessionId, expiresAt, data]);
 }
 
-export async function CreateEvent(name, description, iconSrc, date){
+export async function CreateAnnouncement(title, description, iconSrc, date, isEvent){
     let timeStamp = ConvertJSDateToTimestamp(new Date(date * 1000));
-    var event = await pool.query(`INSERT INTO events (name, description, icon_src, date) VALUES (?, ?, ?, ?)`, [name, description, iconSrc, timeStamp]);
-    return event[0].insertId;
+    var announcement = await pool.query(`INSERT INTO announcements (title, description, icon_src, date, is_event) VALUES (?, ?, ?, ?, ?)`, [title, description, iconSrc, timeStamp, isEvent]);
+    return announcement[0].insertId;
 }
 
 export async function SuspendUser(userId, banLength){
@@ -272,8 +272,8 @@ export async function DeleteOldUnverifiedAccounts(ageThreshold){
     await pool.query(`DELETE FROM users WHERE role = ? AND created_at < ?`, [userRoles.unverified, timeStamp]);
 }
 
-export async function DeleteEvent(eventId){
-    await pool.query(`DELETE FROM events WHERE id = ?`, [eventId]);
+export async function DeleteAnnouncement(announcementId){
+    await pool.query(`DELETE FROM announcements WHERE id = ?`, [announcementId]);
 }
 
 export async function UnbanUser(userId){
