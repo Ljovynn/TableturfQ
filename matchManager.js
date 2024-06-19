@@ -320,7 +320,6 @@ export async function ModSentChatMessage(matchId, userId, content){
 
 export function PlayerSentMatchDispute(playerId){
     var match = FindMatchWithPlayer(playerId);
-
     if (!match) return nullErrors.noMatch;
 
     if (match.status == matchStatuses.dispute) return disputeErrors.alreadyDispute;
@@ -346,11 +345,42 @@ export function GetDisputedMatchesList(){
     return result;
 }
 
+//only able to cancel the dispute, no other actions. has to be confirmed by both players
+export async function PlayerSentResolveDispute(playerId){
+    var match = FindMatchWithPlayer(playerId);
+    if (!match) return nullErrors.noMatch;
+
+    if (match.status != matchStatuses.dispute) return resolveErrors.notDisputed;
+
+    var playerPos = FindPlayerPosInMatch(match, playerId);
+    if (match.players[playerPos - 1].disputeResolveSent == true) return resolveErrors.alreadyConfirmed;
+    match.players[playerPos - 1].disputeResolveSent = true;
+
+    if (match.players[0].disputeResolveSent && match.players[1].disputeResolveSent){
+        match.players[0].disputeResolveSent = false;
+        match.players[1].disputeResolveSent = false;
+
+        if (match.mode == matchModes.casual){
+            match.status == matchStatuses.ingame;
+            SendDisputeMessage(GetDisputedMatchesList(), false);
+            return new ResponseData(201, 'casual');
+        }
+
+        var responseData = HandleNoChangesResolve(match);
+        responseData.data = match.id;
+        return responseData;
+    }
+    return new ResponseData(201);
+}
+
 export async function ResolveMatchDispute(matchId, resolveOption){
     var match = FindMatch(matchId);
     if (!match) return nullErrors.matchDoesntExist;
 
     if (match.status != matchStatuses.dispute) return resolveErrors.notDisputed;
+
+    match.players[0].disputeResolveSent = false;
+    match.players[1].disputeResolveSent = false;
 
     if (match.mode == matchModes.casual){
         match.status == matchStatuses.ingame;
@@ -358,22 +388,11 @@ export async function ResolveMatchDispute(matchId, resolveOption){
         return new ResponseData(201, 'casual');
     }
 
-    var currentGame = match.gamesArr[match.gamesArr.length - 1];
-
     switch (resolveOption){
         case disputeResolveOptions.noChanges:
-            //todo: check which status to revert to
-            if (currentGame.stage == stages.unpicked){
-                match.status = matchStatuses.stageSelection;
-                SendDisputeMessage(GetDisputedMatchesList(), false);
-                return new ResponseData(201);
-            } else{
-                match.status = matchStatuses.ingame;
-                SendDisputeMessage(GetDisputedMatchesList(), false);
-                return new ResponseData(201);
-            }
+            return HandleNoChangesResolve(match);
         case disputeResolveOptions.resetCurrentGame:
-            currentGame = new Game();
+            match.gamesArr[match.gamesArr.length - 1] = new Game();
             match.status = matchStatuses.stageSelection;
             SendDisputeMessage(GetDisputedMatchesList(), false);
             return new ResponseData(201);
@@ -409,6 +428,20 @@ export async function ResolveMatchDispute(matchId, resolveOption){
             return databaseErrors.matchFinishError;
         default:
             return resolveErrors.illegalResolveOption;
+    }
+}
+
+function HandleNoChangesResolve(match){
+    var currentGame = match.gamesArr[match.gamesArr.length - 1];
+
+    if (currentGame.stage == stages.unpicked){
+        match.status = matchStatuses.stageSelection;
+        SendDisputeMessage(GetDisputedMatchesList(), false);
+        return new ResponseData(201);
+    } else{
+        match.status = matchStatuses.ingame;
+        SendDisputeMessage(GetDisputedMatchesList(), false);
+        return new ResponseData(201);
     }
 }
 

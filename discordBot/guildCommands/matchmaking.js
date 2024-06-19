@@ -23,7 +23,7 @@ export async function execute(interaction) {
     const subCommand = interaction.options.getSubcommand();
     var enabled = true;
     if (subCommand === 'status'){
-        const statusEmbed = BuildSimpleEmbed('Matchmaking status:', `${GetQueAvailible()}`, '\u200B');
+        const statusEmbed = BuildSimpleEmbed('Matchmaking status:', `Enabled: ${GetQueAvailible()}`, '\u200B');
 
         await interaction.reply({ embeds: [statusEmbed] });
         return;

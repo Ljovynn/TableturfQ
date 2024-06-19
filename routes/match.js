@@ -3,7 +3,7 @@ import cookieParser from "cookie-parser";
 import { DeserializeSession } from '../utils/session.js';
 
 import { PlayerSentStageStrikes, PlayerSentStagePick, PlayerSentGameWin, PlayerSentCasualMatchEnd, 
-    UserSentChatMessage, PlayerSentMatchDispute } from '../matchManager.js';
+    UserSentChatMessage, PlayerSentMatchDispute, PlayerSentResolveDispute} from '../matchManager.js';
 
 import { FindMatch } from '../matchManager.js';
 
@@ -20,6 +20,7 @@ import { SendSocketMessage, SendEmptySocketMessage } from '../socketManager.js';
 import dotenv from 'dotenv';
 import { definitionErrors, nullErrors, userErrors } from '../Responses/requestErrors.js';
 import { ResponseSucceeded, SetResponse } from '../Responses/ResponseData.js';
+import { disputeResolveOptions } from '../public/constants/matchData.js';
 
 const router = Router();
 
@@ -135,6 +136,24 @@ router.post("/Dispute", async (req, res) => {
 
         res.sendStatus(responseData.code);
         SendEmptySocketMessage('match' + responseData.data, "dispute");
+    } catch (err){
+        res.sendStatus(500);
+    }
+});
+
+router.post("/ResolveDispute", async (req, res) => {
+    try {
+        if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
+
+        var responseData = PlayerSentResolveDispute(userId);
+        if (!ResponseSucceeded(responseData.code)) return SetResponse(res, responseData);
+
+        if (!responseData.data){
+            return res.sendStatus(responseData.code);
+        }
+        
+        SendSocketMessage('match' + responseData.data, "resolveDispute", disputeResolveOptions.noChanges);
+        res.sendStatus(responseData.code);
     } catch (err){
         res.sendStatus(500);
     }

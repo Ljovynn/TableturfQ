@@ -49,5 +49,6 @@ export const disputeErrors = Object.freeze({
 
 export const resolveErrors = Object.freeze({ 
     notDisputed: new ResponseData(403, 'Match is not in dispute'),
+    alreadyConfirmed: new ResponseData(403, 'Player has already sent a resolve confirmation'),
     illegalResolveOption: new ResponseData(400, 'Not a viable resolve option'),
 });
