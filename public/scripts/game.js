@@ -711,11 +711,11 @@ socket.on('matchWin', async (winnerId) => {
 });
 
 socket.on('dispute', async () => {
-    alert('There has been a dispute in match results. Please wait for a mod to resolve the issue.');
+    alert('There has been a dispute in match results. Please wait for a moderator to resolve the issue. If the dispute was made by accident, please press the resolve dispute button and properly mark the winner.');
     await setMatchInfo();
     await showModDispute();
     await showPlayerResolve();
-    confirmationMessage.innerHTML = 'Please wait for a mod to resolve the match dispute.';
+    confirmationMessage.innerHTML = 'Please wait for a moderator to resolve the match dispute. If the dispute was made by accident, please press the resolve dispute button and properly mark the winner.';
     console.log(match);
 });
 
