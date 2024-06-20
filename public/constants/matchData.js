@@ -140,6 +140,7 @@ export function Player(id){
     this.id = id;
     this.unpickableStagesArr = [];
     this.gameConfirmed = false;
+    this.disputeResolveSent = false;
 }
 
 export function Match(id, player1Id, player2Id, matchMode)
