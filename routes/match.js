@@ -143,6 +143,8 @@ router.post("/Dispute", async (req, res) => {
 
 router.post("/ResolveDispute", async (req, res) => {
     try {
+        const userId = req.session.user;
+
         if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
 
         var responseData = PlayerSentResolveDispute(userId);
@@ -155,6 +157,7 @@ router.post("/ResolveDispute", async (req, res) => {
         SendSocketMessage('match' + responseData.data, "resolveDispute", disputeResolveOptions.noChanges);
         res.sendStatus(responseData.code);
     } catch (err){
+        console.error(err);
         res.sendStatus(500);
     }
 });
