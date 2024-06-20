@@ -197,6 +197,11 @@ h3 {
     display: none;
 }
 
+#player-resolve-content {
+    display: none;
+    margin: 20px;
+}
+
 /**** USER PROFILE ****/
 
 #profile-content {

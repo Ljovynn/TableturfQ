@@ -156,6 +156,7 @@ router.post("/ResolveDispute", async (req, res) => {
         SendSocketMessage('match' + responseData.data, "resolveDispute", disputeResolveOptions.noChanges);
         res.sendStatus(responseData.code);
     } catch (err){
+        console.error(err);
         res.sendStatus(500);
     }
 });

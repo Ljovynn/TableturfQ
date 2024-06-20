@@ -20,6 +20,9 @@ const scoreContainers = document.getElementsByClassName('score-container');
 const playerScores = document.getElementsByClassName('player-score');
 const victoryButtons = document.getElementsByClassName('player-victory-button');
 
+const playerResolve = document.getElementById('player-resolve-content');
+const playerResolveDispute = document.getElementById('player-resolve-dispute');
+
 // Admin
 const adminContent = document.getElementById('admin-content');
 const adminDisputeOptions = document.getElementById('admin-dispute-options');
@@ -31,6 +34,7 @@ const turnTimer = document.getElementById('timer-duration');
 
 // Stage elements
 const stageList = document.getElementById('stages-list');
+const starterStages = document.getElementsByClassName('starter-stage');
 const stages = document.getElementsByClassName('stage');
 const selectableStages = document.getElementsByClassName('stage-selectable');
 const playingStage = document.getElementById('playing-stage');
@@ -200,6 +204,15 @@ adminResolveButton.addEventListener('click', async (e) => {
     }
 });
 
+playerResolveDispute.addEventListener('click', async (e) => {
+    playerResolve.style.display = 'none';
+    var response = await postData('/match/ResolveDispute');
+    console.log(response);
+    if ( response == 201 ) {
+        // idk
+    }
+});
+
 // Page functions
 async function getMatchInfo(matchId) {
     var data = {matchId: parseInt(matchId)};
@@ -237,6 +250,7 @@ async function setMatchInfo() {
     console.log(strikes);
     loading.style.display = 'none';
     matchContainer.style.display = 'block';
+    playerResolve.style.display = 'none';
 
     player1Name.innerHTML = players[0].username;
     player1Avatar.src = player1AvatarString;
@@ -344,8 +358,23 @@ function setStages() {
             } else {
                 if ( stage.getAttribute('stage-value') != currentStage ) {
                     stage.classList.add('stage-stricken');
+                    stage.style.display = 'none';
                 }
             }
+            stage.classList.add('stage-selectable');
+        }
+    }
+}
+
+function resetStages() {
+    if ( match.gamesArr.length > 1 ) {
+        for ( let stage of stages ) {
+            stage.classList.remove('stage-stricken');
+            stage.classList.add('stage-selectable');
+        }
+    } else {
+        for ( let stage of starterStages ) {
+            stage.classList.remove('stage-stricken');
             stage.classList.add('stage-selectable');
         }
     }
@@ -462,6 +491,7 @@ function setSelectedStage(selectedStage) {
     for ( let stage of stages ) {
         if ( parseInt(stage.getAttribute('stage-value')) != selectedStage ) {
             stage.classList.add('stage-stricken');
+            stage.style.display = 'none';
         }
     }
 }
@@ -511,6 +541,7 @@ function startGame() {
     playingStage.style.display = 'block';
     strikerSection.style.display = 'none';
     strikeContent.style.display = 'none';
+    playerResolve.style.display = 'none';
 
     var selectedStage = document.getElementsByClassName('stage-selected');
     if ( selectedStage.length > 0 )
@@ -531,7 +562,7 @@ function setWinner(winnerId) {
     }
 }
 
-async function gameReset(winnerId) {
+async function nextGame(winnerId) {
     mapSelect = false;
     playingStage.style.display = 'none';
     confirmationMessage.style.display = 'none';
@@ -546,7 +577,12 @@ async function gameReset(winnerId) {
     setScores();
     setStrikeAmount();
     setCurrentStriker();
+}
 
+async function resetGame() {
+    resetStages();
+    setStrikeAmount();
+    setCurrentStriker();
 }
 
 function gameFinish(winnerId) {
@@ -585,6 +621,10 @@ function showModDispute() {
     if ( matchInfo.user.role == 2 && match.status == 2 ) {
         adminContent.style.display = 'block';
     }
+}
+
+function showPlayerResolve() {
+    playerResolve.style.display = 'block';
 }
 
 async function getModUser(users) {
@@ -656,7 +696,7 @@ socket.on('playerConfirmedWin', (winnerId) => {
 socket.on('gameWin', async (winnerId) => {
     // I guess check if the match is over before reseting the game state
     await setMatchInfo();
-    await gameReset(winnerId);
+    await nextGame(winnerId);
     isPlayerStriker();
     //getMatchInfo(matchId);
     //setMatchInfo(matchId);
@@ -671,14 +711,21 @@ socket.on('matchWin', async (winnerId) => {
 });
 
 socket.on('dispute', async () => {
-    alert('There has been a dispute in match results. Please wait for a mod to resolve the issue.');
+    alert('There has been a dispute in match results. Please wait for a moderator to resolve the issue. If the dispute was made by accident, please press the resolve dispute button and properly mark the winner.');
     await setMatchInfo();
     await showModDispute();
-    confirmationMessage.innerHTML = 'Please wait for a mod to resolve the match dispute.';
+    await showPlayerResolve();
+    confirmationMessage.innerHTML = 'Please wait for a moderator to resolve the match dispute. If the dispute was made by accident, please press the resolve dispute button and properly mark the winner.';
     console.log(match);
 });
 
 socket.on('resolveDispute', async () => {
-    alert('An mod has resolved the current match dispute.');
+    alert('The dispute has been resolved.');
     await setMatchInfo();
+    console.log(match);
+    // If the game or the match has to be reset, go through the reset function
+    // We'll check based on whether or not the strikes have been reset
+    if ( match.gamesArr.at(-1).strikes.length == 0 ) {
+        resetGame();
+    }
 });
