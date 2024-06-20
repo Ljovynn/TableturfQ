@@ -143,6 +143,7 @@ router.post("/Dispute", async (req, res) => {
 
 router.post("/ResolveDispute", async (req, res) => {
     try {
+        const userId = req.session.user;
         if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
 
         var responseData = PlayerSentResolveDispute(userId);
