@@ -71,6 +71,7 @@ var strikeAmount = 1;
 var strikesRemaining = strikeAmount;
 var currentStriker = 0;
 var mapSelect = false;
+var starters = [];
 
 // Just the map for set length -> best of N
 var bestOfSets = {
@@ -230,6 +231,7 @@ async function setMatchInfo() {
     user = matchInfo.user;
     userID = user.id;
     chat = match.chat;
+    starters = match.mode.rulesetData.starterStagesArr;
 
     var player1DiscordId = players[0].discord_id;
     var player1DiscordAvatar = players[0].discord_avatar_hash;
@@ -361,6 +363,12 @@ function setStages() {
                     stage.style.display = 'none';
                 }
             }
+            stage.classList.add('stage-selectable');
+        }
+    } else {
+        for ( let starter of starters ) {
+            var stage = document.querySelectorAll('[stage-value="' + starter + '"]')[0];
+            stage.classList.remove('stage-stricken');
             stage.classList.add('stage-selectable');
         }
     }
