@@ -13,6 +13,7 @@ import { FindIfPlayerInQue } from '../queManager.js';
 import { FindMatchWithPlayer } from '../matchManager.js';
 import { DeleteAllUserSessions, GetMultipleUserDatas, GetUserMatchHistory, SetUserDiscordTokens } from '../database.js';
 import { definitionErrors, userErrors } from '../Responses/requestErrors.js';
+import { SetResponse } from '../Responses/ResponseData.js';
 
 const router = Router();
 

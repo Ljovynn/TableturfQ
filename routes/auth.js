@@ -36,6 +36,7 @@ router.get("/discord/redirect", async (req, res) => {
         res.sendFile(path.join(__dirname, '..', "public/index.html"));
         return;
     }
+    
 
     try{
         const formData = new url.URLSearchParams({
@@ -43,7 +44,7 @@ router.get("/discord/redirect", async (req, res) => {
             client_secret: clientSecret,
             grant_type: "authorization_code",
             code: code.toString(),
-            redirect_uri: 'http://localhost:8080/api/auth/discord/redirect'//website_url + ":" + port + "/api/auth/discord/redirect",
+            redirect_uri: 'http://85.228.168.231/api/auth/discord/redirect'//website_url + ":" + port + "/api/auth/discord/redirect",
         });
     
         const response = await axios.post(apiRouteOauth2Token,
