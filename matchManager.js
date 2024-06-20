@@ -331,6 +331,7 @@ export function PlayerSentMatchDispute(playerId){
 function StartMatchDispute(match){
     match.players[0].gameConfirmed = false;
     match.players[1].gameConfirmed = false;
+    match.gamesArr[match.gamesArr.length - 1].winnerId = 0;
     match.status = matchStatuses.dispute;
     SendDisputeMessage(GetDisputedMatchesList(), true);
 }
