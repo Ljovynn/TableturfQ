@@ -35,6 +35,20 @@ a:hover {
 h3 {
 }
 
+/**** INDEX PAGE STYLES ****/
+.index-link {
+    display: block;
+    margin: 20px;
+}
+
+.index-logged-in-link {
+    display: none;
+}
+
+#index-match-div {
+    display: none;
+}
+
 /**** QUEUE PAGE STYLES ****/
 
 .queue-section {
