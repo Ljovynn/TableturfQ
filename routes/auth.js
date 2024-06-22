@@ -9,7 +9,12 @@ import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import path from 'path';
 
-import { GetUserByDiscordId, CreateUserWithDiscord, SetUserDiscord } from '../database.js';
+import { GetUserByDiscordId, CreateUserWithDiscord, SetUserDiscord, CreateUser, GetUserData, VerifyAccount } from '../database.js';
+import { CheckUserDefined } from '../utils/checkDefined.js';
+import { authErrors, databaseErrors } from '../Responses/authErrors.js';
+import { SetResponse } from '../Responses/ResponseData.js';
+import { userErrors } from '../Responses/requestErrors.js';
+import { userRoles } from '../public/constants/userData.js';
 
 const apiRouteOauth2Token = "https://discord.com/api/v10/oauth2/token";
 const apiRouteUserInfo = "https://discord.com/api/v10/users/@me";
@@ -29,14 +34,28 @@ const router = Router();
 router.use(cookieParser(sessionSecret));
 router.use(DeserializeSession);
 
+//req: username
+router.get("/unverified/login", async (req, res) => {
+    if (CheckUserDefined(req)) return SetResponse(res, authErrors.userLoggedIn);
+
+    var userId = await CreateUser(req.username);
+    if (!userId) return SetResponse(databaseErrors.unverifiedCreateError);
+
+    await SerializeSession(req, userId);
+
+    res.location("/");
+    res.end();
+});
+
 router.get("/discord/redirect", async (req, res) => {
     const { code } = req.query;
+
+    const userId = req.session.user;
 
     if (!code){
         res.sendFile(path.join(__dirname, '..', "public/index.html"));
         return;
     }
-    
 
     try{
         const formData = new url.URLSearchParams({
@@ -58,9 +77,10 @@ router.get("/discord/redirect", async (req, res) => {
     
         if (response.data) {
 
-            const userId = await StoreUserData(access_token, refresh_token);
+            const newUserId = await StoreUserData(access_token, refresh_token, userId);
 
-            await SerializeSession(req, userId);
+            if (!newUserId) return SetResponse(databaseErrors.verifiedCreateError);
+            await SerializeSession(req, newUserId);
     
             //refresh token
             /*const requestFormData = new url.URLSearchParams({
@@ -84,20 +104,29 @@ router.get("/discord/redirect", async (req, res) => {
 
 export default router;
 
-async function StoreUserData(accessToken, refreshToken){
+async function StoreUserData(accessToken, refreshToken, userId){
     const response = await axios.get(apiRouteUserInfo, {
         headers: {
             "Authorization": `Bearer ${accessToken}`,
         },
     });
 
-    var user = await GetUserByDiscordId(response.data.id);
-    var userId;
-    if (!user){
-        userId = await CreateUserWithDiscord(response.data.username, response.data.id, accessToken, refreshToken, response.data.avatar);
-    } else {
-        userId = user.id;
-        await SetUserDiscord(userId, response.data.id, accessToken, refreshToken, response.data.avatar); 
+    //If logged in to account, update that account
+    if (userId){
+        var user = await GetUserData(userId);
+        if (user && user.role == userRoles.unverified){
+            await VerifyAccount(userId, response.data.id, accessToken, refreshToken, response.data.avatar);
+            return userId;
+        }
     }
-    return userId;
+
+    var newUser = await GetUserByDiscordId(response.data.id);
+    var newUserId;
+    if (!newUser){
+        newUserId = await CreateUserWithDiscord(response.data.username, response.data.id, accessToken, refreshToken, response.data.avatar);
+    } else {
+        newUserId = newUser.id;
+        await SetUserDiscord(newUserId, response.data.id, accessToken, refreshToken, response.data.avatar); 
+    }
+    return newUserId;
 }
