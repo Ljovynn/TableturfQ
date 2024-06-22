@@ -150,6 +150,12 @@ router.post("/ResolveDispute", async (req, res) => {
         var responseData = await PlayerSentResolveDispute(userId);
         if (!ResponseSucceeded(responseData.code)) return SetResponse(res, responseData);
 
+        if (responseData.data === 'casual'){
+            res.sendStatus(responseData.code);
+            SendSocketMessage('match' + matchId, "resolveDispute", disputeResolveOptions.noChanges);
+            return;
+        }
+        
         if (!responseData.data){
             return res.sendStatus(responseData.code);
         }
