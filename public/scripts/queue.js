@@ -4,6 +4,7 @@ const queueMatchmaking = document.getElementById('queue-matchmaking');
 const matchMakingReady = document.getElementById('ranked-match-ready');
 const queueTimer = document.getElementById('queue-timer');
 const queueInfo = document.getElementById('queue-info');
+const readyCountdown = document.getElementById('ranked-match-ready-countdown');
 
 // Interactable Elements
 const joinCompetetive = document.getElementById('join-competetive-queue');
@@ -97,11 +98,23 @@ function validateDisplayname(displayName) {
 }
 
 var timer = 0;
+var countdown = 300;
 
 function updateTimer() {
     timer += 1;
     time = secondsToHMS(timer);
     queueTimer.innerHTML = 'Finding Match... ' + time;    
+}
+
+function countdownTimer() {
+    countdown -= 1;
+    time = secondsToMS(countdown);
+    readyCountdown.innerHTML = time;
+    if ( countdown == 0 ) {
+        clearTimer(readyUp);
+        alert('You have been removed from the queue due to inactivity.');
+    }
+
 }
 
 function clearTimer(intervalId) {
@@ -119,6 +132,16 @@ function secondsToHMS(d) {
     return ('0' + h).slice(-2) + ":" + ('0' + m).slice(-2) + ":" + ('0' + s).slice(-2);
 }
 
+function secondsToMS(d) {
+    d = Number(d);
+
+    var h = Math.floor(d / 3600);
+    var m = Math.floor(d % 3600 / 60);
+    var s = Math.floor(d % 3600 % 60);
+
+    return ('0' + m).slice(-2) + ":" + ('0' + s).slice(-2);
+}
+
 // SOCKET JS
 
 socket.emit('join', 'queRoom');
@@ -126,8 +149,9 @@ socket.emit('join', 'queRoom');
 socket.on('matchesFound', (matchedPlayersData) => {
     console.log('Socket event match ready');
     console.log(matchedPlayersData);
-    queueInfo.style.display = 'block';
+    queueInfo.style.display = 'none';
     matchMakingReady.style.display = 'block';
+    readyUp = window.setInterval(countdownTimer, 1000);
 });
 
 socket.on('matchReady', (matchedPlayersData) => {
