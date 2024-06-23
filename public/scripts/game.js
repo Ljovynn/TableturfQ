@@ -426,7 +426,7 @@ function setStrikeAmount() {
         strikeableStages = document.getElementsByClassName('stage-selectable');
         // I think I can use the mod operation for this but 15 stages + 1 % 4 just equals 0?
         if ( strikeableStages.length > 12 ) {
-            strikeAmount = 3;
+            strikeAmount = 2;
             strikeButton.innerHTML = 'Confirm Strikes';
         } else {
             strikeAmount = 1;
