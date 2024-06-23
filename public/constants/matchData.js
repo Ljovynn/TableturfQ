@@ -107,13 +107,12 @@ const currentRankedCounterpicks = [
     stages.maskMansion,
     stages.stickyThicket,
     stages.crackerSnap,
-    stages.twoLaneSplattop,
     stages.pedalToTheMedal,
     stages.overTheLine
 ];
 
 const rankedQueData = new QueData(20, 1, 100, 500, 500, 2500);
-const rankedRulesetData = new RulesetData(setLengths.bo5, turnTimer.s50, currentRankedStarters, currentRankedCounterpicks, 3, true)
+const rankedRulesetData = new RulesetData(setLengths.bo5, turnTimer.s50, currentRankedStarters, currentRankedCounterpicks, 2, true)
 const rankedMatchMode = new MatchMode(rankedRulesetData, rankedQueData);
 
 const casualQueData = new QueData(0, 7, 300, 2000, 500, 2500);
