@@ -425,7 +425,7 @@ function setStrikeAmount() {
     } else {
         strikeableStages = document.getElementsByClassName('stage-selectable');
         // I think I can use the mod operation for this but 15 stages + 1 % 4 just equals 0?
-        if ( matchInfo.match.gamesArr.at(-2).strikes.length == 0 ) {
+        if ( matchInfo.match.gamesArr.at(-1).strikes.length == 0 ) {
             strikeAmount = 2;
             strikeButton.innerHTML = 'Confirm Strikes';
         } else {
