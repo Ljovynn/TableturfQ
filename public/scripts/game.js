@@ -424,8 +424,8 @@ function setStrikeAmount() {
         strikeInfo.innerHTML = strikesRemaining + ' stage strike' + ( strikesRemaining == 1 ? '' : 's' ) + ' remaining.';
     } else {
         strikeableStages = document.getElementsByClassName('stage-selectable');
-        // I think I can use the mod operation for this but 15 stages + 1 % 4 just equals 0?
-        if ( matchInfo.match.gamesArr.at(-1).strikes.length == 0 ) {
+        // Rewrite this, this is dumb as hell
+        if ( strikeableStages.length == 15 ) {
             strikeAmount = 2;
             strikeButton.innerHTML = 'Confirm Strikes';
         } else {
@@ -468,7 +468,8 @@ function setCurrentStriker() {
     currentStrikerName.innerHTML = name + ' is currently striking.';
 
     // If 12 stages remain, just set it to the other player, we have to select the game
-    if ( strikeableStages.length == 12 ) {
+    // Rewrite this too, this is awful
+    if ( strikeableStages.length == 13 ) {
         if ( currentStriker == players[0].id ) {
             currentStriker = players[1].id;
             name = players[1].username;
