@@ -34,7 +34,6 @@ const turnTimer = document.getElementById('timer-duration');
 
 // Stage elements
 const stageList = document.getElementById('stages-list');
-const starterStages = document.getElementsByClassName('starter-stage');
 const stages = document.getElementsByClassName('stage');
 const selectableStages = document.getElementsByClassName('stage-selectable');
 const playingStage = document.getElementById('playing-stage');
@@ -58,6 +57,7 @@ const chatSend = document.getElementById('match-chat-button');
 
 var match;
 var userID = 0;
+var opponentID = 0;
 var user = {};
 var matchInfo = [];
 var players = [];
@@ -68,10 +68,13 @@ var casualMatch = false;
 var strikes = [];
 var stageStrikes = [];
 var strikeAmount = 1;
+var counterpickStrikeAmount;
 var strikesRemaining = strikeAmount;
 var currentStriker = 0;
 var mapSelect = false;
 var starters = [];
+var counterpicks = [];
+var pickingStage = false;
 
 // Just the map for set length -> best of N
 var bestOfSets = {
@@ -121,7 +124,9 @@ for (let stage of stages ) {
                     stageStrikes.splice(i,1);
                 }
 
-                strikeInfo.innerHTML = strikesRemaining + ' stage strike' + ( strikesRemaining == 1 ? '' : 's' ) + ' remaining.';
+                if ( !pickingStage ) {
+                    strikeInfo.innerHTML = strikesRemaining + ' stage strike' + ( strikesRemaining == 1 ? '' : 's' ) + ' remaining.';
+                }
             }
         }
     });
@@ -226,12 +231,23 @@ async function getMatchInfo(matchId) {
 async function setMatchInfo() {
     await getMatchInfo(matchId);
 
+    console.log(matchInfo);
+
     match = matchInfo.match;
     players = matchInfo.players;
     user = matchInfo.user;
     userID = user.id;
+
+    if ( match.players[0].id == userID ) {
+        opponentID = match.players[1].id;
+    } else {
+        opponentID = match.players[0].id;
+    }
+
     chat = match.chat;
     starters = match.mode.rulesetData.starterStagesArr;
+    counterpicks = match.mode.rulesetData.counterPickStagesArr;
+    counterpickStrikeAmount = match.mode.rulesetData.counterPickBans;
 
     var player1DiscordId = players[0].discord_id;
     var player1DiscordAvatar = players[0].discord_avatar_hash;
@@ -264,7 +280,7 @@ async function setMatchInfo() {
     player2VictoryButton.value = players[1].id;
     player2Score.setAttribute('player-id', players[1].id);
 
-    setLength.innerHTML = bestOfSets[match.mode.rulesetData.setLength] + ' games';
+    setLength.innerHTML = 'Best of ' + bestOfSets[match.mode.rulesetData.setLength] + ' games';
     turnTimer.innerHTML = ( match.mode.rulesetData.turnTimer * 10 ) + ' seconds';
 
     addChatMessages(chat);
@@ -352,7 +368,8 @@ function setScores() {
 function setStages() {
     if (match.gamesArr.length > 1) {
         var currentStage = match.gamesArr.at(-1).stage;
-        for( let stage of stages ) {
+        for( let counterpick of counterpicks ) {
+            var stage = document.querySelectorAll('[stage-value="' + counterpick + '"]')[0];
             // If the stage hasn't been selected, remove all stage-stricken classes first
             // If the stage has been selected, strike everything except the selected stage
             if ( !currentStage ) {
@@ -376,14 +393,18 @@ function setStages() {
 
 function resetStages() {
     if ( match.gamesArr.length > 1 ) {
-        for ( let stage of stages ) {
+        for ( let counterpick of counterpicks ) {
+            var stage = document.querySelectorAll('[stage-value="' + counterpick + '"]')[0];
             stage.classList.remove('stage-stricken');
             stage.classList.add('stage-selectable');
+            stage.style.display = 'inline-block';
         }
     } else {
-        for ( let stage of starterStages ) {
+        for ( let starter of starters ) {
+            var stage = document.querySelectorAll('[stage-value="' + starter + '"]')[0];
             stage.classList.remove('stage-stricken');
             stage.classList.add('stage-selectable');
+            stage.style.display = 'inline-block';
         }
     }
 }
@@ -402,6 +423,7 @@ function setStrikes(receivedStrikes) {
             stage.classList.remove('stage-selected');
         stage.classList.remove('stage-selectable');
         stage.classList.add('stage-stricken');
+        stage.style.display = 'none';
     }
     // Reset the local strike array after setting all the strikes
     stageStrikes = [];
@@ -424,9 +446,11 @@ function setStrikeAmount() {
         strikeInfo.innerHTML = strikesRemaining + ' stage strike' + ( strikesRemaining == 1 ? '' : 's' ) + ' remaining.';
     } else {
         strikeableStages = document.getElementsByClassName('stage-selectable');
+        console.log(counterpicks.length);
+        console.log(strikeableStages.length);
         // Rewrite this, this is dumb as hell
-        if ( strikeableStages.length == 15 ) {
-            strikeAmount = 2;
+        if ( strikeableStages.length == counterpicks.length ) {
+            strikeAmount = counterpickStrikeAmount;
             strikeButton.innerHTML = 'Confirm Strikes';
         } else {
             strikeAmount = 1;
@@ -440,6 +464,8 @@ function setStrikeAmount() {
 
 function setCurrentStriker() {
     var strikeableStages = document.getElementsByClassName('stage-selectable');
+    var oppUnpickableStages = [];
+    var oppID;
     // TODO: Rewrite this whole function, this is horrible
     if ( strikeableStages.length == 5 ) {
         currentStriker = players[0].id;
@@ -460,16 +486,23 @@ function setCurrentStriker() {
         currentStriker = match.gamesArr.at(-2).winnerId;
         if ( currentStriker == players[0].id ) {
             name = players[0].username;
+            oppUnpickableStages = match.players[1].unpickableStagesArr;
+            oppID = match.players[1].id;
         } else {
             name = players[1].username;
+            oppUnpickableStages = match.players[0].unpickableStagesArr;
+            oppID = match.players[0].id;
         }
     }
 
     currentStrikerName.innerHTML = name + ' is currently striking.';
 
+    // Hide opponent's DSRs so you don't waste a strike
+    setDSRStages(oppID);
+
     // If 12 stages remain, just set it to the other player, we have to select the game
     // Rewrite this too, this is awful
-    if ( strikeableStages.length == 13 ) {
+    if ( strikeableStages.length == (counterpicks.length - oppUnpickableStages.length - counterpickStrikeAmount) ) {
         if ( currentStriker == players[0].id ) {
             currentStriker = players[1].id;
             name = players[1].username;
@@ -479,6 +512,8 @@ function setCurrentStriker() {
         }
 
         setDSRStages(currentStriker);
+
+        pickingStage = true;
 
         currentStrikerName.innerHTML = name + ' is currently picking the map to play on.';
         strikeInfo.innerHTML = 'Select the map to play on.';
@@ -525,6 +560,7 @@ function setDSRStages(currentStriker) {
             stage.classList.remove('stage-selected');
         stage.classList.remove('stage-selectable');
         stage.classList.add('stage-stricken');
+        stage.style.display = 'none';
     }
 }
 
@@ -578,7 +614,8 @@ async function nextGame(winnerId) {
     player1VictoryButton.style.display = 'none';
     player2VictoryButton.style.display = 'none';
     currentStriker = winnerId;
-    unstrikeAllMaps();
+    strikes = [];
+    resetStages();
     strikerSection.style.display = 'block';
     strikeContent.style.display = 'block';
     console.log('Reset');
@@ -616,14 +653,6 @@ function gameFinish(winnerId) {
 
     gameMessage.innerHTML = name + ' has won the match!';
     requeueButton.style.display = 'block';
-}
-
-function unstrikeAllMaps() {
-    strikes = [];
-    for ( let stage of stages ) {
-        stage.classList.remove('stage-stricken');
-        stage.classList.add('stage-selectable');
-     }
 }
 
 function showModDispute() {

@@ -89,9 +89,9 @@ export function MatchMode(rulesetData, queData){
 const currentRankedStarters = [
     stages.mainStreet, 
     stages.thunderPoint, 
-    stages.squareSquared, 
-    stages.lakefrontProperty, 
-    stages.riverDrift
+    stages.squareSquared,  
+    stages.riverDrift,
+    stages.girderForBattle
 ];
 
 const currentRankedCounterpicks = [
