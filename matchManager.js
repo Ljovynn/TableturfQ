@@ -13,12 +13,12 @@ var matches = [];
 // zeb testing
 //matches.push( new Match(12, 10, 3, matchModes.ranked) );
 //matches.push( new Match(7, 10, 3, matchModes.casual) );
-var m1 = new Match(7, 3, 4, matchModes.ranked);
+/*var m1 = new Match(7, 3, 4, matchModes.ranked);
 m1.status = matchStatuses.dispute;
 matches.push(m1);
 
 var m2 = new Match(8, 1, 2, matchModes.ranked);
-matches.push(m2);
+matches.push(m2);*/
 
 //Ljovynn testing
 
