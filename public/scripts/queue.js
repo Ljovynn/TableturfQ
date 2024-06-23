@@ -1,16 +1,25 @@
-const joinCompetetive = document.getElementById('join-competetive-queue');
-const joinCasual = document.getElementById('join-casual-queue');
+// Elements
 const casualUsername = document.getElementById('casual-username');
-const readyButton = document.getElementById('ranked-match-ready-button');
 const queueMatchmaking = document.getElementById('queue-matchmaking');
 const matchMakingReady = document.getElementById('ranked-match-ready');
 const queueTimer = document.getElementById('queue-timer');
+const queueInfo = document.getElementById('queue-info');
+
+// Interactable Elements
+const joinCompetetive = document.getElementById('join-competetive-queue');
+const joinCasual = document.getElementById('join-casual-queue');
+const readyButton = document.getElementById('ranked-match-ready-button');
+const leaveButton = document.getElementById('leave-queue-button');
 
 const socket = io();
+
+var queuedMatchMode;
+var mainTimer;
 
 joinCompetetive.addEventListener('click', async (e) => {
     console.log('User has joined the competetive queue');
     data = { matchMode: 'ranked' }
+    queuedMatchMode = 'ranked';
 
     // Join the queue
     response = await postData('/que/PlayerEnterQue', data);
@@ -18,8 +27,8 @@ joinCompetetive.addEventListener('click', async (e) => {
     if ( response == 201 ) {
         // Do queue frontend stuff
         alert('Successfully joined the queue!');
-        queueTimer.style.display = 'block';
-        window.setInterval(updateTimer, 1000);
+        queueInfo.style.display = 'block';
+        mainTimer = window.setInterval(updateTimer, 1000);
         // Socket matchfound code
         //matchMakingReady.style.display = 'block';
     } else {
@@ -35,14 +44,15 @@ joinCasual.addEventListener('click', async (e) => {
     // Check that there is a username entered
     if (validateDisplayname(displayName)) {
         data = { matchMode: 'casual' }
+        queuedMatchMode = 'casual';
         // Join the queue
         response = await postData('/que/PlayerEnterQue', data);
         
         if ( response == 201 ) {
             // Do queue frontend stuff
             alert('Successfully joined the queue!');
-            queueTimer.style.display = 'block';
-            window.setInterval(updateTimer, 1000);
+            queueInfo.style.display = 'block';
+            mainTimer = window.setInterval(updateTimer, 1000);
             // Socket matchfound code
             //matchMakingReady.style.display = 'block';
         } else {
@@ -65,6 +75,19 @@ readyButton.addEventListener('click', async (e) => {
     // Redirect to the game room once the game is created
 });
 
+leaveButton.addEventListener('click', async (e) => {
+    console.log('leaving queue');
+    data = { matchMode: queuedMatchMode };
+    response = await postData('/que/PlayerLeaveQue', data);
+    console.log(response);
+    if ( response == 201 ) {
+        clearTimer(mainTimer);
+        queueInfo.style.display = 'none';
+        alert('You have successfully left the queue');
+        queueTimer.innerHTML = 'Finding Match... 00:00:00'; 
+    }
+});
+
 function validateDisplayname(displayName) {
     if ( displayName === '' ) {
         return false;
@@ -79,6 +102,11 @@ function updateTimer() {
     timer += 1;
     time = secondsToHMS(timer);
     queueTimer.innerHTML = 'Finding Match... ' + time;    
+}
+
+function clearTimer(intervalId) {
+    timer = 0;
+    clearInterval(intervalId);
 }
 
 function secondsToHMS(d) {
@@ -98,7 +126,7 @@ socket.emit('join', 'queRoom');
 socket.on('matchesFound', (matchedPlayersData) => {
     console.log('Socket event match ready');
     console.log(matchedPlayersData);
-    queueTimer.style.display = 'none';
+    queueInfo.style.display = 'block';
     matchMakingReady.style.display = 'block';
 });
 

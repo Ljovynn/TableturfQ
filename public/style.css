@@ -56,8 +56,10 @@ h3 {
     padding: 20px;
 }
 
-#queue-timer {
+#queue-info {
     display: none;
+    margin: auto;
+    width: 50%;
 }
 
 #ranked-match-ready {

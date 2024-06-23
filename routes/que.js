@@ -57,6 +57,7 @@ router.post("/PlayerLeaveQue", async (req, res) => {
         }
         res.status(403).send('Player already not in que');
     } catch (err){
+        console.error(err);
         res.sendStatus(500);
     }
 });

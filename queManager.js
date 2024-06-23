@@ -193,7 +193,8 @@ export function FindIfPlayerWaitingForReady(playerId){
 
 export function RemovePlayerFromQue(playerId, matchMode){
     for (let i = 0; i < ques.length; i++){
-        if (ques[i].matchMode != matchMode) continue;
+        // Stringify both objects to check for equality
+        if ( JSON.stringify(ques[i].matchMode) != JSON.stringify(matchModes[matchMode]) ) continue;
 
         for (let j = 0; j < ques[i].queArr.length; i++){
             if (ques[i].queArr[j].id == playerId){
