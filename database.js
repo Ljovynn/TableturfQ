@@ -233,6 +233,11 @@ export async function SetUserRating(userId, rating, rd, vol){
     await pool.query(`UPDATE users SET g2_rating = ?, g2_rd = ?, g2_vol = ? WHERE id = ?`, [rating, rd, vol, userId]);
 }
 
+export async function VerifyAccount(userId, discordId, discordAccessToken, discordRefreshToken, discordAvatarHash){
+    await pool.query(`UPDATE users SET discord_id = ?, role = ?, discord_access_token = ?, discord_refresh_token = ?, discord_avatar_hash = ? WHERE id = ?`, 
+    [discordId, userRoles.verified, discordAccessToken, discordRefreshToken, discordAvatarHash, userId]);
+}
+
 export async function SetUserDiscord(userId, discordId, discordAccessToken, discordRefreshToken, discordAvatarHash){
     await pool.query(`UPDATE users SET discord_id = ?, discord_access_token = ?, discord_refresh_token = ?, discord_avatar_hash = ? WHERE id = ?`, 
     [discordId, discordAccessToken, discordRefreshToken, discordAvatarHash, userId]);

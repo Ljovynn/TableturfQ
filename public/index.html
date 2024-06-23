@@ -13,13 +13,26 @@
             <h1>TableturfQ</h1>
         </header>
         <main class="main">
-            <h3 data-key="howToUse">How to use</h3>
             <div class = "logInButtonDiv">
                 <p><a href="https://discord.com/oauth2/authorize?client_id=1242923464470560840&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fapi%2Fauth%2Fdiscord%2Fredirect&scope=identify"><button id="logIn" style="font-weight: bold;">Log in</button></a></p>
             </div>
-            <a href="/info">Rules and Info</a>
-            <a href="/profile">(ONLY IF LOGGED IN) My Profile</a>
-            <a href="/leaderboard">Leaderboard</a>
+            <div class="index-link">
+                <a href="/info">Rules and Info</a>
+            </div>
+            <div class="index-link index-logged-in-link">
+                <a href="/profile">My Profile</a>
+            </div>
+            <div class="index-link">
+                <a href="/leaderboard">Leaderboard</a>
+            </div>
+            <div class="index-link index-logged-in-link">
+                <a href="/queue">Queue</a>
+            </div>
+            <div id="index-match-div" class="index-link">
+                <a id="index-match-link" href="">Rejoin Game</a>
+            </div>
         </main>
     </body>
+    <script type="text/javascript" src="./scripts/dataPOST.js"></script>
+    <script type="text/javascript" src="./scripts/index.js"></script>
 </html>

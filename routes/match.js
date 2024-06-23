@@ -146,9 +146,15 @@ router.post("/ResolveDispute", async (req, res) => {
         const userId = req.session.user;
         if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
 
-        var responseData = PlayerSentResolveDispute(userId);
+        var responseData = await PlayerSentResolveDispute(userId);
         if (!ResponseSucceeded(responseData.code)) return SetResponse(res, responseData);
 
+        if (responseData.data === 'casual'){
+            res.sendStatus(responseData.code);
+            SendSocketMessage('match' + matchId, "resolveDispute", disputeResolveOptions.noChanges);
+            return;
+        }
+        
         if (!responseData.data){
             return res.sendStatus(responseData.code);
         }
