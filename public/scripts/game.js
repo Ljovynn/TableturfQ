@@ -377,15 +377,16 @@ function setStages() {
             } else {
                 if ( stage.getAttribute('stage-value') != currentStage ) {
                     stage.classList.add('stage-stricken');
-                    stage.style.display = 'none';
                 }
             }
+            stage.classList.remove('stage-unselectable');
             stage.classList.add('stage-selectable');
         }
     } else {
         for ( let starter of starters ) {
             var stage = document.querySelectorAll('[stage-value="' + starter + '"]')[0];
             stage.classList.remove('stage-stricken');
+            stage.classList.remove('stage-unselectable');
             stage.classList.add('stage-selectable');
         }
     }
@@ -423,7 +424,6 @@ function setStrikes(receivedStrikes) {
             stage.classList.remove('stage-selected');
         stage.classList.remove('stage-selectable');
         stage.classList.add('stage-stricken');
-        stage.style.display = 'none';
     }
     // Reset the local strike array after setting all the strikes
     stageStrikes = [];
@@ -535,7 +535,6 @@ function setSelectedStage(selectedStage) {
     for ( let stage of stages ) {
         if ( parseInt(stage.getAttribute('stage-value')) != selectedStage ) {
             stage.classList.add('stage-stricken');
-            stage.style.display = 'none';
         }
     }
 }
@@ -560,7 +559,6 @@ function setDSRStages(currentStriker) {
             stage.classList.remove('stage-selected');
         stage.classList.remove('stage-selectable');
         stage.classList.add('stage-stricken');
-        stage.style.display = 'none';
     }
 }
 
