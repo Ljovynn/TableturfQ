@@ -46,7 +46,7 @@ var recentlyMatchedPlayersList = [];
 export async function AddPlayerToQue(playerId, matchMode){
     if (!GetQueAvailible()) return enterQueErrors.queUnavailible;
     for (let i = 0; i < ques.length; i++){
-        if (ques[i].matchMode == matchModes[matchMode]) return await TryAddPlayerToQue(ques[i], playerId);
+        if (ques[i].matchMode == matchMode) return await TryAddPlayerToQue(ques[i], playerId);
     }
     return enterQueErrors.illegalMatchMode;
 }
@@ -190,11 +190,10 @@ export function FindIfPlayerWaitingForReady(playerId){
     return {inWaiting, ready, timeWaitingStarted};
 }
 
-
 export function RemovePlayerFromQue(playerId, matchMode){
     for (let i = 0; i < ques.length; i++){
         // Stringify both objects to check for equality
-        if ( JSON.stringify(ques[i].matchMode) != JSON.stringify(matchModes[matchMode]) ) continue;
+        if (ques[i].matchMode != matchMode) continue;
 
         for (let j = 0; j < ques[i].queArr.length; i++){
             if (ques[i].queArr[j].id == playerId){
