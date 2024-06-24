@@ -43,7 +43,7 @@ server.listen(port, () => {
     console.log(`TableturfQ is up at port ${port}`);
 
     //que
-    /*setInterval(MatchMakingTick, matchmakingTickInterval);
+    setInterval(MatchMakingTick, matchmakingTickInterval);
     setInterval(CheckMatchmadePlayers, checkMatchmadePlayersInterval);
 
     //match
@@ -62,7 +62,7 @@ server.listen(port, () => {
     setInterval(DeleteOldSessions, deleteOldSessionsInterval);
 
     //announcements
-    setInterval(DeletePastAnnouncements, deleteOldAnnouncementsInterval);*/
+    setInterval(DeletePastAnnouncements, deleteOldAnnouncementsInterval);
 
     StartDiscordBot();
 

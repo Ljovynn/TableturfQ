@@ -277,7 +277,6 @@ async function HandleMatchWin(match){
 
     if (!await FinishMatch(match)) return false;
 
-    console.log("boutta apply elo");
     return await ApplyMatchEloResults(match);
 }
 

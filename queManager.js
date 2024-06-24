@@ -244,7 +244,6 @@ export async function PlayerSentReady(playerId){
 
 async function CheckIfBothPlayersReady(matchingPlayersListIndex){
     var matchingPlayers = matchingPlayersList[matchingPlayersListIndex];
-    console.log('Check both players ready: ' + JSON.stringify(matchingPlayers));
     if (matchingPlayers.players[0].ready && matchingPlayers.players[1].ready){
         var match = await MakeNewMatch(matchingPlayers.players[0].id, matchingPlayers.players[1].id, matchingPlayers.matchMode);
         matchingPlayersList.splice(matchingPlayersListIndex, 1);
