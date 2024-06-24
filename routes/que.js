@@ -21,12 +21,13 @@ router.use(DeserializeSession);
 
 //Posts
 
-//matchmode
+//matchMode = string of matchmode name
 router.post("/PlayerEnterQue", async (req, res) => {
     try {
         const userId = req.session.user;
         console.log(userId);
-        const matchMode = req.body.matchMode;
+        const matchModeInput = req.body.matchMode;
+        const matchMode = matchModes[matchModeInput];
 
         if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
         if (!Object.hasOwn(matchModes, matchMode)) return SetResponse(res, definitionErrors.matchModeUndefined);
@@ -42,11 +43,12 @@ router.post("/PlayerEnterQue", async (req, res) => {
     }
 });
 
-//matchMode
+//matchMode = string of matchmode name
 router.post("/PlayerLeaveQue", async (req, res) => {
     try {
         const userId = req.session.user;
-        const matchMode = req.body.matchMode;
+        const matchModeInput = req.body.matchMode;
+        const matchMode = matchModes[matchModeInput];
 
         if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
         if (!Object.hasOwn(matchModes, matchMode)) return SetResponse(res, definitionErrors.matchModeUndefined);;
