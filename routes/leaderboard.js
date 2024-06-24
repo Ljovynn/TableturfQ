@@ -1,28 +1,14 @@
 import { Router } from 'express';
-import cookieParser from "cookie-parser";
-import { DeserializeSession } from '../utils/session.js';
-
-import { GetCurrentUser } from '../utils/userUtils.js';
-
-import dotenv from 'dotenv';
 
 import { GetLeaderboardAtPos } from '../leaderboardManager.js';
 
 const router = Router();
-
-dotenv.config();
-
-const sessionSecret = process.env.SESSION_SECRET;
-
-router.use(cookieParser(sessionSecret));
-router.use(DeserializeSession);
 
 //post
 
 //req: startPos, hitCount
 router.post('/GetLeaderboard', async (req, res) => {
     try {
-        var user = GetCurrentUser(req);
         var startPos = req.body.startPos;
         var hitCount = req.body.hitCount;
 
@@ -34,12 +20,7 @@ router.post('/GetLeaderboard', async (req, res) => {
             return;
         }
 
-        var leaderboardData = GetLeaderboardAtPos(startPos, hitCount);
-
-        var data = {
-            user: user,
-            leaderboardData: leaderboardData
-        }
+        var data = GetLeaderboardAtPos(startPos, hitCount);
 
         res.status(200).send(data);
     } catch (err){

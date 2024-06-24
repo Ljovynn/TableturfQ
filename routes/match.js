@@ -7,13 +7,11 @@ import { PlayerSentStageStrikes, PlayerSentStagePick, PlayerSentGameWin, PlayerS
 
 import { FindMatch } from '../matchManager.js';
 
-import { GetChatMessages, GetMatch, GetMatchGames, GetUserChatData, GetUserData, GetStageStrikes } from '../database.js';
+import { GetChatMessages, GetMatch, GetMatchGames, GetUserChatData, GetUserData, GetStageStrikes, GetUserRole } from '../database.js';
 import { ConvertDBMatchToMatch } from '../utils/matchUtils.js';
 import { userRoles } from '../public/constants/userData.js';
 
 import { CheckIfArray, CheckUserDefined } from '../utils/checkDefined.js';
-
-import { GetCurrentUser } from '../utils/userUtils.js';
 
 import { SendSocketMessage, SendEmptySocketMessage } from '../socketManager.js';
 
@@ -190,16 +188,16 @@ router.post("/SendChatMessage", async (req, res) => {
 //requests
 
 //req: match id
-//res: user, match object, players, other users in chat
+//res: match object, players, other users in chat
 //deleted accounts are undefined players
 router.post("/GetMatchInfo", async (req, res) => {
     try {
         const matchId = req.body.matchId;
+        const userId = req.session.user;
 
         if (typeof(matchId) !== 'number') return SetResponse(res, definitionErrors.matchUndefined);
 
-        var user = await GetCurrentUser(req);
-        if (!user) return SetResponse(res, definitionErrors.notLoggedIn);
+        const userRole = await GetUserRole(req);
 
         var matchHidden = true;
 
@@ -226,12 +224,9 @@ router.post("/GetMatchInfo", async (req, res) => {
         if (match.players[1].id != 0) players[1] = await GetUserData(match.players[1].id);
 
         //check if user has access
-        if (matchHidden){
-            if (!user) return SetResponse(res, userErrors.notLoggedIn);
-
-            if (user.id != players[0].id && user.id != players[1].id){
-                if (user.role != userRoles.mod) return SetResponse(res, userErrors.noAccess);
-            }
+        if (!CheckIfPlayerIsId(players[0], userId) && !CheckIfPlayerIsId(players[1], userId) && userRole != userRoles.mod){
+            if (matchHidden) return SetResponse(res, userErrors.noAccess);
+            match.chatMessages = [];
         }
 
         var othersInChatIds = [];
@@ -247,7 +242,6 @@ router.post("/GetMatchInfo", async (req, res) => {
         var othersInChat = await GetUserChatData(othersInChatIds);
 
         var data = {
-            user: user,
             match: match,
             players: players,
             othersInChat: othersInChat
@@ -260,5 +254,10 @@ router.post("/GetMatchInfo", async (req, res) => {
     }
     
 });
+
+function CheckIfPlayerIsId(player, id){
+    if (!player) return false;
+    if (player.id == id) return true;
+}
 
 export default router;
