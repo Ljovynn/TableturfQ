@@ -25,12 +25,12 @@ router.use(DeserializeSession);
 router.post("/PlayerEnterQue", async (req, res) => {
     try {
         const userId = req.session.user;
-        console.log(userId);
         const matchModeInput = req.body.matchMode;
-        const matchMode = matchModes[matchModeInput];
 
         if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
-        if (!Object.hasOwn(matchModes, matchMode)) return SetResponse(res, definitionErrors.matchModeUndefined);
+        if (typeof(matchModeInput) === 'undefined') return SetResponse(res, definitionErrors.matchModeUndefined);
+
+        const matchMode = matchModes[matchModeInput];
 
         var responseData = await AddPlayerToQue(userId, matchMode);
         if (!ResponseSucceeded(responseData.code)) return SetResponse(res, responseData);
@@ -48,10 +48,11 @@ router.post("/PlayerLeaveQue", async (req, res) => {
     try {
         const userId = req.session.user;
         const matchModeInput = req.body.matchMode;
-        const matchMode = matchModes[matchModeInput];
 
         if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
-        if (!Object.hasOwn(matchModes, matchMode)) return SetResponse(res, definitionErrors.matchModeUndefined);;
+        if (typeof(matchModeInput) === 'undefined') return SetResponse(res, definitionErrors.matchModeUndefined);
+
+        const matchMode = matchModes[matchModeInput];
 
         if (RemovePlayerFromQue(userId, matchMode)){
             res.sendStatus(201);
