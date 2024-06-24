@@ -13,7 +13,6 @@ import { GetUserByDiscordId, CreateUserWithDiscord, SetUserDiscord, CreateUser, 
 import { CheckUserDefined } from '../utils/checkDefined.js';
 import { authErrors, databaseErrors } from '../Responses/authErrors.js';
 import { SetResponse } from '../Responses/ResponseData.js';
-import { userErrors } from '../Responses/requestErrors.js';
 import { userRoles } from '../public/constants/userData.js';
 
 const apiRouteOauth2Token = "https://discord.com/api/v10/oauth2/token";
@@ -115,7 +114,7 @@ async function StoreUserData(accessToken, refreshToken, userId){
     if (userId){
         var user = await GetUserData(userId);
         if (user && user.role == userRoles.unverified){
-            await VerifyAccount(userId, response.data.id, accessToken, refreshToken, response.data.avatar);
+            await VerifyAccount(userId, response.data.id, accessToken, refreshToken, response.data.avatar, response.data.locale);
             return userId;
         }
     }
@@ -123,10 +122,10 @@ async function StoreUserData(accessToken, refreshToken, userId){
     var newUser = await GetUserByDiscordId(response.data.id);
     var newUserId;
     if (!newUser){
-        newUserId = await CreateUserWithDiscord(response.data.username, response.data.id, accessToken, refreshToken, response.data.avatar);
+        newUserId = await CreateUserWithDiscord(response.data.username, response.data.id, accessToken, refreshToken, response.data.avatar, response.data.locale);
     } else {
         newUserId = newUser.id;
-        await SetUserDiscord(newUserId, response.data.id, accessToken, refreshToken, response.data.avatar); 
+        await SetUserDiscord(newUserId, response.data.id, accessToken, refreshToken, response.data.avatar, response.data.locale); 
     }
     return newUserId;
 }
