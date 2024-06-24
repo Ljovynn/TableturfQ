@@ -56,9 +56,10 @@ const chatSend = document.getElementById('match-chat-button');
 
 
 var match;
-var userID = 0;
-var opponentID = 0;
 var user = {};
+var userID = 0;
+var username = '';
+var opponentID = 0;
 var matchInfo = [];
 var players = [];
 var chat = [];
@@ -93,6 +94,7 @@ console.log(matchId);
 
 const socket = io();
 
+await setUserInfo();
 await setMatchInfo();
 // check if the match is in dispute on pageload for admins that come to check chat
 await showModDispute();
@@ -158,7 +160,7 @@ chatSend.addEventListener('click', async (e) => {
     // Do front end validation/sanitization functions
     if ( validateChatMessage(chatMessage) ) {
         var data;
-        if ( matchInfo.user.role == 2 ) {
+        if ( user.role == 2 ) {
             data = { matchId: parseInt(matchId), message: chatMessage };
             var response = await postData('/admin/ModChatMessage', data);
         } else {
@@ -220,6 +222,20 @@ playerResolveDispute.addEventListener('click', async (e) => {
 });
 
 // Page functions
+async function getUserInfo() {
+    var data = {};
+    var result = await fetchData('/user/GetUserInfo');
+    return result;
+}
+
+async function setUserInfo() {
+    var userInfo = await getUserInfo();
+
+    user = userInfo.user;
+    username = user.username;
+    userID = user.id;
+}
+
 async function getMatchInfo(matchId) {
     var data = {matchId: parseInt(matchId)};
     console.log(data);
@@ -235,8 +251,6 @@ async function setMatchInfo() {
 
     match = matchInfo.match;
     players = matchInfo.players;
-    user = matchInfo.user;
-    userID = user.id;
 
     if ( match.players[0].id == userID ) {
         opponentID = match.players[1].id;
@@ -654,7 +668,7 @@ function gameFinish(winnerId) {
 }
 
 function showModDispute() {
-    if ( matchInfo.user.role == 2 && match.status == 2 ) {
+    if ( user.role == 2 && match.status == 2 ) {
         adminContent.style.display = 'block';
     }
 }
@@ -738,10 +752,11 @@ socket.on('gameWin', async (winnerId) => {
     //setMatchInfo(matchId);
 });
 
-socket.on('matchWin', async (winnerId) => {
+socket.on('matchWin', async (data) => {
     console.log('Match win socket!');
+    console.log(data[0]);
     //await getMatchInfo(matchId);
-    gameFinish(winnerId);
+    gameFinish(data[0]);
     // Unhide return to queue button
     // Do any final things
 });

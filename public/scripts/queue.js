@@ -66,7 +66,8 @@ joinCasual.addEventListener('click', async (e) => {
 });
 
 readyButton.addEventListener('click', async (e) => {
-    console.log('User is ready for competetive match.')
+    console.log('User is ready for competetive match.');
+    readyButton.style.display = 'none';
 
     // Not sure if we need to send any data but we can leave it blank for now
 

@@ -56,8 +56,8 @@ for ( let nextButton of nextButtons ) {
 
 async function setLeaderBoard(startPos, hitCount) {
     result = await getLeaderBoard(startPos, hitCount);
-    users = result.leaderboardData.result;
-    totalPlayers = result.leaderboardData.totalPlayers;
+    users = result.result;
+    totalPlayers = result.totalPlayers;
     var placement = 1 + startPos;
 
     // If the current page is 0, hide the prev button, otherwise show it
