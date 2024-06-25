@@ -80,6 +80,8 @@ export async function MatchMakingTick(){
         if (matchedPlayers) newlyMatchedPlayers.push(matchedPlayers);
     }
 
+    //console.log("Matchmaking tick: " + JSON.stringify(ques[1].queArr));
+
     //set up match
     for (let i = 0; i < newlyMatchedPlayers.length; i++){
         if (newlyMatchedPlayers[i].matchMode == matchModes.casual){

@@ -8,7 +8,7 @@ import { CheckIfArray, CheckUserDefined } from '../utils/checkDefined.js';
 import { GetCurrentUser } from '../utils/userUtils.js';
 
 import dotenv from 'dotenv';
-import { FindIfPlayerInQue } from '../queManager.js';
+import { FindIfPlayerInQue, FindIfPlayerWaitingForReady } from '../queManager.js';
 import { FindMatchWithPlayer } from '../matchManager.js';
 import { DeleteAllUserSessions, GetMultipleUserDatas, GetUserMatchHistory, GetUserRankedMatchCount, SetUserCountry, SetUserDiscordTokens, SetUsername } from '../database.js';
 import { definitionErrors, userErrors } from '../Responses/requestErrors.js';
@@ -109,11 +109,9 @@ router.post("/DeleteUserLoginData", async (req, res) => {
 
 //req: userIdList
 //res: users
-//user: id, username, role, g2_rating, discord_id, discord_avatar_hash, created_at, banned
+//user: id, username, role, g2_rating, hide_rank, discord_id, discord_username, discord_avatar_hash, country, created_at, banned
 router.post("/GetUsers", async (req, res) => {
     try{
-        console.log('user list');
-        console.log(req.body.userIdList);
         const userIdList = req.body.userIdList;
         if (!CheckIfArray(userIdList) || userIdList.length == 0) return SetResponse(res, definitionErrors.userNotDefined);
 
@@ -138,9 +136,10 @@ router.get("/GetUserInfo", async (req, res) => {
         if (!user) return SetResponse(res, userErrors.notLoggedIn);
 
         var queData = FindIfPlayerInQue(user.id);
+        var readyData = FindIfPlayerWaitingForReady(user.id);
         var matchId = FindMatchWithPlayer(user.id);
 
-        var data = {user, queData, matchId};
+        var data = {user, queData, readyData, matchId};
 
         res.status(200).send(data);
     } catch(error){
