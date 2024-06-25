@@ -1,10 +1,11 @@
 import express from "express";
-import session from "express-session";
 import dotenv from "dotenv";
 import { createServer } from 'http';
 import { fileURLToPath } from 'url';
 import { CreateSocketConnection, SendSocketMessage } from "./socketManager.js";
 import path from 'path';
+
+import { sessionMiddleware } from "./utils/session.js";
 
 import { MatchMakingTick, CheckMatchmadePlayers } from "./queManager.js";
 import { UpdateLeaderboard } from "./leaderboardManager.js";
@@ -17,7 +18,6 @@ import { DeletePastAnnouncements } from "./announcementManager.js";
 dotenv.config();
 
 const port = process.env.PORT;
-const sessionSecret = process.env.SESSION_SECRET;
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -43,6 +43,7 @@ server.listen(port, () => {
     console.log(`TableturfQ is up at port ${port}`);
 
     //que
+    
     setInterval(MatchMakingTick, matchmakingTickInterval);
     setInterval(CheckMatchmadePlayers, checkMatchmadePlayersInterval);
 
@@ -63,7 +64,7 @@ server.listen(port, () => {
 
     //announcements
     setInterval(DeletePastAnnouncements, deleteOldAnnouncementsInterval);
-
+    
     StartDiscordBot();
 
     DeleteUnfinishedMatches();
@@ -76,17 +77,7 @@ async function TickCancelOldMatches(){
     }
 }
 
-app.use(
-    session({
-        secret: sessionSecret,
-        name: 'DISCORD_OAUTH2_SESSION_ID',
-        resave: false,
-        saveUninitialized: false,
-        cookie: {
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-        },
-    })
-);
+app.use(sessionMiddleware);
 app.use(express.static('public',{extensions:['html']}));
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
