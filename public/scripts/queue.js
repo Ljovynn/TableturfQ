@@ -1,5 +1,7 @@
 // Elements
+const loading = document.getElementById('loading');
 const competetiveQueue = document.getElementById('competetive-queue');
+const casualQueue = document.getElementById('casual-queue');
 const casualUsername = document.getElementById('casual-username');
 const queueMatchmaking = document.getElementById('queue-matchmaking');
 const matchMakingReady = document.getElementById('ranked-match-ready');
@@ -48,30 +50,23 @@ joinCompetetive.addEventListener('click', async (e) => {
 
 joinCasual.addEventListener('click', async (e) => {
     console.log('User has joined the casual queue');
-    console.log('Submitted user name: ' + casualUsername.value);
-    displayName = casualUsername.value;
 
     // Check that there is a username entered
-    if (validateDisplayname(displayName)) {
-        var data = { matchMode: 'casual' }
-        queuedMatchMode = 'casual';
-        // Join the queue
-        var response = await postData('/que/PlayerEnterQue', data);
-        
-        if ( response == 201 ) {
-            // Do queue frontend stuff
-            alert('Successfully joined the queue!');
-            timer = 0;
-            queueInfo.style.display = 'block';
-            mainTimer = window.setInterval(updateTimer, 1000);
-            // Socket matchfound code
-            //matchMakingReady.style.display = 'block';
-        } else {
-            alert('There was a problem joining the queue. Please refresh and try again');
-        }
-
+    var data = { matchMode: 'casual' }
+    queuedMatchMode = 'casual';
+    // Join the queue
+    var response = await postData('/que/PlayerEnterQue', data);
+    
+    if ( response == 201 ) {
+        // Do queue frontend stuff
+        alert('Successfully joined the queue!');
+        timer = 0;
+        queueInfo.style.display = 'block';
+        mainTimer = window.setInterval(updateTimer, 1000);
+        // Socket matchfound code
+        //matchMakingReady.style.display = 'block';
     } else {
-        alert('Please enter a valid display name.');
+        alert('There was a problem joining the queue. Please refresh and try again');
     }
 });
 
@@ -109,14 +104,23 @@ async function getUserInfo() {
 }
 
 async function setUserInfo() {
-    var userInfo = await getUserInfo();
-    user = userInfo.user;
-    console.log(user);
-    userID = user.id;
-    console.log(userID);
-    if ( !user.discord_id ) {
-        isCasual = true;
-        competetiveQueue.style.display = 'none';
+    console.log('Setting user info');
+    try {
+        var userInfo = await getUserInfo();
+        user = userInfo.user;
+        console.log(user);
+        userID = user.id;
+        console.log(userID);
+        loading.style.display = 'none';
+        if ( !user.discord_id ) {
+            isCasual = true;
+            casualQueue.style.display = 'block';
+        } else {
+            competetiveQueue.style.display = 'inline-block';
+            casualQueue.style.display = 'inline-block';
+        }
+    } catch (error) {
+        window.location.href = '/';
     }
 }
 

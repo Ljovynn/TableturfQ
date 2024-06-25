@@ -86,28 +86,32 @@ async function getUserInfo() {
 }
 
 async function setUserInfo() {
-    userInfo = await getUserInfo();
+    try {
+        userInfo = await getUserInfo();
 
-    loadingSection.style.display = 'none';
-    profileContent.style.display = 'block';
-    console.log(userInfo);
+        loadingSection.style.display = 'none';
+        profileContent.style.display = 'block';
+        console.log(userInfo);
 
-    user = userInfo.user;
-    username = user.username;
-    discordUsername = user.discord_username;
-    discordId = user.discord_id;
-    discordAvatarHash = user.discord_avatar_hash;
-    eloRating = (Math.round(user.g2_rating * 100) / 100).toFixed(2);
-    rank = await GetRank(eloRating);
-    console.log(rank);
+        user = userInfo.user;
+        username = user.username;
+        discordUsername = user.discord_username;
+        discordId = user.discord_id;
+        discordAvatarHash = user.discord_avatar_hash;
+        eloRating = (Math.round(user.g2_rating * 100) / 100).toFixed(2);
+        rank = await GetRank(eloRating);
+        console.log(rank);
 
-    userDisplayName.innerHTML = username;
-    userDiscordName.innerHTML = discordUsername;
-    var avatarString = 'https://cdn.discordapp.com/avatars/' + discordId + '/' + discordAvatarHash + '.jpg';
-    userProfilePicture.src = avatarString;
+        userDisplayName.innerHTML = username;
+        userDiscordName.innerHTML = discordUsername;
+        var avatarString = 'https://cdn.discordapp.com/avatars/' + discordId + '/' + discordAvatarHash + '.jpg';
+        userProfilePicture.src = avatarString;
 
-    userELO.innerHTML = eloRating;
-    userRank.src = rank.imageURL;
+        userELO.innerHTML = eloRating;
+        userRank.src = rank.imageURL;
+    } catch (error) {
+        window.location.href = '/';
+    }
 }
 
 async function getMatchHistory() {

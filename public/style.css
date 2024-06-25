@@ -62,6 +62,10 @@ h3 {
 
 /**** QUEUE PAGE STYLES ****/
 
+#competetive-queue, #casual-queue {
+    display: none;
+}
+
 .queue-section {
     display: inline-block;
     padding: 20px;
