@@ -286,7 +286,7 @@ async function HandleRankedMatchWin(match){
 async function CheckPlacements(playerId){
     const rankedMatchCount = await GetUserRankedMatchCount(playerId);
 
-    if (rankedMatchCount >= placementMatchCount){
+    if (rankedMatchCount == placementMatchCount){
         await SetUserHideRank(playerId, false);
     }
 }
