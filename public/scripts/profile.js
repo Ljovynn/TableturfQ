@@ -1,11 +1,15 @@
+import { GetRank } from "../constants/rankData.js";
+
 // User elements
 const loadingSection = document.getElementById('page-loading');
 const profileContent = document.getElementById('profile-content');
+const userInGameName = document.getElementById('user-in-game-name-value');
 const userDiscordName = document.getElementById('user-discord-name');
 const userDisplayNameContent = document.getElementById('user-in-game-name');
 const userDisplayName =  document.getElementById('user-in-game-name-value');
 const userProfilePicture = document.getElementById('user-profile-picture');
 const userELO = document.getElementById('user-rank-elo');
+const userRank = document.getElementById('user-rank');
 
 // Interaction/edit elements
 const editDisplayName = document.getElementById('user-profile-edit-name');
@@ -22,11 +26,13 @@ const logoutButton = document.getElementById('logout-button');
 // User vars
 var user;
 var userId;
+var username;
+var discordUsername;
 var discordId;
 var discordAvatarHash;
-var username;
 var userInfo;
 var eloRating;
+var rank;
 
 var matches;
 
@@ -46,13 +52,13 @@ editDisplayNameClose.addEventListener('click', (e) => {
 });
 
 displayNameSubmit.addEventListener('click', (e) => {
-    newDisplayName = displayNameInput.value;
+    var newDisplayName = displayNameInput.value;
     console.log('User submitted display name edit: ' + newDisplayName);
     // Validate the name update
     if ( validateDisplayName(newDisplayName) ) {
 
-        data = { userDisplayName: newDisplayName };
-        response = postData('/user/EditInGameName', data);
+        var data = { username: newDisplayName };
+        var response = postData('/user/SetUsername', data);
 
         // On successful response
         editDisplayNameForm.classList.toggle('editing');
@@ -88,15 +94,20 @@ async function setUserInfo() {
 
     user = userInfo.user;
     username = user.username;
+    discordUsername = user.discord_username;
     discordId = user.discord_id;
     discordAvatarHash = user.discord_avatar_hash;
     eloRating = (Math.round(user.g2_rating * 100) / 100).toFixed(2);
+    rank = await GetRank(eloRating);
+    console.log(rank);
 
-    userDiscordName.innerHTML = username;
-    avatarString = 'https://cdn.discordapp.com/avatars/' + discordId + '/' + discordAvatarHash + '.jpg';
+    userDisplayName.innerHTML = username;
+    userDiscordName.innerHTML = discordUsername;
+    var avatarString = 'https://cdn.discordapp.com/avatars/' + discordId + '/' + discordAvatarHash + '.jpg';
     userProfilePicture.src = avatarString;
 
     userELO.innerHTML = eloRating;
+    userRank.src = rank.imageURL;
 }
 
 async function getMatchHistory() {

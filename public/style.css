@@ -261,6 +261,10 @@ h3 {
     cursor: pointer;
 }
 
+#user-rank {
+    width: 30px;
+}
+
 #user-match-info {
     display: inline-block;
     width: 50%;
