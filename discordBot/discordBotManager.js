@@ -104,8 +104,8 @@ export async function SendDisputeMessage(matchDisputes, sendNewMessage){
 
 		for (let i = 0; i < limit; i++){
 		var dispute = {
-			name: `Match ${matchDisputes[i].id}`,
-			value: `[Link](${websiteURL}:${port}/user)`,
+			name: `Match id ${matchDisputes[i].id}`,
+			value: `[Link](${websiteURL}/game?matchID=${matchDisputes[i].id})`,
 		}
 		disputesFields.push(dispute)
 		}

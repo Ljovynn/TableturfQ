@@ -45,12 +45,16 @@ export async function execute(interaction) {
 	}
 
 	var rank = unranked;
-	if (!user.hide_rank) rank = GetRank(user.g2_rating);
+	var ratingValue = 'None';
+	if (!user.hide_rank) {
+		rank = GetRank(user.g2_rating);
+		ratingValue = Math.floor(user.g2_rating);
+	}
 
     var profileFields = [ 
 	{
         name: 'Rating',
-        value: `${Math.floor(user.g2_rating)}`,
+        value: ratingValue,
 		inline: true
 		},
 	{
