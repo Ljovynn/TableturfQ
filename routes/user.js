@@ -51,7 +51,7 @@ router.post("/GetUserMatchHistory", async (req, res) => {
 });
 
 //username (max 32 letters)
-router.post("SetUsername", async (req, res) => {
+router.post("/SetUsername", async (req, res) => {
     try{
         const userId = req.session.user;
         const username = req.body.username;
@@ -70,7 +70,7 @@ router.post("SetUsername", async (req, res) => {
 });
 
 //country (2 letters. send 'none' for removal)
-router.post("SetUserCountry", async (req, res) => {
+router.post("/SetUserCountry", async (req, res) => {
     try{
         const userId = req.session.user;
         const country = req.body.country;
