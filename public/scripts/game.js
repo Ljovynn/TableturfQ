@@ -1,4 +1,5 @@
 import { matchModes } from "../constants/matchData.js";
+import { GetRank } from "../constants/rankData.js";
 
 // Create variables for all the elements we need to interact with
 
@@ -12,6 +13,8 @@ const player1Name = document.getElementById('player1-name');
 const player2Name = document.getElementById('player2-name');
 const player1Avatar = document.getElementById('player1-avatar');
 const player2Avatar = document.getElementById('player2-avatar');
+const player1RankIcon = document.getElementById('player1-rank-icon');
+const player2RankIcon = document.getElementById('player2-rank-icon');
 const player1VictoryButton = document.getElementById('player1-victory-button');
 const player2VictoryButton = document.getElementById('player2-victory-button');
 const player1Score = document.getElementById('player1-score');
@@ -58,9 +61,19 @@ const chatSend = document.getElementById('match-chat-button');
 
 var match;
 var user = {};
+var oppUser = {};
+
+// Player
 var userID = 0;
 var username = '';
-var opponentID = 0;
+var userELO;
+var userRank;
+
+// Opponent
+var oppID = 0;
+var oppELO;
+var oppRank;
+
 var matchInfo = [];
 var players = [];
 var chat = [];
@@ -230,9 +243,10 @@ async function getUserInfo() {
     return result;
 }
 
-async function setUserInfo() {
-    var userInfo = await getUserInfo();
 
+async function setUserInfo() {
+    var userInfo = await getUserInfo(userID);
+    
     user = userInfo.user;
     username = user.username;
     userID = user.id;
@@ -254,11 +268,13 @@ async function setMatchInfo() {
     match = matchInfo.match;
     players = matchInfo.players;
 
+    console.log('UserID ' + userID);
     if ( match.players[0].id == userID ) {
-        opponentID = match.players[1].id;
+        oppID = match.players[1].id;
     } else {
-        opponentID = match.players[0].id;
+        oppID = match.players[0].id;
     }
+    console.log(oppID);
 
     chat = match.chat;
     starters = match.mode.rulesetData.starterStagesArr;
@@ -267,8 +283,15 @@ async function setMatchInfo() {
 
     var player1DiscordId = players[0].discord_id;
     var player1DiscordAvatar = players[0].discord_avatar_hash;
+    var player1ELO = players[0].g2_rating;
+    var player1Rank = await GetRank(player1ELO);
+    console.log(player1Rank);
+
     var player2DiscordId = players[1].discord_id;
     var player2DiscordAvatar  = players[1].discord_avatar_hash;
+    var player2ELO = players[1].g2_rating;
+    var player2Rank = await GetRank(player2ELO);
+    console.log(player2Rank);
 
     var player1AvatarString = 'https://cdn.discordapp.com/avatars/' + player1DiscordId + '/' + player1DiscordAvatar + '.jpg';
     var player2AvatarString = 'https://cdn.discordapp.com/avatars/' + player2DiscordId + '/' + player2DiscordAvatar + '.jpg';
@@ -290,11 +313,13 @@ async function setMatchInfo() {
     player1Avatar.src = player1AvatarString;
     player1VictoryButton.value = players[0].id;
     player1Score.setAttribute('player-id', players[0].id);
+    player1RankIcon.src = player1Rank.imageURL;
 
     player2Name.innerHTML = players[1].username;
     player2Avatar.src = player2AvatarString;
     player2VictoryButton.value = players[1].id;
     player2Score.setAttribute('player-id', players[1].id);
+    player2RankIcon.src = player2Rank.imageURL;
 
     setLength.innerHTML = 'Best of ' + bestOfSets[match.mode.rulesetData.setLength] + ' games';
     turnTimer.innerHTML = ( match.mode.rulesetData.turnTimer * 10 ) + ' seconds';
@@ -537,6 +562,8 @@ function setCurrentStriker() {
 }
 
 function isPlayerStriker() {
+    console.log(userID);
+    console.log(currentStriker);
     if ( userID == currentStriker ) {
         gameMessage.style.display = 'none';
         strikeContent.style.display = 'block';
@@ -605,6 +632,11 @@ function startGame() {
     var selectedStage = document.getElementsByClassName('stage-selected');
     if ( selectedStage.length > 0 )
         selectedStage[0].classList.remove('stage-selected');
+
+    var strickenStages = document.getElementsByClassName('stage-stricken');
+    for ( let stage of strickenStages ) {
+        stage.style.display = 'none';
+    }
 
     for (let victoryButton of victoryButtons ) {
         victoryButton.style.display = 'inline-block';

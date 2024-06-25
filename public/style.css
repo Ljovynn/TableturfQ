@@ -89,6 +89,11 @@ h3 {
     border-radius: 50%;
 }
 
+.player-rank {
+    margin: 10px;
+    width: 50px;
+}
+
 #confirmation-message {
     display: none;
 }
