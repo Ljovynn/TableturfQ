@@ -10,7 +10,7 @@ import { GetCurrentUser } from '../utils/userUtils.js';
 import dotenv from 'dotenv';
 import { FindIfPlayerInQue } from '../queManager.js';
 import { FindMatchWithPlayer } from '../matchManager.js';
-import { DeleteAllUserSessions, GetMultipleUserDatas, GetUserMatchHistory, SetUserCountry, SetUserDiscordTokens, SetUsername } from '../database.js';
+import { DeleteAllUserSessions, GetMultipleUserDatas, GetUserMatchHistory, GetUserRankedMatchCount, SetUserCountry, SetUserDiscordTokens, SetUsername } from '../database.js';
 import { definitionErrors, userErrors } from '../Responses/requestErrors.js';
 import { SetResponse } from '../Responses/ResponseData.js';
 import { usernameMaxLength, usernameMinLength } from '../public/constants/userData.js';
@@ -143,6 +143,20 @@ router.get("/GetUserInfo", async (req, res) => {
         var data = {user, queData, matchId};
 
         res.status(200).send(data);
+    } catch(error){
+        res.sendStatus(400);
+    }
+});
+
+//returns how many ranked matches user has played
+router.get("/GetUserPlacementInfo", async (req, res) => {
+    try{
+        const userId = req.session.user;
+        if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
+
+        var matchCount = await GetUserRankedMatchCount(userId);
+
+        res.status(200).send(matchCount);
     } catch(error){
         res.sendStatus(400);
     }
