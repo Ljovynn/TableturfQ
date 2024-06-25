@@ -22,6 +22,8 @@ export const definitionErrors = Object.freeze({
     winnerUndefined: new ResponseData(400, 'No winner ID submitted'),
     countryUndefined: new ResponseData(400, 'No country submitted'),
     countryWrongFormat: new ResponseData(400, 'Country not submitted correctly'),
+    usernameUndefined: new ResponseData(400, 'No username submitted'),
+    usernameWrongFormat: new ResponseData(400, 'Username not submitted correctly'),
 });
 
 export const nullErrors = Object.freeze({

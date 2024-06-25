@@ -117,7 +117,7 @@ async function StoreUserData(accessToken, refreshToken, userId){
     if (userId){
         var user = await GetUserData(userId);
         if (user && user.role == userRoles.unverified){
-            await VerifyAccount(userId, response.data.id, accessToken, refreshToken, response.data.avatar);
+            await VerifyAccount(userId, response.data.id, response.data.username, accessToken, refreshToken, response.data.avatar);
             return userId;
         }
     }
@@ -128,7 +128,7 @@ async function StoreUserData(accessToken, refreshToken, userId){
         newUserId = await CreateUserWithDiscord(response.data.username, response.data.id, accessToken, refreshToken, response.data.avatar);
     } else {
         newUserId = newUser.id;
-        await SetUserDiscord(newUserId, response.data.id, accessToken, refreshToken, response.data.avatar); 
+        await SetUserDiscord(newUserId, response.data.id, response.data.username, accessToken, refreshToken, response.data.avatar); 
     }
     return newUserId;
 }
