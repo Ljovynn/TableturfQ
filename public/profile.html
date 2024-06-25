@@ -18,22 +18,22 @@
             <div id="profile-content">
                 <div id="user-info-section">
                     <img id="user-profile-picture" src=""/>
-                    <!--<p id="user-in-game-name">
+                    <p id="user-in-game-name">
                         <span id="user-profile-edit-name"><i class="fa-solid fa-pencil"></i></span>&nbsp;
-                        <span id="user-in-game-name-value">zeb</span>
+                        <span id="user-in-game-name-value"></span>
                     </p>
                     <div id="user-profile-edit-name-form">
                         <i id="user-profile-edit-close" class="fa-solid fa-x"></i>
                         <input type="text" id="user-profile-name-input" />
                         <input type="button" id="user-profile-name-submit" value="Edit Display name" />
-                    </div>-->
+                    </div>
                     <p><i class="fa-brands fa-discord"></i>&nbsp;<span id="user-discord-name">username</span></p>
                     <button id="logout-button" value="logout">Logout</button>
                 </div>
                 <div id="user-match-info">
                     <div id="user-rank-info">
                         <p>ELO Rating: <span id="user-rank-elo">1500</span></p>
-                        <!--<p id="user-rank">User Rank: Diamond</p>-->
+                        <p>User Rank: <img id="user-rank" /></p>
                     </div>
                     <div id="user-match-history">
                         <div class="match-row">
@@ -47,5 +47,6 @@
         </main>
     </body>
     <script type="text/javascript" src="./scripts/dataPOST.js"></script>
-    <script type="text/javascript" src="./scripts/profile.js"></script>
+    <script type="text/javascript" src="./constants/rankData.js"></script>
+    <script type="module" src="./scripts/profile.js"></script>
 </html>
