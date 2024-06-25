@@ -22,8 +22,7 @@ export const sessionMiddleware = session({
 export async function SerializeSession(req, userId){
     req.session.user = userId;
     req.session.touch();
-
-    console.log("serialising session");
+    
     await CreateSession(req.sessionID, req.session.cookie.expires, JSON.stringify(userId));
 }
 
@@ -39,14 +38,11 @@ export async function DeserializeSession(req, res, next){
     const session = await GetSession(sessionId)
     if (!session){
         req.session.user = undefined;
-        console.log("cant find session");
         return next();
     }
     if (session.expires_at < Date.now()){
         req.session.user = undefined;
-        console.log("session expired");
         await DeleteSession(sessionId);
-        console.log("session deleted");
         return next();
     }
     const data = JSON.parse(session.data);
