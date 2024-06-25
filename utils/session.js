@@ -1,9 +1,23 @@
 import { GetSession, CreateSession, DeleteSession } from '../database.js';
+import session from "express-session";
 import cookieParser from 'cookie-parser';
 import dotenv from "dotenv";
 
 dotenv.config();
 const sessionSecret = process.env.SESSION_SECRET;
+
+export const sessionMiddleware = session({
+    secret: sessionSecret,
+    name: 'DISCORD_OAUTH2_SESSION_ID',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        sameSite: 'strict',
+        //secure: true,
+        //partitioned: true,
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+    },
+})
 
 export async function SerializeSession(req, userId){
     req.session.user = userId;
