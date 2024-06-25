@@ -99,6 +99,10 @@ h3 {
     width: 200px;
 }
 
+#player1-discord-name, #player2-discord-name {
+    display: none;
+}
+
 #player1-avatar, #player2-avatar {
     width: 150px;
     border-radius: 50%;

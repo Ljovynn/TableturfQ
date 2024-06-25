@@ -36,25 +36,34 @@ var eloRating;
 var rank;
 
 var matches;
+var playerID = 0;
 
-setUserInfo();
-setMatchHistory();
+try {
+    const url = window.location.href;
+    const searchParams = new URL(url).searchParams;
+    const entries = new URLSearchParams(searchParams).entries();
+    const entriesArray = Array.from(entries);
+    playerID = entriesArray[0][1];
+} catch (error) {
+    // idk who cares
+}
+
+
+await setUserInfo();
+await setMatchHistory();
 
 editDisplayName.addEventListener('click', (e) => {
-    console.log('User clicked the display name edit button');
     editDisplayNameForm.classList.toggle('editing');
     userDisplayNameContent.classList.toggle('editing');
 });
 
 editDisplayNameClose.addEventListener('click', (e) => {
-    console.log('User clicked the edit display name close button');
     editDisplayNameForm.classList.toggle('editing');
     userDisplayNameContent.classList.toggle('editing');
 });
 
 displayNameSubmit.addEventListener('click', (e) => {
     var newDisplayName = displayNameInput.value;
-    console.log('User submitted display name edit: ' + newDisplayName);
     // Validate the name update
     if ( validateDisplayName(newDisplayName) ) {
 
@@ -73,7 +82,6 @@ displayNameSubmit.addEventListener('click', (e) => {
 
 logoutButton.addEventListener('click', async (e) => {
     response = await postData('/user/DeleteUserLoginData');
-    console.log(response);
     if ( response == 201 ) {
         window.location.href = '/';
     }
@@ -88,19 +96,23 @@ async function getUserInfo() {
 
 async function setUserInfo() {
     try {
-        userInfo = await getUserInfo();
+        // If no playerID is set, try the default get current user info
+        if ( playerID != 0 ) {
+            userInfo = await getMatchUsers([playerID]);
+            user = userInfo[0];
+        } else {
+            userInfo = await getUserInfo();
+            user = userInfo.user;
+        }
 
         loadingSection.style.display = 'none';
         profileContent.style.display = 'block';
-        console.log(userInfo);
 
-        user = userInfo.user;
         userId = user.id;
         username = user.username;
         discordUsername = user.discord_username;
         discordId = user.discord_id;
         discordAvatarHash = user.discord_avatar_hash;
-        console.log(rank);
 
         userDisplayName.innerHTML = username;
         userDiscordName.innerHTML = discordUsername;
@@ -114,6 +126,7 @@ async function setUserInfo() {
             userRank.src = rank.imageURL;
             userRankInfo.style.display = 'block';
         }
+        hideNonUserElements();
     } catch (error) {
         window.location.href = '/';
     }
@@ -121,9 +134,10 @@ async function setUserInfo() {
 
 async function getMatchHistory() {
     var data = {};
-    var result = await getData('/user/GetUserMatchHistory');
-    console.log('matches');
-    console.log(result);
+    if ( playerID != 0 ) {
+        data = { playerId: parseInt(playerID) }
+    }
+    var result = await getData('/user/GetUserMatchHistory', data);
     return result;
 }
 
@@ -131,7 +145,6 @@ async function setMatchHistory() {
     matches = await getMatchHistory();
 
     for ( let match of matches ) {
-        console.log(match);
         let row = document.createElement('div');
         row.classList.add('match-row');
 
@@ -142,7 +155,6 @@ async function setMatchHistory() {
 
         let matchupCell = document.createElement('div');
         var players = await getMatchUsers( [match.player1_id, match.player2_id] );
-        console.log(players);
         matchupCell.classList.add('matchup');
         matchupCell.append(players[0].username + ' vs ' + players[1].username);
 
@@ -184,9 +196,13 @@ async function setMatchHistory() {
 
 async function getMatchUsers(users) {
     var data = { userIdList: users };
-    console.log(data);
     var result = await getData('/user/GetUsers', data);
     return result;
+}
+
+function hideNonUserElements() {
+    editDisplayName.style.display = 'none';
+    logoutButton.style.display = 'none';
 }
 
 function validateDisplayName(newDisplayName) {

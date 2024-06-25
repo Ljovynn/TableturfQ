@@ -13,6 +13,8 @@ const player1InGameName = document.getElementById('player1-in-game-name');
 const player2InGameName = document.getElementById('player2-in-game-name');
 const player1Name = document.getElementById('player1-name');
 const player2Name = document.getElementById('player2-name');
+const player1DiscordName = document.getElementById('player1-discord-name');
+const player2DiscordName = document.getElementById('player2-discord-name');
 const player1Avatar = document.getElementById('player1-avatar');
 const player2Avatar = document.getElementById('player2-avatar');
 const player1RankContent = document.getElementById('player1-rank');
@@ -314,8 +316,11 @@ async function setMatchInfo() {
     playerResolve.style.display = 'none';
 
     player1InGameName.innerHTML = players[0].username;
-    player1Name.innerHTML = players[0].discord_username;
-    player1Avatar.src = player1AvatarString;
+    if ( players[0].discord_id ) {
+        player1DiscordName.style.display = 'block';
+        player1Name.innerHTML = players[0].discord_username;
+        player1Avatar.src = player1AvatarString;
+    }
     player1VictoryButton.value = players[0].id;
     player1Score.setAttribute('player-id', players[0].id);
     if ( !players[0].hide_rank ) {
@@ -324,11 +329,14 @@ async function setMatchInfo() {
     }
 
     player2InGameName.innerHTML = players[1].username;
-    player2Name.innerHTML = players[1].discord_username;
-    player2Avatar.src = player2AvatarString;
+    if ( players[1].discord_id ) {
+        player2DiscordName.style.display = 'block';
+        player2Name.innerHTML = players[1].discord_username;
+        player2Avatar.src = player2AvatarString;
+    }
     player2VictoryButton.value = players[1].id;
     player2Score.setAttribute('player-id', players[1].id);
-    if ( !players[0].hide_rank ) {
+    if ( !players[1].hide_rank ) {
         player2RankIcon.src = player2Rank.imageURL;
         player2RankContent.style.display = 'block';
     }
