@@ -126,10 +126,20 @@ router.post("/GetUsers", async (req, res) => {
 
 //requests
 
-//res: user, queData, matchId
+//res: user, queData, readyData, matchId
+
 //user: id, username, role, g2_rating, discord_id, discord_avatar_hash, created_at, banned
-//quedata: matchmode, timestamp when que started
-//readyData: bool if waiting for ready, bool if you pressed ready, timestamp since ready wait started
+
+//quedata:
+//matchmode = matchMode object
+//timeQueStarted = timestamp when que started
+//returns undefined if not in que
+
+//readyData:
+//ready = bool if you pressed ready, 
+//timeWaitingStarted = timestamp since ready wait started
+//returns undefined if not in ready waiting
+
 //matchId: just the id of match player is in
 router.get("/GetUserInfo", async (req, res) => {
     try{

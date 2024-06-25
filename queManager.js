@@ -162,7 +162,10 @@ export function FindIfPlayerInQue(playerId){
     for (let i = 0; i < ques.length; i++){
         for (let j = 0; j < ques[i].queArr.length; j++){
             if (ques[i].queArr[j].id == playerId){
-                var data = [ques[i].matchMode, ques[i].queArr[j].startedQue];
+                var data = {
+                    matchMode: ques[i].matchMode, 
+                    timeQueStarted: ques[i].queArr[j].startedQue
+                };
                 return data;
             }
         }
@@ -171,26 +174,24 @@ export function FindIfPlayerInQue(playerId){
 }
 
 export function FindIfPlayerWaitingForReady(playerId){
-    var inWaiting = false;
-    var ready = false;
-    var timeWaitingStarted;
+    var data = {
+    ready: false,
+    timeWaitingStarted: null,
+    }
 
     for (let i = 0; i < matchingPlayersList.length; i++){
         if (matchingPlayersList[i].players[0] == playerId){
-            inWaiting = true;
-            ready = matchingPlayersList[i].players[0].ready;
-            timeWaitingStarted = matchingPlayersList[i].createdAt;
-            break;
+            data.ready = matchingPlayersList[i].players[0].ready;
+            data.timeWaitingStarted = matchingPlayersList[i].createdAt;
+            return data;
         }
         else if (matchingPlayersList[i].players[1] == playerId){
-            inWaiting = true;
-            ready = matchingPlayersList[i].players[1].ready;
-            timeWaitingStarted = matchingPlayersList[i].createdAt;
-            break;
+            data.ready = matchingPlayersList[i].players[1].ready;
+            data.timeWaitingStarted = matchingPlayersList[i].createdAt;
+            return data;
         }
     }
-
-    return {inWaiting, ready, timeWaitingStarted};
+    return undefined;
 }
 
 export function RemovePlayerFromQue(playerId, matchMode){
