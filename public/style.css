@@ -104,6 +104,10 @@ h3 {
     border-radius: 50%;
 }
 
+#player1-rank, #player2-rank {
+    display: none;
+}
+
 .player-rank {
     margin: 10px;
     width: 50px;
@@ -249,6 +253,7 @@ h3 {
     display: inline-block;
     width: 50%;
     margin: auto;
+    margin-bottom: 20px;
 }
 
 #user-profile-picture {
@@ -276,6 +281,10 @@ h3 {
     cursor: pointer;
 }
 
+#user-rank-info {
+    display: none;
+}
+
 #user-rank {
     width: 30px;
 }
@@ -284,10 +293,6 @@ h3 {
     display: inline-block;
     width: 50%;
     margin: auto;
-}
-
-#user-rank-info {
-    display: block;
 }
 
 #user-match-history {

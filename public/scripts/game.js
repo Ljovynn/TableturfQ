@@ -9,11 +9,15 @@ const loading = document.getElementById('loading-message');
 const requeueButton = document.getElementById('requeue-button');
 
 // Player elements
+const player1InGameName = document.getElementById('player1-in-game-name');
+const player2InGameName = document.getElementById('player2-in-game-name');
 const player1Name = document.getElementById('player1-name');
 const player2Name = document.getElementById('player2-name');
 const player1Avatar = document.getElementById('player1-avatar');
 const player2Avatar = document.getElementById('player2-avatar');
+const player1RankContent = document.getElementById('player1-rank');
 const player1RankIcon = document.getElementById('player1-rank-icon');
+const player2RankContent = document.getElementById('player2-rank');
 const player2RankIcon = document.getElementById('player2-rank-icon');
 const player1VictoryButton = document.getElementById('player1-victory-button');
 const player2VictoryButton = document.getElementById('player2-victory-button');
@@ -246,7 +250,7 @@ async function getUserInfo() {
 
 async function setUserInfo() {
     var userInfo = await getUserInfo(userID);
-    
+
     user = userInfo.user;
     username = user.username;
     userID = user.id;
@@ -309,17 +313,25 @@ async function setMatchInfo() {
     matchContainer.style.display = 'block';
     playerResolve.style.display = 'none';
 
-    player1Name.innerHTML = players[0].username;
+    player1InGameName.innerHTML = players[0].username;
+    player1Name.innerHTML = players[0].discord_username;
     player1Avatar.src = player1AvatarString;
     player1VictoryButton.value = players[0].id;
     player1Score.setAttribute('player-id', players[0].id);
-    player1RankIcon.src = player1Rank.imageURL;
+    if ( !players[0].hide_rank ) {
+        player1RankIcon.src = player1Rank.imageURL;
+        player1RankContent.style.display = 'block';
+    }
 
-    player2Name.innerHTML = players[1].username;
+    player2InGameName.innerHTML = players[1].username;
+    player2Name.innerHTML = players[1].discord_username;
     player2Avatar.src = player2AvatarString;
     player2VictoryButton.value = players[1].id;
     player2Score.setAttribute('player-id', players[1].id);
-    player2RankIcon.src = player2Rank.imageURL;
+    if ( !players[0].hide_rank ) {
+        player2RankIcon.src = player2Rank.imageURL;
+        player2RankContent.style.display = 'block';
+    }
 
     setLength.innerHTML = 'Best of ' + bestOfSets[match.mode.rulesetData.setLength] + ' games';
     turnTimer.innerHTML = ( match.mode.rulesetData.turnTimer * 10 ) + ' seconds';
@@ -333,8 +345,33 @@ async function setMatchInfo() {
         setCurrentStriker();
         isPlayerStriker();
 
-        if ( match.status == 1 ) {
-            startGame();
+        switch(match.status) {
+            case 1:
+                startGame();
+                break;
+            case 2:
+                //idk dispute?
+                break;
+            case 3:
+                console.log('setting winner - player1');
+                // player 1 win
+                stageList.style.display = 'none';
+                currentStrikerName.style.display = 'none';
+                gameMessage.innerHTML = players[0].username + ' has won the match!';
+                requeueButton.style.display = 'block';
+                break;
+            case 4:
+                console.log('setting winner - player2');
+                // player 2 win
+                stageList.style.display = 'none';
+                currentStrikerName.style.display = 'none';
+                gameMessage.innerHTML = players[0].username + ' has won the match!';
+                requeueButton.style.display = 'block';
+                break;
+            case 5:
+                // No Winner
+                break;
+            default: 
         }
     } else {
         setCasualGame();

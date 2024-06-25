@@ -8,6 +8,7 @@ const userDiscordName = document.getElementById('user-discord-name');
 const userDisplayNameContent = document.getElementById('user-in-game-name');
 const userDisplayName =  document.getElementById('user-in-game-name-value');
 const userProfilePicture = document.getElementById('user-profile-picture');
+const userRankInfo = document.getElementById('user-rank-info');
 const userELO = document.getElementById('user-rank-elo');
 const userRank = document.getElementById('user-rank');
 
@@ -94,12 +95,11 @@ async function setUserInfo() {
         console.log(userInfo);
 
         user = userInfo.user;
+        userId = user.id;
         username = user.username;
         discordUsername = user.discord_username;
         discordId = user.discord_id;
         discordAvatarHash = user.discord_avatar_hash;
-        eloRating = (Math.round(user.g2_rating * 100) / 100).toFixed(2);
-        rank = await GetRank(eloRating);
         console.log(rank);
 
         userDisplayName.innerHTML = username;
@@ -107,8 +107,13 @@ async function setUserInfo() {
         var avatarString = 'https://cdn.discordapp.com/avatars/' + discordId + '/' + discordAvatarHash + '.jpg';
         userProfilePicture.src = avatarString;
 
-        userELO.innerHTML = eloRating;
-        userRank.src = rank.imageURL;
+        if ( !user.hide_rank ) {
+            eloRating = (Math.round(user.g2_rating * 100) / 100).toFixed(2);
+            rank = await GetRank(eloRating);
+            userELO.innerHTML = eloRating;
+            userRank.src = rank.imageURL;
+            userRankInfo.style.display = 'block';
+        }
     } catch (error) {
         window.location.href = '/';
     }
@@ -132,11 +137,11 @@ async function setMatchHistory() {
 
         let dateCell = document.createElement('div');
         dateCell.classList.add('match-date');
-        matchDate = match.created_at.split('T')[0];
+        var matchDate = match.created_at.split('T')[0];
         dateCell.append(matchDate);
 
         let matchupCell = document.createElement('div');
-        players = await getMatchUsers( [match.player1_id, match.player2_id] );
+        var players = await getMatchUsers( [match.player1_id, match.player2_id] );
         console.log(players);
         matchupCell.classList.add('matchup');
         matchupCell.append(players[0].username + ' vs ' + players[1].username);
@@ -159,7 +164,7 @@ async function setMatchHistory() {
                 break;
             case 4:
                 // player 2 win
-                if ( players[0].id == userId )
+                if ( players[1].id == userId )
                     outcome = 'L';
                 else
                     outcome = 'W';

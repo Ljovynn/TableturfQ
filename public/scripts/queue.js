@@ -85,8 +85,8 @@ readyButton.addEventListener('click', async (e) => {
 
 leaveButton.addEventListener('click', async (e) => {
     console.log('leaving queue');
-    data = { matchMode: queuedMatchMode };
-    response = await postData('/que/PlayerLeaveQue', data);
+    var data = { matchMode: queuedMatchMode };
+    var response = await postData('/que/PlayerLeaveQue', data);
     console.log(response);
     if ( response == 201 ) {
         clearTimer(mainTimer);
