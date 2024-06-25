@@ -16,6 +16,7 @@ const socket = io();
 
 var queuedMatchMode;
 var mainTimer;
+var readyUp;
 var ready = false;
 
 var user;
@@ -79,7 +80,7 @@ readyButton.addEventListener('click', async (e) => {
 
     // Not sure if we need to send any data but we can leave it blank for now
 
-    response = await postData('/que/PlayerReady');
+    var response = await postData('/que/PlayerReady');
     console.log(response);
 
     // Redirect to the game room once the game is created
@@ -171,12 +172,10 @@ function secondsToMS(d) {
 }
 
 // SOCKET JS
-console.log('Joining queRoom' + userID.toString());
-socket.emit('join', 'queRoom' + userID.toString());
+socket.emit('join', 'queRoom');
 
-socket.on('matchFound', (matchedPlayersData) => {
+socket.on('matchFound', () => {
     console.log('Socket event match ready');
-    console.log(matchedPlayersData);
     timer = 0;
     countdown = 300;
     queueInfo.style.display = 'none';
