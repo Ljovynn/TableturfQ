@@ -125,7 +125,7 @@ function FindPlayersToMatch(que){
             //check if players didn't match recently
             var index = SearchMatchedPlayersList(recentlyMatchedPlayersList, que.queArr[i].id);
             if (index != -1){
-                if (recentlyMatchedPlayersList[index].players[0] == que.queArr[j].id || recentlyMatchedPlayersList[index].players[1] == que.queArr[j].id) continue;
+                if (recentlyMatchedPlayersList[index].players[0].id == que.queArr[j].id || recentlyMatchedPlayersList[index].players[1].id == que.queArr[j].id) continue;
             }
             var data = {
                 players: [que.queArr[i].id, que.queArr[j].id],
