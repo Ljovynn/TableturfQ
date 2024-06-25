@@ -2,7 +2,7 @@ import { matchModes } from "./public/constants/matchData.js";
 import { FindIfPlayerInMatch, MakeNewMatch } from "./matchManager.js";
 import { GetUserData } from "./database.js";
 import { userRoles } from "./public/constants/userData.js";
-import { SendSocketMessage } from "./socketManager.js";
+import { SendEmptySocketMessage, SendSocketMessage } from "./socketManager.js";
 import { ResponseData } from "./Responses/ResponseData.js";
 import { enterQueErrors, readyUpErrors } from "./Responses/queErrors.js";
 import { GetQueAvailible } from "./queEnabled.js";
@@ -86,24 +86,18 @@ export async function MatchMakingTick(){
             RemovePlayersFromQue(ques[0].queArr, newlyMatchedPlayers[i].players[0], newlyMatchedPlayers[i].players[1]);
             var match = await MakeNewMatch(newlyMatchedPlayers[i].players[0], newlyMatchedPlayers[i].players[1], newlyMatchedPlayers[i].matchMode);
 
-            //GET RID OF THIS IF NEW SOCKETS ROOMS WORK
-            var matchedPlayersData = {
-                matchId: match.id,
-                player1Id: match.players[0].id,
-                player2Id: match.players[1].id
-            }
             var player1Room = "queRoom" + match.players[0].id.toString();
             var player2Room = "queRoom" + match.players[1].id.toString();
-            SendSocketMessage(player1Room, "matchReady", matchedPlayersData);
-            SendSocketMessage(player2Room, "matchReady", matchedPlayersData);
+            SendSocketMessage(player1Room, "matchReady", match.id);
+            SendSocketMessage(player2Room, "matchReady", match.id);
         } else{
             RemovePlayersFromQue(ques[1].queArr, newlyMatchedPlayers[i].players[0], newlyMatchedPlayers[i].players[1]);
             matchingPlayersList.push(new MatchedPlayers(newlyMatchedPlayers[i].players[0], newlyMatchedPlayers[i].players[1], newlyMatchedPlayers[i].matchMode));
 
             var player1Room = "queRoom" + newlyMatchedPlayers[i].players[0].toString();
             var player2Room = "queRoom" + newlyMatchedPlayers[i].players[1].toString();
-            SendSocketMessage(player1Room, "matchesFound", newlyMatchedPlayers[i]);
-            SendSocketMessage(player2Room, "matchesFound", newlyMatchedPlayers[i]);
+            SendEmptySocketMessage(player1Room, "matchFound");
+            SendEmptySocketMessage(player2Room, "matchFound");
         }
     }
 }
