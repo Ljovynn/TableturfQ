@@ -299,8 +299,8 @@ async function setMatchInfo() {
     var player2Rank = await GetRank(player2ELO);
     console.log(player2Rank);
 
-    var player1AvatarString = 'https://cdn.discordapp.com/avatars/' + player1DiscordId + '/' + player1DiscordAvatar + '.jpg';
-    var player2AvatarString = 'https://cdn.discordapp.com/avatars/' + player2DiscordId + '/' + player2DiscordAvatar + '.jpg';
+    var player1AvatarString = 'https://cdn.discordapp.com/avatars/' + player1DiscordId + '/' + player1DiscordAvatar + '.jpg' + '?size=512';
+    var player2AvatarString = 'https://cdn.discordapp.com/avatars/' + player2DiscordId + '/' + player2DiscordAvatar + '.jpg' + '?size=512';
 
     if ( JSON.stringify(match.mode) === JSON.stringify(matchModes.casual) ) {
         casualMatch = true;
