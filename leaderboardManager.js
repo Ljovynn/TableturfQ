@@ -21,7 +21,7 @@ export function GetLeaderboardAtPos(startPos, hitCount){
 }
 
 export function GetPlayerLeaderboardPosition(userId){
-    for (i = 0; i < leaderboard.length; i++){
+    for (let i = 0; i < leaderboard.length; i++){
         if (leaderboard[i].id == userId) return i + 1;
     }
     return 0;
