@@ -2,6 +2,8 @@ import glicko2 from "glicko2";
 import { GetUserRankData, SetUserRating } from "./database.js";
 import { matchStatuses } from "./public/constants/matchData.js";
 
+export const placementMatchCount = 5;
+
 export var settings = {
     // tau : "Reasonable choices are between 0.3 and 1.2, though the system should
     //      be tested to decide which value results in greatest predictive accuracy."

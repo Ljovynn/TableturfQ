@@ -1,6 +1,6 @@
 import {stages, matchStatuses, matchModes, Game, Match, ChatMessage, disputeResolveOptions} from "./public/constants/matchData.js";
-import { ApplyMatchEloResults } from "./glicko2Manager.js";
-import { AddChatMessage, CreateMatch, GetMatch, SetMatchResult } from "./database.js";
+import { ApplyMatchEloResults, placementMatchCount } from "./glicko2Manager.js";
+import { AddChatMessage, CreateMatch, GetMatch, GetUserRankedMatchCount, SetMatchResult, SetUserHideRank } from "./database.js";
 import { FindPlayerPosInMatch } from "./utils/matchUtils.js";
 import { AddRecentlyMatchedPlayers } from "./queManager.js";
 import { SendDisputeMessage } from "./discordBot/discordBotManager.js";
@@ -239,7 +239,7 @@ export async function PlayerSentGameWin(playerId, winnerId){
         if (CheckMatchWin(match, winnerId)){
             match.winnerId = winnerId;
             data.matchWin = true;
-            data.newPlayerRatings = await HandleMatchWin(match);
+            data.newPlayerRatings = await HandleRankedMatchWin(match);
             if (data.newPlayerRatings) return new ResponseData(201, data);
             return databaseErrors.matchFinishError;
         } else{
@@ -268,7 +268,7 @@ function CheckMatchWin(match, winnerId){
     return false;
 }
 
-async function HandleMatchWin(match){
+async function HandleRankedMatchWin(match){
     if (match.players[0].id == match.winnerId){
         match.status = matchStatuses.player1Win;
     } else {
@@ -277,7 +277,18 @@ async function HandleMatchWin(match){
 
     if (!await FinishMatch(match)) return false;
 
+    CheckPlacements(match.players[0].id);
+    CheckPlacements(match.players[1].id);
+
     return await ApplyMatchEloResults(match);
+}
+
+async function CheckPlacements(playerId){
+    const rankedMatchCount = await GetUserRankedMatchCount(playerId);
+
+    if (rankedMatchCount >= placementMatchCount){
+        await SetUserHideRank(playerId, false);
+    }
 }
 
 export async function PlayerSentCasualMatchEnd(playerId){
@@ -430,14 +441,14 @@ export async function ResolveMatchDispute(matchId, resolveOption){
             match.winnerId = match.players[0].id;
             var result = { winnerId: match.winnerId }
             SendDisputeMessage(GetDisputedMatchesList(), false);
-            result.newPlayerRatings = await HandleMatchWin(match);
+            result.newPlayerRatings = await HandleRankedMatchWin(match);
             if (result.newPlayerRatings) return new ResponseData(201, result);
             return databaseErrors.matchFinishError;
         case disputeResolveOptions.matchWinPlayer2:
             match.winnerId = match.players[1].id;
             var result = { winnerId: match.winnerId }
             SendDisputeMessage(GetDisputedMatchesList(), false);
-            result.newPlayerRatings = await HandleMatchWin(match);
+            result.newPlayerRatings = await HandleRankedMatchWin(match);
             if (result.newPlayerRatings) return new ResponseData(201, result);
             return databaseErrors.matchFinishError;
         default:
@@ -488,7 +499,7 @@ async function HandleDisputeGameWin(match, winnerIndex){
 
         data.matchFinished = true;
         data.winnerId = match.winnerId;
-        data.newPlayerRatings = await HandleMatchWin(match);
+        data.newPlayerRatings = await HandleRankedMatchWin(match);
         if (data.newPlayerRatings) return data;
         return false;
     } else{
@@ -520,7 +531,7 @@ export async function HandleBannedPlayerInMatch(playerId){
         var otherPos = (playerPos + 1) % 2;
         match.winnerId = match.players[otherPos].id;
         result.winnerId = match.winnerId;
-        result.newPlayerRatings = await HandleMatchWin(match);
+        result.newPlayerRatings = await HandleRankedMatchWin(match);
     }
     result.matchId = match.id;
     result.mode = match.mode;

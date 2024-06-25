@@ -21,7 +21,7 @@ export async function GetMatch(matchId){
 }
 
 export async function GetUserByDiscordId(discordId){
-    const [rows] = await pool.query(`SELECT id, username, role, g2_rating, CAST(discord_id AS CHAR) discord_id, discord_username, discord_avatar_hash, country, created_at FROM users u WHERE discord_id = ?`, [discordId]);
+    const [rows] = await pool.query(`SELECT id, username, role, g2_rating, hide_rank, CAST(discord_id AS CHAR) discord_id, discord_username, discord_avatar_hash, country, created_at FROM users u WHERE discord_id = ?`, [discordId]);
     if (rows[0]){
         console.log("databse found user with discord id " + discordId);
         console.log("insert id: " + rows[0].insertId); 
@@ -39,19 +39,19 @@ export async function GetUserLoginData(userId){
 }
 
 export async function GetUserData(userId){
-    const [rows] = await pool.query(`SELECT id, username, role, g2_rating, CAST(discord_id AS CHAR) discord_id, discord_username, discord_avatar_hash, country, created_at,
+    const [rows] = await pool.query(`SELECT id, username, role, g2_rating, hide_rank, CAST(discord_id AS CHAR) discord_id, discord_username, discord_avatar_hash, country, created_at,
     (SELECT COUNT(*) FROM ban_list WHERE user_id = u.id) AS banned FROM users u WHERE id = ?`, [userId]);
     return rows[0];
 }
 
 export async function GetMultipleUserDatas(userIdlist){
-    const [rows] = await pool.query(`SELECT id, username, role, g2_rating, CAST(discord_id AS CHAR) discord_id, discord_username, discord_avatar_hash, country, created_at,
+    const [rows] = await pool.query(`SELECT id, username, role, g2_rating, hide_rank, CAST(discord_id AS CHAR) discord_id, discord_username, discord_avatar_hash, country, created_at,
     (SELECT COUNT(*) FROM ban_list WHERE user_id = u.id) AS banned FROM users u WHERE id IN (?)`, [userIdlist]);
     return rows; 
 }
 
 export async function GetUserRankData(userId){
-    const [rows] = await pool.query(`SELECT id, g2_rating, g2_rd, g2_vol FROM users WHERE id = ?`, [userId]);
+    const [rows] = await pool.query(`SELECT id, g2_rating, hide_rank, g2_rd, g2_vol FROM users WHERE id = ?`, [userId]);
     return rows[0];
 }
 
@@ -91,6 +91,12 @@ export async function GetUserMatchCount(userId)
     if (count[0]) return count[0].matchCount;
 }
 
+export async function GetUserRankedMatchCount(userId)
+{
+    const [count] = await pool.query(`SELECT COUNT(*) AS matchCount FROM matches WHERE ranked = FALSE AND (player1_id = ? OR player2_id = ?)`, [userId, userId]);
+    if (count[0]) return count[0].matchCount;
+}
+
 export async function GetMatchGames(matchId){
     const [rows] = await pool.query(`SELECT * FROM games WHERE match_id = ? ORDER BY id`, [matchId]);
     return rows;
@@ -113,7 +119,7 @@ export async function GetSession(sessionId){
 
 export async function GetLeaderboard(){
     const [rows] = await pool.query (`SELECT id, username, role, g2_rating, CAST(discord_id AS CHAR) discord_id, discord_avatar_hash, created_at FROM users u WHERE NOT EXISTS
-    (SELECT * FROM ban_list WHERE user_id = u.id) AND role != 0 ORDER BY g2_rating DESC`);
+    (SELECT * FROM ban_list WHERE user_id = u.id) AND role != 0 AND hide_rank = FALSE ORDER BY g2_rating DESC`);
     return rows;
 }
 
@@ -238,6 +244,10 @@ export async function SetUserRole(userId, role){
 
 export async function SetUserRating(userId, rating, rd, vol){
     await pool.query(`UPDATE users SET g2_rating = ?, g2_rd = ?, g2_vol = ? WHERE id = ?`, [rating, rd, vol, userId]);
+}
+
+export async function SetUserHideRank(userId, shouldHide){
+    await pool.query(`UPDATE users SET hide_rank = ? WHERE id = ?`, [shouldHide, userId]);
 }
 
 export async function VerifyAccount(userId, discordId, discordUsername, discordAccessToken, discordRefreshToken, discordAvatarHash){

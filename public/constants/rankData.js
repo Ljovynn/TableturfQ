@@ -4,6 +4,8 @@ function Rank(name, ratingThreshold, imageURL){
     this.imageURL = imageURL;
 }
 
+export const unranked = Object.freeze(new Rank('Unranked', 0, 'https://leanny.github.io/splat3/images/badge/Badge_NawaBattlerRank_Lv00.png'));
+
 export const ranks = Object.freeze([
     new Rank('Bronze 1', 0, 'https://leanny.github.io/splat3/images/badge/Badge_NawaBattlerRank_Lv03.png'),
     new Rank('Bronze 2', 1200, 'https://leanny.github.io/splat3/images/badge/Badge_NawaBattlerRank_Lv04.png'),
