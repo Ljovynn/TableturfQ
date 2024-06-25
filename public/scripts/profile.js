@@ -135,7 +135,7 @@ async function setUserInfo() {
 async function getMatchHistory() {
     var data = {};
     if ( playerID != 0 ) {
-        data = { playerId: parseInt(playerID) }
+        data = { userId: parseInt(playerID) }
     }
     var result = await getData('/user/GetUserMatchHistory', data);
     return result;

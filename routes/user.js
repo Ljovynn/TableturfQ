@@ -32,7 +32,7 @@ router.use(DeserializeSession);
 //res: matchHistory (DB matches, not match objects)
 router.post("/GetUserMatchHistory", async (req, res) => {
     try{
-        const userId = req.session.user;
+        const userId = req.body.userId;
         var pageNumber = req.pageNumber;
 
         if (typeof(userId) !== 'number') return SetResponse(res, definitionErrors.userNotDefined);
@@ -140,7 +140,7 @@ router.post("/GetUsers", async (req, res) => {
 //timeWaitingStarted = timestamp since ready wait started
 //returns undefined if not in ready waiting
 
-//matchId: just the id of match player is in
+//matchId: just the id of match player is in, undefined if not in match
 router.get("/GetUserInfo", async (req, res) => {
     try{
         var user = await GetCurrentUser(req);
