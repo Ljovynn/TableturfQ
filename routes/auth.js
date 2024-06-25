@@ -35,7 +35,7 @@ router.use(cookieParser(sessionSecret));
 router.use(DeserializeSession);
 
 //req: username
-router.get("/unverified/login", async (req, res) => {
+router.post("/unverified/login", async (req, res) => {
     if (CheckUserDefined(req)) return SetResponse(res, authErrors.userLoggedIn);
 
     const username = req.body.username;
