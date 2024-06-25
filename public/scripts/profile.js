@@ -186,5 +186,9 @@ function validateDisplayName(newDisplayName) {
         return false;
     }
 
+    if ( newDisplayName.length < 2 || newDisplayName.length > 32 ) {
+        return false;
+    }
+
     return true;
 }

@@ -1,4 +1,5 @@
 // Elements
+const competetiveQueue = document.getElementById('competetive-queue');
 const casualUsername = document.getElementById('casual-username');
 const queueMatchmaking = document.getElementById('queue-matchmaking');
 const matchMakingReady = document.getElementById('ranked-match-ready');
@@ -18,6 +19,7 @@ var queuedMatchMode;
 var mainTimer;
 var readyUp;
 var ready = false;
+var isCasual = false;
 
 var user;
 var userID = 0;
@@ -109,8 +111,13 @@ async function getUserInfo() {
 async function setUserInfo() {
     var userInfo = await getUserInfo();
     user = userInfo.user;
+    console.log(user);
     userID = user.id;
     console.log(userID);
+    if ( !user.discord_id ) {
+        isCasual = true;
+        competetiveQueue.style.display = 'none';
+    }
 }
 
 function validateDisplayname(displayName) {

@@ -49,6 +49,17 @@ h3 {
     display: none;
 }
 
+#login-content {
+    width: 50%;
+    margin: auto;
+}
+
+#user-login, #guest-login {
+    display: inline-block;
+    width: 50%;
+    margin: auto;
+}
+
 /**** QUEUE PAGE STYLES ****/
 
 .queue-section {
