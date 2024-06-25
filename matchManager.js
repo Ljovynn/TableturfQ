@@ -1,6 +1,6 @@
 import {stages, matchStatuses, matchModes, Game, Match, ChatMessage, disputeResolveOptions} from "./public/constants/matchData.js";
 import { ApplyMatchEloResults } from "./glicko2Manager.js";
-import { CreateMatch, SetMatchResult } from "./database.js";
+import { AddChatMessage, CreateMatch, GetMatch, SetMatchResult } from "./database.js";
 import { FindPlayerPosInMatch } from "./utils/matchUtils.js";
 import { AddRecentlyMatchedPlayers } from "./queManager.js";
 import { SendDisputeMessage } from "./discordBot/discordBotManager.js";
@@ -294,23 +294,37 @@ export async function PlayerSentCasualMatchEnd(playerId){
     return new ResponseData(201, match.id);
 }
 
-export function UserSentChatMessage(playerId, content){
-    var match = FindMatchWithPlayer(playerId);
-    if (!match) return nullErrors.noMatch;
-
+export async function UserSentChatMessage(matchId, playerId, content){
     if (HasBadWords(content)) return chatMessageErrors.badWords;
+
+    var match = FindMatchWithPlayer(playerId);
+    if (!match){
+        match = await GetMatch(matchId);
+        if (!match) return nullErrors.matchDoesntExist;
+
+        if (match.player1_id != playerId && match.player2_id != playerId) return chatMessageErrors.notInMatch;
+
+        await AddChatMessage(matchId, playerId, content);
+        return new ResponseData(201);
+    }
 
     var chatMessage = new ChatMessage(content, playerId);
     match.chat.push(chatMessage);
-    return new ResponseData(201, match.id);
+    return new ResponseData(201);
 }
 
 //trust server that its a mod and verified user
 export async function ModSentChatMessage(matchId, userId, content){
-    var match = FindMatch(matchId);
-    if (!match) return nullErrors.matchDoesntExist;
-
     if (HasBadWords(content)) return chatMessageErrors.badWords;
+    
+    var match = FindMatch(matchId);
+    if (!match){
+        match = await GetMatch(matchId);
+        if (!match) return nullErrors.matchDoesntExist;
+
+        await AddChatMessage(matchId, userId, content);
+        return new ResponseData(201);
+    }
 
     var chatMessage = new ChatMessage(content, userId);
     match.chat.push(chatMessage);

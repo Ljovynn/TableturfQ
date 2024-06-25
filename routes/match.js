@@ -165,21 +165,23 @@ router.post("/ResolveDispute", async (req, res) => {
     }
 });
 
-//message
+//matchId, message
 router.post("/SendChatMessage", async (req, res) => {
     try {
         const userId = req.session.user;
+        const matchId = req.body.matchId;
         const message = req.body.message;
 
         if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
+        if (typeof(matchId) !== 'number') return SetResponse(res, definitionErrors.matchUndefined);
         if (typeof(message) !== 'string') return SetResponse(res, definitionErrors.chatMessageUndefined);
 
-        var responseData = UserSentChatMessage(userId, message);
+        var responseData = await UserSentChatMessage(matchId, userId, message);
         if (!ResponseSucceeded(responseData.code)) return SetResponse(res, responseData);
 
         res.sendStatus(responseData.code);
         var socketMessage = {ownerId: userId, content: message};
-        SendSocketMessage('match' + responseData.data, "chatMessage", socketMessage);
+        SendSocketMessage('match' + matchId, "chatMessage", socketMessage);
     } catch (err){
         res.sendStatus(500);
     }

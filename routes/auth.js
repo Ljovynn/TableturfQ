@@ -52,7 +52,9 @@ router.get("/discord/redirect", async (req, res) => {
     const userId = req.session.user;
 
     if (!code){
-        res.sendFile(path.join(__dirname, '..', "public/index.html"));
+        res.writeHead(301, {
+            Location: `${websiteURL}`
+        }).end();
         return;
     }
 
@@ -91,8 +93,9 @@ router.get("/discord/redirect", async (req, res) => {
     
             const refresh = await AxiosPost(requestFormData, apiRouteOauth2Token);*/
             
-            res.location("/");
-            res.end();
+            res.writeHead(301, {
+                Location: `${websiteURL}`
+            }).end();
             //res.sendFile(path.join(__dirname, '..', "public/index.html"));
         }
     } catch(error){

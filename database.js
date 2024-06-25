@@ -204,6 +204,12 @@ export async function BanUser(userId){
     await pool.query(`INSERT INTO ban_list (user_id) VALUES (?)`, [userId]);
 }
 
+export async function AddChatMessage(matchId, ownerId, content){
+    const [count] = await pool.query(`SELECT COUNT(*) AS chatCount FROM chat_messages WHERE match_id = ?`, [matchId]);
+    const messageNumber = count[0].chatCount + 1;
+    await pool.query(`INSERT INTO chat_messages (match_id, message_number, owner_id, content) VALUES ?, ?, ?, ?`, [matchId, messageNumber, ownerId, content]);
+}
+
 
 //Update
 export async function SetMatchResult(match){
