@@ -184,9 +184,7 @@ socket.on('matchFound', () => {
     readyUp = window.setInterval(countdownTimer, 1000);
 });
 
-socket.on('matchReady', (matchedPlayersData) => {
-    console.log(matchedPlayersData);
-    const matchID = matchedPlayersData.matchId;
+socket.on('matchReady', (matchID) => {
     console.log('/game?matchID=' + matchID);
     window.location.href = '/game?matchID=' + matchID;
 });
