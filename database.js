@@ -179,7 +179,7 @@ async function CreateCounterpickGameAndStrikes(match, gameNumber){
 
 export async function CreateUser(username)
 {
-    const result = await pool.query(`INSERT INTO users (username, g2_rating, g2_rd, g2_vol) VALUES (?)`, [username, settings.rating, settings.rd, settings.vol]);
+    const result = await pool.query(`INSERT INTO users (username, g2_rating, g2_rd, g2_vol) VALUES (?, ?, ?, ?)`, [username, settings.rating, settings.rd, settings.vol]);
     return result[0].insertId;
 }
 
