@@ -96,7 +96,7 @@ router.get("/discord/redirect", async (req, res) => {
             res.writeHead(301, {
                 Location: `${websiteURL}`
             }).end();
-            //res.sendFile(path.join(__dirname, '..', "public/index.html"));
+            //res.end();
         }
     } catch(error){
         console.log(error);
@@ -117,7 +117,7 @@ async function StoreUserData(accessToken, refreshToken, userId){
     if (userId){
         var user = await GetUserData(userId);
         if (user && user.role == userRoles.unverified){
-            await VerifyAccount(userId, response.data.id, accessToken, refreshToken, response.data.avatar, response.data.locale);
+            await VerifyAccount(userId, response.data.id, accessToken, refreshToken, response.data.avatar);
             return userId;
         }
     }
@@ -125,10 +125,10 @@ async function StoreUserData(accessToken, refreshToken, userId){
     var newUser = await GetUserByDiscordId(response.data.id);
     var newUserId;
     if (!newUser){
-        newUserId = await CreateUserWithDiscord(response.data.username, response.data.id, accessToken, refreshToken, response.data.avatar, response.data.locale);
+        newUserId = await CreateUserWithDiscord(response.data.username, response.data.id, accessToken, refreshToken, response.data.avatar);
     } else {
         newUserId = newUser.id;
-        await SetUserDiscord(newUserId, response.data.id, accessToken, refreshToken, response.data.avatar, response.data.locale); 
+        await SetUserDiscord(newUserId, response.data.id, accessToken, refreshToken, response.data.avatar); 
     }
     return newUserId;
 }

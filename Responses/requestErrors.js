@@ -20,6 +20,8 @@ export const definitionErrors = Object.freeze({
     userNotDefined: new ResponseData(404, 'No user account exists with this ID'),
     chatMessageUndefined: new ResponseData(400, 'No chat message submitted'),
     winnerUndefined: new ResponseData(400, 'No winner ID submitted'),
+    countryUndefined: new ResponseData(400, 'No country submitted'),
+    countryWrongFormat: new ResponseData(400, 'Country not submitted correctly'),
 });
 
 export const nullErrors = Object.freeze({

@@ -11,7 +11,7 @@ import { GetCurrentUser } from '../utils/userUtils.js';
 import dotenv from 'dotenv';
 import { FindIfPlayerInQue } from '../queManager.js';
 import { FindMatchWithPlayer } from '../matchManager.js';
-import { DeleteAllUserSessions, GetMultipleUserDatas, GetUserMatchHistory, SetUserDiscordTokens } from '../database.js';
+import { DeleteAllUserSessions, GetMultipleUserDatas, GetUserMatchHistory, SetUserCountry, SetUserDiscordTokens } from '../database.js';
 import { definitionErrors, userErrors } from '../Responses/requestErrors.js';
 import { SetResponse } from '../Responses/ResponseData.js';
 
@@ -43,6 +43,30 @@ router.post("/GetUserMatchHistory", async (req, res) => {
         var matchHistory = await GetUserMatchHistory(userId, matchHistoryHitsPerPage, pageNumber);
 
         res.status(200).send(matchHistory);
+    } catch(error){
+        console.error(error);
+        res.sendStatus(400);
+    }
+});
+
+//country (2 letters. send 'none' for removal)
+router.post("SetUserCountry", async (req, res) => {
+    try{
+        const userId = req.session.user;
+        const country = req.body.country;
+
+        if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
+        if (typeof(country) !== 'string') return SetResponse(res, definitionErrors.countryUndefined);
+
+        if (country == 'none'){
+            await SetUserCountry(userId, null);
+            res.sendStatus(201);
+            return;
+        }
+        if (country.length != 2) return SetResponse(res, definitionErrors.countryWrongFormat);
+
+        await SetUserCountry(userId, country);
+        res.sendStatus(201);
     } catch(error){
         console.error(error);
         res.sendStatus(400);
