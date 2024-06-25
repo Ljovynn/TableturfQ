@@ -13,8 +13,7 @@ import { FindMatchWithPlayer } from '../matchManager.js';
 import { DeleteAllUserSessions, GetMultipleUserDatas, GetUserMatchHistory, SetUserCountry, SetUserDiscordTokens, SetUsername } from '../database.js';
 import { definitionErrors, userErrors } from '../Responses/requestErrors.js';
 import { SetResponse } from '../Responses/ResponseData.js';
-
-const usernameMinLength = 2;
+import { usernameMaxLength, usernameMinLength } from '../public/constants/userData.js';
 
 const router = Router();
 
@@ -59,7 +58,7 @@ router.post("/SetUsername", async (req, res) => {
         if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
         if (typeof(username) !== 'string') return SetResponse(res, definitionErrors.usernameUndefined);
 
-        if (username.length < usernameMinLength || username.length > 32) return SetResponse(res, definitionErrors.usernameWrongFormat);
+        if (username.length < usernameMinLength || username.length > usernameMaxLength) return SetResponse(res, definitionErrors.usernameWrongFormat);
 
         await SetUsername(userId, username);
         res.sendStatus(201);

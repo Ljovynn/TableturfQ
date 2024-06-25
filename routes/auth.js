@@ -13,7 +13,8 @@ import { GetUserByDiscordId, CreateUserWithDiscord, SetUserDiscord, CreateUser, 
 import { CheckUserDefined } from '../utils/checkDefined.js';
 import { authErrors, databaseErrors } from '../Responses/authErrors.js';
 import { SetResponse } from '../Responses/ResponseData.js';
-import { userRoles } from '../public/constants/userData.js';
+import { userRoles, usernameMaxLength, usernameMinLength } from '../public/constants/userData.js';
+import { definitionErrors } from '../Responses/requestErrors.js';
 
 const apiRouteOauth2Token = "https://discord.com/api/v10/oauth2/token";
 const apiRouteUserInfo = "https://discord.com/api/v10/users/@me";
@@ -37,7 +38,12 @@ router.use(DeserializeSession);
 router.get("/unverified/login", async (req, res) => {
     if (CheckUserDefined(req)) return SetResponse(res, authErrors.userLoggedIn);
 
-    var userId = await CreateUser(req.username);
+    const username = req.body.username;
+    if (typeof(username) !== 'string') return SetResponse(res, definitionErrors.usernameUndefined);
+
+    if (username.length < usernameMinLength || username.length > usernameMaxLength) return SetResponse(res, definitionErrors.usernameWrongFormat);
+
+    var userId = await CreateUser(username);
     if (!userId) return SetResponse(databaseErrors.unverifiedCreateError);
 
     await SerializeSession(req, userId);
