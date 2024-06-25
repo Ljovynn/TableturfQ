@@ -18,13 +18,18 @@ var queuedMatchMode;
 var mainTimer;
 var ready = false;
 
+var user;
+var userID = 0;
+
+await setUserInfo();
+
 joinCompetetive.addEventListener('click', async (e) => {
     console.log('User has joined the competetive queue');
-    data = { matchMode: 'ranked' }
+    var data = { matchMode: 'ranked' }
     queuedMatchMode = 'ranked';
 
     // Join the queue
-    response = await postData('/que/PlayerEnterQue', data);
+    var response = await postData('/que/PlayerEnterQue', data);
     console.log('Response data: ' + JSON.stringify(response));
     if ( response == 201 ) {
         // Do queue frontend stuff
@@ -45,10 +50,10 @@ joinCasual.addEventListener('click', async (e) => {
 
     // Check that there is a username entered
     if (validateDisplayname(displayName)) {
-        data = { matchMode: 'casual' }
+        var data = { matchMode: 'casual' }
         queuedMatchMode = 'casual';
         // Join the queue
-        response = await postData('/que/PlayerEnterQue', data);
+        var response = await postData('/que/PlayerEnterQue', data);
         
         if ( response == 201 ) {
             // Do queue frontend stuff
@@ -94,6 +99,19 @@ leaveButton.addEventListener('click', async (e) => {
     }
 });
 
+async function getUserInfo() {
+    var data = {};
+    var result = await fetchData('/user/GetUserInfo');
+    return result;
+}
+
+async function setUserInfo() {
+    var userInfo = await getUserInfo();
+    user = userInfo.user;
+    userID = user.id;
+    console.log(userID);
+}
+
 function validateDisplayname(displayName) {
     if ( displayName === '' ) {
         return false;
@@ -107,13 +125,13 @@ var countdown = 300;
 
 function updateTimer() {
     timer += 1;
-    time = secondsToHMS(timer);
+    var time = secondsToHMS(timer);
     queueTimer.innerHTML = 'Finding Match... ' + time;    
 }
 
 function countdownTimer() {
     countdown -= 1;
-    time = secondsToMS(countdown);
+    var time = secondsToMS(countdown);
     readyCountdown.innerHTML = time;
     if ( countdown == 0 ) {
         clearTimer(readyUp);
@@ -153,10 +171,10 @@ function secondsToMS(d) {
 }
 
 // SOCKET JS
+console.log('Joining queRoom' + userID.toString());
+socket.emit('join', 'queRoom' + userID.toString());
 
-socket.emit('join', 'queRoom');
-
-socket.on('matchesFound', (matchedPlayersData) => {
+socket.on('matchFound', (matchedPlayersData) => {
     console.log('Socket event match ready');
     console.log(matchedPlayersData);
     timer = 0;
