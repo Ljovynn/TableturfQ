@@ -9,7 +9,7 @@ export var settings = {
     //      be tested to decide which value results in greatest predictive accuracy."
     tau : 0.5,
     // rating : default rating
-    rating : 1500,
+    rating : 1400,
     //rd : Default rating deviation 
     //     small number = good confidence on the rating accuracy
     rd : 140,
