@@ -93,7 +93,7 @@ export async function GetUserMatchCount(userId)
 
 export async function GetUserRankedMatchCount(userId)
 {
-    const [count] = await pool.query(`SELECT COUNT(*) AS matchCount FROM matches WHERE ranked = FALSE AND (player1_id = ? OR player2_id = ?)`, [userId, userId]);
+    const [count] = await pool.query(`SELECT COUNT(*) AS matchCount FROM matches WHERE ranked = TRUE AND (player1_id = ? OR player2_id = ?)`, [userId, userId]);
     if (count[0]) return count[0].matchCount;
 }
 
