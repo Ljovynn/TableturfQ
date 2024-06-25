@@ -69,8 +69,6 @@ router.post("/PlayerReady", async (req, res) => {
     //if match created send socket
     try {
         const userId = req.session.user;
-        console.log('Post Player Ready function');
-
 
         if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
 
@@ -81,13 +79,11 @@ router.post("/PlayerReady", async (req, res) => {
         if (!responseData.data) return;
 
         var match = responseData.data;
-
-        var matchedPlayersData = {
-            matchId: match.id,
-            player1Id: match.players[0].id,
-            player2Id: match.players[1].id
-        }
-        SendSocketMessage("queRoom", "matchReady", matchedPlayersData);
+        
+        var player1Room = "queRoom" + match.players[0].id.toString();
+        var player2Room = "queRoom" + match.players[1].id.toString();
+        SendSocketMessage(player1Room, "matchReady", match.id);
+        SendSocketMessage(player2Room, "matchReady", match.id);
     } catch (err){
         console.error(err);
         res.sendStatus(500);

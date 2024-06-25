@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import { FindIfPlayerInMatch } from "./matchManager.js";
 import { GetMatch, GetUserRole } from "./database.js";
 import { userRoles } from "./public/constants/userData.js";
+import { instrument } from "@socket.io/admin-ui";
 
 dotenv.config();
 const sessionSecret = process.env.SESSION_SECRET;
@@ -40,6 +41,11 @@ export function CreateSocketConnection (server){
                 SocketJoinMatchRoom(socket, room);
             }
         });
+    });
+
+    instrument(io, {
+        auth: false,
+        mode: "development",
     });
 
     connected = true;
