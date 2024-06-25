@@ -48,8 +48,7 @@ router.get("/unverified/login", async (req, res) => {
 
     await SerializeSession(req, userId);
 
-    res.location("/");
-    res.end();
+    res.sendStatus(201);
 });
 
 router.get("/discord/redirect", async (req, res) => {
