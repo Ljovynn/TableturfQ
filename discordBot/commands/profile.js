@@ -4,6 +4,7 @@ import { GetRank, unranked } from "../../public/constants/rankData.js";
 import { DetailMinute } from "../../utils/date.js";
 import { embedColor } from '../constants.js';
 import { BuildSimpleEmbed } from "../utils/embed.js";
+import { GetPlayerLeaderboardPosition } from "../../leaderboardManager.js";
 
 import dotenv from 'dotenv';
 
@@ -24,15 +25,15 @@ export async function execute(interaction) {
 
     const user = await GetUserByDiscordId(discordUser.id);
 
-    var matchCount;
-
     if (!user){
-        const noUserEmbed = BuildSimpleEmbed('TableturfQ Profile', `The selected user has no TableturfQ profile.`, '\u200B');
+        const noUserEmbed = BuildSimpleEmbed('TableturfQ Profile', ' ', `<@${discordUser.id}> has no TableturfQ profile.`);
         await interaction.reply({ embeds: [noUserEmbed] });
 		return;        
     }
 
-    matchCount = await GetUserMatchCount(user.id);
+	var matchCount = await GetUserMatchCount(user.id);
+	var leaderboardPosition = GetPlayerLeaderboardPosition(user.id);
+	if (leaderboardPosition == 0) leaderboardPosition = 'N/A';
     const matches = await GetUserMatchHistory(user.id, 1, 1);
     if (matches[0]){
         var lastPlayed = matches[0].created_at;
@@ -45,7 +46,7 @@ export async function execute(interaction) {
 	}
 
 	var rank = unranked;
-	var ratingValue = 'None';
+	var ratingValue = 'N/A';
 	if (!user.hide_rank) {
 		rank = GetRank(user.g2_rating);
 		ratingValue = Math.floor(user.g2_rating);
@@ -67,15 +68,20 @@ export async function execute(interaction) {
         value: ' ',
 		inline: false
 		},
-	{ 
+	{
+		name: 'Leaderboard position', 
+		value: `${leaderboardPosition}`,
+		inline: true
+		},
+	{
         name: 'Match count', 
         value: `${matchCount}`,
 		inline: true
 		},
-	{
+	{ 
 		name: 'Last played',
 		value: lastPlayedValue,
-		inline: true
+		inline: false
 		},
     ];
 
@@ -85,7 +91,7 @@ export async function execute(interaction) {
 		author: {
 			name: `${user.username}`,
 			icon_url: `https://cdn.discordapp.com/avatars/${user.discord_id}/${user.discord_avatar_hash}.png`,
-			url: `${websiteURL}:${port}/user`,
+			url: `${websiteURL}/profile?playerId=${user.id}`,
 		},
 		thumbnail: {
 			url: `${rank.imageURL}`,

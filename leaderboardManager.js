@@ -19,3 +19,10 @@ export function GetLeaderboardAtPos(startPos, hitCount){
 
     return data;
 }
+
+export function GetPlayerLeaderboardPosition(userId){
+    for (i = 0; i < leaderboard.length; i++){
+        if (leaderboard[i].id == userId) return i + 1;
+    }
+    return 0;
+}
