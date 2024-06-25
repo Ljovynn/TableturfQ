@@ -51,6 +51,7 @@ const strikeButton = document.getElementById('confirm-map-selection');
 
 // Chat elements
 const chatLog = document.getElementById('match-chat-log');
+const chatForm = document.getElementById('match-chat-form');
 const chatInput = document.getElementById('match-chat-input');
 const chatSend = document.getElementById('match-chat-button');
 
@@ -153,7 +154,8 @@ for (let victoryButton of victoryButtons ) {
 }
 
 // Chat send listener
-chatSend.addEventListener('click', async (e) => {
+chatForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
     var chatMessage = chatInput.value;
     console.log( 'Player is sending the message: ' + chatMessage );
 
@@ -164,7 +166,7 @@ chatSend.addEventListener('click', async (e) => {
             data = { matchId: parseInt(matchId), message: chatMessage };
             var response = await postData('/admin/ModChatMessage', data);
         } else {
-            data = { userId: userID, message: chatMessage };
+            data = { matchId: parseInt(matchId), userId: userID, message: chatMessage };
             var response = await postData('/match/SendChatMessage', data);
         }
         console.log('chat message send response: ' + response);

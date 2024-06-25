@@ -16,6 +16,7 @@ const socket = io();
 
 var queuedMatchMode;
 var mainTimer;
+var ready = false;
 
 joinCompetetive.addEventListener('click', async (e) => {
     console.log('User has joined the competetive queue');
@@ -52,6 +53,7 @@ joinCasual.addEventListener('click', async (e) => {
         if ( response == 201 ) {
             // Do queue frontend stuff
             alert('Successfully joined the queue!');
+            timer = 0;
             queueInfo.style.display = 'block';
             mainTimer = window.setInterval(updateTimer, 1000);
             // Socket matchfound code
@@ -68,6 +70,7 @@ joinCasual.addEventListener('click', async (e) => {
 readyButton.addEventListener('click', async (e) => {
     console.log('User is ready for competetive match.');
     readyButton.style.display = 'none';
+    ready = true;
 
     // Not sure if we need to send any data but we can leave it blank for now
 
@@ -86,6 +89,7 @@ leaveButton.addEventListener('click', async (e) => {
         clearTimer(mainTimer);
         queueInfo.style.display = 'none';
         alert('You have successfully left the queue');
+        timer = 0;
         queueTimer.innerHTML = 'Finding Match... 00:00:00'; 
     }
 });
@@ -113,7 +117,12 @@ function countdownTimer() {
     readyCountdown.innerHTML = time;
     if ( countdown == 0 ) {
         clearTimer(readyUp);
-        alert('You have been removed from the queue due to inactivity.');
+        if ( !ready ) {
+            alert('You have been removed from the queue due to inactivity.');
+        } else {
+            alert('Your opponent did not ready up for the match and it has been canceled.');
+        }
+        matchMakingReady.style.display = 'none';
     }
 
 }
@@ -150,8 +159,11 @@ socket.emit('join', 'queRoom');
 socket.on('matchesFound', (matchedPlayersData) => {
     console.log('Socket event match ready');
     console.log(matchedPlayersData);
+    timer = 0;
+    countdown = 300;
     queueInfo.style.display = 'none';
     matchMakingReady.style.display = 'block';
+    ready = false;
     readyUp = window.setInterval(countdownTimer, 1000);
 });
 
