@@ -16,7 +16,12 @@ var connected = false;
 export function CreateSocketConnection (server){
     if (connected) return;
 
-    io = new Server(server);
+    io = new Server(server, {
+        cors: {
+          origin: ["https://admin.socket.io"],
+          credentials: true
+        }
+    });
 
     io.engine.use(sessionMiddleware);
     io.engine.use(cookieParser(sessionSecret));

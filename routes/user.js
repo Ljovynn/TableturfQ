@@ -4,16 +4,17 @@ import { Router } from 'express';
 import cookieParser from "cookie-parser";
 import { DeserializeSession } from '../utils/session.js';
 
-
 import { CheckIfArray, CheckUserDefined } from '../utils/checkDefined.js';
 import { GetCurrentUser } from '../utils/userUtils.js';
 
 import dotenv from 'dotenv';
 import { FindIfPlayerInQue } from '../queManager.js';
 import { FindMatchWithPlayer } from '../matchManager.js';
-import { DeleteAllUserSessions, GetMultipleUserDatas, GetUserMatchHistory, SetUserCountry, SetUserDiscordTokens } from '../database.js';
+import { DeleteAllUserSessions, GetMultipleUserDatas, GetUserMatchHistory, SetUserCountry, SetUserDiscordTokens, SetUsername } from '../database.js';
 import { definitionErrors, userErrors } from '../Responses/requestErrors.js';
 import { SetResponse } from '../Responses/ResponseData.js';
+
+const usernameMinLength = 2;
 
 const router = Router();
 
@@ -43,6 +44,25 @@ router.post("/GetUserMatchHistory", async (req, res) => {
         var matchHistory = await GetUserMatchHistory(userId, matchHistoryHitsPerPage, pageNumber);
 
         res.status(200).send(matchHistory);
+    } catch(error){
+        console.error(error);
+        res.sendStatus(400);
+    }
+});
+
+//username (max 32 letters)
+router.post("SetUsername", async (req, res) => {
+    try{
+        const userId = req.session.user;
+        const username = req.body.username;
+
+        if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
+        if (typeof(username) !== 'string') return SetResponse(res, definitionErrors.usernameUndefined);
+
+        if (username.length < usernameMinLength || username.length > 32) return SetResponse(res, definitionErrors.usernameWrongFormat);
+
+        await SetUsername(userId, username);
+        res.sendStatus(201);
     } catch(error){
         console.error(error);
         res.sendStatus(400);

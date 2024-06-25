@@ -21,7 +21,7 @@ export async function GetMatch(matchId){
 }
 
 export async function GetUserByDiscordId(discordId){
-    const [rows] = await pool.query(`SELECT id, username, role, g2_rating, CAST(discord_id AS CHAR) discord_id, discord_avatar_hash, country, created_at FROM users u WHERE discord_id = ?`, [discordId]);
+    const [rows] = await pool.query(`SELECT id, username, role, g2_rating, CAST(discord_id AS CHAR) discord_id, discord_username, discord_avatar_hash, country, created_at FROM users u WHERE discord_id = ?`, [discordId]);
     if (rows[0]){
         console.log("databse found user with discord id " + discordId);
         console.log("insert id: " + rows[0].insertId); 
@@ -39,13 +39,13 @@ export async function GetUserLoginData(userId){
 }
 
 export async function GetUserData(userId){
-    const [rows] = await pool.query(`SELECT id, username, role, g2_rating, CAST(discord_id AS CHAR) discord_id, discord_avatar_hash, country, created_at,
+    const [rows] = await pool.query(`SELECT id, username, role, g2_rating, CAST(discord_id AS CHAR) discord_id, discord_username, discord_avatar_hash, country, created_at,
     (SELECT COUNT(*) FROM ban_list WHERE user_id = u.id) AS banned FROM users u WHERE id = ?`, [userId]);
     return rows[0];
 }
 
 export async function GetMultipleUserDatas(userIdlist){
-    const [rows] = await pool.query(`SELECT id, username, role, g2_rating, CAST(discord_id AS CHAR) discord_id, discord_avatar_hash, country, created_at,
+    const [rows] = await pool.query(`SELECT id, username, role, g2_rating, CAST(discord_id AS CHAR) discord_id, discord_username, discord_avatar_hash, country, created_at,
     (SELECT COUNT(*) FROM ban_list WHERE user_id = u.id) AS banned FROM users u WHERE id IN (?)`, [userIdlist]);
     return rows; 
 }
@@ -73,7 +73,7 @@ export async function GetUserBanAndRole(userId){
 export async function GetUserChatData(userIdArr){
     const rows = [];
     for (let i = 0; i < userIdArr.length; i++){
-        rows[i] = await pool.query(`SELECT id, username, role, CAST(discord_id AS CHAR) discord_id FROM users WHERE id = ?`, [userIdArr[i]]);
+        rows[i] = await pool.query(`SELECT id, username, role, CAST(discord_id AS CHAR) discord_id, discord_username FROM users WHERE id = ?`, [userIdArr[i]]);
     }
     return rows;
 }
@@ -177,10 +177,10 @@ export async function CreateUser(username)
     return result[0].insertId;
 }
 
-export async function CreateUserWithDiscord(username, discordId, discordAccessToken, discordRefreshToken, discordAvatarHash){
-    const result = await pool.query(`INSERT INTO users (username, role, g2_rating, g2_rd, g2_vol, discord_id, discord_access_token, discord_refresh_token, discord_avatar_hash) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [username, userRoles.verified, settings.rating, settings.rd, settings.vol, discordId, discordAccessToken, discordRefreshToken, discordAvatarHash]);
+export async function CreateUserWithDiscord(discordUsername, discordId, discordAccessToken, discordRefreshToken, discordAvatarHash){
+    const result = await pool.query(`INSERT INTO users (username, role, g2_rating, g2_rd, g2_vol, discord_id, discord_username, discord_access_token, discord_refresh_token, discord_avatar_hash) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [discordUsername, userRoles.verified, settings.rating, settings.rd, settings.vol, discordId, discordUsername, discordAccessToken, discordRefreshToken, discordAvatarHash]);
     return result[0].insertId;
 }
 
@@ -240,14 +240,18 @@ export async function SetUserRating(userId, rating, rd, vol){
     await pool.query(`UPDATE users SET g2_rating = ?, g2_rd = ?, g2_vol = ? WHERE id = ?`, [rating, rd, vol, userId]);
 }
 
-export async function VerifyAccount(userId, discordId, discordAccessToken, discordRefreshToken, discordAvatarHash){
-    await pool.query(`UPDATE users SET discord_id = ?, role = ?, discord_access_token = ?, discord_refresh_token = ?, discord_avatar_hash = ? WHERE id = ?`, 
-    [discordId, userRoles.verified, discordAccessToken, discordRefreshToken, discordAvatarHash, userId]);
+export async function VerifyAccount(userId, discordId, discordUsername, discordAccessToken, discordRefreshToken, discordAvatarHash){
+    await pool.query(`UPDATE users SET discord_id = ?, discord_username = ?, role = ?, discord_access_token = ?, discord_refresh_token = ?, discord_avatar_hash = ? WHERE id = ?`, 
+    [discordId, discordUsername, userRoles.verified, discordAccessToken, discordRefreshToken, discordAvatarHash, userId]);
 }
 
-export async function SetUserDiscord(userId, discordId, discordAccessToken, discordRefreshToken, discordAvatarHash){
-    await pool.query(`UPDATE users SET discord_id = ?, discord_access_token = ?, discord_refresh_token = ?, discord_avatar_hash = ? WHERE id = ?`, 
-    [discordId, discordAccessToken, discordRefreshToken, discordAvatarHash, userId]);
+export async function SetUsername(userId, username){
+    await pool.query(`UPDATE users SET username = ? WHERE id = ?`, [username, userId])
+}
+
+export async function SetUserDiscord(userId, discordId, discordUsername, discordAccessToken, discordRefreshToken, discordAvatarHash){
+    await pool.query(`UPDATE users SET discord_id = ?, discord_username = ?, discord_access_token = ?, discord_refresh_token = ?, discord_avatar_hash = ? WHERE id = ?`, 
+    [discordId, discordUsername, discordAccessToken, discordRefreshToken, discordAvatarHash, userId]);
 }
 
 export async function SetUserCountry(userId, country){
