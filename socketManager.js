@@ -48,10 +48,10 @@ export function CreateSocketConnection (server){
         });
     });
 
-    instrument(io, {
+    /*instrument(io, {
         auth: false,
         mode: "development",
-    });
+    });*/
 
     connected = true;
 };
