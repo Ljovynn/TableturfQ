@@ -317,6 +317,8 @@ async function setMatchInfo() {
 
     player1InGameName.innerHTML = players[0].username;
     if ( players[0].discord_id ) {
+        player1InGameName.href = '/profile?playerId=' + players[0].id;
+        player1InGameName.setAttribute('target', '_blank');
         player1DiscordName.style.display = 'block';
         player1Name.innerHTML = players[0].discord_username;
         player1Avatar.src = player1AvatarString;
@@ -329,6 +331,8 @@ async function setMatchInfo() {
 
     player2InGameName.innerHTML = players[1].username;
     if ( players[1].discord_id ) {
+        player2InGameName.href = '/profile?playerId=' + players[1].id;
+        player2InGameName.setAttribute('target', '_blank');
         player2DiscordName.style.display = 'block';
         player2Name.innerHTML = players[1].discord_username;
         player2Avatar.src = player2AvatarString;

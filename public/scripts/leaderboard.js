@@ -94,7 +94,12 @@ async function setLeaderBoard(startPos, hitCount) {
 
         let nameCell = document.createElement('div');
         nameCell.classList.add('leaderboard-name');
-        nameCell.append(user.username);
+
+        let userLink = document.createElement('a');
+        userLink.href = '/profile?playerId=' + user.id;
+        userLink.setAttribute('target', '_blank');
+        userLink.append(user.username);
+        nameCell.append(userLink);
 
         let eloCell = document.createElement('div');
         eloCell.classList.add('leaderboard-ELO');

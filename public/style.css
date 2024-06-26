@@ -99,6 +99,24 @@ h3 {
     width: 200px;
 }
 
+#player1-in-game-name, #player2-in-game-name {
+    display: block;
+    margin: 10px;
+}
+
+/* No hover effect by default so we can set it when there's a link */
+#player1-in-game-name:hover, #player2-in-game-name:hover {
+    color: white;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+}
+
+
+/* Hover effect when link attribute is set */
+#player1-in-game-name[href]:hover, #player2-in-game-name[href]:hover {
+    color: black;
+    text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
+}
+
 #player1-discord-name, #player2-discord-name {
     display: none;
 }
