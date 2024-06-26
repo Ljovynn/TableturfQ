@@ -18,6 +18,7 @@
     "discord.js": "^14.15.3",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "express-mysql-session": "^2.1.8",
     "express-session": "^1.18.0",
     "glicko2": "^1.1.0",
     "mysql2": "^3.9.3",

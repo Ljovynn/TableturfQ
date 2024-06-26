@@ -11,7 +11,7 @@ import { MatchMakingTick, CheckMatchmadePlayers } from "./queManager.js";
 import { UpdateLeaderboard, UpdateUserList } from "./userListManager.js";
 
 import { StartDiscordBot } from "./discordBot/discordBotManager.js";
-import { DeleteOldSessions, DeleteOldSuspensions, DeleteOldUnverifiedAccounts, DeleteUnfinishedMatches } from "./database.js";
+import { DeleteOldSuspensions, DeleteOldUnverifiedAccounts, DeleteUnfinishedMatches } from "./database.js";
 import { CancelOldMatches } from "./matchManager.js";
 import { DeletePastAnnouncements } from "./announcementManager.js";
 
@@ -28,7 +28,6 @@ const updateLeaderboardInterval = 5 * 60 * 1000;
 const updateUserListInterval = 30 * 60 * 1000;
 const deleteOldUnverifiedUsersInterval = 24 * 60 * 60 * 1000;
 const deleteOldSuspensionsInterval = 60 * 60 * 1000;
-const deleteOldSessionsInterval = 24 * 60 * 60 * 1000;
 const deleteOldAnnouncementsInterval = 2 * 60 * 60 * 1000;
 
 //Todo: test if account deletion when user is in match messes anything
@@ -60,9 +59,6 @@ server.listen(port, () => {
         DeleteOldUnverifiedAccounts(unverifiedUserDeletionThreshold);
     }, deleteOldUnverifiedUsersInterval);
     setInterval(DeleteOldSuspensions, deleteOldSuspensionsInterval);
-
-    //sessions
-    setInterval(DeleteOldSessions, deleteOldSessionsInterval);
 
     //announcements
     setInterval(DeletePastAnnouncements, deleteOldAnnouncementsInterval);

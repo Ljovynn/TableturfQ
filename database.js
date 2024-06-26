@@ -1,11 +1,15 @@
 import mysql from 'mysql2';
 import dotenv from 'dotenv';
+import session from 'express-session';
+import expressMySqlSession from 'express-mysql-session';
 import { userRoles } from './public/constants/userData.js';
 import { FindPlayerPosInMatch } from './utils/matchUtils.js';
 import { settings } from './glicko2Manager.js';
 import { ConvertJSDateToTimestamp } from './utils/date.js';
 
 dotenv.config();
+
+const MySQLStore = expressMySqlSession(session);
 
 const pool = mysql.createPool({
     host: process.env.MYSQLHOST,
@@ -14,6 +18,16 @@ const pool = mysql.createPool({
     database: process.env.MYSQLDATABASE,
     port: process.env.MYSQLPORT,
 }).promise()
+
+const storeOptions = {
+    clearExpired: true,
+    checkExpirationInterval: 5 * 60 * 60 * 1000,
+    expiration: 7 * 24 * 60 * 60 * 1000,
+    createDatabaseTable: false,
+    disableTouch: false,
+}
+
+export const sessionStore = new MySQLStore(storeOptions, pool);
 
 //Get
 export async function GetMatch(matchId){
@@ -112,7 +126,7 @@ export async function GetChatMessages(matchId){
 }
 
 export async function GetSession(sessionId){
-    const [rows] = await pool.query(`SELECT * FROM sessions WHERE id = ?`, [sessionId]);
+    const [rows] = await pool.query(`SELECT * FROM sessions WHERE session_id = ?`, [sessionId]);
     return rows[0];
 }
 
@@ -189,9 +203,9 @@ export async function CreateUserWithDiscord(discordUsername, discordId, discordA
     return result[0].insertId;
 }
 
-export async function CreateSession(sessionId, expiresAt, data){
+/*export async function CreateSession(sessionId, expiresAt, data){
     await pool.query(`INSERT INTO sessions (id, expires_at, data) VALUES (?, ?, ?)`, [sessionId, expiresAt, data]);
-}
+}*/
 
 export async function CreateAnnouncement(title, description, iconSrc, date, isEvent){
     let timeStamp = ConvertJSDateToTimestamp(new Date(date * 1000));
@@ -283,17 +297,17 @@ export async function DeleteUnfinishedMatches(){
 }
 
 export async function DeleteSession(sessionId){
-    await pool.query(`DELETE FROM sessions WHERE id = ?`, [sessionId]);
+    await pool.query(`DELETE FROM sessions WHERE session_id = ?`, [sessionId]);
 }
 
 export async function DeleteAllUserSessions(userId){
     await pool.query(`DELETE FROM sessions WHERE data = ?`, [userId]);
 }
 
-export async function DeleteOldSessions(){
+/*export async function DeleteOldSessions(){
     let timeStamp = ConvertJSDateToTimestamp(new Date());
     await pool.query(`DELETE FROM sessions WHERE expires_at < ?`, [timeStamp]);
-}
+}*/
 
 export async function DeleteOldUnverifiedAccounts(ageThreshold){
     const cutoffDate = Date.now() - ageThreshold;

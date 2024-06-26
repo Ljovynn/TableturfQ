@@ -1,8 +1,6 @@
 //TODO: //get match history
 
 import { Router } from 'express';
-import cookieParser from "cookie-parser";
-import { DeserializeSession } from '../utils/session.js';
 
 import { CheckIfArray, CheckUserDefined } from '../utils/checkDefined.js';
 import { GetCurrentUser } from '../utils/userUtils.js';
@@ -23,9 +21,6 @@ const matchHistoryHitsPerPage = 10;
 dotenv.config();
 
 const sessionSecret = process.env.SESSION_SECRET;
-
-router.use(cookieParser(sessionSecret));
-router.use(DeserializeSession);
 
 //posts
 

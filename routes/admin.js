@@ -1,6 +1,4 @@
 import { Router } from 'express';
-import cookieParser from "cookie-parser";
-import { DeserializeSession } from '../utils/session.js';
 
 import { CheckUserDefined } from '../utils/checkDefined.js';
 import { BanUser, GetUserBanAndRole, GetUserRole, SuspendUser, UnbanUser } from '../database.js';
@@ -20,9 +18,6 @@ const router = Router();
 dotenv.config();
 
 const sessionSecret = process.env.SESSION_SECRET;
-
-router.use(cookieParser(sessionSecret));
-router.use(DeserializeSession);
 
 //posts
 

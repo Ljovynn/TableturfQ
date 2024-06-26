@@ -1,6 +1,4 @@
 import { Router } from 'express';
-import cookieParser from "cookie-parser";
-import { DeserializeSession } from '../utils/session.js';
 import { AddPlayerToQue, RemovePlayerFromQue, PlayerSentReady } from "../queManager.js";
 import { CheckUserDefined } from "../utils/checkDefined.js";
 import { SendSocketMessage } from "../socketManager.js";
@@ -15,9 +13,6 @@ const router = Router();
 dotenv.config();
 
 const sessionSecret = process.env.SESSION_SECRET;
-
-router.use(cookieParser(sessionSecret));
-router.use(DeserializeSession);
 
 //Posts
 

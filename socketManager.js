@@ -1,6 +1,5 @@
 import { Server } from "socket.io";
-import cookieParser from 'cookie-parser';
-import { sessionMiddleware, DeserializeSession } from "./utils/session.js";
+import { sessionMiddleware } from "./utils/session.js";
 import dotenv from "dotenv";
 import { FindIfPlayerInMatch } from "./matchManager.js";
 import { GetMatch, GetUserRole } from "./database.js";
@@ -24,12 +23,9 @@ export function CreateSocketConnection (server){
     });
 
     io.engine.use(sessionMiddleware);
-    io.engine.use(cookieParser(sessionSecret));
-    io.engine.use(DeserializeSession);
 
     io.on("connection", socket => {
-        //socket.use(cookieParser(sessionSecret));
-        //socket.use(DeserializeSession);
+
     
         //join match id as room
         socket.on('join', function(room){
