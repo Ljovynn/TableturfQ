@@ -180,12 +180,12 @@ export function FindIfPlayerWaitingForReady(playerId){
     }
 
     for (let i = 0; i < matchingPlayersList.length; i++){
-        if (matchingPlayersList[i].players[0] == playerId){
+        if (matchingPlayersList[i].players[0].id == playerId){
             data.ready = matchingPlayersList[i].players[0].ready;
             data.timeWaitingStarted = matchingPlayersList[i].createdAt;
             return data;
         }
-        else if (matchingPlayersList[i].players[1] == playerId){
+        else if (matchingPlayersList[i].players[1].id == playerId){
             data.ready = matchingPlayersList[i].players[1].ready;
             data.timeWaitingStarted = matchingPlayersList[i].createdAt;
             return data;
