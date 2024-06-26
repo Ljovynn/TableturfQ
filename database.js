@@ -24,12 +24,10 @@ export async function GetMatch(matchId){
 export async function GetUserByDiscordId(discordId){
     const [rows] = await pool.query(`SELECT id, username, role, g2_rating, hide_rank, CAST(discord_id AS CHAR) discord_id, discord_username, discord_avatar_hash, country, created_at FROM users u WHERE discord_id = ?`, [discordId]);
     if (rows[0]){
-        console.log("databse found user with discord id " + discordId);
-        console.log("insert id: " + rows[0].insertId); 
-        console.log("id: " + rows[0].id);
+        //console.log("insert id: " + rows[0].insertId); 
+        //console.log("id: " + rows[0].id);
         return rows[0]
     } else {
-        console.log("databse did not find user with discord id " + discordId);
         return undefined;
     }
 }
@@ -134,13 +132,7 @@ export async function GetFutureAnnouncements(){
 
 export async function CreateMatch(player1Id, player2Id, isRanked){
     const result = await pool.query(`INSERT INTO matches (player1_id, player2_id, ranked) VALUES (?, ?, ?)`, [player1Id, player2Id, isRanked]);
-    if (result[0].id){
-        console.log("no insert id");
-        return result[0].id;
-    } else{
-        console.log("insert id");
-        return result[0].insertId;
-    }
+    return result[0].insertId;
 }
 
 async function CreateFirstGameStrikes(match){
