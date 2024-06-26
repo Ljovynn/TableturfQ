@@ -26,6 +26,9 @@ var isCasual = false;
 var user;
 var userID = 0;
 
+var timer = 0;
+var countdown = 300;
+
 await setUserInfo();
 
 joinCompetetive.addEventListener('click', async (e) => {
@@ -107,6 +110,7 @@ async function setUserInfo() {
     console.log('Setting user info');
     try {
         var userInfo = await getUserInfo();
+        console.log(userInfo);
         user = userInfo.user;
         console.log(user);
         userID = user.id;
@@ -119,9 +123,25 @@ async function setUserInfo() {
             competetiveQueue.style.display = 'inline-block';
             casualQueue.style.display = 'inline-block';
         }
+
+        if ( userInfo.queData ) {
+            setQueueInfo(userInfo.queData);
+        }
     } catch (error) {
         window.location.href = '/';
     }
+}
+
+function setQueueInfo(queueData) {
+    var timeStarted = Math.floor( queueData.timeQueStarted / 1000 );
+    console.log(timeStarted);
+    var timeNow = Math.floor(Date.now() / 1000);
+    console.log(timeNow);
+    var timeElapsed = timeNow - timeStarted;
+    console.log(timeElapsed);
+    timer = timeElapsed;
+    queueInfo.style.display = 'block';
+    mainTimer = window.setInterval(updateTimer, 1000);
 }
 
 function validateDisplayname(displayName) {
@@ -131,9 +151,6 @@ function validateDisplayname(displayName) {
 
     return true;
 }
-
-var timer = 0;
-var countdown = 300;
 
 function updateTimer() {
     timer += 1;
