@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import cookieParser from "cookie-parser";
 import { SerializeSession } from '../utils/session.js';
 
 import axios from 'axios';
@@ -29,8 +28,6 @@ const clientSecret = process.env.CLIENT_SECRET;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const router = Router();
-
-router.use(cookieParser(sessionSecret));
 
 //req: username
 router.post("/unverified/login", async (req, res) => {
@@ -78,7 +75,6 @@ router.get("/discord/redirect", async (req, res) => {
             }
         );
 
-        console.log("hej");
         const {access_token, refresh_token} = response.data;
     
         if (response.data) {
