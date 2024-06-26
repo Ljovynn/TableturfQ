@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-import { GetLeaderboardAtPos } from '../leaderboardManager.js';
+import { GetLeaderboardAtPos } from '../userListManager.js';
 
 const router = Router();
 

@@ -8,7 +8,7 @@ import path from 'path';
 import { sessionMiddleware } from "./utils/session.js";
 
 import { MatchMakingTick, CheckMatchmadePlayers } from "./queManager.js";
-import { UpdateLeaderboard } from "./leaderboardManager.js";
+import { UpdateLeaderboard, UpdateUserList } from "./userListManager.js";
 
 import { StartDiscordBot } from "./discordBot/discordBotManager.js";
 import { DeleteOldSessions, DeleteOldSuspensions, DeleteOldUnverifiedAccounts, DeleteUnfinishedMatches } from "./database.js";
@@ -25,6 +25,7 @@ const matchmakingTickInterval = 5 * 1000;
 const checkMatchmadePlayersInterval = 60 * 1000;
 const cancelLongMatchesInterval = 3 * 60 * 1000;
 const updateLeaderboardInterval = 5 * 60 * 1000;
+const updateUserListInterval = 30 * 60 * 1000;
 const deleteOldUnverifiedUsersInterval = 24 * 60 * 60 * 1000;
 const deleteOldSuspensionsInterval = 60 * 60 * 1000;
 const deleteOldSessionsInterval = 24 * 60 * 60 * 1000;
@@ -50,8 +51,9 @@ server.listen(port, () => {
     //match
     setInterval(TickCancelOldMatches, cancelLongMatchesInterval);
 
-    //leaderboard
+    //user lists
     setInterval(UpdateLeaderboard, updateLeaderboardInterval);
+    setInterval(UpdateUserList, updateUserListInterval);
 
     //accounts
     setInterval(() => {

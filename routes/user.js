@@ -14,6 +14,7 @@ import { DeleteAllUserSessions, GetMultipleUserDatas, GetUserMatchHistory, GetUs
 import { definitionErrors, userErrors } from '../Responses/requestErrors.js';
 import { SetResponse } from '../Responses/ResponseData.js';
 import { usernameMaxLength, usernameMinLength } from '../public/constants/userData.js';
+import { SearchUser } from '../userListManager.js';
 
 const router = Router();
 
@@ -127,6 +128,25 @@ router.post("/GetUsers", async (req, res) => {
         res.sendStatus(400);
     }
 });
+
+//req: input
+//res: users
+//user: id, username, g2_rating, hide_rank, discord_avatar_hash, country,
+router.post("/SearchUser", async (req, res) => {
+    try{
+        const input = req.body.input;
+
+        if (typeof(input) !== 'string') return SetResponse(res, definitionErrors.usernameUndefined);
+
+        const users = SearchUser(input);
+
+        res.status(200).send(users);
+    } catch(error){
+        console.log(error);
+        res.sendStatus(400);
+    }
+});
+
 
 //requests
 

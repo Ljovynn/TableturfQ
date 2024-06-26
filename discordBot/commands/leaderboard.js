@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, messageLink } from "discord.js";
-import { GetLeaderboardAtPos } from "../../leaderboardManager.js";
+import { GetLeaderboardAtPos } from "../../userListManager.js";
 import { embedColor } from '../constants.js';
 import { GetRank } from "../../public/constants/rankData.js";
 const hitsPerPage = 15;

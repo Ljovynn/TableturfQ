@@ -4,7 +4,7 @@ import { GetRank, unranked } from "../../public/constants/rankData.js";
 import { DetailMinute } from "../../utils/date.js";
 import { embedColor } from '../constants.js';
 import { BuildSimpleEmbed } from "../utils/embed.js";
-import { GetPlayerLeaderboardPosition } from "../../leaderboardManager.js";
+import { GetPlayerLeaderboardPosition } from "../../userListManager.js";
 
 import dotenv from 'dotenv';
 

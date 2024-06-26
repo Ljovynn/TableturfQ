@@ -116,8 +116,14 @@ export async function GetSession(sessionId){
     return rows[0];
 }
 
+export async function GetUserList(){
+    const [rows] = await pool.query (`SELECT id, username, g2_rating, hide_rank, discord_avatar_hash, country FROM users u WHERE NOT EXISTS
+    (SELECT * FROM ban_list WHERE user_id = u.id) AND role != 0`);
+    return rows;
+}
+
 export async function GetLeaderboard(){
-    const [rows] = await pool.query (`SELECT id, username, role, g2_rating, CAST(discord_id AS CHAR) discord_id, discord_username, discord_avatar_hash, created_at FROM users u WHERE NOT EXISTS
+    const [rows] = await pool.query (`SELECT id, username, g2_rating, CAST(discord_id AS CHAR) discord_id, discord_username, discord_avatar_hash, country FROM users u WHERE NOT EXISTS
     (SELECT * FROM ban_list WHERE user_id = u.id) AND role != 0 AND hide_rank = FALSE ORDER BY g2_rating DESC`);
     return rows;
 }
