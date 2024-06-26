@@ -138,11 +138,8 @@ async function setUserInfo() {
 
 function setQueueInfo(queueData) {
     var timeStarted = Math.floor( queueData.timeQueStarted / 1000 );
-    console.log(timeStarted);
     var timeNow = Math.floor(Date.now() / 1000);
-    console.log(timeNow);
     var timeElapsed = timeNow - timeStarted;
-    console.log(timeElapsed);
     timer = timeElapsed;
     queueInfo.style.display = 'block';
     mainTimer = window.setInterval(updateTimer, 1000);
@@ -150,11 +147,8 @@ function setQueueInfo(queueData) {
 
 function setReadyUp(readyData) {
     var timeStarted = Math.floor( readyData.timeWaitingStarted / 1000 );
-    console.log(timeStarted);
     var timeNow = Math.floor(Date.now() / 1000);
-    console.log(timeNow);
     var timeElapsed = timeNow - timeStarted;
-    console.log(timeElapsed);
     countdown = 300;
     countdown = countdown - timeElapsed;
     matchMakingReady.style.display = 'block';
