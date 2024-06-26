@@ -1,6 +1,7 @@
 import { SlashCommandBuilder, PermissionFlagsBits } from "discord.js";
-import { BanUser, GetUserByDiscordId, SuspendUser, UnbanUser } from "../../database.js";
+import { BanUser, GetUserByDiscordId, SetUserRole, SuspendUser, UnbanUser } from "../../database.js";
 import { BuildSimpleEmbed } from "../utils/embed.js";
+import { userRoles } from "../../public/constants/userData.js";
 
 const banLengths = {
     '1 day': 24 * 60 * 60 * 1000,
@@ -20,6 +21,11 @@ const banLengthDiscordOptions = [
     { name: '1 year', value: '1 year' },
 ];
 
+const roleOptions = [
+    { name: 'Regular user', value: userRoles.verified },
+    { name: 'Moderator', value: userRoles.mod },
+];
+
 export const data = new SlashCommandBuilder()
     .setName('ttbqplayer')
     .setDescription('Set a player\'s status')
@@ -31,7 +37,7 @@ export const data = new SlashCommandBuilder()
             .addSubcommand(subCommand => 
                 subCommand
                     .setName('ban')
-                    .setDescription('Ban the player\'s TableturfQ account')
+                    .setDescription('Ban the user\'s TableturfQ account')
                     .addUserOption(option =>
                         option.setName('user')
                         .setDescription('The user')
@@ -43,11 +49,23 @@ export const data = new SlashCommandBuilder()
             .addSubcommand(subCommand => 
                 subCommand
                     .setName('pardon')
-                    .setDescription('Unban the player\'s TableturfQ account')
+                    .setDescription('Unban the user\'s TableturfQ account')
                     .addUserOption(option =>
                         option.setName('user')
                         .setDescription('The user')
-                        .setRequired(true))))
+                        .setRequired(true)))
+            .addSubcommand(subCommand => 
+                subCommand
+                    .setName('setrole')
+                    .setDescription('Set the user\'s TableturfQ account role')
+                    .addUserOption(option =>
+                        option.setName('user')
+                        .setDescription('The user')
+                        .setRequired(true))
+                    .addIntegerOption(option =>
+                        option.setName('role')
+                        .setDescription('The new role')
+                        .addChoices(roleOptions))))
     .addSubcommandGroup(subCommandGroup =>
         subCommandGroup
             .setName('byid')
@@ -55,7 +73,7 @@ export const data = new SlashCommandBuilder()
             .addSubcommand(subCommand => 
                 subCommand
                     .setName('ban')
-                    .setDescription('Ban the player\'s TableturfQ account')
+                    .setDescription('Ban the user\'s TableturfQ account')
                     .addIntegerOption(option =>
                         option.setName('id')
                         .setDescription('The ID')
@@ -68,7 +86,7 @@ export const data = new SlashCommandBuilder()
             .addSubcommand(subCommand => 
                 subCommand
                     .setName('pardon')
-                    .setDescription('Unban the player\'s TableturfQ account')
+                    .setDescription('Unban the user\'s TableturfQ account')
                     .addIntegerOption(option =>
                         option.setName('id')
                         .setDescription('The ID')
@@ -77,12 +95,13 @@ export const data = new SlashCommandBuilder()
 export async function execute(interaction) {
     const subCommandGroup = interaction.options.getSubcommandGroup();
 
+    var discordUser;
     var id;
     if (subCommandGroup === 'bydiscord'){
-        const user = interaction.options.getUser('user');
-        const DBuser = await GetUserByDiscordId(user.id);
+        discordUser = interaction.options.getUser('user');
+        const DBuser = await GetUserByDiscordId(discordUser.id);
         if (!DBuser){
-            const banFailedEmbed = BuildSimpleEmbed('Ban failed', 'Failed to ban user. Error message:', `Discord user <@${user.id}> has no TableturfQ account.`);
+            const banFailedEmbed = BuildSimpleEmbed('Ban failed', 'Failed to ban user. Error message:', `Discord user <@${discordUser.id}> has no TableturfQ account.`);
             await interaction.reply({ embeds: [banFailedEmbed] });
             return;
         }
@@ -117,16 +136,33 @@ export async function execute(interaction) {
             return;
         }
     }
-    //unban
 
-    try{
-        await UnbanUser(id);
-    } catch(error){
-        const unbanFailedEmbed = BuildSimpleEmbed('Unban failed', `Failed to unban user with TableturfQ id ${id}. Error message:`, error.message);
-        await interaction.reply({embeds: [unbanFailedEmbed] });
-        return;
+    //unban
+    if (subCommand === 'pardon'){
+        try{
+            await UnbanUser(id);
+
+            const unbanEmbed = BuildSimpleEmbed('Unban successful', `Successfully unbanned user with TableturfQ id **${id}**.`, 'Good for them.');
+            await interaction.reply({ embeds: [unbanEmbed] });
+            return;
+        } catch(error){
+            const unbanFailedEmbed = BuildSimpleEmbed('Unban failed', `Failed to unban user with TableturfQ id ${id}. Error message:`, error.message);
+            await interaction.reply({embeds: [unbanFailedEmbed] });
+            return;
+        }
     }
 
-    const unbanEmbed = BuildSimpleEmbed('Unban successful', `Successfully unbanned user with TableturfQ id **${id}**.`, 'Good for them.');
-    await interaction.reply({ embeds: [unbanEmbed] });
+    //set role
+    try{
+        const newRole = interaction.options.get('role');
+        await SetUserRole(id, newRole.value);
+
+        const setRoleEmbed = BuildSimpleEmbed('Role set successfully', `Successfully set Discord user's TableturfQ account <@${discordUser.id}> as ${newRole.name}.`, ' ');
+        await interaction.reply({ embeds: [setRoleEmbed] });
+        return;
+    } catch(error){
+        const setRoledFailedEmbed = BuildSimpleEmbed('Set role failed', `Failed to set update role of Discord user <@${discordUser.id}>'s TableturfQ account. Error message:`, error.message);
+        await interaction.reply({embeds: [setRoledFailedEmbed] });
+        return;
+    }
 }
