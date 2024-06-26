@@ -127,6 +127,10 @@ async function setUserInfo() {
         if ( userInfo.queData ) {
             setQueueInfo(userInfo.queData);
         }
+
+        if ( userInfo.readyData ) {
+            setReadyUp(userInfo.readyData);
+        }
     } catch (error) {
         window.location.href = '/';
     }
@@ -142,6 +146,25 @@ function setQueueInfo(queueData) {
     timer = timeElapsed;
     queueInfo.style.display = 'block';
     mainTimer = window.setInterval(updateTimer, 1000);
+}
+
+function setReadyUp(readyData) {
+    var timeStarted = Math.floor( readyData.timeWaitingStarted / 1000 );
+    console.log(timeStarted);
+    var timeNow = Math.floor(Date.now() / 1000);
+    console.log(timeNow);
+    var timeElapsed = timeNow - timeStarted;
+    console.log(timeElapsed);
+    countdown = 300;
+    countdown = countdown - timeElapsed;
+    matchMakingReady.style.display = 'block';
+    ready = readyData.ready;
+    if ( ready ) {
+        readyButton.style.display = 'none';
+    } else {
+        readyButton.style.display = 'inline-block'
+    }
+    readyUp = window.setInterval(countdownTimer, 1000);
 }
 
 function validateDisplayname(displayName) {
