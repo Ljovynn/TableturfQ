@@ -121,17 +121,17 @@ export async function execute(interaction) {
         try{
             if (banLengthObject){
                 await SuspendUser(id, banLengths[banLength]);
-                const banEmbed = BuildSimpleEmbed('Ban successful', `Successfully suspended user with TableturfQ id **${id}**.`, `The ban lasts for ${banLength}.`);
+                const banEmbed = BuildSimpleEmbed('Ban successful', `Successfully suspended user with TableturfQ ID **${id}**.`, `The ban lasts for ${banLength}.`);
                 await interaction.reply({ embeds: [banEmbed] });
                 return;
             } else{
                 await BanUser(id);
-                const banEmbed = BuildSimpleEmbed('Ban successful', `Successfully banned user with TableturfQ id **${id}**.`, 'The ban is permanent.');
+                const banEmbed = BuildSimpleEmbed('Ban successful', `Successfully banned user with TableturfQ ID **${id}**.`, 'The ban is permanent.');
                 await interaction.reply({ embeds: [banEmbed] });
                 return;
         }
         } catch(error){
-            const banFailedEmbed = BuildSimpleEmbed('Ban failed', `Failed to ban user with TableturfQ id **${id}**. Error message:`, error.message);
+            const banFailedEmbed = BuildSimpleEmbed('Ban failed', `Failed to ban user with TableturfQ ID **${id}**. Error message:`, error.message);
             await interaction.reply({ embeds: [banFailedEmbed] });
             return;
         }
@@ -142,11 +142,11 @@ export async function execute(interaction) {
         try{
             await UnbanUser(id);
 
-            const unbanEmbed = BuildSimpleEmbed('Unban successful', `Successfully unbanned user with TableturfQ id **${id}**.`, 'Good for them.');
+            const unbanEmbed = BuildSimpleEmbed('Unban successful', `Successfully unbanned user with TableturfQ ID **${id}**.`, 'Good for them.');
             await interaction.reply({ embeds: [unbanEmbed] });
             return;
         } catch(error){
-            const unbanFailedEmbed = BuildSimpleEmbed('Unban failed', `Failed to unban user with TableturfQ id ${id}. Error message:`, error.message);
+            const unbanFailedEmbed = BuildSimpleEmbed('Unban failed', `Failed to unban user with TableturfQ ID ${id}. Error message:`, error.message);
             await interaction.reply({embeds: [unbanFailedEmbed] });
             return;
         }
@@ -154,14 +154,14 @@ export async function execute(interaction) {
 
     //set role
     try{
-        const newRole = interaction.options.get('role');
-        await SetUserRole(id, newRole.value);
+        const newRole = interaction.options.get('role').value;
+        await SetUserRole(id, newRole);
 
-        const setRoleEmbed = BuildSimpleEmbed('Role set successfully', `Successfully set Discord user's TableturfQ account <@${discordUser.id}> as ${newRole.name}.`, ' ');
+        const setRoleEmbed = BuildSimpleEmbed('Role set successfully', `Successfully set user with TableturfQ ID **${id}** as role ID ${newRole}.`, `Discord user: <@${discordUser.id}>`);
         await interaction.reply({ embeds: [setRoleEmbed] });
         return;
     } catch(error){
-        const setRoledFailedEmbed = BuildSimpleEmbed('Set role failed', `Failed to set update role of Discord user <@${discordUser.id}>'s TableturfQ account. Error message:`, error.message);
+        const setRoledFailedEmbed = BuildSimpleEmbed('Set role failed', `Failed to update role of user with TableturfQ ID **${id}**.`, `Discord user: <@${discordUser.id}>. Error message: ${error.message}`);
         await interaction.reply({embeds: [setRoledFailedEmbed] });
         return;
     }
