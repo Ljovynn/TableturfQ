@@ -48,10 +48,12 @@ export function CreateSocketConnection (server){
         });
     });
 
-    /*instrument(io, {
-        auth: false,
-        mode: "development",
-    });*/
+    if (process.env.NODE_ENV === 'development') {
+        instrument(io, {
+            auth: false,
+            mode: "development",
+        });
+    }
 
     connected = true;
 };

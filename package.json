@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
+    "productionStart": "NODE_ENV=production node server.js",
     "dev": "npx nodemon server.js"
   },
   "keywords": [],
