@@ -1,5 +1,5 @@
 import { GetSession, CreateSession, DeleteSession } from '../database.js';
-import session from "express-session";
+import session from 'express-session';
 import cookieParser from 'cookie-parser';
 import dotenv from "dotenv";
 
@@ -17,6 +17,7 @@ export const sessionMiddleware = session({
         //partitioned: true,
         maxAge: 7 * 24 * 60 * 60 * 1000,
     },
+    store: false,
 })
 
 export async function SerializeSession(req, userId){
