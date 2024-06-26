@@ -1,6 +1,7 @@
 import { SlashCommandBuilder, messageLink } from "discord.js";
 import { GetLeaderboardAtPos } from "../../leaderboardManager.js";
 import { embedColor } from '../constants.js';
+import { GetRank } from "../../public/constants/rankData.js";
 const hitsPerPage = 15;
 
 export const data = new SlashCommandBuilder()
@@ -25,11 +26,13 @@ export async function execute(interaction) {
     ];
     
     for (let i = 0; i < leaderboard.length; i++){
-        //Todo: insert rank emoji
+        const rank = GetRank(leaderboard[i].g2_rating);
+
         var tagValue = leaderboard[i].discord_username;
         const isMember = await interaction.guild.members.fetch(leaderboard[i].discord_id).then(() => true).catch(() => false);
         if (isMember) tagValue = `<@${leaderboard[i].discord_id}>`;
-        leaderboardsFields[0].value += `\n${startPosition + i}. ${tagValue} **${Math.floor(leaderboard[i].g2_rating)}**`;
+
+        leaderboardsFields[0].value += `\n${startPosition + i}. <${rank.emoji}> ${tagValue} **${Math.floor(leaderboard[i].g2_rating)}**`;
     }
     leaderboardsFields[0].value += '\u200B';
     
