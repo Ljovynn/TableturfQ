@@ -49,6 +49,7 @@ export function CreateSocketConnection (server){
     });
 
     if (process.env.NODE_ENV === 'development') {
+        console.log("Setting up socket admin page");
         instrument(io, {
             auth: false,
             mode: "development",
