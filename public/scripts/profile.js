@@ -177,9 +177,9 @@ async function setMatchHistory() {
             case 4:
                 // player 2 win
                 if ( players[1].id == userId )
-                    outcome = 'L';
-                else
                     outcome = 'W';
+                else
+                    outcome = 'L';
                 break;
             default:
                 break;

@@ -28,14 +28,18 @@ router.use(DeserializeSession);
 
 //posts
 
-//req: userId (anyone), pageNumber
+//req: userId (anyone, leave blank for yourself), pageNumber
 //res: matchHistory (DB matches, not match objects)
 router.post("/GetUserMatchHistory", async (req, res) => {
     try{
-        const userId = req.body.userId;
+        var userId = req.body.userId;
         var pageNumber = req.pageNumber;
 
-        if (typeof(userId) !== 'number') return SetResponse(res, definitionErrors.userNotDefined);
+        if (typeof(userId) !== 'number'){
+            userId = req.session.user;
+            if (!CheckUserDefined(req)) return SetResponse(res, definitionErrors.userNotDefined);
+        } 
+
         if (typeof(pageNumber) !== 'number' || pageNumber < 0){
             pageNumber = 1;
         }
