@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from "discord.js";
+import { SlashCommandBuilder, messageLink } from "discord.js";
 import { GetLeaderboardAtPos } from "../../leaderboardManager.js";
 import { embedColor } from '../constants.js';
 const hitsPerPage = 15;
@@ -16,26 +16,31 @@ export async function execute(interaction) {
     var leaderboardData = GetLeaderboardAtPos(startPosition - 1, hitsPerPage);
     var leaderboard = leaderboardData.result;
 
+
+
     var leaderboardsFields = [ 
-        {
-            name: '\u200B',
-            value: ''},
-        ];
+    {
+        name: '\u200B',
+        value: ''},
+    ];
     
-        for (let i = 0; i < leaderboard.length; i++){
-            //Todo: insert rank emoji
-            leaderboardsFields[0].value += `\n${startPosition + i}. <@${leaderboard[i].discord_id}> **${Math.floor(leaderboard[i].g2_rating)}**`;
+    for (let i = 0; i < leaderboard.length; i++){
+        //Todo: insert rank emoji
+        var tagValue = leaderboard[i].discord_username;
+        const isMember = await interaction.guild.members.fetch(leaderboard[i].discord_id).then(() => true).catch(() => false);
+        if (isMember) tagValue = `<@${leaderboard[i].discord_id}>`;
+        leaderboardsFields[0].value += `\n${startPosition + i}. ${tagValue} **${Math.floor(leaderboard[i].g2_rating)}**`;
+    }
+    leaderboardsFields[0].value += '\u200B';
+    
+    const leaderboardEmbed = {
+        color: embedColor,
+        title: `🏆 TableturfQ Leaderboard [${startPosition}-${startPosition + leaderboard.length - 1}] 🏆`,
+        fields: leaderboardsFields,
+        footer: {
+        text: `Total players: ${leaderboardData.totalPlayers}`,
         }
-        leaderboardsFields[0].value += '\u200B';
-    
-        const leaderboardEmbed = {
-            color: embedColor,
-            title: `🏆 TableturfQ Leaderboard [${startPosition}-${startPosition + leaderboard.length - 1}] 🏆`,
-            fields: leaderboardsFields,
-            footer: {
-            text: `Total players: ${leaderboardData.totalPlayers}`,
-            }
-        };
+    };
 
     await interaction.reply({ embeds: [leaderboardEmbed] });
 }
