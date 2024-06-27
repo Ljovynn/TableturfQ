@@ -301,13 +301,8 @@ export async function DeleteSession(sessionId){
 }
 
 export async function DeleteAllUserSessions(userId){
-    await pool.query(`DELETE FROM sessions WHERE data = ?`, [userId]);
+    await pool.query(`DELETE FROM sessions WHERE data LIKE '%"user":?%'`, [userId]);
 }
-
-/*export async function DeleteOldSessions(){
-    let timeStamp = ConvertJSDateToTimestamp(new Date());
-    await pool.query(`DELETE FROM sessions WHERE expires_at < ?`, [timeStamp]);
-}*/
 
 export async function DeleteOldUnverifiedAccounts(ageThreshold){
     const cutoffDate = Date.now() - ageThreshold;
