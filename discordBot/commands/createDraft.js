@@ -96,15 +96,17 @@ export async function execute(interaction) {
         console.log(result);
         if (result.status != 201){
             embed = BuildSimpleEmbed('Tableturf Draft', 'Draft creation denied', ' ');
+            await interaction.reply({ embeds: [embed] });
+            return;
         } else{
             var data = JSON.parse(result.responseText);
             embed = BuildSimpleEmbed('Tableturf Draft', `Draft successfully created: ${player1} VS ${player2}`, `[Link](tableturfdraft.se/draft?id=${result.data})`);
+            await interaction.reply({ embeds: [embed] });
+            return;
         }
     } catch(error){
-        embed = BuildSimpleEmbed('Tableturf Draft', 'Draft creation failed', 'The website is probably down');
+        console.log(error);
     }
-
-    await interaction.reply({ embeds: [embed] });
 }
 
 function MakeRequest(data){
