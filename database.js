@@ -35,6 +35,11 @@ export async function GetMatch(matchId){
     return rows[0];
 }
 
+export async function GetRecentMatches(cutoff){
+    const [rows] = await pool.query(`SELECT * FROM matches ORDER BY id DESC LIMIT ?`, [cutoff]);
+    return rows;
+}
+
 export async function GetUserByDiscordId(discordId){
     const [rows] = await pool.query(`SELECT id, username, role, g2_rating, hide_rank, CAST(discord_id AS CHAR) discord_id, discord_username, discord_avatar_hash, country, created_at FROM users u WHERE discord_id = ?`, [discordId]);
     if (rows[0]){

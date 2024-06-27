@@ -8,6 +8,7 @@ import { sessionMiddleware } from "./utils/session.js";
 
 import { MatchMakingTick, CheckMatchmadePlayers } from "./queManager.js";
 import { UpdateLeaderboard, UpdateUserList } from "./userListManager.js";
+import { UpdateRecentMatches } from "./matchHistoryManager.js";
 
 import { StartDiscordBot } from "./discordBot/discordBotManager.js";
 import { DeleteOldSuspensions, DeleteOldUnverifiedAccounts, DeleteUnfinishedMatches } from "./database.js";
@@ -25,6 +26,7 @@ const checkMatchmadePlayersInterval = 60 * 1000;
 const cancelLongMatchesInterval = 3 * 60 * 1000;
 const updateLeaderboardInterval = 5 * 60 * 1000;
 const updateUserListInterval = 30 * 60 * 1000;
+const updateGlobalMatchHistoryInterval = 60 * 1000;
 const deleteOldUnverifiedUsersInterval = 24 * 60 * 60 * 1000;
 const deleteOldSuspensionsInterval = 60 * 60 * 1000;
 const deleteOldAnnouncementsInterval = 2 * 60 * 60 * 1000;
@@ -49,6 +51,9 @@ const server = app.listen(port, () => {
     //user lists
     setInterval(UpdateLeaderboard, updateLeaderboardInterval);
     setInterval(UpdateUserList, updateUserListInterval);
+
+    //match history
+    setInterval(UpdateRecentMatches, updateGlobalMatchHistoryInterval);
 
     //accounts
     setInterval(() => {
@@ -86,6 +91,7 @@ import leaderboardRouter from './routes/leaderboard.js';
 import adminRouter from './routes/admin.js';
 import userRouter from './routes/user.js';
 import announcementRouter from './routes/announcementInfo.js';
+import matchHistoryRouter from './routes/matchHistory.js';
 
 app.use('/api/auth', authRouter);
 app.use('/match', matchRouter);
@@ -94,6 +100,7 @@ app.use('/leaderboard', leaderboardRouter);
 app.use('/admin', adminRouter);
 app.use('/user', userRouter);
 app.use('/announcementInfo', announcementRouter);
+app.use('/matchHistory', matchHistoryRouter);
 
 //todo: mod stuff
 //resolve dispute
