@@ -109,7 +109,7 @@ export async function execute(interaction) {
                 },
             }
         );
-        console.log(response);
+        
         if (response.status != 201){
             const deniedEmbed = BuildSimpleEmbed('Tableturf Draft', 'Draft creation denied', ' ');
             await interaction.editReply({ embeds: [deniedEmbed] });
@@ -155,6 +155,7 @@ export async function execute(interaction) {
             return;
         }
     } catch(error){
+        console.log(error.message);
         const errorEmbed = BuildSimpleEmbed('Tableturf Draft', 'Draft creation failed', 'The website is probably down');
         await interaction.editReply({ embeds: [errorEmbed] });
     }
