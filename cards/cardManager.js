@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import { SanitizeString } from '../utils/string.js';
 
 export const uniqueCards = 266;
+export const unique312s = 19;
 
 //sorted alphabetically for autocomplete purposes
 var enCards = [];
