@@ -80,7 +80,7 @@ export async function execute(interaction) {
     const timer = interaction.options.getInteger('timer') ?? defaultValues.timer;
     const stage = interaction.options.getInteger('stage') ?? defaultValues.stage;
 
-    //await interaction.deferReply();
+    await interaction.deferReply();
 
     try {
         const formData = {
@@ -99,18 +99,24 @@ export async function execute(interaction) {
                 },
             }
         );
+        if (!response){
+            var embed = BuildSimpleEmbed('Tableturf Draft', 'Draft creation failed', 'The website is probably down');
+            await interaction.editReply({ embeds: [embed] });
+            return;
+        }
         console.log(response);
         if (response.status != 201){
             var deniedEmbed = BuildSimpleEmbed('Tableturf Draft', 'Draft creation denied', ' ');
-            await interaction.reply({ embeds: [deniedEmbed] });
+            await interaction.editReply({ embeds: [deniedEmbed] });
             return;
         } else{
-            var data = JSON.parse(response.responseText);
-            var embed = BuildSimpleEmbed('Tableturf Draft', `Draft successfully created: ${player1} VS ${player2}`, `[Link](tableturfdraft.se/draft?id=${data})`);
-            await interaction.reply({ embeds: [embed] });
+            var embed = BuildSimpleEmbed('Tableturf Draft', `Draft successfully created: ${player1} VS ${player2}`, `[Link](tableturfdraft.se/draft?id=${response.data})`);
+            await interaction.editReply({ embeds: [embed] });
             return;
         }
     } catch(error){
         console.log(error);
+        var embed = BuildSimpleEmbed('Tableturf Draft', 'Draft creation failed. Error message:', error.message);
+        await interaction.editReply({ embeds: [embed] });
     }
 }
