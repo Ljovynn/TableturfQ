@@ -83,7 +83,7 @@ export async function execute(interaction) {
     //await interaction.deferReply();
 
     try {
-        const formdata = {
+        const formData = {
             player1Name: player1,
             player2Name: player2,
             draftSize: draftSize,
