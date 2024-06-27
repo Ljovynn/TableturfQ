@@ -13,6 +13,7 @@ import { authErrors, databaseErrors } from '../Responses/authErrors.js';
 import { SetResponse } from '../Responses/ResponseData.js';
 import { userRoles, usernameMaxLength, usernameMinLength } from '../public/constants/userData.js';
 import { definitionErrors } from '../Responses/requestErrors.js';
+import { HasBadWords } from '../utils/string.js';
 
 const apiRouteOauth2Token = "https://discord.com/api/v10/oauth2/token";
 const apiRouteUserInfo = "https://discord.com/api/v10/users/@me";
@@ -34,8 +35,8 @@ router.post("/unverified/login", async (req, res) => {
 
     const username = req.body.username;
     if (typeof(username) !== 'string') return SetResponse(res, definitionErrors.usernameUndefined);
-
     if (username.length < usernameMinLength || username.length > usernameMaxLength) return SetResponse(res, definitionErrors.usernameWrongFormat);
+    if (HasBadWords(username)) return SetResponse(res, definitionErrors.usernameContainsBadWord);
 
     var userId = await CreateUser(username);
     if (!userId) return SetResponse(databaseErrors.unverifiedCreateError);

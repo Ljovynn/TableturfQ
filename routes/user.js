@@ -12,6 +12,7 @@ import { definitionErrors, userErrors } from '../Responses/requestErrors.js';
 import { SetResponse } from '../Responses/ResponseData.js';
 import { usernameMaxLength, usernameMinLength } from '../public/constants/userData.js';
 import { SearchUser } from '../userListManager.js';
+import { HasBadWords } from '../utils/string.js';
 
 const router = Router();
 
@@ -27,9 +28,10 @@ router.post("/SetUsername", async (req, res) => {
         const username = req.body.username;
 
         if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
+        
         if (typeof(username) !== 'string') return SetResponse(res, definitionErrors.usernameUndefined);
-
         if (username.length < usernameMinLength || username.length > usernameMaxLength) return SetResponse(res, definitionErrors.usernameWrongFormat);
+        if (HasBadWords(username)) return SetResponse(res, definitionErrors.usernameContainsBadWord);
 
         await SetUsername(userId, username);
         res.sendStatus(201);

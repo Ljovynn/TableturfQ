@@ -24,6 +24,7 @@ export const definitionErrors = Object.freeze({
     countryWrongFormat: new ResponseData(400, 'Country not submitted correctly'),
     usernameUndefined: new ResponseData(400, 'No username submitted'),
     usernameWrongFormat: new ResponseData(400, 'Username not submitted correctly'),
+    usernameContainsBadWord: new ResponseData(400, 'Username contains blacklisted word'),
 });
 
 export const nullErrors = Object.freeze({
