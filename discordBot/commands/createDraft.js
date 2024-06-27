@@ -84,10 +84,7 @@ export async function execute(interaction) {
     //await interaction.deferReply();
 
     try {
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", "http://tableturfdraft.se/GenerateNewDraft", true);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.send(JSON.stringify({
+        let result = await MakeRequest({
             player1Name: player1,
             player2Name: player2,
             draftSize: draftSize,
@@ -95,18 +92,26 @@ export async function execute(interaction) {
             timer: timer,
             stage: stage,
             includeUnreleasedCards: false
-        }));
-        xhr.onload = function() {
-            if (xhr.status != 201){
-                embed = BuildSimpleEmbed('Tableturf Draft', 'Draft creation denied', ' ');
-            }
-            //response = draft id
-            var data = JSON.parse(this.responseText);
-            embed = BuildSimpleEmbed('Tableturf Draft', `Draft successfully created: ${player1} VS ${player2}`, `[Link](tableturfdraft.se/draft?id=${data})`);
-    }
+        });
+        console.log(result);
+        if (result.status != 201){
+            embed = BuildSimpleEmbed('Tableturf Draft', 'Draft creation denied', ' ');
+        }
+
+        var data = JSON.parse(result.responseText);
+        embed = BuildSimpleEmbed('Tableturf Draft', `Draft successfully created: ${player1} VS ${player2}`, `[Link](tableturfdraft.se/draft?id=${data})`);
     } catch(error){
         embed = BuildSimpleEmbed('Tableturf Draft', 'Draft creation failed', 'The website is probably down');
     }
 
     await interaction.reply({ embeds: [embed] });
+}
+
+function MakeRequest(data){
+    return new Promise(function (resolve, reject) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "http://tableturfdraft.se/GenerateNewDraft", true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify(data));
+    });
 }
