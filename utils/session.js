@@ -15,7 +15,7 @@ export const sessionMiddleware = session({
     saveUninitialized: false,
     cookie: {
         sameSite: 'strict',
-        secure: false,
+        secure: SSL,
         //partitioned: true,
         maxAge: 7 * 24 * 60 * 60 * 1000,
     },
