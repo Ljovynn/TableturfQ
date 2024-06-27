@@ -4,8 +4,6 @@ import { CheckUserDefined } from '../utils/checkDefined.js';
 import { BanUser, GetUserBanAndRole, GetUserRole, SuspendUser, UnbanUser } from '../database.js';
 import { userRoles } from '../public/constants/userData.js';
 
-import dotenv from 'dotenv';
-
 import { SendEmptySocketMessage, SendSocketMessage } from '../socketManager.js';
 import { RemovePlayerFromAnyQue } from '../queManager.js';
 import { GetDisputedMatchesList, HandleBannedPlayerInMatch, ModSentChatMessage, ResolveMatchDispute, UserSentChatMessage } from '../matchManager.js';
@@ -14,10 +12,6 @@ import { ResponseSucceeded, SetResponse } from '../Responses/ResponseData.js';
 import { definitionErrors, userErrors } from '../Responses/requestErrors.js';
 
 const router = Router();
-
-dotenv.config();
-
-const sessionSecret = process.env.SESSION_SECRET;
 
 //posts
 

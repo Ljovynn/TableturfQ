@@ -21,7 +21,6 @@ dotenv.config();
 
 const websiteURL = process.env.URL;
 const port = process.env.PORT;
-const sessionSecret = process.env.SESSION_SECRET;
 const clientId = process.env.CLIENT_ID;
 const clientSecret = process.env.CLIENT_SECRET;
 

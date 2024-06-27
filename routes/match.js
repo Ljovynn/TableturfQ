@@ -13,16 +13,11 @@ import { CheckIfArray, CheckUserDefined } from '../utils/checkDefined.js';
 
 import { SendSocketMessage, SendEmptySocketMessage } from '../socketManager.js';
 
-import dotenv from 'dotenv';
 import { definitionErrors, nullErrors, userErrors } from '../Responses/requestErrors.js';
 import { ResponseSucceeded, SetResponse } from '../Responses/ResponseData.js';
 import { disputeResolveOptions } from '../public/constants/matchData.js';
 
 const router = Router();
-
-dotenv.config();
-
-const sessionSecret = process.env.SESSION_SECRET;
 
 /*import { SendDisputeMessage } from '../discordBot/discordBotManager.js';
 import { GetDisputedMatchesList } from '../matchManager.js';

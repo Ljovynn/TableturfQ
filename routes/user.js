@@ -5,7 +5,6 @@ import { Router } from 'express';
 import { CheckIfArray, CheckUserDefined } from '../utils/checkDefined.js';
 import { GetCurrentUser } from '../utils/userUtils.js';
 
-import dotenv from 'dotenv';
 import { FindIfPlayerInQue, FindIfPlayerWaitingForReady } from '../queManager.js';
 import { FindMatchWithPlayer } from '../matchManager.js';
 import { DeleteAllUserSessions, GetMultipleUserDatas, GetUserMatchHistory, GetUserRankedMatchCount, SetUserCountry, SetUserDiscordTokens, SetUsername } from '../database.js';
@@ -18,9 +17,6 @@ const router = Router();
 
 const matchHistoryHitsPerPage = 10;
 
-dotenv.config();
-
-const sessionSecret = process.env.SESSION_SECRET;
 
 //posts
 

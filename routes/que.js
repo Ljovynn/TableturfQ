@@ -6,13 +6,7 @@ import { definitionErrors, userErrors } from '../Responses/requestErrors.js';
 import { matchModes } from '../public/constants/matchData.js';
 import { ResponseSucceeded, SetResponse } from '../Responses/ResponseData.js';
 
-import dotenv from 'dotenv';
-
 const router = Router();
-
-dotenv.config();
-
-const sessionSecret = process.env.SESSION_SECRET;
 
 //Posts
 
