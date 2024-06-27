@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, messageLink } from "discord.js";
+import { SlashCommandBuilder } from "discord.js";
 import { GetLeaderboardAtPos } from "../../userListManager.js";
 import { embedColor } from '../constants.js';
 import { GetRank } from "../../public/constants/rankData.js";
