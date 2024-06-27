@@ -1,6 +1,5 @@
 import express from "express";
 import dotenv from "dotenv";
-import { createServer } from 'http';
 import { fileURLToPath } from 'url';
 import { CreateSocketConnection, SendSocketMessage } from "./socketManager.js";
 import path from 'path';
@@ -35,11 +34,8 @@ const unverifiedUserDeletionThreshold = 7 * 24 * 60 * 60 * 1000;
 const matchDeletionThreshold = 2 * 60 * 60 * 1000;
 
 const app = express();
-const server = createServer(app);
 
-CreateSocketConnection(server);
-
-server.listen(port, () => {
+const server = app.listen(port, () => {
     console.log(`TableturfQ is up at port ${port}`);
 
     //que
@@ -67,6 +63,8 @@ server.listen(port, () => {
 
     DeleteUnfinishedMatches();
 });
+
+CreateSocketConnection(server);
 
 async function TickCancelOldMatches(){
     var cancelledMatchIds = await CancelOldMatches(matchDeletionThreshold);

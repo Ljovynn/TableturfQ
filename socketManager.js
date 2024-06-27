@@ -15,6 +15,7 @@ var connected = false;
 export function CreateSocketConnection (server){
     if (connected) return;
 
+    console.log("Setting up socket connection");
     io = new Server(server, {
         cors: {
           origin: ["https://admin.socket.io"],
