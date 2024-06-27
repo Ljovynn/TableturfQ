@@ -1,21 +1,4 @@
-export const stages = Object.freeze({ 
-    unpicked: 0,
-    mainStreet: 1, 
-    thunderPoint: 2, 
-    xMarksTheGarden: 3, 
-    squareSquared: 4, 
-    lakefrontProperty: 5, 
-    doubleGemini: 6, 
-    riverDrift: 7,
-    boxSeats: 8, 
-    girderForBattle: 9, 
-    maskMansion: 10, 
-    stickyThicket: 11, 
-    crackerSnap: 12,
-    twoLaneSplattop: 13, 
-    pedalToTheMedal: 14,
-    overTheLine: 15
-});
+import { stages } from "./stageData.js";
 
 export const matchStatuses = Object.freeze({ 
     stageSelection: 0,

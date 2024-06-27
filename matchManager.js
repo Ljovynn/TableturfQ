@@ -1,4 +1,5 @@
-import {stages, matchStatuses, matchModes, Game, Match, ChatMessage, disputeResolveOptions} from "./public/constants/matchData.js";
+import {matchStatuses, matchModes, Game, Match, ChatMessage, disputeResolveOptions} from "./public/constants/matchData.js";
+import { stages } from "./public/constants/stageData.js";
 import { ApplyMatchEloResults, placementMatchCount } from "./glicko2Manager.js";
 import { AddChatMessage, CreateMatch, GetMatch, GetUserRankedMatchCount, SetMatchResult, SetUserHideRank } from "./database.js";
 import { FindPlayerPosInMatch } from "./utils/matchUtils.js";

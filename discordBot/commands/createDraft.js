@@ -1,7 +1,16 @@
 import axios from 'axios';
+import { embedColor } from '../constants.js';
 import { SlashCommandBuilder } from "discord.js";
 import { uniqueCards, unique312s } from "../../cards/cardManager.js";
 import { BuildSimpleEmbed } from "../utils/embed.js";
+import { stages, stageImageSources } from '../../public/constants/stageData.js';
+
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const websiteURL = process.env.URL;
+const port = process.env.PORT;
 
 const timerOptions = [
     { name: 'None', value: 0 },
@@ -15,29 +24,29 @@ const timerOptions = [
 ];
 
 const stageOptions= [
-    { name: 'Undefined', value: 0 },
-    { name: 'Main Street', value: 1 },
-    { name: 'Thunder Point', value: 2 },
-    { name: 'X Marks the Garden', value: 3 },
-    { name: 'Square Squared', value: 4 },
-    { name: 'Lakefront Property', value: 5 },
-    { name: 'Double Gemini', value: 6 },
-    { name: 'River Drift', value: 7 },
-    { name: 'Box Seats', value: 8 },
-    { name: 'Girder for Battle', value: 9 },
-    { name: 'Mask Mansion', value: 10 },
-    { name: 'Sticky Thicket', value: 11 },
-    { name: 'Cracker Snap', value: 12 },
-    { name: 'Two-Lane Splattop', value: 13 },
-    { name: 'Pedal to the Metal', value: 14 },
-    { name: 'Over the Line', value: 15 },
+    { name: 'Undefined', value: stages.unpicked },
+    { name: 'Main Street', value: stages.mainStreet },
+    { name: 'Thunder Point', value: stages.thunderPoint },
+    { name: 'X Marks the Garden', value: stages.xMarksTheGarden },
+    { name: 'Square Squared', value: stages.squareSquared },
+    { name: 'Lakefront Property', value: stages.lakefrontProperty },
+    { name: 'Double Gemini', value: stages.doubleGemini },
+    { name: 'River Drift', value: stages.riverDrift },
+    { name: 'Box Seats', value: stages.boxSeats },
+    { name: 'Girder for Battle', value: stages.girderForBattle },
+    { name: 'Mask Mansion', value: stages.maskMansion },
+    { name: 'Sticky Thicket', value: stages.stickyThicket },
+    { name: 'Cracker Snap', value: stages.crackerSnap },
+    { name: 'Two-Lane Splattop', value: stages.twoLaneSplattop },
+    { name: 'Pedal to the Metal', value: stages.pedalToTheMedal },
+    { name: 'Over the Line', value: stages.overTheLine },
 ];
 
 const defaultValues = {
     draftSize: 60,
     minSpecialCards: 4,
     timer: 0,
-    stage: 0
+    stage: stages.unpicked
 }
 
 export const data = new SlashCommandBuilder()
@@ -102,17 +111,51 @@ export async function execute(interaction) {
         );
         console.log(response);
         if (response.status != 201){
-            var deniedEmbed = BuildSimpleEmbed('Tableturf Draft', 'Draft creation denied', ' ');
+            const deniedEmbed = BuildSimpleEmbed('Tableturf Draft', 'Draft creation denied', ' ');
             await interaction.editReply({ embeds: [deniedEmbed] });
             return;
         } else{
-            var embed = BuildSimpleEmbed('Tableturf Draft', `Draft successfully created: ${player1} VS ${player2}`, `[Link](tableturfdraft.se/draft?id=${response.data})`);
+            const embedFields = [
+                {
+                    name: `Draft successfully created: ${player1} VS ${player2}`,
+                    value: `[Link](http://tableturfdraft.se/draft?id=${response.data})`,
+                    inline: false
+                },
+                {
+                    name: 'Draft size',
+                    value: draftSize,
+                    inline: true
+                },
+                {
+                    name: 'Min 3-12s',
+                    value: minSpecialCards,
+                    inline: true
+                },
+                {
+                    name: 'Timer',
+                    value: `${timer} seconds`,
+                    inline: true
+                },
+            ]
+
+            const embed = {
+                color: embedColor,
+                title: 'Tableturf Draft',
+                author: {
+                    name: `${user.username}`,
+                    icon_url: `https://cdn.discordapp.com/avatars/${user.discord_id}/${user.discord_avatar_hash}.png`,
+                    url: `${websiteURL}/profile?playerId=${user.id}`,
+                },
+                thumbnail: {
+                    url: `${websiteURL}/assets/images/${stageImageSources[stage]}`,
+                },
+                fields: embedFields,
+            };
             await interaction.editReply({ embeds: [embed] });
             return;
         }
     } catch(error){
-        console.log(error);
-        var errorEmbed = BuildSimpleEmbed('Tableturf Draft', 'Draft creation failed', 'The website is probably down');
+        const errorEmbed = BuildSimpleEmbed('Tableturf Draft', 'Draft creation failed', 'The website is probably down');
         await interaction.editReply({ embeds: [errorEmbed] });
     }
 }
