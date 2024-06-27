@@ -123,12 +123,12 @@ export async function execute(interaction) {
                 },
                 {
                     name: 'Draft size',
-                    value: draftSize,
+                    value: draftSize.tooString(),
                     inline: true
                 },
                 {
                     name: 'Min 3-12s',
-                    value: minSpecialCards,
+                    value: minSpecialCards.toString(),
                     inline: true
                 },
                 {
