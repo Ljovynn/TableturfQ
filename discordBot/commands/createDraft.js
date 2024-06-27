@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { SlashCommandBuilder } from "discord.js";
 import { uniqueCards, unique312s } from "../../cards/cardManager.js";
 import { BuildSimpleEmbed } from "../utils/embed.js";
@@ -79,12 +80,10 @@ export async function execute(interaction) {
     const timer = interaction.options.getInteger('timer') ?? defaultValues.timer;
     const stage = interaction.options.getInteger('stage') ?? defaultValues.stage;
 
-    var embed;
-
     //await interaction.deferReply();
 
     try {
-        let result = await MakeRequest({
+        const formdata = {
             player1Name: player1,
             player2Name: player2,
             draftSize: draftSize,
@@ -92,28 +91,26 @@ export async function execute(interaction) {
             timer: timer,
             stage: stage,
             includeUnreleasedCards: false
-        });
-        console.log(result);
-        if (result.status != 201){
-            embed = BuildSimpleEmbed('Tableturf Draft', 'Draft creation denied', ' ');
-            await interaction.reply({ embeds: [embed] });
+        }
+        const response = await axios.post('http://tableturfdraft.se/GenerateNewDraft',
+            formData, {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+        console.log(response);
+        if (response.status != 201){
+            var deniedEmbed = BuildSimpleEmbed('Tableturf Draft', 'Draft creation denied', ' ');
+            await interaction.reply({ embeds: [deniedEmbed] });
             return;
         } else{
-            var data = JSON.parse(result.responseText);
-            embed = BuildSimpleEmbed('Tableturf Draft', `Draft successfully created: ${player1} VS ${player2}`, `[Link](tableturfdraft.se/draft?id=${result.data})`);
+            var data = JSON.parse(response.responseText);
+            var embed = BuildSimpleEmbed('Tableturf Draft', `Draft successfully created: ${player1} VS ${player2}`, `[Link](tableturfdraft.se/draft?id=${data})`);
             await interaction.reply({ embeds: [embed] });
             return;
         }
     } catch(error){
         console.log(error);
     }
-}
-
-function MakeRequest(data){
-    return new Promise(function (resolve, reject) {
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", "http://tableturfdraft.se/GenerateNewDraft", true);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.send(JSON.stringify(data));
-    });
 }
