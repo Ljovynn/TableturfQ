@@ -4,7 +4,7 @@ import { sessionStore } from '../database.js';
 
 dotenv.config();
 const sessionSecret = process.env.SESSION_SECRET;
-const SSL = (process.env.SSL === 'true') ? true : false;
+const SSL = (process.env.SSL === 'true') ? false : false;
 
 
 
