@@ -123,7 +123,7 @@ export async function execute(interaction) {
                 },
                 {
                     name: 'Draft size',
-                    value: draftSize.tooString(),
+                    value: draftSize.toString(),
                     inline: true
                 },
                 {
