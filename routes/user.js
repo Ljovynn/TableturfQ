@@ -20,31 +20,6 @@ const matchHistoryHitsPerPage = 10;
 
 //posts
 
-//req: userId (anyone, leave blank for yourself), pageNumber
-//res: matchHistory (DB matches, not match objects)
-router.post("/GetUserMatchHistory", async (req, res) => {
-    try{
-        var userId = req.body.userId;
-        var pageNumber = req.pageNumber;
-
-        if (typeof(userId) !== 'number'){
-            userId = req.session.user;
-            if (!CheckUserDefined(req)) return SetResponse(res, definitionErrors.userNotDefined);
-        } 
-
-        if (typeof(pageNumber) !== 'number' || pageNumber < 0){
-            pageNumber = 1;
-        }
-
-        var matchHistory = await GetUserMatchHistory(userId, matchHistoryHitsPerPage, pageNumber);
-
-        res.status(200).send(matchHistory);
-    } catch(error){
-        console.error(error);
-        res.sendStatus(400);
-    }
-});
-
 //username (max 32 letters)
 router.post("/SetUsername", async (req, res) => {
     try{
