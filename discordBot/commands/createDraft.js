@@ -94,16 +94,12 @@ export async function execute(interaction) {
         }
         const response = await axios.post('http://tableturfdraft.se/GenerateNewDraft',
             formData, {
+                timeout: 5 * 1000,
                 headers: {
                     "Content-Type": "application/json",
                 },
             }
         );
-        if (!response){
-            var embed = BuildSimpleEmbed('Tableturf Draft', 'Draft creation failed', 'The website is probably down');
-            await interaction.editReply({ embeds: [embed] });
-            return;
-        }
         console.log(response);
         if (response.status != 201){
             var deniedEmbed = BuildSimpleEmbed('Tableturf Draft', 'Draft creation denied', ' ');
@@ -116,7 +112,7 @@ export async function execute(interaction) {
         }
     } catch(error){
         console.log(error);
-        var embed = BuildSimpleEmbed('Tableturf Draft', 'Draft creation failed. Error message:', error.message);
-        await interaction.editReply({ embeds: [embed] });
+        var errorEmbed = BuildSimpleEmbed('Tableturf Draft', 'Draft creation failed', 'The website is probably down');
+        await interaction.editReply({ embeds: [errorEmbed] });
     }
 }
