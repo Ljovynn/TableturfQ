@@ -9,7 +9,7 @@ import { BuildSimpleEmbed } from './utils/embed.js';
 dotenv.config();
 
 const token = process.env.TOKEN;
-const disputeChannelId = process.env.DISPUTE_CHANNEL_ID
+const logChannelId = process.env.DISPUTE_CHANNEL_ID
 const websiteURL = process.env.URL;
 const port = process.env.PORT;
 
@@ -61,7 +61,12 @@ client.once(Events.ClientReady, readyClient => {
 
 async function SetLogChannel(){
 	try {
-		channel = await client.channels.fetch(disputeChannelId);
+		channel = await client.channels.fetch(logChannelId);
+
+		const suspiciousActionsEmbed = BuildSimpleEmbed('Suspicious actions:', 'No suspicious actions reported yet.', ' ');
+
+		const suspiciousActionsMessage = await channel.send({ embeds: [suspiciousActionsEmbed] });
+		suspiciousActionsMessageId = suspiciousActionsMessage.id;
 
 		const disputeEmbed = {
 		color: embedColor,
@@ -72,11 +77,6 @@ async function SetLogChannel(){
 
 		const disputeMessage = await channel.send({ embeds: [disputeEmbed] });
 		disputeMessageId = disputeMessage.id;
-
-		const suspiciousActionsEmbed = BuildSimpleEmbed('Suspicious actions:', 'No suspicious actions reported yet.', ' ');
-
-		const suspiciousActionsMessage = await channel.send({ embeds: [suspiciousActionsEmbed] });
-		suspiciousActionsMessageId = suspiciousActionsMessage.id;
 
 	} catch(error){
 		console.log(error);
