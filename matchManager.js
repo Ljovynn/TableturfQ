@@ -4,7 +4,7 @@ import { ApplyMatchEloResults, placementMatchCount } from "./glicko2Manager.js";
 import { AddChatMessage, CreateMatch, GetMatch, GetUserRankedMatchCount, SetMatchResult, SetUserHideRank } from "./database.js";
 import { FindPlayerPosInMatch } from "./utils/matchUtils.js";
 import { AddRecentlyMatchedPlayers } from "./queManager.js";
-import { SendDisputeMessage } from "./discordBot/discordBotManager.js";
+import { SendDisputeMessage, SendNewSuspiciousAction, SuspiciousAction } from "./discordBot/discordBotManager.js";
 import { ResponseData } from "./Responses/ResponseData.js";
 import { casualMatchEndErrors, chatMessageErrors, disputeErrors, gameWinErrors, databaseErrors, resolveErrors, stagePickErrors, stageStrikeErrors, nullErrors } from "./Responses/matchErrors.js";
 import { HasBadWords } from "./utils/string.js";
@@ -238,6 +238,11 @@ export async function PlayerSentGameWin(playerId, winnerId){
         match.status = matchStatuses.stageSelection;
 
         if (CheckMatchWin(match, winnerId)){
+            if (match.createdAt < Date.now() + (5 * 60 * 1000)){
+                const suspiciousAction = new SuspiciousAction(winnerId.toString(), `User won a ranked match against user ID ${match.players[winnerPos % 2].id} in less than 5 minutes`, Date.now());
+                SendNewSuspiciousAction(suspiciousAction);
+            }
+
             match.winnerId = winnerId;
             data.matchWin = true;
             data.newPlayerRatings = await HandleRankedMatchWin(match);
@@ -302,6 +307,11 @@ export async function PlayerSentCasualMatchEnd(playerId){
 
     match.status = matchStatuses.noWinner;
     if (!await FinishMatch(match)) return databaseErrors.matchFinishError;
+
+    if (match.createdAt < Date.now() + (30 * 1000)){
+        const suspiciousAction = new SuspiciousAction(playerId.toString(), 'User ended a casual match within 30 seconds', Date.now());
+        SendNewSuspiciousAction(suspiciousAction);
+    }
 
     return new ResponseData(201, match.id);
 }

@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import fs from 'node:fs';
 import path from 'path';
 import { embedColor } from './constants.js';
+import { BuildSimpleEmbed } from './utils/embed.js';
 
 dotenv.config();
 
@@ -16,12 +17,17 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
+var channel;
+
 client.commands = new Collection();
 
 var folderPath = path.join(__dirname, 'commands');
 const commandFolder = fs.readdirSync(folderPath);
 
-var previousDisputeMessageId;
+var suspiciousActionsList = [];
+
+var disputeMessageId;
+var suspiciousActionsMessageId;
 
 for (const file of commandFolder) {
     const filePath = `./commands/${file}`;
@@ -50,7 +56,32 @@ for (const file of guildCommandFolder) {
 
 client.once(Events.ClientReady, readyClient => {
 	console.log(`Discord bot logged in as ${readyClient.user.tag}`);
+	SetLogChannel();
 });
+
+async function SetLogChannel(){
+	try {
+		channel = await client.channels.fetch(disputeChannelId);
+
+		const disputeEmbed = {
+		color: embedColor,
+		title: 'Current disputes:',
+		fields: [{name: 'There are currently no disputes.', value: ' '}],
+		timestamp: new Date().toISOString(),
+		};
+
+		const disputeMessage = await channel.send({ embeds: [disputeEmbed] });
+		disputeMessageId = disputeMessage.id;
+
+		const suspiciousActionsEmbed = BuildSimpleEmbed('Suspicious actions:', 'No suspicious actions reported yet.', ' ');
+
+		const suspiciousActionsMessage = await channel.send({ embeds: [suspiciousActionsEmbed] });
+		suspiciousActionsMessageId = suspiciousActionsMessage.id;
+
+	} catch(error){
+		console.log(error);
+	}
+}
 
 client.on(Events.InteractionCreate, async interaction => {
 	if (interaction.isChatInputCommand()){
@@ -93,42 +124,73 @@ export function StartDiscordBot(){
 
 export async function SendDisputeMessage(matchDisputes, sendNewMessage){
 	try {
-		var channelId = disputeChannelId;
-		if (!channelId) return;
-		const channel = await client.channels.fetch(channelId);
 		if (!channel) return;
 
 		//build embed
-		var disputesFields = [];
+		var fields = [];
 		var limit = Math.min(matchDisputes.length, 25);
 
 		for (let i = 0; i < limit; i++){
-		var dispute = {
-			name: `Match id ${matchDisputes[i].id}`,
-			value: `[Link](${websiteURL}/game?matchID=${matchDisputes[i].id})`,
+			var field = {
+				name: `Match id ${matchDisputes[i].id}`,
+				value: `[Link](${websiteURL}/game?matchID=${matchDisputes[i].id})`,
+			}
+			fields.push(field)
 		}
-		disputesFields.push(dispute)
-		}
-		if (matchDisputes.length == 0) disputesFields.push({name: 'There are currently no disputes.', value: '\u200B'});
+		if (matchDisputes.length == 0) fields.push({name: 'There are currently no disputes.', value: ' '});
 
 		const disputeEmbed = {
 		color: embedColor,
 		title: 'Current disputes:',
-		fields: disputesFields,
+		fields: fields,
 		timestamp: new Date().toISOString(),
 		};
 
-		if (!previousDisputeMessageId){
-			const message = await channel.send({ embeds: [disputeEmbed] });
-			previousDisputeMessageId = message.id;
-		} else{
-			const previousMessage = await channel.messages.fetch(previousDisputeMessageId);
-			if (previousMessage) previousMessage.edit({ embeds: [disputeEmbed] })
-		}
+		const previousMessage = await channel.messages.fetch(disputeMessageId);
+		if (previousMessage) await previousMessage.edit({ embeds: [disputeEmbed] });
+
 		if (sendNewMessage){
 			const tempMessage = await channel.send('ping');
 			await tempMessage.delete();
 		}
+	} catch (error){
+		console.log(error);
+	}
+}
+
+export function SuspiciousAction(userId, description, timestamp){
+    this.userId = userId;
+    this.description = description;
+    this.timestamp = timestamp;
+}
+
+export async function SendNewSuspiciousAction(suspiciousAction){
+	suspiciousActionsList.push(suspiciousAction);
+
+	if (suspiciousActionsList > 25) suspiciousActionsList.shift();
+
+	try {
+		if (!channel) return;
+
+		//build embed
+		var fields = [];
+
+		for (let i = 0; i < suspiciousActionsList.length; i++){
+			var field = {
+				name: `User ID ${suspiciousActionsList[i].userId} at ${suspiciousActionsList[i].timestamp}:`,
+				value: suspiciousActionsList[i].description,
+			}
+			fields.push(field)
+		}
+
+		const suspiciousActionsEmbed = {
+		color: embedColor,
+		title: 'Suspicious actions:',
+		fields: fields,
+		};
+
+		const previousMessage = await channel.messages.fetch(suspiciousActionsMessageId);
+		if (previousMessage) await previousMessage.edit({ embeds: [suspiciousActionsEmbed] });
 	} catch (error){
 		console.log(error);
 	}
