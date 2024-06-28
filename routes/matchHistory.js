@@ -5,6 +5,8 @@ import { ApplyHideRank } from '../utils/userUtils.js';
 
 const router = Router();
 
+const matchHistoryHitsPerPage = 10;
+
 //posts
 
 //req: userId (anyone, leave blank for yourself), pageNumber
