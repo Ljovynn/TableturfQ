@@ -29,6 +29,9 @@ const scoreContainers = document.getElementsByClassName('score-container');
 const playerScores = document.getElementsByClassName('player-score');
 const victoryButtons = document.getElementsByClassName('player-victory-button');
 
+const needHelp = document.getElementById('player-need-help');
+const playerRaiseDispute = document.getElementById('player-raise-dispute-button');
+
 const playerResolve = document.getElementById('player-resolve-content');
 const playerResolveDispute = document.getElementById('player-resolve-dispute');
 
@@ -231,6 +234,17 @@ adminResolveButton.addEventListener('click', async (e) => {
     if ( response == 201 ) {
         adminContent.style.display = 'none';
     }
+});
+
+needHelp.addEventListener('click', async (e) => {
+    playerRaiseDispute.style.display = 'inline-block';
+});
+
+playerRaiseDispute.addEventListener('click', async (e) => {
+    var data = { userId: userID };
+    var response = await postData('/match/Dispute', data);
+    console.log(response);
+    playerRaiseDispute.style.display = 'none';
 });
 
 playerResolveDispute.addEventListener('click', async (e) => {
