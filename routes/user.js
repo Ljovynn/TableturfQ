@@ -16,8 +16,6 @@ import { HasBadWords } from '../utils/string.js';
 
 const router = Router();
 
-const matchHistoryHitsPerPage = 10;
-
 
 //posts
 

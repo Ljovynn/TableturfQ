@@ -6,6 +6,8 @@ import { CheckUserDefined } from '../utils/checkDefined.js';
 
 const router = Router();
 
+const matchHistoryHitsPerPage = 10;
+
 //posts
 
 //req: userId (anyone, leave blank for yourself), pageNumber

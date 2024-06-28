@@ -33,7 +33,6 @@ matches.push(m1);
 matches.push(m2);
 matches.push(m3);*/
 
-//TODO
 export async function CancelOldMatches(cutoffTime){
     var result = [];
     var cutoffDate = Date.now() - cutoffTime;
@@ -41,7 +40,7 @@ export async function CancelOldMatches(cutoffTime){
         if (matches[i].createdAt > cutoffDate) continue;
 
         matches[i].status = matchStatuses.noWinner;
-        if (await FinishMatch(matches[i])) result.push(matches[i].id);
+        if (await FinishMatch(matches[i]), true) result.push(matches[i].id);
     }
     return result;
 }
@@ -442,7 +441,7 @@ export async function ResolveMatchDispute(matchId, resolveOption){
             return new ResponseData(201);
         case disputeResolveOptions.cancelMatch:
             match.status = matchStatuses.noWinner;
-            await (FinishMatch(match));
+            await (FinishMatch(match, true));
             SendDisputeMessage(GetDisputedMatchesList(), false);
             return new ResponseData(201);
         case disputeResolveOptions.gameWinPlayer1:
@@ -575,8 +574,8 @@ export function FindMatchWithPlayer(playerId){
     }
 }
 
-async function FinishMatch(match){
-    await SetMatchResult(match);
+async function FinishMatch(match, cancelled = false){
+    if (!cancelled) await SetMatchResult(match);
 
     const matchIndex = matches.indexOf(match);
     if (matchIndex == -1) return false;
