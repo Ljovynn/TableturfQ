@@ -28,6 +28,7 @@ const player2Score = document.getElementById('player2-score');
 const scoreContainers = document.getElementsByClassName('score-container');
 const playerScores = document.getElementsByClassName('player-score');
 const victoryButtons = document.getElementsByClassName('player-victory-button');
+const leaveMatch = document.getElementById('leave-match-button');
 
 const needHelp = document.getElementById('player-need-help');
 const playerRaiseDispute = document.getElementById('player-raise-dispute-button');
@@ -253,6 +254,15 @@ playerResolveDispute.addEventListener('click', async (e) => {
     console.log(response);
     if ( response == 201 ) {
         // idk
+    }
+});
+
+leaveMatch.addEventListener('click', async (e) => {
+    if ( casualMatch ) {
+        var data = {userId: userID};
+        var response = await postData('/match/CasualMatchEnd', data);
+        console.log(response);
+        window.location.href = '/';
     }
 });
 
@@ -854,6 +864,12 @@ socket.on('matchWin', async (data) => {
     gameFinish(data[0]);
     // Unhide return to queue button
     // Do any final things
+});
+
+socket.on('matchEnd', async (data) => {
+    alert('Your opponent has left the match.');
+    requeueButton.style.display = 'block';
+    leaveMatch.style.display = 'none';
 });
 
 socket.on('dispute', async () => {
