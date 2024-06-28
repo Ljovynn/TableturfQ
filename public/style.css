@@ -172,6 +172,25 @@ h3 {
     color: black;
 }
 
+#player-raise-dispute {
+    width: 50%;
+    margin: auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#player-need-help {
+    display: block;
+}
+
+#player-need-help:hover {
+    cursor: pointer;
+}
+
+#player-raise-dispute-button {
+    display: none;
+}
+
 .stage-selectable {
     display: inline-block;
 }

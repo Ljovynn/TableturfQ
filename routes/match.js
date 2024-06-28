@@ -104,6 +104,8 @@ router.post("/WinGame", async (req, res) => {
 
 router.post("/CasualMatchEnd", async (req, res) => {
     try {
+        var userId = req.body.userId;
+
         if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
 
         var responseData = await PlayerSentCasualMatchEnd(userId);
@@ -112,12 +114,15 @@ router.post("/CasualMatchEnd", async (req, res) => {
         res.sendStatus(responseData.code);
         SendEmptySocketMessage('match' + responseData.data, "matchEnd");
     } catch (err){
+        console.error(err);
         res.sendStatus(500);
     }
 });
 
 router.post("/Dispute", async (req, res) => {
     try {
+        var userId = req.body.userId;
+
         if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
 
         var responseData = PlayerSentMatchDispute(userId);
@@ -126,6 +131,7 @@ router.post("/Dispute", async (req, res) => {
         res.sendStatus(responseData.code);
         SendEmptySocketMessage('match' + responseData.data, "dispute");
     } catch (err){
+        console.error(err);
         res.sendStatus(500);
     }
 });

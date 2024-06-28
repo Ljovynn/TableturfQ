@@ -133,11 +133,13 @@ async function setUserInfo() {
 }
 
 async function getMatchHistory() {
+    var page = 1;
+    var hits = 10;
     var data = {};
     if ( playerID != 0 ) {
-        data = { userId: parseInt(playerID) }
+        data = { userId: parseInt(playerID), pageNumber: parseInt(page), hitsPerPage: parseInt(hits) };
     }
-    var result = await getData('/user/GetUserMatchHistory', data);
+    var result = await getData('/matchHistory/GetUserMatchHistory', data);
     return result;
 }
 
