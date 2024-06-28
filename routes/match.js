@@ -129,14 +129,15 @@ router.post("/ForfeitMatch", async (req, res) => {
         var responseData = await PlayerSentForfeit(userId);
         if (!ResponseSucceeded(responseData.code)) return SetResponse(res, responseData);
 
+        var matchId = responseData.data.matchId;
+
         var data = {
             forfeitId: userId,
-            matchId: responseData.matchId,
             newPlayerRatings: responseData.newPlayerRatings,
         }
 
         res.sendStatus(responseData.code);
-        SendSocketMessage('match' + responseData.data, "forfeit", data);
+        SendSocketMessage('match' + matchId, "forfeit", data);
     } catch (err){
         console.error(err);
         res.sendStatus(500);
