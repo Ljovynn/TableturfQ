@@ -51,8 +51,8 @@ router.get("/GetRecentMatches", async (req, res) => {
 async function GetUsers(matches){
     var userIdList = [];
         for (let i = 0; i < matches.length; i++){
-            if (!userIdList.some((player) => player.id === matches[i].player1_id)) userIdList.push(matches[i].player1_id);
-            if (!userIdList.some((player) => player.id === matches[i].player2_id)) userIdList.push(matches[i].player2_id);
+            if (!userIdList.some((player) => player.id === matches[i].player1_id) && matches[i].player1_id !== null) userIdList.push(matches[i].player1_id);
+            if (!userIdList.some((player) => player.id === matches[i].player2_id) && matches[i].player2_id !== null) userIdList.push(matches[i].player2_id);
         }
 
     return await GetMultipleUserDatas(userIdList);
