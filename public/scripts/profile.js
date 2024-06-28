@@ -35,7 +35,9 @@ var userInfo;
 var eloRating;
 var rank;
 
+var matchList;
 var matches;
+var matchUsers;
 var playerID = 0;
 
 try {
@@ -45,6 +47,7 @@ try {
     const entriesArray = Array.from(entries);
     playerID = entriesArray[0][1];
 } catch (error) {
+    console.log(error);
     // idk who cares
 }
 
@@ -128,6 +131,7 @@ async function setUserInfo() {
         }
         hideNonUserElements();
     } catch (error) {
+        console.log(error);
         window.location.href = '/';
     }
 }
@@ -138,13 +142,17 @@ async function getMatchHistory() {
     var data = {};
     if ( playerID != 0 ) {
         data = { userId: parseInt(playerID), pageNumber: parseInt(page), hitsPerPage: parseInt(hits) };
+    } else {
+        data = { userId: parseInt(userId), pageNumber: parseInt(page), hitsPerPage: parseInt(hits) };
     }
     var result = await getData('/matchHistory/GetUserMatchHistory', data);
     return result;
 }
 
 async function setMatchHistory() {
-    matches = await getMatchHistory();
+    matchList = await getMatchHistory();
+    matches = matchList.matchHistory;
+    matchUsers = matchList.users;
 
     for ( let match of matches ) {
         let row = document.createElement('div');
@@ -156,9 +164,11 @@ async function setMatchHistory() {
         dateCell.append(matchDate);
 
         let matchupCell = document.createElement('div');
-        var players = await getMatchUsers( [match.player1_id, match.player2_id] );
+       // var players = await getMatchUsers( [match.player1_id, match.player2_id] );
+        var player1 = getMatchPlayer(matchUsers, match.player1_id);
+        var player2 = getMatchPlayer(matchUsers, match.player2_id);
         matchupCell.classList.add('matchup');
-        matchupCell.append(players[0].username + ' vs ' + players[1].username);
+        matchupCell.append(player1[0].username + ' vs ' + player2[0].username);
 
         let outcomeCell = document.createElement('div');
         outcomeCell.classList.add('match-outcome');
@@ -171,19 +181,20 @@ async function setMatchHistory() {
                 break;
             case 3:
                 // player 1 win
-                if ( players[0].id == userId )
-                    outcome = 'W';
+                if ( player1[0].id == userId )
+                    outcome = 'Victory';
                 else
-                    outcome = 'L';
+                    outcome = 'Defeat';
                 break;
             case 4:
                 // player 2 win
-                if ( players[1].id == userId )
-                    outcome = 'W';
+                if ( player2[0].id == userId )
+                    outcome = 'Victory';
                 else
-                    outcome = 'L';
+                    outcome = 'Defeat';
                 break;
             default:
+                outcome = 'No Winner';
                 break;
         }
         outcomeCell.append(outcome);
@@ -202,9 +213,16 @@ async function getMatchUsers(users) {
     return result;
 }
 
+function getMatchPlayer( matchUsers, playerId ) {
+    var player = matchUsers.filter( (user) => user.id === playerId );
+    return player;
+}
+
 function hideNonUserElements() {
-    editDisplayName.style.display = 'none';
-    logoutButton.style.display = 'none';
+    if ( playerID != 0 ) {
+        editDisplayName.style.display = 'none';
+        logoutButton.style.display = 'none';
+    }
 }
 
 function validateDisplayName(newDisplayName) {
