@@ -109,6 +109,9 @@ export async function execute(interaction) {
                 },
             }
         );
+
+        var timerString = 'None';
+        if (timer != 0) timerString = `${timer} seconds`;
         
         if (response.status != 201){
             const deniedEmbed = BuildSimpleEmbed('Tableturf Draft', 'Draft creation denied', ' ');
@@ -133,7 +136,7 @@ export async function execute(interaction) {
                 },
                 {
                     name: 'Timer',
-                    value: `${timer} seconds`,
+                    value: timerString,
                     inline: true
                 },
             ]
