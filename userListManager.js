@@ -34,6 +34,34 @@ export function GetLeaderboardAtPos(startPos, hitCount){
     return data;
 }
 
+export function SearchLeaderboard(input){
+    var result = [];
+    var nameIncludesResult = [];
+    
+    if (input.length < 2) return result;
+    input = input.toLowerCase();
+
+    for (let i = 0; i < userList.length; i++){
+        var lowerCaseUsername = userList[i].username.toLowerCase();
+
+        if (lowerCaseUsername === input) {
+            result.push({user: userList[i], position: i + 1});
+            continue;
+        }
+
+        if (lowerCaseUsername.includes(input)) nameIncludesResult.push({user: userList[i], position: i + 1});
+    }
+
+    for (let i = 0; i < nameIncludesResult.length; i++){
+        result.push(nameIncludesResult[i]);
+    }
+
+    if (result.length > maxSearchUserHit){
+        result = result.splice(0, maxSearchUserHit);
+    }
+    return result;
+}
+
 export function SearchUser(input){
     var result = [];
     var nameIncludesResult = [];

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-import { GetLeaderboardAtPos } from '../userListManager.js';
+import { GetLeaderboardAtPos, SearchLeaderboard } from '../userListManager.js';
 
 const router = Router();
 
@@ -26,6 +26,24 @@ router.post('/GetLeaderboard', async (req, res) => {
     } catch (err){
         console.error(err);
         res.sendStatus(500);
+    }
+});
+
+//req: input
+//res: leaderboardUsers
+//leaderboardUsers: user, position
+router.post('/SearchLeaderboard', async (req, res) => {
+    try{
+        const input = req.body.input;
+
+        if (typeof(input) !== 'string') return SetResponse(res, definitionErrors.usernameUndefined);
+
+        const leaderboardUsers = SearchLeaderboard(input);
+
+        res.status(200).send(leaderboardUsers);
+    } catch(error){
+        console.log(error);
+        res.sendStatus(400);
     }
 });
 
