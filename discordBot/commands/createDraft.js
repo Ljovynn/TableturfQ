@@ -141,11 +141,6 @@ export async function execute(interaction) {
             const embed = {
                 color: embedColor,
                 title: 'Tableturf Draft',
-                author: {
-                    name: `${user.username}`,
-                    icon_url: `https://cdn.discordapp.com/avatars/${user.discord_id}/${user.discord_avatar_hash}.png`,
-                    url: `${websiteURL}/profile?playerId=${user.id}`,
-                },
                 thumbnail: {
                     url: `${websiteURL}/assets/images/${stageImageSources[stage]}`,
                 },
@@ -155,7 +150,6 @@ export async function execute(interaction) {
             return;
         }
     } catch(error){
-        console.log(error.message);
         const errorEmbed = BuildSimpleEmbed('Tableturf Draft', 'Draft creation failed', 'The website is probably down');
         await interaction.editReply({ embeds: [errorEmbed] });
     }
