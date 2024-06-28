@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { GetGlobalMatchHistory } from '../matchHistoryManager.js';
 import { GetMultipleUserDatas } from '../database.js';
+import { ApplyHideRank } from '../utils/userUtils.js';
 
 const router = Router();
 
@@ -50,12 +51,18 @@ router.get("/GetRecentMatches", async (req, res) => {
 
 async function GetUsers(matches){
     var userIdList = [];
-        for (let i = 0; i < matches.length; i++){
-            if (!userIdList.some((player) => player.id === matches[i].player1_id) && matches[i].player1_id !== null) userIdList.push(matches[i].player1_id);
-            if (!userIdList.some((player) => player.id === matches[i].player2_id) && matches[i].player2_id !== null) userIdList.push(matches[i].player2_id);
-        }
+    for (let i = 0; i < matches.length; i++){
+        if (!userIdList.some((player) => player.id === matches[i].player1_id) && matches[i].player1_id !== null) userIdList.push(matches[i].player1_id);
+        if (!userIdList.some((player) => player.id === matches[i].player2_id) && matches[i].player2_id !== null) userIdList.push(matches[i].player2_id);
+    }
 
-    return await GetMultipleUserDatas(userIdList);
+    const users = await GetMultipleUserDatas(userIdList);
+
+    for (let i = 0; i < users.length; i++){
+        ApplyHideRank(users[i]);
+    }
+
+    return users;
 }
 
 export default router;

@@ -3,7 +3,7 @@
 import { Router } from 'express';
 
 import { CheckIfArray, CheckUserDefined } from '../utils/checkDefined.js';
-import { GetCurrentUser } from '../utils/userUtils.js';
+import { ApplyHideRank, GetCurrentUser } from '../utils/userUtils.js';
 
 import { FindIfPlayerInQue, FindIfPlayerWaitingForReady } from '../queManager.js';
 import { FindMatchWithPlayer } from '../matchManager.js';
@@ -90,6 +90,10 @@ router.post("/GetUsers", async (req, res) => {
 
         const users = await GetMultipleUserDatas(userIdList);
 
+        for (let i = 0; i < users.length; i++){
+            ApplyHideRank(users[i]);
+        }
+
         res.status(200).send(users);
     } catch(error){
         console.log(error);
@@ -137,6 +141,8 @@ router.get("/GetUserInfo", async (req, res) => {
     try{
         var user = await GetCurrentUser(req);
         if (!user) return SetResponse(res, userErrors.notLoggedIn);
+
+        ApplyHideRank(user);
 
         var queData = FindIfPlayerInQue(user.id);
         var readyData = FindIfPlayerWaitingForReady(user.id);

@@ -16,6 +16,7 @@ import { SendSocketMessage, SendEmptySocketMessage } from '../socketManager.js';
 import { definitionErrors, nullErrors, userErrors } from '../Responses/requestErrors.js';
 import { ResponseSucceeded, SetResponse } from '../Responses/ResponseData.js';
 import { disputeResolveOptions } from '../public/constants/matchData.js';
+import { ApplyHideRank } from '../utils/userUtils.js';
 
 const router = Router();
 
@@ -212,8 +213,18 @@ router.post("/GetMatchInfo", async (req, res) => {
         }
 
         var players = []
-        if (match.players[0].id != 0) players[0] = await GetUserData(match.players[0].id);
-        if (match.players[1].id != 0) players[1] = await GetUserData(match.players[1].id);
+        if (match.players[0].id != 0){
+            players[0] = await GetUserData(match.players[0].id);
+            ApplyHideRank(players[0]);
+        } else {
+            players[0] = null;
+        }
+        if (match.players[1].id != 0){
+            players[1] = await GetUserData(match.players[1].id);
+            ApplyHideRank(players[1]);
+        } else {
+            players[1] = null;
+        }
 
         //check if user has access
         if (!CheckIfPlayerIsId(players[0], userId) && !CheckIfPlayerIsId(players[1], userId) && userRole != userRoles.mod){

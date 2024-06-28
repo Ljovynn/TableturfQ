@@ -52,6 +52,9 @@ export async function ApplyMatchEloResults(match){
   await SetUserRating(match.players[0].id, newPlayer1Rating, player1.getRd(), player1.getVol());
   await SetUserRating(match.players[1].id, newPlayer2Rating, player2.getRd(), player2.getVol());
 
+  if (player1Data.hide_rank) newPlayer1Rating = null;
+  if (player2Data.hide_rank) newPlayer2Rating = null;
+
   var data = {
     newPlayer1Rating,
     newPlayer2Rating

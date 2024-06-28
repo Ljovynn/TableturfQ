@@ -1,7 +1,8 @@
 import { GetLeaderboard, GetUserList } from "./database.js";
+import { ApplyHideRank } from "./utils/userUtils.js";
 
-var userList = await GetUserList();
-var leaderboard = await GetLeaderboard();
+var userList = await UpdateLeaderboard();
+var leaderboard = await UpdateUserList();
 
 var maxSearchUserHit = 10;
 
@@ -11,6 +12,10 @@ export async function UpdateLeaderboard(){
 
 export async function UpdateUserList(){
     userList = await GetUserList();
+
+    for (let i = 0; i < userList.length; i++){
+        ApplyHideRank(userList[i]);
+    }
 }
 
 export function GetLeaderboardAtPos(startPos, hitCount){

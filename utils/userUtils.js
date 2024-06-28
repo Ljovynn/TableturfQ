@@ -9,3 +9,7 @@ export async function GetCurrentUser(req){
     }
     return undefined;
 }
+
+export function ApplyHideRank(user){
+    if (user.hide_rank === true) user.g2_rating = null;
+}
