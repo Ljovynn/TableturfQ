@@ -6,7 +6,7 @@ import { FindPlayerPosInMatch } from "./utils/matchUtils.js";
 import { AddRecentlyMatchedPlayers } from "./queManager.js";
 import { SendDisputeMessage, SendNewSuspiciousAction, SuspiciousAction } from "./discordBot/discordBotManager.js";
 import { ResponseData } from "./Responses/ResponseData.js";
-import { casualMatchEndErrors, chatMessageErrors, disputeErrors, gameWinErrors, databaseErrors, resolveErrors, stagePickErrors, stageStrikeErrors, nullErrors } from "./Responses/matchErrors.js";
+import { casualMatchEndErrors, chatMessageErrors, disputeErrors, gameWinErrors, databaseErrors, resolveErrors, stagePickErrors, stageStrikeErrors, nullErrors, forfeitErrors } from "./Responses/matchErrors.js";
 import { HasBadWords } from "./utils/string.js";
 import { DetailMinute } from "./utils/date.js";
 
@@ -24,14 +24,8 @@ matches.push(m2);*/
 
 //Ljovynn testing
 
-/*var m1 = new Match(1, 1, 2, matchModes.ranked);
-m1.status = matchStatuses.dispute;
-var m2 = new Match(2, 1, 2, matchModes.ranked);
-var m3 = new Match(3, 2, 3, matchModes.ranked);
-m3.status = matchStatuses.dispute;
-matches.push(m1);
-matches.push(m2);
-matches.push(m3);*/
+/*var m1 = await MakeNewMatch(1, 2, matchModes.ranked);
+await PlayerSentForfeit(2);*/
 
 export async function CancelOldMatches(cutoffTime){
     var result = [];
@@ -48,15 +42,14 @@ export async function CancelOldMatches(cutoffTime){
 export async function MakeNewMatch(player1Id, player2Id, matchMode){
 
     //randomize player positions
-    //disabled for testing purposes
-    /*
-    var tempName;
-    let r = Math.floor(Math.random() * 2);c
+
+    var tempId;
+    let r = Math.floor(Math.random() * 2);
     if (r == 1){
-        let tempName = player1Id;
+        let tempId = player1Id;
         player1Id = player2Id;
-        player2Id = tempName;
-    }*/
+        player2Id = tempId;
+    }
 
     var isRanked = false;
     if (matchMode == matchModes.ranked){
@@ -287,6 +280,30 @@ async function HandleRankedMatchWin(match){
     CheckPlacements(match.players[1].id);
 
     return await ApplyMatchEloResults(match);
+}
+
+export async function PlayerSentForfeit(playerId){
+    var match = FindMatchWithPlayer(playerId);
+    if (!match) return nullErrors.noMatch;
+
+    if (match.mode == matchModes.casual) return forfeitErrors.casual;
+
+    var playerPos = FindPlayerPosInMatch(match, playerId);
+
+    match.winnerId = match.players[playerPos % 2].id;
+
+    var result = {
+        matchId: match.id,
+        newPlayerRatings: undefined,
+    }
+    
+    result.newPlayerRatings = await HandleRankedMatchWin(match);
+    if (!result.newPlayerRatings) return databaseErrors.matchFinishError;
+
+    const suspiciousAction = new SuspiciousAction(playerId.toString(), `User forfeited a ranked match against user ID ${match.players[playerPos % 2].id}`, `${DetailMinute(new Date(Date.now()))} UTC`);
+    SendNewSuspiciousAction(suspiciousAction);
+
+    return new ResponseData(201, result);
 }
 
 async function CheckPlacements(playerId){

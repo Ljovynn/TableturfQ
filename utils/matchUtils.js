@@ -1,9 +1,9 @@
 import { Match, Game, matchModes, ChatMessage } from "../public/constants/matchData.js";
 
 export function FindPlayerPosInMatch(match, playerId){
-    if (match.players[0].id == playerId){
+    if (match.players[0].id === playerId){
         return 1;
-    } else if (match.players[1].id == playerId){
+    } else if (match.players[1].id === playerId){
         return 2;
     }
     return 0;
@@ -13,7 +13,6 @@ export function ConvertDBMatchToMatch(matchData, gamesData, strikeData, chatMess
     var matchMode = matchModes.casual;
     if (matchData.ranked == true) {
         matchMode = matchModes.ranked;
-
     }
 
     if (matchData.player1_id == null) matchData.player1_id = 0;

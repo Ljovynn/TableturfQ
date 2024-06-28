@@ -1,7 +1,8 @@
 import { Router } from 'express';
 
 import { PlayerSentStageStrikes, PlayerSentStagePick, PlayerSentGameWin, PlayerSentCasualMatchEnd, 
-    UserSentChatMessage, PlayerSentMatchDispute, PlayerSentResolveDispute} from '../matchManager.js';
+    UserSentChatMessage, PlayerSentMatchDispute, PlayerSentResolveDispute,
+    PlayerSentForfeit} from '../matchManager.js';
 
 import { FindMatch } from '../matchManager.js';
 
@@ -113,6 +114,29 @@ router.post("/CasualMatchEnd", async (req, res) => {
 
         res.sendStatus(responseData.code);
         SendEmptySocketMessage('match' + responseData.data, "matchEnd");
+    } catch (err){
+        console.error(err);
+        res.sendStatus(500);
+    }
+});
+
+router.post("/ForfeitMatch", async (req, res) => {
+    try {
+        var userId = req.body.userId;
+
+        if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
+
+        var responseData = await PlayerSentForfeit(userId);
+        if (!ResponseSucceeded(responseData.code)) return SetResponse(res, responseData);
+
+        var data = {
+            forfeitId: userId,
+            matchId: responseData.matchId,
+            newPlayerRatings: responseData.newPlayerRatings,
+        }
+
+        res.sendStatus(responseData.code);
+        SendSocketMessage('match' + responseData.data, "forfeit", data);
     } catch (err){
         console.error(err);
         res.sendStatus(500);
