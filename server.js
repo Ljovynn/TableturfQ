@@ -66,7 +66,7 @@ const server = app.listen(port, () => {
     
     StartDiscordBot();
 
-    DeleteUnfinishedMatches();
+    //DeleteUnfinishedMatches();
 });
 
 CreateSocketConnection(server);
