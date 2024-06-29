@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from "discord.js";
 import { GetLeaderboardAtPos } from "../../userListManager.js";
-import { embedColor } from '../constants.js';
+import { embedColor } from '../utils/constants.js';
 import { GetRank } from "../../public/constants/rankData.js";
 const hitsPerPage = 15;
 
@@ -16,8 +16,6 @@ export async function execute(interaction) {
     const startPosition = interaction.options.getInteger('position') ?? 1;
     var leaderboardData = GetLeaderboardAtPos(startPosition - 1, hitsPerPage);
     var leaderboard = leaderboardData.result;
-
-
 
     var leaderboardsFields = [ 
     {

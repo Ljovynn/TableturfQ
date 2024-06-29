@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { embedColor } from '../constants.js';
+import { embedColor } from '../utils/constants.js';
 import { SlashCommandBuilder } from "discord.js";
 import { uniqueCards, unique312s } from "../../cards/cardManager.js";
 import { BuildSimpleEmbed } from "../utils/embed.js";

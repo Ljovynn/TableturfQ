@@ -1,7 +1,7 @@
 import { SlashCommandBuilder, PermissionFlagsBits } from "discord.js";
 import { CheckIfAnnouncementExistsById, DeleteAnnouncementById, SetNewAnnouncement } from "../../announcementManager.js";
 import { BuildSimpleEmbed } from "../utils/embed.js";
-import { embedColor } from "../constants.js";
+import { embedColor } from "../utils/constants.js";
 import { DetailMinute } from "../../utils/date.js";
 
 export const data = new SlashCommandBuilder()

@@ -3,7 +3,7 @@ import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import fs from 'node:fs';
 import path from 'path';
-import { embedColor } from './constants.js';
+import { embedColor } from './utils/constants.js';
 import { BuildSimpleEmbed } from './utils/embed.js';
 
 dotenv.config();

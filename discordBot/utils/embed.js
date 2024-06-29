@@ -1,4 +1,4 @@
-import { embedColor } from "../constants.js";
+import { embedColor } from "./constants.js";
 
 export function BuildSimpleEmbed(title, name, value){
     const embed = {
