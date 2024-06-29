@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { GetGlobalMatchHistory } from '../matchHistoryManager.js';
 import { CheckUserDefined } from '../utils/checkDefined.js';
+import { SetResponse } from '../Responses/ResponseData.js';
 import { GetMultipleUserDatas, GetUserMatchHistory } from '../database.js';
 import { ApplyHideRank } from '../utils/userUtils.js';
 
