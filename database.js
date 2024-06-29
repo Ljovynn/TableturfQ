@@ -291,7 +291,7 @@ export async function SetUserDiscordTokens(userId, discordAccessToken, discordRe
 }*/
 
 export async function DeleteUnfinishedMatches(){
-    await pool.execute(`DELETE FROM matches WHERE result = 0`);
+    await pool.query(`DELETE FROM matches WHERE result = 0`);
 }
 
 export async function DeleteSession(sessionId){
