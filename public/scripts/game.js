@@ -101,6 +101,9 @@ var starters = [];
 var counterpicks = [];
 var pickingStage = false;
 
+// Suppress the opponent left socket if the current user is the one who left the match
+var userLeft = false;
+
 // Just the map for set length -> best of N
 var bestOfSets = {
     1: 1,
@@ -259,10 +262,19 @@ playerResolveDispute.addEventListener('click', async (e) => {
 
 leaveMatch.addEventListener('click', async (e) => {
     if ( casualMatch ) {
+        userLeft = true;
         var data = {userId: userID};
         var response = await postData('/match/CasualMatchEnd', data);
         console.log(response);
         window.location.href = '/';
+    } else {
+        if ( window.confirm('Are you sure you want to leave the match? It will be considered a forfeit and result in a loss.') ) {
+            userLeft = true;
+            var data = { userId: userID };
+            var response = await postData('/match/ForfeitMatch', data);
+            console.log(response);
+            window.location.href = '/';
+        }
     }
 });
 
@@ -867,9 +879,21 @@ socket.on('matchWin', async (data) => {
 });
 
 socket.on('matchEnd', async (data) => {
-    alert('Your opponent has left the match.');
-    requeueButton.style.display = 'block';
-    leaveMatch.style.display = 'none';
+    if ( !userLeft ) {
+        alert('Your opponent has left the match.');
+        confirmationMessage.innerHTML = 'Your opponent has left the match.';
+        requeueButton.style.display = 'block';
+        leaveMatch.style.display = 'none';
+    }
+});
+
+socket.on('forfeit', async (data) => {
+    if ( !userLeft ) {
+        alert('Your opponent has forfeited the match.');
+        confirmationMessage.innerHTML = 'Your opponent has forfeited the match.';
+        requeueButton.style.display = 'block';
+        leaveMatch.style.display = 'none';
+    }
 });
 
 socket.on('dispute', async () => {
