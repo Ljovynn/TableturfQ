@@ -181,7 +181,9 @@ export async function SendNewSuspiciousAction(suspiciousAction){
 			if (!user) continue;
 
 			var field = {
-				name: `User ${user.username}, ID ${user.id} at ${suspiciousActionsList[i].timestamp}:`,
+				name: `User ${user.username}
+				ID ${user.id}
+				at ${suspiciousActionsList[i].timestamp}:`,
 				value: suspiciousActionsList[i].description,
 			}
 			fields.push(field)

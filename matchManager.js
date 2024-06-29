@@ -232,7 +232,7 @@ export async function PlayerSentGameWin(playerId, winnerId){
 
         if (CheckMatchWin(match, winnerId)){
             if (match.createdAt < Date.now() + (5 * 60 * 1000)){
-                const suspiciousAction = new SuspiciousAction(winnerId.toString(), `User won a ranked match against user ID ${match.players[winnerPos % 2].id} in less than 5 minutes`, `${DetailMinute(new Date(Date.now()))} UTC`);
+                const suspiciousAction = new SuspiciousAction(winnerId.toString(), `Won a ranked match against user ID ${match.players[winnerPos % 2].id} in less than 5 minutes`, `${DetailMinute(new Date(Date.now()))} UTC`);
                 SendNewSuspiciousAction(suspiciousAction);
             }
 
@@ -300,7 +300,7 @@ export async function PlayerSentForfeit(playerId){
     result.newPlayerRatings = await HandleRankedMatchWin(match);
     if (!result.newPlayerRatings) return databaseErrors.matchFinishError;
 
-    const suspiciousAction = new SuspiciousAction(playerId.toString(), `User forfeited a ranked match against user ID ${match.players[playerPos % 2].id}`, `${DetailMinute(new Date(Date.now()))} UTC`);
+    const suspiciousAction = new SuspiciousAction(playerId.toString(), `Forfeited a ranked match against user ID ${match.players[playerPos % 2].id}`, `${DetailMinute(new Date(Date.now()))} UTC`);
     SendNewSuspiciousAction(suspiciousAction);
 
     return new ResponseData(201, result);
@@ -326,7 +326,7 @@ export async function PlayerSentCasualMatchEnd(playerId){
     if (!await FinishMatch(match)) return databaseErrors.matchFinishError;
 
     if (match.createdAt < Date.now() + (30 * 1000)){
-        const suspiciousAction = new SuspiciousAction(playerId.toString(), 'User ended a casual match within 30 seconds', `${DetailMinute(new Date(Date.now()))} UTC`);
+        const suspiciousAction = new SuspiciousAction(playerId.toString(), 'Ended a casual match within 30 seconds', `${DetailMinute(new Date(Date.now()))} UTC`);
         SendNewSuspiciousAction(suspiciousAction);
     }
 
