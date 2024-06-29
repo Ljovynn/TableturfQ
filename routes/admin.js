@@ -150,7 +150,6 @@ router.post("/ModChatMessage", async (req, res) => {
         if (userError) return res.status(userError.code).send(userError.data);
 
         var responseData = await ModSentChatMessage(matchId, userId, message)
-        console.log(responseData);
         if (!ResponseSucceeded(responseData.code)) return SetResponse(res, responseData);
 
         res.sendStatus(responseData.code);
