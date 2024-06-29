@@ -525,9 +525,17 @@ function resetStages() {
             stage.style.display = 'inline-block';
         }
     } else {
+        for ( let stage of stages ) {
+            stage.classList.remove('stage-selectable');
+            stage.classList.add('stage-unselectable');
+            stage.classList.add('stage-stricken');
+            stage.style.display = 'none';
+        }
+
         for ( let starter of starters ) {
             var stage = document.querySelectorAll('[stage-value="' + starter + '"]')[0];
             stage.classList.remove('stage-stricken');
+            stage.classList.remove('stage-unselectable');
             stage.classList.add('stage-selectable');
             stage.style.display = 'inline-block';
         }
@@ -758,6 +766,8 @@ async function resetGame() {
     resetStages();
     setStrikeAmount();
     setCurrentStriker();
+    pickingStage = false;
+    mapSelect = false;
 }
 
 function gameFinish(winnerId) {
@@ -905,7 +915,8 @@ socket.on('dispute', async () => {
     console.log(match);
 });
 
-socket.on('resolveDispute', async () => {
+socket.on('resolveDispute', async (resolveOption) => {
+    console.log(resolveOption);
     alert('The dispute has been resolved.');
     await setMatchInfo();
     console.log(match);
