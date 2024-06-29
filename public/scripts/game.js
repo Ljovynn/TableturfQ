@@ -650,6 +650,8 @@ function setCurrentStriker() {
         currentStrikerName.innerHTML = name + ' is currently picking the map to play on.';
         strikeInfo.innerHTML = 'Select the map to play on.';
     }
+
+    currentStrikerName.style.display = 'block';
 }
 
 function isPlayerStriker() {
@@ -786,6 +788,8 @@ function gameFinish(winnerId) {
     } else {
         name = players[1].username;
     }
+
+    leaveMatch.style.display = 'none';
 
     confirmationMessage.style.display = 'none';
     gameMessage.style.display = 'block';
