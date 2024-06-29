@@ -243,18 +243,15 @@ router.post("/GetMatchInfo", async (req, res) => {
             match = ConvertDBMatchToMatch(matchData, gameData, strikeData, chatMessages);
         }
 
-        var players = []
-        if (match.players[0].id != 0){
+        var players = [null, null]
+        if (match.players[0].id !== null){
             players[0] = await GetUserData(match.players[0].id);
-            ApplyHideRank(players[0]);
-        } else {
-            players[0] = null;
+            players[0].g2_rating = ApplyHideRank(players[0]);
         }
-        if (match.players[1].id != 0){
+
+        if (match.players[1].id !== null){
             players[1] = await GetUserData(match.players[1].id);
-            ApplyHideRank(players[1]);
-        } else {
-            players[1] = null;
+            players[1].g2_rating = ApplyHideRank(players[1]);
         }
 
         //check if user has access

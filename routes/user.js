@@ -89,7 +89,7 @@ router.post("/GetUsers", async (req, res) => {
         const users = await GetMultipleUserDatas(userIdList);
 
         for (let i = 0; i < users.length; i++){
-            ApplyHideRank(users[i]);
+            users[i].g2_rating = ApplyHideRank(users[i]);
         }
 
         res.status(200).send(users);
@@ -140,7 +140,7 @@ router.get("/GetUserInfo", async (req, res) => {
         var user = await GetCurrentUser(req);
         if (!user) return SetResponse(res, userErrors.notLoggedIn);
 
-        ApplyHideRank(user);
+        user.g2_rating = ApplyHideRank(user);
 
         var queData = FindIfPlayerInQue(user.id);
         var readyData = FindIfPlayerWaitingForReady(user.id);

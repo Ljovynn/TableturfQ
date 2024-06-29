@@ -64,7 +64,7 @@ async function GetUsers(matches){
     const users = await GetMultipleUserDatas(userIdList);
 
     for (let i = 0; i < users.length; i++){
-        ApplyHideRank(users[i]);
+        users[i].g2_rating = ApplyHideRank(users[i]);
     }
 
     return users;
