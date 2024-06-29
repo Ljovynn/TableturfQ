@@ -260,7 +260,7 @@ router.post("/GetMatchInfo", async (req, res) => {
         //check if user has access
         if (!CheckIfPlayerIsId(players[0], userId) && !CheckIfPlayerIsId(players[1], userId) && userRole != userRoles.mod){
             if (matchHidden) return SetResponse(res, userErrors.noAccess);
-            match.chatMessages = [];
+            match.chat = [];
         }
 
         var othersInChatIds = [];
@@ -291,7 +291,8 @@ router.post("/GetMatchInfo", async (req, res) => {
 
 function CheckIfPlayerIsId(player, id){
     if (!player) return false;
-    if (player.id == id) return true;
+    if (player.id === id) return true;
+    return false;
 }
 
 export default router;
