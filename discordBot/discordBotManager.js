@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import path from 'path';
 import { embedColor } from './utils/constants.js';
 import { BuildSimpleEmbed } from './utils/embed.js';
+import { GetUserData } from '../database.js';
 
 dotenv.config();
 
@@ -172,12 +173,15 @@ export async function SendNewSuspiciousAction(suspiciousAction){
 	try {
 		if (!channel) return;
 
+		var user = await GetUserData(suspiciousActionsList[i].userId);
+		if (!user) return;
+
 		//build embed
 		var fields = [];
 
 		for (let i = 0; i < suspiciousActionsList.length; i++){
 			var field = {
-				name: `User ID ${suspiciousActionsList[i].userId} at ${suspiciousActionsList[i].timestamp}:`,
+				name: `User ${user.username}, ID ${user.id} at ${suspiciousActionsList[i].timestamp}:`,
 				value: suspiciousActionsList[i].description,
 			}
 			fields.push(field)
