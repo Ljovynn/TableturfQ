@@ -95,15 +95,21 @@ logoutButton.addEventListener('click', async (e) => {
 });
 
 async function getUserInfo() {
-    var data = {};
-    var result = await fetchData('/user/GetUserInfo');
-    return result;
+    try {
+        var data = {};
+        var result = await fetchData('/user/GetUserInfo');
+        return result;
+    } catch (error) {
+        return null;
+    }
 }
 
 async function setUserInfo() {
     try {
         loggedInUserInfo = await getUserInfo();
-        loggedInUserID = loggedInUserInfo.user.id;
+        if ( loggedInUserInfo ) {
+            loggedInUserID = loggedInUserInfo.user.id;
+        }
         // If no playerID is set, try the default get current user info
         if ( playerID != '' ) {
             userInfo = await getMatchUsers([playerID]);
@@ -137,7 +143,7 @@ async function setUserInfo() {
         hideNonUserElements();
     } catch (error) {
         console.log(error);
-        window.location.href = '/';
+        //window.location.href = '/';
     }
 }
 
@@ -224,7 +230,7 @@ function getMatchPlayer( matchUsers, playerId ) {
 }
 
 function hideNonUserElements() {
-    if ( playerID != loggedInUserID ) {
+    if ( userId != loggedInUserID ) {
         editDisplayName.style.display = 'none';
         logoutButton.style.display = 'none';
     }

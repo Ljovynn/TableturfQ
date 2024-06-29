@@ -173,13 +173,13 @@ export async function SendNewSuspiciousAction(suspiciousAction){
 	try {
 		if (!channel) return;
 
-		var user = await GetUserData(suspiciousActionsList[i].userId);
-		if (!user) return;
-
 		//build embed
 		var fields = [];
 
 		for (let i = 0; i < suspiciousActionsList.length; i++){
+			var user = await GetUserData(suspiciousActionsList[i].userId);
+			if (!user) continue;
+
 			var field = {
 				name: `User ${user.username}, ID ${user.id} at ${suspiciousActionsList[i].timestamp}:`,
 				value: suspiciousActionsList[i].description,
