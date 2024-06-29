@@ -24,6 +24,9 @@ const matchHistory = document.getElementById('user-match-history');
 // Logout
 const logoutButton = document.getElementById('logout-button');
 
+var loggedInUserInfo;
+var loggedInUserID = '';
+
 // User vars
 var user;
 var userId;
@@ -38,7 +41,7 @@ var rank;
 var matchList;
 var matches;
 var matchUsers;
-var playerID = 0;
+var playerID = '';
 
 try {
     const url = window.location.href;
@@ -99,12 +102,14 @@ async function getUserInfo() {
 
 async function setUserInfo() {
     try {
+        loggedInUserInfo = await getUserInfo();
+        loggedInUserID = loggedInUserInfo.user.id;
         // If no playerID is set, try the default get current user info
-        if ( playerID != 0 ) {
+        if ( playerID != '' ) {
             userInfo = await getMatchUsers([playerID]);
             user = userInfo[0];
         } else {
-            userInfo = await getUserInfo();
+            userInfo = loggedInUserInfo;
             user = userInfo.user;
         }
 
@@ -140,7 +145,7 @@ async function getMatchHistory() {
     var page = 1;
     var hits = 10;
     var data = {};
-    if ( playerID != 0 ) {
+    if ( playerID != '' ) {
         data = { userId: playerID, pageNumber: parseInt(page), hitsPerPage: parseInt(hits) };
     } else {
         data = { userId: userId, pageNumber: parseInt(page), hitsPerPage: parseInt(hits) };
@@ -219,7 +224,7 @@ function getMatchPlayer( matchUsers, playerId ) {
 }
 
 function hideNonUserElements() {
-    if ( playerID != 0 ) {
+    if ( playerID != loggedInUserID ) {
         editDisplayName.style.display = 'none';
         logoutButton.style.display = 'none';
     }
