@@ -141,9 +141,9 @@ async function getMatchHistory() {
     var hits = 10;
     var data = {};
     if ( playerID != 0 ) {
-        data = { userId: parseInt(playerID), pageNumber: parseInt(page), hitsPerPage: parseInt(hits) };
+        data = { userId: playerID, pageNumber: parseInt(page), hitsPerPage: parseInt(hits) };
     } else {
-        data = { userId: parseInt(userId), pageNumber: parseInt(page), hitsPerPage: parseInt(hits) };
+        data = { userId: userId, pageNumber: parseInt(page), hitsPerPage: parseInt(hits) };
     }
     var result = await getData('/matchHistory/GetUserMatchHistory', data);
     return result;

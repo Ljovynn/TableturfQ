@@ -31,7 +31,7 @@ if ( isAdmin ) {
     	var matchId = resolutionButton.value;
     	var resolveOption = document.getElementById('match-resolve-' + matchId);
 
-        var data = { matchId: parseInt(matchId), resolveOption: parseInt(resolveOption) };
+        var data = { matchId: matchId, resolveOption: parseInt(resolveOption) };
         var response = await postData('/admin/ResolveDispute', data);
         console.log(response);
         
@@ -128,7 +128,7 @@ async function setListeners() {
 		    	var matchId = resolutionButton.value;
 		    	var resolveOption = document.getElementById('match-action-' + matchId);
 
-		        var data = { matchId: parseInt(matchId), resolveOption: parseInt(resolveOption.value) };
+		        var data = { matchId: matchId, resolveOption: parseInt(resolveOption.value) };
 		        var response = await postData('/admin/ResolveDispute', data);
 		        console.log(response);
 		        if ( response == 201 ) {
