@@ -247,14 +247,12 @@ router.post("/GetMatchInfo", async (req, res) => {
         if (match.players[0].id !== null){
             players[0] = await GetUserData(match.players[0].id);
             players[0].g2_rating = ApplyHideRank(players[0]);
-            console.log("player 1 after hide");
         }
 
         if (match.players[1].id !== null){
             players[1] = await GetUserData(match.players[1].id);
             players[1].g2_rating = ApplyHideRank(players[1]);
         }
-        console.log("player 1 after hide: " + JSON.stringify(players[0]));
 
         //check if user has access
         if (!CheckIfPlayerIsId(players[0], userId) && !CheckIfPlayerIsId(players[1], userId) && userRole != userRoles.mod){
