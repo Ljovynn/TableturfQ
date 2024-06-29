@@ -156,7 +156,7 @@ export async function SetMatchResult(match){
 
     var ranked = (match.mode == matchModes.ranked);
 
-    await pool.execute(`INSERT INTO matches (id, player1_id, player2_id, ranked) VALUES (?, ?, ?, ?)`, [match.id, match.players[0].id, match.players[1].id, ranked]);
+    await pool.execute(`INSERT INTO matches (id, player1_id, player2_id, ranked, result) VALUES (?, ?, ?, ?, ?)`, [match.id, match.players[0].id, match.players[1].id, ranked, match.status]);
 
     CreateFirstGameStrikes(match);
 
@@ -206,6 +206,7 @@ async function CreateCounterpickGameAndStrikes(match, gameNumber){
         data[i] = [gameId, game.strikes[i], winnerPos];
     }
 
+    if (data.length == 0) return;
     await pool.query(`INSERT INTO stage_strikes (game_id, stage, strike_owner) VALUES ?`, [data.map(strike => [strike[0], strike[1], strike[2]])]);
 }
 
