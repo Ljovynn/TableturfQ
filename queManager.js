@@ -86,7 +86,7 @@ export async function MatchMakingTick(){
     for (let i = 0; i < newlyMatchedPlayers.length; i++){
         if (newlyMatchedPlayers[i].matchMode == matchModes.casual){
             RemovePlayersFromQue(ques[0].queArr, newlyMatchedPlayers[i].players[0], newlyMatchedPlayers[i].players[1]);
-            var match = await MakeNewMatch(newlyMatchedPlayers[i].players[0], newlyMatchedPlayers[i].players[1], newlyMatchedPlayers[i].matchMode);
+            var match = MakeNewMatch(newlyMatchedPlayers[i].players[0], newlyMatchedPlayers[i].players[1], newlyMatchedPlayers[i].matchMode);
 
             var player1Room = "queRoom" + match.players[0].id.toString();
             var player2Room = "queRoom" + match.players[1].id.toString();
@@ -249,7 +249,7 @@ export async function PlayerSentReady(playerId){
 async function CheckIfBothPlayersReady(matchingPlayersListIndex){
     var matchingPlayers = matchingPlayersList[matchingPlayersListIndex];
     if (matchingPlayers.players[0].ready && matchingPlayers.players[1].ready){
-        var match = await MakeNewMatch(matchingPlayers.players[0].id, matchingPlayers.players[1].id, matchingPlayers.matchMode);
+        var match = MakeNewMatch(matchingPlayers.players[0].id, matchingPlayers.players[1].id, matchingPlayers.matchMode);
         matchingPlayersList.splice(matchingPlayersListIndex, 1);
         return match;
     }
