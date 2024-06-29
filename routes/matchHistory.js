@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import { GetGlobalMatchHistory } from '../matchHistoryManager.js';
+import { CheckUserDefined } from '../utils/checkDefined.js';
 import { GetMultipleUserDatas, GetUserMatchHistory } from '../database.js';
 import { ApplyHideRank } from '../utils/userUtils.js';
-import { CheckUserDefined } from '../utils/checkDefined.js';
 
 const router = Router();
 
@@ -15,10 +15,9 @@ const matchHistoryHitsPerPage = 10;
 router.post("/GetUserMatchHistory", async (req, res) => {
     try{
         var userId = req.body.userId;
-        var pageNumber = req.body.pageNumber;
-        var matchHistoryHitsPerPage = req.body.hitsPerPage;
+        var pageNumber = req.pageNumber;
 
-        if (typeof(userId) !== 'number'){
+        if (typeof(userId) !== 'string'){
             userId = req.session.user;
             if (!CheckUserDefined(req)) return SetResponse(res, definitionErrors.userNotDefined);
         } 
@@ -29,7 +28,8 @@ router.post("/GetUserMatchHistory", async (req, res) => {
 
         var matchHistory = await GetUserMatchHistory(userId, matchHistoryHitsPerPage, pageNumber);
 
-        const users = await GetUsers(matchHistory);
+        var users = null;
+        if (matchHistory.length > 0) users = await GetUsers(matchHistory);
 
         res.status(200).send({matchHistory, users});
     } catch(error){

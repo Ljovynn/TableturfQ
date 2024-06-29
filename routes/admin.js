@@ -21,7 +21,7 @@ router.post("/ResolveDispute", async (req, res) => {
         const matchId = req.body.matchId;
         const resolveOption = req.body.resolveOption;
 
-        if (typeof(matchId) !== 'number') return SetResponse(res, definitionErrors.matchUndefined);
+        if (typeof(matchId) !== 'string') return SetResponse(res, definitionErrors.matchUndefined);
         if (typeof(resolveOption) !== 'number') return SetResponse(res, definitionErrors.resolveOptionUndefined);
 
         var userError = await CheckIfNotAdmin(req);
@@ -78,7 +78,7 @@ router.post("/BanUser", async (req, res) => {
         const bannedUserId = req.session.bannedUserId;
         const banLength = req.body.expiresAt;
 
-        if (typeof(bannedUserId) !== 'number') return SetResponse(res, definitionErrors.bannedUserUndefined);
+        if (typeof(bannedUserId) !== 'string') return SetResponse(res, definitionErrors.bannedUserUndefined);
         if (typeof(banLength) !== 'number' && typeof(banLength) !== 'undefined') return SetResponse(res, definitionErrors.banLengthWrongFormat);
 
         var userError = await CheckIfNotAdmin(req);
@@ -121,7 +121,7 @@ router.post("/UnbanUser", async (req, res) => {
     try {
         const unbannedUserId = req.session.unbannedUserId;
 
-        if (typeof(unbannedUserId) !== 'number') return SetResponse(res, definitionErrors.unbannedUserUndefined);
+        if (typeof(unbannedUserId) !== 'string') return SetResponse(res, definitionErrors.unbannedUserUndefined);
 
         var userError = await CheckIfNotAdmin(req);
         if (userError) return SetResponse(res, userError);
@@ -143,7 +143,7 @@ router.post("/ModChatMessage", async (req, res) => {
         const matchId = req.body.matchId;
         const message = req.body.message;
 
-        if (typeof(matchId) !== 'number') return SetResponse(res, definitionErrors.matchUndefined);
+        if (typeof(matchId) !== 'string') return SetResponse(res, definitionErrors.matchUndefined);
         if (typeof(message) !== 'string') return SetResponse(res, definitionErrors.chatMessageUndefined);
 
         var userError = await CheckIfNotAdmin(req);

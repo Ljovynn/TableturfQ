@@ -1,7 +1,8 @@
 import {matchStatuses, matchModes, Game, Match, ChatMessage, disputeResolveOptions} from "./public/constants/matchData.js";
+import { GenerateNanoId } from "./nanoIdManager.js";
 import { stages } from "./public/constants/stageData.js";
 import { ApplyMatchEloResults, placementMatchCount } from "./glicko2Manager.js";
-import { AddChatMessage, CreateMatch, GetMatch, GetUserRankedMatchCount, SetMatchResult, SetUserHideRank } from "./database.js";
+import { AddChatMessage, GetMatch, GetUserRankedMatchCount, SetMatchResult, SetUserHideRank } from "./database.js";
 import { FindPlayerPosInMatch } from "./utils/matchUtils.js";
 import { AddRecentlyMatchedPlayers } from "./queManager.js";
 import { SendDisputeMessage, SendNewSuspiciousAction, SuspiciousAction } from "./discordBot/discordBotManager.js";
@@ -39,7 +40,7 @@ export async function CancelOldMatches(cutoffTime){
     return result;
 }
 
-export async function MakeNewMatch(player1Id, player2Id, matchMode){
+export function MakeNewMatch(player1Id, player2Id, matchMode){
 
     //randomize player positions
 
@@ -56,8 +57,7 @@ export async function MakeNewMatch(player1Id, player2Id, matchMode){
         isRanked = true;
     }
 
-    const matchId = await CreateMatch(player1Id, player2Id, isRanked);
-    if (!matchId) return databaseErrors.matchCreateError;
+    const matchId = GenerateNanoId();
 
     var match = new Match(matchId, player1Id, player2Id, matchMode);
     matches.push(match);
@@ -212,10 +212,10 @@ export async function PlayerSentGameWin(playerId, winnerId){
 
     var game = match.gamesArr[match.gamesArr.length - 1];
 
-    if (game.winnerId == 0){
+    if (game.winnerId == null){
         game.winnerId = winnerId;
     } else if (game.winnerId != winnerId){
-        game.winnerId = 0;
+        game.winnerId = null;
 
         StartMatchDispute(match);
         data.dispute = true;
@@ -383,7 +383,7 @@ export function PlayerSentMatchDispute(playerId){
 function StartMatchDispute(match){
     match.players[0].gameConfirmed = false;
     match.players[1].gameConfirmed = false;
-    match.gamesArr[match.gamesArr.length - 1].winnerId = 0;
+    match.gamesArr[match.gamesArr.length - 1].winnerId = null;
     match.status = matchStatuses.dispute;
     SendDisputeMessage(GetDisputedMatchesList(), true);
 }

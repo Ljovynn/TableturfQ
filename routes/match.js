@@ -80,7 +80,7 @@ router.post("/WinGame", async (req, res) => {
         const winnerId = req.body.winnerId;
 
         if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
-        if (typeof(winnerId) !== 'number') return SetResponse(res, definitionErrors.winnerUndefined);
+        if (typeof(winnerId) !== 'string') return SetResponse(res, definitionErrors.winnerUndefined);
 
         var responseData = await PlayerSentGameWin(userId, winnerId);
         if (!ResponseSucceeded(responseData.code)) return SetResponse(res, responseData);
@@ -195,7 +195,7 @@ router.post("/SendChatMessage", async (req, res) => {
         const message = req.body.message;
 
         if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
-        if (typeof(matchId) !== 'number') return SetResponse(res, definitionErrors.matchUndefined);
+        if (typeof(matchId) !== 'string') return SetResponse(res, definitionErrors.matchUndefined);
         if (typeof(message) !== 'string') return SetResponse(res, definitionErrors.chatMessageUndefined);
 
         var responseData = await UserSentChatMessage(matchId, userId, message);
@@ -219,7 +219,7 @@ router.post("/GetMatchInfo", async (req, res) => {
         const matchId = req.body.matchId;
         const userId = req.session.user;
 
-        if (typeof(matchId) !== 'number') return SetResponse(res, definitionErrors.matchUndefined);
+        if (typeof(matchId) !== 'string') return SetResponse(res, definitionErrors.matchUndefined);
 
         const userRole = await GetUserRole(userId);
 

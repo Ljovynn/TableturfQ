@@ -8,6 +8,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 
 import { GetUserByDiscordId, CreateUserWithDiscord, SetUserDiscord, CreateUser, GetUserData, VerifyAccount } from '../database.js';
+import { GenerateNanoId } from '../nanoIdManager.js';
 import { CheckUserDefined } from '../utils/checkDefined.js';
 import { authErrors, databaseErrors } from '../Responses/authErrors.js';
 import { SetResponse } from '../Responses/ResponseData.js';
@@ -38,8 +39,8 @@ router.post("/unverified/login", async (req, res) => {
     if (username.length < usernameMinLength || username.length > usernameMaxLength) return SetResponse(res, definitionErrors.usernameWrongFormat);
     if (HasBadWords(username)) return SetResponse(res, definitionErrors.usernameContainsBadWord);
 
-    var userId = await CreateUser(username);
-    if (!userId) return SetResponse(databaseErrors.unverifiedCreateError);
+    const userId = GenerateNanoId();
+    await CreateUser(userId, username);
 
     await SerializeSession(req, userId);
 
@@ -81,7 +82,7 @@ router.get("/discord/redirect", async (req, res) => {
 
             const newUserId = await StoreUserData(access_token, refresh_token, userId);
 
-            if (!newUserId) return SetResponse(databaseErrors.verifiedCreateError);
+            if (!newUserId) return SetResponse(res, databaseErrors.verifiedCreateError);
             await SerializeSession(req, newUserId);
     
             //refresh token
@@ -126,7 +127,8 @@ async function StoreUserData(accessToken, refreshToken, userId){
     var newUser = await GetUserByDiscordId(response.data.id);
     var newUserId;
     if (!newUser){
-        newUserId = await CreateUserWithDiscord(response.data.username, response.data.id, accessToken, refreshToken, response.data.avatar);
+        newUserId = GenerateNanoId();
+        await CreateUserWithDiscord(newUserId, response.data.username, response.data.id, accessToken, refreshToken, response.data.avatar);
     } else {
         newUserId = newUser.id;
         await SetUserDiscord(newUserId, response.data.id, response.data.username, accessToken, refreshToken, response.data.avatar); 

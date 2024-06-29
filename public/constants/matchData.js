@@ -115,7 +115,7 @@ export function ChatMessage(content, ownerId){
 export function Game(){
     this.stage = stages.unpicked;
     this.strikes = [];
-    this.winnerId = 0;
+    this.winnerId = null;
 }
 
 export function Player(id){

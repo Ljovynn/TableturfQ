@@ -6,6 +6,7 @@ import { userRoles } from './public/constants/userData.js';
 import { FindPlayerPosInMatch } from './utils/matchUtils.js';
 import { settings } from './glicko2Manager.js';
 import { ConvertJSDateToTimestamp } from './utils/date.js';
+import { matchModes } from './public/constants/matchData.js';
 
 dotenv.config();
 
@@ -36,7 +37,7 @@ export async function GetMatch(matchId){
 }
 
 export async function GetRecentMatches(cutoff){
-    const [rows] = await pool.execute(`SELECT * FROM matches ORDER BY id DESC LIMIT ?`, [cutoff.toString()]);
+    const [rows] = await pool.execute(`SELECT * FROM matches ORDER BY created_at DESC LIMIT ?`, [cutoff.toString()]);
     return rows;
 }
 
@@ -97,7 +98,7 @@ export async function GetUserChatData(userIdArr){
 export async function GetUserMatchHistory(userId, hitsPerPage, pageNumber)
 {
     var offset = (pageNumber - 1) * hitsPerPage;
-    const [rows] = await pool.execute(`SELECT * FROM matches WHERE player1_id = ? OR player2_id = ? ORDER BY id DESC LIMIT ? OFFSET ?`, [userId, userId, hitsPerPage.toString(), offset.toString()]);
+    const [rows] = await pool.execute(`SELECT * FROM matches WHERE player1_id = ? OR player2_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?`, [userId, userId, hitsPerPage.toString(), offset.toString()]);
     return rows;
 }
 
@@ -151,9 +152,25 @@ export async function GetFutureAnnouncements(){
 
 //Create
 
-export async function CreateMatch(player1Id, player2Id, isRanked){
-    const result = await pool.execute(`INSERT INTO matches (player1_id, player2_id, ranked) VALUES (?, ?, ?)`, [player1Id, player2Id, isRanked]);
-    return result[0].insertId;
+export async function SetMatchResult(match){
+
+    var ranked = (match.mode == matchModes.ranked);
+
+    await pool.execute(`INSERT INTO matches (id, player1_id, player2_id, ranked) VALUES (?, ?, ?, ?)`, [match.id, match.players[0].id, match.players[1].id, ranked]);
+
+    CreateFirstGameStrikes(match);
+
+    for (let i = 1; i < match.gamesArr.length; i++){
+        CreateCounterpickGameAndStrikes(match, i + 1);
+    }
+
+    var chatData = [];
+    for (let i = 0; i < match.chat.length; i++){
+        chatData[i] = [match.id, i + 1, match.chat[i].ownerId, match.chat[i].content];
+    }
+
+    if (chatData.length == 0) return;
+    await pool.query(`INSERT INTO chat_messages (match_id, message_number, owner_id, content) VALUES ?`, [chatData.map(msg => [msg[0], msg[1], msg[2], msg[3]])]);
 }
 
 async function CreateFirstGameStrikes(match){
@@ -181,7 +198,7 @@ async function CreateFirstGameStrikes(match){
 async function CreateCounterpickGameAndStrikes(match, gameNumber){
     var game = match.gamesArr[gameNumber - 1];
     var winnerPos = FindPlayerPosInMatch(match, game.winnerId);
-    const result = await pool.query(`INSERT INTO games (match_id, stage, result) VALUES (?, ?, ?)`, [match.id, game.stage, winnerPos]);
+    const result = await pool.execute(`INSERT INTO games (match_id, stage, result) VALUES (?, ?, ?)`, [match.id, game.stage, winnerPos]);
 
     const gameId = result[0].insertId;
     var data = [];
@@ -192,17 +209,14 @@ async function CreateCounterpickGameAndStrikes(match, gameNumber){
     await pool.query(`INSERT INTO stage_strikes (game_id, stage, strike_owner) VALUES ?`, [data.map(strike => [strike[0], strike[1], strike[2]])]);
 }
 
-export async function CreateUser(username)
+export async function CreateUser(userId, username)
 {
-    const result = await pool.execute(`INSERT INTO users (username, g2_rating, g2_rd, g2_vol) VALUES (?, ?, ?, ?)`, [username, settings.rating, settings.rd, settings.vol]);
-    return result[0].insertId;
+    await pool.execute(`INSERT INTO users (id, username, g2_rating, g2_rd, g2_vol) VALUES (?, ?, ?, ?, ?)`, [userId, username, settings.rating, settings.rd, settings.vol]);
 }
 
-export async function CreateUserWithDiscord(discordUsername, discordId, discordAccessToken, discordRefreshToken, discordAvatarHash){
-    const result = await pool.execute(`INSERT INTO users (username, role, g2_rating, g2_rd, g2_vol, discord_id, discord_username, discord_access_token, discord_refresh_token, discord_avatar_hash) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [discordUsername, userRoles.verified, settings.rating, settings.rd, settings.vol, discordId, discordUsername, discordAccessToken, discordRefreshToken, discordAvatarHash]);
-    return result[0].insertId;
+export async function CreateUserWithDiscord(userId, discordUsername, discordId, discordAccessToken, discordRefreshToken, discordAvatarHash){
+    await pool.execute(`INSERT INTO users (id, username, role, g2_rating, g2_rd, g2_vol, discord_id, discord_username, discord_access_token, discord_refresh_token, discord_avatar_hash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [userId, discordUsername, userRoles.verified, settings.rating, settings.rd, settings.vol, discordId, discordUsername, discordAccessToken, discordRefreshToken, discordAvatarHash]);
 }
 
 /*export async function CreateSession(sessionId, expiresAt, data){
@@ -233,25 +247,6 @@ export async function AddChatMessage(matchId, ownerId, content){
 
 
 //Update
-export async function SetMatchResult(match){
-
-    const matchResult = match.status;
-    await pool.execute(`UPDATE matches SET result = ? WHERE id = ?`, [matchResult, match.id]);
-
-    CreateFirstGameStrikes(match);
-
-    for (let i = 1; i < match.gamesArr.length; i++){
-        CreateCounterpickGameAndStrikes(match, i + 1);
-    }
-
-    var chatData = [];
-    for (let i = 0; i < match.chat.length; i++){
-        chatData[i] = [match.id, i + 1, match.chat[i].ownerId, match.chat[i].content];
-    }
-
-    if (chatData.length == 0) return;
-    await pool.query(`INSERT INTO chat_messages (match_id, message_number, owner_id, content) VALUES ?`, [chatData.map(msg => [msg[0], msg[1], msg[2], msg[3]])]);
-}
 
 export async function SetUserRole(userId, role){
     await pool.execute(`UPDATE users SET role = ? WHERE id = ?`, [role, userId]);
