@@ -34,7 +34,7 @@ export function CreateSocketConnection (server){
             if (room == 'queRoom'){
                 if (!userId) return; 
 
-                var userQueRoom = 'queRoom' + userId.toString();
+                var userQueRoom = 'queRoom' + userId;
                 socket.join(userQueRoom);
                 return;
             }
@@ -58,21 +58,21 @@ export function CreateSocketConnection (server){
 
 async function SocketJoinMatchRoom(socket, room){
     const userId = socket.request.session.user;
-    const roomId = +room.slice(5);
+    const roomId = room.slice(5);
     if (!roomId) return;
 
     //find if user in active match
-    if (FindIfPlayerInMatch(userId)) socket.join(room.toString());
+    if (FindIfPlayerInMatch(userId)) socket.join(room);
 
     //find if user is in inactive match
     const match = await GetMatch(roomId);
     if (match){
-        if (match.player1_id == userId || match.player2_id == userId) socket.join(room.toString());
+        if (match.player1_id == userId || match.player2_id == userId) socket.join(room);
     }
 
     //if user is mod
     const userRole = await GetUserRole(userId);
-    if (userRole == userRoles.mod) socket.join(room.toString());
+    if (userRole == userRoles.mod) socket.join(room);
 }
 
 export function SendSocketMessage(roomId, key, message){

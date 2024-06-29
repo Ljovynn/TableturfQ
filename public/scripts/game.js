@@ -163,7 +163,7 @@ for (let victoryButton of victoryButtons ) {
     victoryButton.addEventListener('click', async (e) => {
         console.log('Marked victory for ' + victoryButton.value);
         // Send off the victory mark event for the selected player and wait for the other player to submit the victor
-        var data = { winnerId: parseInt(victoryButton.value) };
+        var data = { winnerId: victoryButton.value };
         var response = await postData('/match/WinGame', data);
         console.log(response);
         if ( response == 201 ) {
@@ -186,10 +186,10 @@ chatForm.addEventListener('submit', async (e) => {
     if ( validateChatMessage(chatMessage) ) {
         var data;
         if ( user.role == 2 ) {
-            data = { matchId: parseInt(matchId), message: chatMessage };
+            data = { matchId: matchId, message: chatMessage };
             var response = await postData('/admin/ModChatMessage', data);
         } else {
-            data = { matchId: parseInt(matchId), userId: userID, message: chatMessage };
+            data = { matchId: matchId, userId: userID, message: chatMessage };
             var response = await postData('/match/SendChatMessage', data);
         }
         console.log('chat message send response: ' + response);
@@ -229,7 +229,7 @@ strikeButton.addEventListener('click', async (e) => {
 });
 
 adminResolveButton.addEventListener('click', async (e) => {
-    var data = { matchId: parseInt(matchId), resolveOption: parseInt(adminDisputeOptions.value) };
+    var data = { matchId: matchId, resolveOption: parseInt(adminDisputeOptions.value) };
     var response = await postData('/admin/ResolveDispute', data);
     console.log(response);
     if ( response == 201 ) {
@@ -283,7 +283,7 @@ async function setUserInfo() {
 }
 
 async function getMatchInfo(matchId) {
-    var data = {matchId: parseInt(matchId)};
+    var data = {matchId: matchId};
     console.log(data);
     var result = await getData('/match/GetMatchInfo', data);
     matchInfo = result;
@@ -810,7 +810,7 @@ function validateChatMessage(chatMessage) {
 
 // SOCKET FUNCTIONS
 
-socket.emit('join', 'match' + matchId.toString());
+socket.emit('join', 'match' + matchId);
 
 socket.on('chatMessage', (chatData) => {
     console.log(chatData);

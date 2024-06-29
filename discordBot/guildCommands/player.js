@@ -159,7 +159,7 @@ export async function execute(interaction) {
         const newRole = interaction.options.get('role').value;
         await SetUserRole(user.id, newRole);
 
-        const setRoleEmbed = BuildSimpleEmbed('Role set successfully', `Successfully set user **${user.username}** as role ID ${newRole}`, `Discord user: <@${discordUser.id}>`);
+        const setRoleEmbed = BuildSimpleEmbed('Role set successfully', `Successfully set user **${user.username}** as role ${roleOptions[newRole - 1].name}`, `Discord user: <@${discordUser.id}>`);
         await interaction.reply({ embeds: [setRoleEmbed] });
         return;
     } catch(error){
