@@ -284,6 +284,12 @@ export async function SetUserDiscordTokens(userId, discordAccessToken, discordRe
     [discordAccessToken, discordRefreshToken, userId]);
 }
 
+export async function UpdateRankDecay(decay, timeThreshold){
+    const cutoffDate = Date.now() - timeThreshold;
+    let timeStamp = ConvertJSDateToTimestamp(new Date(cutoffDate));
+    await pool.execute(`UPDATE users u SET g2_rating = u.g2_rating - ? WHERE NOT EXISTS (SELECT * FROM matches m WHERE (m.player1_id = u.id OR m.player2_id = u.id) AND m.created_at > ?)`, [decay, timeStamp]);
+}
+
 //delete
 
 /*export async function DeleteChatMessage(matchId, messageNumber){
