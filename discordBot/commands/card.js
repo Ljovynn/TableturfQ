@@ -2,7 +2,7 @@ import { SlashCommandBuilder } from "discord.js";
 import { GetCardById, GetCardByName, GetCardListByLanguage } from "../../cards/cardManager.js";
 import { SanitizeString } from "../../utils/string.js";
 import { uniqueCards } from "../../cards/cardManager.js";
-import { embedColor } from '../constants.js';
+import { embedColor } from '../utils/constants.js';
 
 export const data = new SlashCommandBuilder()
     .setName('card')
