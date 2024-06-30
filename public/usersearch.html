@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <meta name="title" property="og:title" content="TableturfQ"/>
+		<meta name="description" property="og:description" content="Tableturf Matchmaking!"/>
+        <title>TableturfQ</title>
+        <link rel="stylesheet" href="./style.css">
+    </head>
+    <body class="body">
+        <header>
+            <h1><a href="/">TableturfQ</a></h1>
+            <h3>User Search</h3>
+        </header>
+        <main class="main">
+            <form id="user-search-form">
+                <input id="user-search" type="text" placeholder="Search for a player" />
+                <input id="user-search-button" type="submit" value="Search" />
+            </form>
+            <div id="user-search-results">
+                <div></div>
+            </div>
+        </main>
+    </body>
+    <script type="text/javascript" src="./scripts/dataPOST.js"></script>
+    <script type="module" src="./scripts/usersearch.js"></script>
+</html>
