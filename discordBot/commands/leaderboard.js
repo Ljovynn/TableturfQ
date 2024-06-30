@@ -42,7 +42,7 @@ export async function execute(interaction) {
         title: `🏆 TableturfQ Leaderboard [${startPosition}-${startPosition + leaderboard.length - 1}] 🏆`,
         fields: leaderboardsFields,
         footer: {
-        text: `Total players: ${leaderboardData.totalPlayers}`,
+        text: `Total ranked players: ${leaderboardData.totalPlayers}`,
         }
     };
 

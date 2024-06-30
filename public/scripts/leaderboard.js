@@ -32,6 +32,13 @@ leaderBoardForm.addEventListener('submit', async (e) => {
     }
 });
 
+searchInput.addEventListener('input', async (e) => {
+    if ( searchInput.value == '' ) {
+        refreshLeaderBoard(startPos, hitCount);
+        setLeaderBoard(startPos, hitCount);
+    }
+});
+
 pageFilter.addEventListener('change', (e) => {
     hitCount = pageFilter.value;
     // Reset startPos too?
@@ -150,6 +157,8 @@ function addSearchedUser(users) {
             let countryElement = document.createElement('img');
             countryElement.src = 'https://flagcdn.com/w20/' + user.user.country + '.png';
             userLink.append(countryElement);
+            flagSpace = document.createTextNode("\u00A0");
+            userLink.append(flagSpace);
         }
 
         userLink.append(user.user.username);
