@@ -268,6 +268,9 @@ function countdownTimer() {
             alert('Your opponent did not ready up for the match and it has been canceled.');
         }
         matchMakingReady.style.display = 'none';
+        for ( let queueButton of queueButtons ) {
+            queueButton.style.display = 'inline-block';
+        }
     }
 
 }
