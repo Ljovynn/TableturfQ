@@ -148,8 +148,10 @@ function addSearchedUser(users) {
 
         if ( user.user.country ) {
             let countryElement = document.createElement('img');
-            countryElement.src = 'https://flagcdn.com/w20/' + user.user.country + '.png';
+            countryElement.src = 'https://flagcdn.com/w20/' + user.country + '.png';
             userLink.append(countryElement);
+            flagSpace = document.createTextNode("\u00A0");
+            userLink.append(flagSpace);
         }
 
         userLink.append(user.user.username);
