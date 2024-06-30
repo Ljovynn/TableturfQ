@@ -77,6 +77,12 @@ h3 {
     width: 50%;
 }
 
+#recent-matches {
+    display: none;
+    width: 50%;
+    margin: auto;
+}
+
 #ranked-match-ready {
     display: none;
 }

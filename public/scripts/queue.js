@@ -10,6 +10,8 @@ const matchMakingReady = document.getElementById('ranked-match-ready');
 const queueTimer = document.getElementById('queue-timer');
 const queueInfo = document.getElementById('queue-info');
 const readyCountdown = document.getElementById('ranked-match-ready-countdown');
+const recentMatches = document.getElementById('recent-matches');
+const recentMatchesList = document.getElementById('recent-matches-list');
 
 // Interactable Elements
 const joinCompetetive = document.getElementById('join-competetive-queue');
@@ -33,6 +35,7 @@ var countdown;
 console.log(countdown);
 
 await setUserInfo();
+await getRecentMatches();
 
 joinCompetetive.addEventListener('click', async (e) => {
     console.log('User has joined the competetive queue');
@@ -148,6 +151,66 @@ function setQueueInfo(queueData) {
     mainTimer = window.setInterval(updateTimer, 1000);
 }
 
+async function getRecentMatches() {
+    var data = {};
+    var result = await fetchData('/matchHistory/GetRecentMatches');
+    console.log(result);
+    displayRecentMatches(result);
+}
+
+function displayRecentMatches(recentMatchData) {
+    var players = recentMatchData.users;
+    var matches = recentMatchData.recentMatches;
+    if ( matches.length > 0 ) {
+        for ( let match of matches ) {
+            let row = document.createElement('div');
+            row.classList.add('match-row');
+
+            let dateCell = document.createElement('div');
+            dateCell.classList.add('match-date');
+            var matchDate = match.created_at.split('T')[0];
+            dateCell.append(matchDate);
+
+            let matchupCell = document.createElement('div');
+           // var players = await getMatchUsers( [match.player1_id, match.player2_id] );
+            var player1 = getMatchPlayer(players, match.player1_id);
+            var player2 = getMatchPlayer(players, match.player2_id);
+            matchupCell.classList.add('matchup');
+            matchupCell.append(player1[0].username + ' vs ' + player2[0].username);
+
+            let outcomeCell = document.createElement('div');
+            outcomeCell.classList.add('match-outcome');
+            let outcome = '';
+            switch ( match.result ) {
+                case 0:
+                case 1:
+                case 2:
+                    outcome = 'In Game';
+                    break;
+                case 3:
+                    // player 1 win
+                    outcome = player1[0].username + ' Victory';
+                    break;
+                case 4:
+                    // player 2 win
+                    outcome = player2[0].username + ' Victory';
+                    break;
+                default:
+                    outcome = 'No Winner';
+                    break;
+            }
+            outcomeCell.append(outcome);
+
+            row.append(dateCell);
+            row.append(matchupCell);
+            row.append(outcomeCell);
+
+            recentMatchesList.append(row);
+        }
+        recentMatches.style.display = 'block';
+    }
+}
+
 function setReadyUp(readyData) {
     var timeStarted = Math.floor( readyData.timeWaitingStarted / 1000 );
     var timeNow = Math.floor(Date.now() / 1000);
@@ -217,6 +280,11 @@ function secondsToMS(d) {
     var s = Math.floor(d % 3600 % 60);
 
     return ('0' + m).slice(-2) + ":" + ('0' + s).slice(-2);
+}
+
+function getMatchPlayer( matchUsers, playerId ) {
+    var player = matchUsers.filter( (user) => user.id === playerId );
+    return player;
 }
 
 // SOCKET JS
