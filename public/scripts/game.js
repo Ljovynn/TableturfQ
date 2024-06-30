@@ -100,6 +100,7 @@ var mapSelect = false;
 var starters = [];
 var counterpicks = [];
 var pickingStage = false;
+var privateMatch = false;
 
 // Suppress the opponent left socket if the current user is the one who left the match
 var userLeft = false;
@@ -245,10 +246,12 @@ needHelp.addEventListener('click', async (e) => {
 });
 
 playerRaiseDispute.addEventListener('click', async (e) => {
-    var data = { userId: userID };
-    var response = await postData('/match/Dispute', data);
-    console.log(response);
-    playerRaiseDispute.style.display = 'none';
+    if ( !privateMatch ) {
+        var data = { userId: userID };
+        var response = await postData('/match/Dispute', data);
+        console.log(response);
+        playerRaiseDispute.style.display = 'none';
+    }
 });
 
 playerResolveDispute.addEventListener('click', async (e) => {
@@ -287,11 +290,20 @@ async function getUserInfo() {
 
 
 async function setUserInfo() {
-    var userInfo = await getUserInfo(userID);
+    try {
+        var userInfo = await getUserInfo(userID);
 
-    user = userInfo.user;
-    username = user.username;
-    userID = user.id;
+        user = userInfo.user;
+        username = user.username;
+        userID = user.id;
+    } catch (error) {
+        await getMatchInfo(matchId);
+        match = matchInfo.match;
+        console.log(match);
+        if ( match.status != 3 || match.status != 4 ) {
+            window.location.href = '/';  
+        }
+    }
 }
 
 async function getMatchInfo(matchId) {
@@ -322,6 +334,7 @@ async function setMatchInfo() {
     starters = match.mode.rulesetData.starterStagesArr;
     counterpicks = match.mode.rulesetData.counterPickStagesArr;
     counterpickStrikeAmount = match.mode.rulesetData.counterPickBans;
+    privateMatch = match.privateBattle;
 
     var player1DiscordId = players[0].discord_id;
     var player1DiscordAvatar = players[0].discord_avatar_hash;
@@ -422,6 +435,7 @@ async function setMatchInfo() {
     } else {
         setCasualGame();
     }
+    checkPrivateMatch();
 }
 
 // Grab all messages associated with the game and add them to the chat log
@@ -746,6 +760,12 @@ function setWinner(winnerId) {
     }
 }
 
+function checkPrivateMatch() {
+    if ( privateMatch ) {
+        playerRaiseDispute.style.display = 'none';
+    }
+}
+
 async function nextGame(winnerId) {
     mapSelect = false;
     playingStage.style.display = 'none';
@@ -805,7 +825,9 @@ function showModDispute() {
 }
 
 function showPlayerResolve() {
-    playerResolve.style.display = 'block';
+    if ( !privateMatch ) {
+        playerResolve.style.display = 'block';
+    }
 }
 
 async function getModUser(users) {
@@ -911,7 +933,9 @@ socket.on('forfeit', async (data) => {
 });
 
 socket.on('dispute', async () => {
-    alert('There has been a dispute in match results. Please wait for a moderator to resolve the issue. If the dispute was made by accident, please press the resolve dispute button and properly mark the winner.');
+    if ( !privateMatch ) {
+        alert('There has been a dispute in match results. Please wait for a moderator to resolve the issue. If the dispute was made by accident, please press the resolve dispute button and properly mark the winner.');
+    }
     await setMatchInfo();
     await showModDispute();
     await showPlayerResolve();
@@ -921,7 +945,9 @@ socket.on('dispute', async () => {
 
 socket.on('resolveDispute', async (resolveOption) => {
     console.log(resolveOption);
-    alert('The dispute has been resolved.');
+    if ( !privateMatch ) {
+        alert('The dispute has been resolved.');
+    }
     await setMatchInfo();
     console.log(match);
     // If the game or the match has to be reset, go through the reset function
