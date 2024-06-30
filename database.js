@@ -137,7 +137,7 @@ export async function GetSession(sessionId){
 }
 
 export async function GetUserList(){
-    const [rows] = await pool.execute (`SELECT id, username, g2_rating, hide_rank, discord_id, discord_avatar_hash, country FROM users u WHERE NOT EXISTS (SELECT * FROM ban_list WHERE user_id = u.id) AND role != 0`);
+    const [rows] = await pool.execute (`SELECT id, username, g2_rating, hide_rank, CAST(discord_id AS CHAR) discord_id, discord_avatar_hash, country FROM users u WHERE NOT EXISTS (SELECT * FROM ban_list WHERE user_id = u.id) AND role != 0`);
     return rows;
 }
 
