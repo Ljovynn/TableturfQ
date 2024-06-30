@@ -1,3 +1,5 @@
+import { PublicQueDatas } from "../constants/queData.js";
+
 // Elements
 const loading = document.getElementById('loading');
 const competetiveQueue = document.getElementById('competetive-queue');
@@ -27,7 +29,8 @@ var user;
 var userID = 0;
 
 var timer = 0;
-var countdown = 300;
+var countdown;
+console.log(countdown);
 
 await setUserInfo();
 
@@ -149,7 +152,7 @@ function setReadyUp(readyData) {
     var timeStarted = Math.floor( readyData.timeWaitingStarted / 1000 );
     var timeNow = Math.floor(Date.now() / 1000);
     var timeElapsed = timeNow - timeStarted;
-    countdown = 300;
+    countdown = PublicQueDatas[queuedMatchMode].readyTimer;
     countdown = countdown - timeElapsed;
     matchMakingReady.style.display = 'block';
     ready = readyData.ready;
@@ -222,7 +225,7 @@ socket.emit('join', 'queRoom');
 socket.on('matchFound', () => {
     console.log('Socket event match ready');
     timer = 0;
-    countdown = 300;
+    countdown = PublicQueDatas[queuedMatchMode].readyTimer;
     queueInfo.style.display = 'none';
     matchMakingReady.style.display = 'block';
     ready = false;
