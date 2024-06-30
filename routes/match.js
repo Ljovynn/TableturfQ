@@ -255,9 +255,12 @@ router.post("/GetMatchInfo", async (req, res) => {
         }
 
         //check if user has access
-        if (!CheckIfPlayerIsId(players[0], userId) && !CheckIfPlayerIsId(players[1], userId) && userRole != userRoles.mod){
-            if (matchHidden) return SetResponse(res, userErrors.noAccess);
-            match.chat = [];
+        if (!CheckIfPlayerIsId(players[0], userId) && !CheckIfPlayerIsId(players[1], userId)){
+            //mods cant see PBs
+            if (userRole != userRoles.mod || match.privateBattle){
+                if (matchHidden) return SetResponse(res, userErrors.noAccess);
+                match.chat = [];
+            }
         }
 
         var othersInChatIds = [];
