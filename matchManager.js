@@ -197,12 +197,7 @@ export async function PlayerSentGameWin(playerId, winnerId){
     if (match.mode == matchModes.casual) return gameWinErrors.casual;
     if (match.status != matchStatuses.ingame) return gameWinErrors.wrongStatus;
 
-    var winnerPos;
-    if (match.players[0].id == winnerId){
-        winnerPos = 1;
-    } else{
-        winnerPos = 2;
-    }
+    const winnerPos = (match.players[0].id == winnerId) ? 1 : 2;
 
     match.players[playerPos - 1].gameConfirmed = true;
 
@@ -264,11 +259,7 @@ function CheckMatchWin(match, winnerId){
 }
 
 async function HandleRankedMatchWin(match){
-    if (match.players[0].id == match.winnerId){
-        match.status = matchStatuses.player1Win;
-    } else {
-        match.status = matchStatuses.player2Win;
-    }
+    match.status = (match.players[0].id == match.winnerId) ? matchStatuses.player1Win : matchStatuses.player2Win;
 
     if (!await FinishMatch(match)) return true;
     if (match.privateBattle) return;

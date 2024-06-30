@@ -102,6 +102,15 @@ async function setLeaderBoard(startPos, hitCount) {
         let userLink = document.createElement('a');
         userLink.href = '/profile?playerId=' + user.id;
         userLink.setAttribute('target', '_blank');
+
+        if ( user.country ) {
+            let countryElement = document.createElement('img');
+            countryElement.src = 'https://flagcdn.com/w20/' + user.country + '.png';
+            userLink.append(countryElement);
+            flagSpace = document.createTextNode("\u00A0");
+            userLink.append(flagSpace);
+        }
+
         userLink.append(user.username);
         nameCell.append(userLink);
 
@@ -136,6 +145,13 @@ function addSearchedUser(users) {
         let userLink = document.createElement('a');
         userLink.href = '/profile?playerId=' + user.user.id;
         userLink.setAttribute('target', '_blank');
+
+        if ( user.user.country ) {
+            let countryElement = document.createElement('img');
+            countryElement.src = 'https://flagcdn.com/w20/' + user.user.country + '.png';
+            userLink.append(countryElement);
+        }
+
         userLink.append(user.user.username);
         nameCell.append(userLink);
 

@@ -300,7 +300,14 @@ function secondsToMS(d) {
 function getReadableTime(time) {
     var returnTime;
     var timeUnit;
-    if ( time > 3600 ) {
+    if ( time / 3600 > 24 ) {
+        returnTime = Math.floor( time / 3600 / 24);
+        if ( returnTime != 1 ) {
+            timeUnit = 'days';
+        } else {
+            timeUnit = 'day'
+        }
+    } else if ( time > 3600 ) {
         returnTime = Math.round( time / 3600);
         if ( returnTime != 1 ) {
             timeUnit = 'hours';
