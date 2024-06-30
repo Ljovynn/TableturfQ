@@ -16,6 +16,7 @@ const recentMatchesList = document.getElementById('recent-matches-list');
 // Interactable Elements
 const joinCompetetive = document.getElementById('join-competetive-queue');
 const joinCasual = document.getElementById('join-casual-queue');
+const queueButtons = document.getElementsByClassName('queue-button');
 const readyButton = document.getElementById('ranked-match-ready-button');
 const leaveButton = document.getElementById('leave-queue-button');
 
@@ -45,6 +46,9 @@ joinCompetetive.addEventListener('click', async (e) => {
     var response = await postData('/que/PlayerEnterQue', data);
     console.log('Response data: ' + JSON.stringify(response));
     if ( response == 201 ) {
+        for ( let queueButton of queueButtons ) {
+            queueButton.style.display = 'none';
+        }
         // Do queue frontend stuff
         alert('Successfully joined the queue!');
         queueInfo.style.display = 'block';
@@ -66,6 +70,9 @@ joinCasual.addEventListener('click', async (e) => {
     var response = await postData('/que/PlayerEnterQue', data);
     
     if ( response == 201 ) {
+        for ( let queueButton of queueButtons ) {
+            queueButton.style.display = 'none';
+        }
         // Do queue frontend stuff
         alert('Successfully joined the queue!');
         timer = 0;
@@ -97,6 +104,9 @@ leaveButton.addEventListener('click', async (e) => {
     var response = await postData('/que/PlayerLeaveQue', data);
     console.log(response);
     if ( response == 201 ) {
+        for ( let queueButton of queueButtons ) {
+            queueButton.style.display = 'inline-block';
+        }
         clearTimer(mainTimer);
         queueInfo.style.display = 'none';
         alert('You have successfully left the queue');
@@ -167,10 +177,20 @@ function displayRecentMatches(recentMatchData) {
             let row = document.createElement('div');
             row.classList.add('match-row');
 
-            /*let dateCell = document.createElement('div');
+            let dateCell = document.createElement('div');
             dateCell.classList.add('match-date');
-            var matchDate = match.created_at.split('T')[0];
-            dateCell.append(matchDate);*/
+            var matchDate = match.created_at;
+            matchDate = new Date(matchDate);
+            matchDate = matchDate.getTime() / 1000;
+            console.log(matchDate);
+            var timeNow = Math.floor(Date.now() / 1000);
+            console.log(timeNow);
+            var timeElapsed = timeNow - matchDate;
+            console.log(timeElapsed);
+            var readableTime = getReadableTime(timeElapsed);
+            console.log(readableTime);
+
+            dateCell.append(readableTime);
 
             let matchupCell = document.createElement('div');
            // var players = await getMatchUsers( [match.player1_id, match.player2_id] );
@@ -202,7 +222,7 @@ function displayRecentMatches(recentMatchData) {
             }
             outcomeCell.append(outcome);
 
-            //row.append(dateCell);
+            row.append(dateCell);
             row.append(matchupCell);
             row.append(outcomeCell);
 
@@ -282,6 +302,35 @@ function secondsToMS(d) {
     var s = Math.floor(d % 3600 % 60);
 
     return ('0' + m).slice(-2) + ":" + ('0' + s).slice(-2);
+}
+
+function getReadableTime(time) {
+    var returnTime;
+    var timeUnit;
+    if ( time > 3600 ) {
+        returnTime = Math.round( time / 3600);
+        if ( returnTime != 1 ) {
+            timeUnit = 'hours';
+        } else {
+            timeUnit = 'hour'
+        }
+    } else if ( time < 60 ) {
+        returnTime = time;
+        if ( returnTime != 1 ) {
+            timeUnit = 'seconds';
+        } else {
+            timeUnit = 'second';
+        }
+    } else {
+        returnTime = Math.round( time / 60 );
+        if ( returnTime != 1 ) {
+            timeUnit = 'minutes';
+        } else {
+            timeUnit = 'minute';
+        }
+    }
+
+    return returnTime + ' ' + timeUnit + ' ago';
 }
 
 function getMatchPlayer( matchUsers, playerId ) {
