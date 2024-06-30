@@ -81,7 +81,7 @@ async function TryAddPlayerToQue(que, playerId){
 
 //main matchmaking algorithm. once every n seconds
 export async function MatchMakingTick(){
-    //CheckMatchmadePlayers();
+    CheckMatchmadePlayers();
     CheckRecentlyMatchedPlayers();
     
     var newlyMatchedPlayers = [];
