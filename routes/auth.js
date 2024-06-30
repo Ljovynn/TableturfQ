@@ -115,11 +115,14 @@ async function StoreUserData(accessToken, refreshToken, userId){
         },
     });
 
+    var avatar = null;
+    if (response.data.avatar) avatar = HandleAvatarGif(response.data.avatar);
+
     //If logged in to account, update that account
     if (userId){
         var user = await GetUserData(userId);
         if (user && user.role == userRoles.unverified){
-            await VerifyAccount(userId, response.data.id, response.data.username, accessToken, refreshToken, response.data.avatar);
+            await VerifyAccount(userId, response.data.id, response.data.username, accessToken, refreshToken, avatar);
             return userId;
         }
     }
@@ -128,10 +131,15 @@ async function StoreUserData(accessToken, refreshToken, userId){
     var newUserId;
     if (!newUser){
         newUserId = GenerateNanoId();
-        await CreateUserWithDiscord(newUserId, response.data.username, response.data.id, accessToken, refreshToken, response.data.avatar);
+        await CreateUserWithDiscord(newUserId, response.data.username, response.data.id, accessToken, refreshToken, avatar);
     } else {
         newUserId = newUser.id;
-        await SetUserDiscord(newUserId, response.data.id, response.data.username, accessToken, refreshToken, response.data.avatar); 
+        await SetUserDiscord(newUserId, response.data.id, response.data.username, accessToken, refreshToken, avatar); 
     }
     return newUserId;
+}
+
+function HandleAvatarGif(avatar){
+    if (avatar.slice(0, 2) === 'a_') return avatar.slice(2);
+    return avatar;
 }
