@@ -331,9 +331,9 @@ async function setMatchInfo() {
     console.log(oppID);
 
     chat = match.chat;
-    starters = match.mode.rulesetData.starterStagesArr;
-    counterpicks = match.mode.rulesetData.counterPickStagesArr;
-    counterpickStrikeAmount = match.mode.rulesetData.counterPickBans;
+    starters = matchModes[match.mode].starterStagesArr;
+    counterpicks = matchModes[match.mode].counterPickStagesArr;
+    counterpickStrikeAmount = matchModes[match.mode].counterPickBans;
     privateMatch = match.privateBattle;
 
     var player1DiscordId = players[0].discord_id;
@@ -392,8 +392,8 @@ async function setMatchInfo() {
         player2RankIcon.src = player2Rank.imageURL;
     }
 
-    setLength.innerHTML = 'Best of ' + bestOfSets[match.mode.rulesetData.setLength] + ' games';
-    turnTimer.innerHTML = ( match.mode.rulesetData.turnTimer * 10 ) + ' seconds';
+    setLength.innerHTML = 'Best of ' + bestOfSets[matchModes[match.mode].setLength] + ' games';
+    turnTimer.innerHTML = ( matchModes[match.mode].turnTimer * 10 ) + ' seconds';
 
     addChatMessages(chat);
     if ( !casualMatch ) {
@@ -436,6 +436,7 @@ async function setMatchInfo() {
         setCasualGame();
     }
     checkPrivateMatch();
+    checkMatchOver();
 }
 
 // Grab all messages associated with the game and add them to the chat log
@@ -763,6 +764,13 @@ function setWinner(winnerId) {
 function checkPrivateMatch() {
     if ( privateMatch ) {
         playerRaiseDispute.style.display = 'none';
+    }
+}
+
+function checkMatchOver() {
+    if ( matchInfo.match.status == 3 || matchInfo.match.status == 4 ) {
+        needHelp.style.display = 'none';
+        leaveMatch.style.display = 'none';
     }
 }
 
