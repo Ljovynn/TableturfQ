@@ -94,7 +94,7 @@ export async function MatchMakingTick(){
 
     //set up match
     for (let i = 0; i < newlyMatchedPlayers.length; i++){
-        if (newlyMatchedPlayers[i].matchMode == matchModes.casual){
+        if (queDatas[newlyMatchedPlayers[i].matchMode].readyTimer == 0){
             RemovePlayersFromQue(ques[0].queArr, newlyMatchedPlayers[i].players[0], newlyMatchedPlayers[i].players[1]);
             var match = MakeNewMatch(newlyMatchedPlayers[i].players[0], newlyMatchedPlayers[i].players[1], newlyMatchedPlayers[i].matchMode);
 
