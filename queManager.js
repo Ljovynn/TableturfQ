@@ -185,17 +185,20 @@ export function FindIfPlayerInQue(playerId){
 
 export function FindIfPlayerWaitingForReady(playerId){
     var data = {
+    matchMode: null,
     ready: false,
     timeWaitingStarted: null,
     }
 
     for (let i = 0; i < matchingPlayersList.length; i++){
         if (matchingPlayersList[i].players[0].id == playerId){
+            data.matchMode = matchingPlayersList[i].matchMode;
             data.ready = matchingPlayersList[i].players[0].ready;
             data.timeWaitingStarted = matchingPlayersList[i].createdAt;
             return data;
         }
         else if (matchingPlayersList[i].players[1].id == playerId){
+            data.matchMode = matchingPlayersList[i].matchMode;
             data.ready = matchingPlayersList[i].players[1].ready;
             data.timeWaitingStarted = matchingPlayersList[i].createdAt;
             return data;

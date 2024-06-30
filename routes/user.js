@@ -135,6 +135,7 @@ router.post("/SearchUser", async (req, res) => {
 //returns undefined if not in que
 
 //readyData:
+//matchMode: string
 //ready = bool if you pressed ready, 
 //timeWaitingStarted = timestamp since ready wait started
 //returns undefined if not in ready waiting
