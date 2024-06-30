@@ -3,7 +3,7 @@ import { AddPlayerToQue, RemovePlayerFromQue, PlayerSentReady } from "../queMana
 import { CheckUserDefined } from "../utils/checkDefined.js";
 import { SendSocketMessage } from "../socketManager.js";
 import { definitionErrors, userErrors } from '../Responses/requestErrors.js';
-import { matchModes } from '../public/constants/matchData.js';
+import { rulesets } from '../public/constants/matchData.js';
 import { ResponseSucceeded, SetResponse } from '../Responses/ResponseData.js';
 
 const router = Router();

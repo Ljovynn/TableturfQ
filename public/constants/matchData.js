@@ -45,7 +45,7 @@ export const disputeResolveOptions = Object.freeze({
     matchWinPlayer2: 7
 });
 
-function MatchMode(setLength, turnTimer, starterStagesArr, counterPickStagesArr, counterPickBans, DSR){
+function Ruleset(setLength, turnTimer, starterStagesArr, counterPickStagesArr, counterPickBans, DSR){
     this.setLength = setLength;
     this.turnTimer = turnTimer;
     this.starterStagesArr = starterStagesArr;
@@ -79,13 +79,18 @@ const currentRankedCounterpicks = [
     stages.overTheLine
 ];
 
-const rankedMatchMode = new MatchMode(setLengths.bo5, turnTimer.s50, currentRankedStarters, currentRankedCounterpicks, 2, true)
+const rankedRuleset = new Ruleset(setLengths.bo5, turnTimer.s50, currentRankedStarters, currentRankedCounterpicks, 2, true)
 
-const casualMatchMode = new MatchMode(setLengths.unlimited, turnTimer.unlimited, [], [], 0, false)
+const casualRuleset = new Ruleset(setLengths.unlimited, turnTimer.unlimited, [], [], 0, false)
+
+export const rulesets = Object.freeze({ 
+    'casual': casualRuleset, 
+    'ranked': rankedRuleset
+});
 
 export const matchModes = Object.freeze({ 
-    'casual': casualMatchMode, 
-    'ranked': rankedMatchMode
+    casual: 'casual',
+    ranked: 'ranked'
 });
 
 export function ChatMessage(content, ownerId){
@@ -110,7 +115,7 @@ export function Match(id, player1Id, player2Id, matchMode, privateBattle = false
 {
     this.id = id;
     var startingStatus = matchStatuses.stageSelection;
-    if (matchModes[matchMode].setLength == setLengths.unlimited || setLength == 0){
+    if (rulesets[matchMode].setLength == setLengths.unlimited || setLength == 0){
         startingStatus = matchStatuses.ingame;
     }
     this.status = startingStatus;
@@ -121,7 +126,7 @@ export function Match(id, player1Id, player2Id, matchMode, privateBattle = false
 
     this.mode = matchMode;
     this.setLength = setLength;
-    if (!setLength) this.setLength = matchModes[matchMode].setLength;
+    if (!setLength) this.setLength = rulesets[matchMode].setLength;
 
     this.gamesArr = [new Game()];
     this.privateBattle = privateBattle;
