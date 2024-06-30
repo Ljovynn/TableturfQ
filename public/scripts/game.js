@@ -1,4 +1,4 @@
-import { matchModes } from "../constants/matchData.js";
+import { matchModes, rulesets } from "../constants/matchData.js";
 import { GetRank } from "../constants/rankData.js";
 
 // Create variables for all the elements we need to interact with
@@ -299,8 +299,12 @@ async function setUserInfo() {
     } catch (error) {
         await getMatchInfo(matchId);
         match = matchInfo.match;
+        console.log(matchModes[match.mode]);
+        counterpicks = rulesets[ matchModes[match.mode] ].counterPickStagesArr;
+        chatForm.style.display = 'none';
+        chatLog.style.display = 'none';
         console.log(match);
-        if ( match.status != 3 || match.status != 4 ) {
+        if ( match.status != 3 && match.status != 4 ) {
             window.location.href = '/';  
         }
     }
@@ -331,9 +335,9 @@ async function setMatchInfo() {
     console.log(oppID);
 
     chat = match.chat;
-    starters = matchModes[match.mode].starterStagesArr;
-    counterpicks = matchModes[match.mode].counterPickStagesArr;
-    counterpickStrikeAmount = matchModes[match.mode].counterPickBans;
+    starters = rulesets[ matchModes[match.mode] ].starterStagesArr;
+    counterpicks = rulesets[ matchModes[match.mode] ].counterPickStagesArr;
+    counterpickStrikeAmount = rulesets[ matchModes[match.mode] ].counterPickBans;
     privateMatch = match.privateBattle;
 
     var player1DiscordId = players[0].discord_id;
@@ -392,8 +396,8 @@ async function setMatchInfo() {
         player2RankIcon.src = player2Rank.imageURL;
     }
 
-    setLength.innerHTML = 'Best of ' + bestOfSets[matchModes[match.mode].setLength] + ' games';
-    turnTimer.innerHTML = ( matchModes[match.mode].turnTimer * 10 ) + ' seconds';
+    setLength.innerHTML = 'Best of ' + ( privateMatch ? match.setLength : bestOfSets[rulesets[ matchModes[match.mode] ].setLength] ) + ' games';
+    turnTimer.innerHTML = ( rulesets[ matchModes[match.mode] ].turnTimer * 10 ) + ' seconds';
 
     addChatMessages(chat);
     if ( !casualMatch ) {
@@ -768,9 +772,12 @@ function checkPrivateMatch() {
 }
 
 function checkMatchOver() {
+    console.log(matchInfo.match.status);
     if ( matchInfo.match.status == 3 || matchInfo.match.status == 4 ) {
         needHelp.style.display = 'none';
         leaveMatch.style.display = 'none';
+        playerRaiseDispute.style.display = 'none';
+        strikerSection.style.display = 'none';
     }
 }
 
