@@ -112,7 +112,7 @@ export async function GetUserMatchCount(userId)
 
 export async function GetUserRankedMatchCount(userId)
 {
-    const [count] = await pool.execute(`SELECT COUNT(*) AS matchCount FROM matches WHERE ranked = TRUE AND (player1_id = ? OR player2_id = ?) AND private_battle = FALSE`, [userId, userId]);
+    const [count] = await pool.execute(`SELECT COUNT(*) AS matchCount FROM matches WHERE ranked = TRUE AND (player1_id = ? OR player2_id = ?)`, [userId, userId]);
     if (count[0]) return count[0].matchCount;
 }
 
@@ -156,7 +156,7 @@ export async function GetFutureAnnouncements(){
 
 export async function SetMatchResult(match){
 
-    var ranked = (match.mode == matchModes.ranked);
+    var ranked = (match.mode == matchModes.ranked && !match.privateBattle);
 
     await pool.execute(`INSERT INTO matches (id, player1_id, player2_id, ranked, set_length, result, private_battle) VALUES (?, ?, ?, ?, ?, ?, ?)`,
     [match.id, match.players[0].id, match.players[1].id, ranked, match.setLength, match.status, match.privateBattle]);

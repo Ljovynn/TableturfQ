@@ -276,6 +276,7 @@ async function HandleRankedMatchWin(match){
     }
 
     if (!await FinishMatch(match)) return true;
+    if (match.privateBattle) return;
 
     CheckPlacements(match.players[0].id);
     CheckPlacements(match.players[1].id);
@@ -301,8 +302,10 @@ export async function PlayerSentForfeit(playerId){
     result.newPlayerRatings = await HandleRankedMatchWin(match);
     if (!result.newPlayerRatings) return databaseErrors.matchFinishError;
 
-    const suspiciousAction = new SuspiciousAction(playerId.toString(), `Forfeited a ranked match against user ID ${match.players[playerPos % 2].id}`, `${DetailMinute(new Date(Date.now()))} UTC`);
-    SendNewSuspiciousAction(suspiciousAction);
+    if (!match.privateBattle){
+        const suspiciousAction = new SuspiciousAction(playerId.toString(), `Forfeited a ranked match against user ID ${match.players[playerPos % 2].id}`, `${DetailMinute(new Date(Date.now()))} UTC`);
+        SendNewSuspiciousAction(suspiciousAction);
+    }
 
     return new ResponseData(201, result);
 }

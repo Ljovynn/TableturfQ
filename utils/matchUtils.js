@@ -11,7 +11,7 @@ export function FindPlayerPosInMatch(match, playerId){
 
 export function ConvertDBMatchToMatch(matchData, gamesData, strikeData, chatMessages){
     var matchMode = matchModes.casual;
-    if (matchData.ranked == true) {
+    if (matchData.ranked || matchData.private_battle) {
         matchMode = matchModes.ranked;
     }
 
