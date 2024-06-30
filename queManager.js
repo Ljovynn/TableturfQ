@@ -5,6 +5,7 @@ import { userRoles } from "./public/constants/userData.js";
 import { SendEmptySocketMessage, SendSocketMessage } from "./socketManager.js";
 import { ResponseData } from "./Responses/ResponseData.js";
 import { enterQueErrors, readyUpErrors } from "./Responses/queErrors.js";
+import { matchModes } from "./public/constants/matchData.js";
 
 const readyTimerGracePeriod = 1000 * 3;
 const alreadyMatchedPlayersTime = 1000 * 60 * 20;
@@ -33,8 +34,8 @@ function MatchedPlayers(player1Id, player2Id, matchMode){
 }
 
 var ques = [
-    new Que('casual'),
-    new Que('ranked')
+    new Que(matchModes.casual),
+    new Que(matchModes.ranked)
 ]
 
 var matchingPlayersList = [];
@@ -64,7 +65,7 @@ async function TryAddPlayerToQue(que, playerId){
     var user = await GetUserData(playerId);
     if (!user) return enterQueErrors.noUser;
     if (user.banned == 1) return enterQueErrors.banned;
-    if (que.matchMode == 'ranked'){
+    if (que.matchMode == matchModes.ranked){
         if (user.role == userRoles.unverified) return enterQueErrors.unverified;
     }
 
@@ -93,7 +94,7 @@ export async function MatchMakingTick(){
 
     //set up match
     for (let i = 0; i < newlyMatchedPlayers.length; i++){
-        if (newlyMatchedPlayers[i].matchMode == 'casual'){
+        if (newlyMatchedPlayers[i].matchMode == matchModes.casual){
             RemovePlayersFromQue(ques[0].queArr, newlyMatchedPlayers[i].players[0], newlyMatchedPlayers[i].players[1]);
             var match = MakeNewMatch(newlyMatchedPlayers[i].players[0], newlyMatchedPlayers[i].players[1], newlyMatchedPlayers[i].matchMode);
 

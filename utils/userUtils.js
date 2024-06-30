@@ -1,5 +1,6 @@
 import { GetUserData } from "../database.js"
 import { HandleBannedPlayerInMatch } from "../matchManager.js";
+import { matchModes } from "../public/constants/matchData.js";
 import { RemovePlayerFromAnyQue } from "../queManager.js";
 import { SendEmptySocketMessage, SendSocketMessage } from "../socketManager.js";
 
@@ -23,10 +24,10 @@ export async function HandleBanUser(bannedUserId){
     var matchData = await HandleBannedPlayerInMatch(bannedUserId);
 
     switch (matchData.mode){
-        case 'casual':
+        case matchModes.casual:
             SendEmptySocketMessage(matchData.matchId, "matchEnd");
             break;
-        case 'ranked':
+        case matchModes.ranked:
             var data = [matchData.winnerId, matchData.newPlayerRatings]
             SendSocketMessage('match' + matchData.matchId, "matchWin", data);
             break;

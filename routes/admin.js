@@ -6,7 +6,7 @@ import { userRoles } from '../public/constants/userData.js';
 
 import { SendSocketMessage } from '../socketManager.js';
 import { GetDisputedMatchesList, ModSentChatMessage, ResolveMatchDispute } from '../matchManager.js';
-import { disputeResolveOptions } from '../public/constants/matchData.js';
+import { disputeResolveOptions, matchModes } from '../public/constants/matchData.js';
 import { ResponseSucceeded, SetResponse } from '../Responses/ResponseData.js';
 import { definitionErrors, userErrors } from '../Responses/requestErrors.js';
 import { HandleBanUser } from '../utils/userUtils.js';
@@ -31,7 +31,7 @@ router.post("/ResolveDispute", async (req, res) => {
         if (!ResponseSucceeded(responseData.code)) return SetResponse(res, responseData);
         var matchData = responseData.data;
 
-        if (responseData.data === 'casual'){
+        if (responseData.data === matchModes.casual){
             res.sendStatus(responseData.code);
             SendSocketMessage('match' + matchId, "resolveDispute", disputeResolveOptions.noChanges);
             return;
