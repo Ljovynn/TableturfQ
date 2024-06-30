@@ -125,11 +125,8 @@ async function setUserInfo() {
     console.log('Setting user info');
     try {
         var userInfo = await getUserInfo();
-        console.log(userInfo);
         user = userInfo.user;
-        console.log(user);
         userID = user.id;
-        console.log(userID);
         loading.style.display = 'none';
         if ( !user.discord_id ) {
             isCasual = true;
@@ -148,7 +145,7 @@ async function setUserInfo() {
         }
     } catch (error) {
         console.log(error);
-        //window.location.href = '/';
+        window.location.href = '/';
     }
 }
 
@@ -182,13 +179,9 @@ function displayRecentMatches(recentMatchData) {
             var matchDate = match.created_at;
             matchDate = new Date(matchDate);
             matchDate = matchDate.getTime() / 1000;
-            console.log(matchDate);
             var timeNow = Math.floor(Date.now() / 1000);
-            console.log(timeNow);
             var timeElapsed = timeNow - matchDate;
-            console.log(timeElapsed);
             var readableTime = getReadableTime(timeElapsed);
-            console.log(readableTime);
 
             dateCell.append(readableTime);
 
