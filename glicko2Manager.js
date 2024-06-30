@@ -12,7 +12,7 @@ export var settings = {
     rating : 1400,
     //rd : Default rating deviation 
     //     small number = good confidence on the rating accuracy
-    rd : 140,
+    rd : 130,
     //vol : Default volatility (expected fluctation on the player rating)
     vol : 0.06
   };
