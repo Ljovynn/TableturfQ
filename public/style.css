@@ -328,6 +328,27 @@ h3 {
     cursor: pointer;
 }
 
+#user-profile-edit-country:hover {
+    cursor: pointer;
+}
+
+#user-country.editing {
+    display: none;
+}
+
+#user-profile-edit-country-form {
+    display: none;
+    margin: 10px;
+}
+
+#user-profile-edit-country-form.editing {
+    display: block;
+}
+
+#user-country-edit-close {
+    cursor: pointer;
+}
+
 #user-rank-info {
     display: none;
 }
