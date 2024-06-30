@@ -8,7 +8,7 @@ import { AddRecentlyMatchedPlayers } from "./queManager.js";
 import { SendDisputeMessage, SendNewSuspiciousAction, SuspiciousAction } from "./discordBot/discordBotManager.js";
 import { ResponseData } from "./Responses/ResponseData.js";
 import { casualMatchEndErrors, chatMessageErrors, disputeErrors, gameWinErrors, databaseErrors, resolveErrors, stagePickErrors, stageStrikeErrors, nullErrors, forfeitErrors } from "./Responses/matchErrors.js";
-import { HasBadWords } from "./utils/string.js";
+import { HasBadWords, SanitizeDiscordLog } from "./utils/string.js";
 import { DetailMinute } from "./utils/date.js";
 
 var matches = [];
@@ -233,7 +233,7 @@ export async function PlayerSentGameWin(playerId, winnerId){
 
         if (CheckMatchWin(match, winnerId)){
             if (match.createdAt < Date.now() + (5 * 60 * 1000)){
-                const suspiciousAction = new SuspiciousAction(winnerId.toString(), `Won a ranked match against user ID ${match.players[winnerPos % 2].id} in less than 5 minutes`, `${DetailMinute(new Date(Date.now()))} UTC`);
+                const suspiciousAction = new SuspiciousAction(winnerId, `Won a ranked match against user ID ${SanitizeDiscordLog(match.players[winnerPos % 2].id)} in less than 5 minutes`, `${DetailMinute(new Date(Date.now()))} UTC`);
                 SendNewSuspiciousAction(suspiciousAction);
             }
 
@@ -303,7 +303,7 @@ export async function PlayerSentForfeit(playerId){
     if (!result.newPlayerRatings) return databaseErrors.matchFinishError;
 
     if (!match.privateBattle){
-        const suspiciousAction = new SuspiciousAction(playerId.toString(), `Forfeited a ranked match against user ID ${match.players[playerPos % 2].id}`, `${DetailMinute(new Date(Date.now()))} UTC`);
+        const suspiciousAction = new SuspiciousAction(playerId, `Forfeited a ranked match against user ID ${SanitizeDiscordLog(match.players[playerPos % 2].id)}`, `${DetailMinute(new Date(Date.now()))} UTC`);
         SendNewSuspiciousAction(suspiciousAction);
     }
 
@@ -330,7 +330,7 @@ export async function PlayerSentCasualMatchEnd(playerId){
     if (!await FinishMatch(match)) return databaseErrors.matchFinishError;
 
     if (match.createdAt < Date.now() + (30 * 1000)){
-        const suspiciousAction = new SuspiciousAction(playerId.toString(), 'Ended a casual match within 30 seconds', `${DetailMinute(new Date(Date.now()))} UTC`);
+        const suspiciousAction = new SuspiciousAction(playerId, 'Ended a casual match within 30 seconds', `${DetailMinute(new Date(Date.now()))} UTC`);
         SendNewSuspiciousAction(suspiciousAction);
     }
 

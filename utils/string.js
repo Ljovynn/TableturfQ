@@ -6,6 +6,11 @@ export function SanitizeString(string){
     return result;
 }
 
+export function SanitizeDiscordLog(string){
+    let result = string.replace(/-/g, '\\-').replace(/_/g, '\\_');
+    return result;
+}
+
 const badWords = Object.freeze([
     'nigger',
     'fucktard',

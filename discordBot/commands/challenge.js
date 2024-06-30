@@ -110,7 +110,6 @@ export async function execute(interaction) {
 	        await confirmation.update({ embeds: [denyEmbed], components: [] });
 	    }
     } catch (error) {
-        console.log(error);
         const timeoutEmbed = BuildSimpleEmbed('Challenge player', 'Challenge failed', `<@${challengedDiscordUser.id}> took too long to respond`);
 	    await interaction.editReply({embeds: [timeoutEmbed], components: [] });
     }

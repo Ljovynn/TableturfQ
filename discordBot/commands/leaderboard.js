@@ -2,6 +2,8 @@ import { SlashCommandBuilder } from "discord.js";
 import { GetLeaderboardAtPos } from "../../userListManager.js";
 import { embedColor } from '../utils/constants.js';
 import { GetRank } from "../../public/constants/rankData.js";
+import { SanitizeDiscordLog } from "../../utils/string.js";
+
 const hitsPerPage = 15;
 
 export const data = new SlashCommandBuilder()
@@ -26,7 +28,7 @@ export async function execute(interaction) {
     for (let i = 0; i < leaderboard.length; i++){
         const rank = GetRank(leaderboard[i].g2_rating);
 
-        var tagValue = leaderboard[i].discord_username;
+        var tagValue = SanitizeDiscordLog(leaderboard[i].discord_username);
         const isMember = await interaction.guild.members.fetch(leaderboard[i].discord_id).then(() => true).catch(() => false);
         if (isMember) tagValue = `<@${leaderboard[i].discord_id}>`;
 

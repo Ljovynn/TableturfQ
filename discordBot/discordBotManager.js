@@ -6,6 +6,7 @@ import path from 'path';
 import { embedColor } from './utils/constants.js';
 import { BuildSimpleEmbed } from './utils/embed.js';
 import { GetUserData } from '../database.js';
+import { SanitizeDiscordLog } from '../utils/string.js';
 
 dotenv.config();
 
@@ -137,7 +138,7 @@ export async function SendDisputeMessage(matchDisputes, sendNewMessage){
 
 		for (let i = 0; i < limit; i++){
 			var field = {
-				name: `Match id ${matchDisputes[i].id}`,
+				name: `Match id ${SanitizeDiscordLog(matchDisputes[i].id)}`,
 				value: `[Link](${websiteURL}/game?matchID=${matchDisputes[i].id})`,
 			}
 			fields.push(field)
@@ -185,7 +186,7 @@ export async function SendNewSuspiciousAction(suspiciousAction){
 			if (!user) continue;
 
 			var field = {
-				name: `User ${user.username}\nID ${user.id}\nat ${suspiciousActionsList[i].timestamp}:`,
+				name: `User ${SanitizeDiscordLog(user.username)}\nID ${SanitizeDiscordLog(user.id)}\nat ${suspiciousActionsList[i].timestamp}:`,
 				value: suspiciousActionsList[i].description,
 			}
 			fields.push(field)
