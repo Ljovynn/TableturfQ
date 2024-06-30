@@ -111,6 +111,10 @@ router.post("/SearchUser", async (req, res) => {
 
         const users = SearchUser(input);
 
+        for (let i = 0; i < users.length; i++){
+            users[i].g2_rating = ApplyHideRank(users[i]);
+        }
+
         res.status(200).send(users);
     } catch(error){
         console.log(error);

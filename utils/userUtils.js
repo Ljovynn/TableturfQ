@@ -15,7 +15,7 @@ export async function GetCurrentUser(req){
 }
 
 export function ApplyHideRank(user){
-    if (user.hide_rank === false) return user.g2_rating;
+    if (user.hide_rank == false) return user.g2_rating;
     return null;
 }
 
