@@ -83,6 +83,10 @@ h3 {
     margin: auto;
 }
 
+#recent-matches-list {
+    outline: 2px solid black;
+}
+
 #ranked-match-ready {
     display: none;
 }

@@ -166,10 +166,10 @@ function displayRecentMatches(recentMatchData) {
             let row = document.createElement('div');
             row.classList.add('match-row');
 
-            let dateCell = document.createElement('div');
+            /*let dateCell = document.createElement('div');
             dateCell.classList.add('match-date');
             var matchDate = match.created_at.split('T')[0];
-            dateCell.append(matchDate);
+            dateCell.append(matchDate);*/
 
             let matchupCell = document.createElement('div');
            // var players = await getMatchUsers( [match.player1_id, match.player2_id] );
@@ -201,7 +201,7 @@ function displayRecentMatches(recentMatchData) {
             }
             outcomeCell.append(outcome);
 
-            row.append(dateCell);
+            //row.append(dateCell);
             row.append(matchupCell);
             row.append(outcomeCell);
 
