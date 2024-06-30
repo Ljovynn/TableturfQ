@@ -123,11 +123,13 @@ export async function execute(interaction) {
         try{
             if (banLengthObject){
                 await SuspendUser(user.id, banLengths[banLength]);
+                await HandleBanUser(user.id);
                 const banEmbed = BuildSimpleEmbed('Ban successful', `Successfully suspended user **${user.username}**`, `The ban lasts for ${banLength}.`);
                 await interaction.reply({ embeds: [banEmbed] });
                 return;
             } else{
                 await BanUser(user.id);
+                await HandleBanUser(user.id);
                 const banEmbed = BuildSimpleEmbed('Ban successful', `Successfully banned user **${user.username}**`, 'The ban is permanent.');
                 await interaction.reply({ embeds: [banEmbed] });
                 return;

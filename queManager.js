@@ -5,7 +5,6 @@ import { userRoles } from "./public/constants/userData.js";
 import { SendEmptySocketMessage, SendSocketMessage } from "./socketManager.js";
 import { ResponseData } from "./Responses/ResponseData.js";
 import { enterQueErrors, readyUpErrors } from "./Responses/queErrors.js";
-import { GetQueAvailible } from "./queEnabled.js";
 
 const readyTimerGracePeriod = 1000 * 3;
 const alreadyMatchedPlayersTime = 1000 * 60 * 20;
@@ -40,11 +39,18 @@ var ques = [
 
 var matchingPlayersList = [];
 
+var queAvailible = true;
+
+export function GetQueAvailible(){return queAvailible}
+export function SetQueAvailible(availible){
+    queAvailible = availible;
+}
+
 //also uses MathedPlayers function
 var recentlyMatchedPlayersList = [];
 
 export async function AddPlayerToQue(playerId, matchMode){
-    if (!GetQueAvailible()) return enterQueErrors.queUnavailible;
+    if (!queAvailible) return enterQueErrors.queUnavailible;
     for (let i = 0; i < ques.length; i++){
         if (ques[i].matchMode == matchMode) return await TryAddPlayerToQue(ques[i], playerId);
     }
@@ -194,6 +200,7 @@ export function FindIfPlayerWaitingForReady(playerId){
     return undefined;
 }
 
+//doesnt remove from ready list
 export function RemovePlayerFromQue(playerId, matchMode){
     for (let i = 0; i < ques.length; i++){
         // Stringify both objects to check for equality
@@ -209,6 +216,7 @@ export function RemovePlayerFromQue(playerId, matchMode){
     return false;
 }
 
+//does remove from ready list
 export function RemovePlayerFromAnyQue(playerId){
     for (let i = 0; i < ques.length; i++){
         for (let j = 0; j < ques[i].queArr.length; i++){
@@ -218,6 +226,8 @@ export function RemovePlayerFromAnyQue(playerId){
             }
         }
     }
+    var index = SearchMatchedPlayersList(matchingPlayersList, playerId);
+    if (index != -1) matchingPlayersList.splice(index, 1);
     return false;
 }
 

@@ -11,7 +11,7 @@ import { UpdateLeaderboard, UpdateUserList } from "./userListManager.js";
 import { UpdateRecentMatches } from "./matchHistoryManager.js";
 
 import { StartDiscordBot } from "./discordBot/discordBotManager.js";
-import { DeleteOldSuspensions, DeleteOldUnverifiedAccounts, DeleteUnfinishedMatches } from "./database.js";
+import { DeleteOldSuspensions, DeleteOldUnverifiedAccounts, DeleteUnfinishedMatches, UpdateRankDecay } from "./database.js";
 import { CancelOldMatches } from "./matchManager.js";
 import { DeletePastAnnouncements } from "./announcementManager.js";
 
@@ -30,10 +30,14 @@ const updateGlobalMatchHistoryInterval = 60 * 1000;
 const deleteOldUnverifiedUsersInterval = 24 * 60 * 60 * 1000;
 const deleteOldSuspensionsInterval = 60 * 60 * 1000;
 const deleteOldAnnouncementsInterval = 2 * 60 * 60 * 1000;
+const decayRankInterval = 24 * 60 * 60 * 1000;
 
 //Todo: test if account deletion when user is in match messes anything
 const unverifiedUserDeletionThreshold = 7 * 24 * 60 * 60 * 1000;
 const matchDeletionThreshold = 2 * 60 * 60 * 1000;
+
+const decayRankAmount = 10;
+const decayRankThreshold = 7 * 24 * 60 * 60 * 1000;
 
 const app = express();
 
@@ -55,7 +59,7 @@ const server = app.listen(port, () => {
     //match history
     setInterval(UpdateRecentMatches, updateGlobalMatchHistoryInterval);
 
-    //accounts
+    //users
     setInterval(() => {
         DeleteOldUnverifiedAccounts(unverifiedUserDeletionThreshold);
     }, deleteOldUnverifiedUsersInterval);
@@ -63,10 +67,15 @@ const server = app.listen(port, () => {
 
     //announcements
     setInterval(DeletePastAnnouncements, deleteOldAnnouncementsInterval);
+
+    //rank decay
+    setInterval(() => {
+        UpdateRankDecay(decayRankAmount, decayRankThreshold);
+    }, decayRankInterval);
     
     StartDiscordBot();
 
-    //DeleteUnfinishedMatches();
+    DeleteUnfinishedMatches();
 });
 
 CreateSocketConnection(server);

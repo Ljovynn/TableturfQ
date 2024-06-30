@@ -48,6 +48,7 @@ router.post("/SetUserCountry", async (req, res) => {
         if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
         if (typeof(country) !== 'string') return SetResponse(res, definitionErrors.countryUndefined);
 
+        country = country.toLowerCase();
         if (country == 'none'){
             await SetUserCountry(userId, null);
             res.sendStatus(201);

@@ -15,7 +15,7 @@ export function ConvertDBMatchToMatch(matchData, gamesData, strikeData, chatMess
         matchMode = matchModes.ranked;
     }
 
-    var match = new Match(matchData.id, matchData.player1_id, matchData.player2_id, matchMode);
+    var match = new Match(matchData.id, matchData.player1_id, matchData.player2_id, matchMode, matchData.private_battle, matchData.set_length);
     match.status = matchData.result;
     match.createdAt = matchData.created_at;
 

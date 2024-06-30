@@ -40,7 +40,8 @@ export async function CancelOldMatches(cutoffTime){
     return result;
 }
 
-export function MakeNewMatch(player1Id, player2Id, matchMode){
+//assumes that players arent in match already
+export function MakeNewMatch(player1Id, player2Id, matchMode, privateBattle = false, setLength = null){
 
     //randomize player positions
 
@@ -59,7 +60,7 @@ export function MakeNewMatch(player1Id, player2Id, matchMode){
 
     const matchId = GenerateNanoId();
 
-    var match = new Match(matchId, player1Id, player2Id, matchMode);
+    var match = new Match(matchId, player1Id, player2Id, matchMode, privateBattle, setLength);
     matches.push(match);
     return match;
 }
@@ -232,7 +233,7 @@ export async function PlayerSentGameWin(playerId, winnerId){
 
         if (CheckMatchWin(match, winnerId)){
             if (match.createdAt < Date.now() + (5 * 60 * 1000)){
-                const suspiciousAction = new SuspiciousAction(winnerId.toString(), `User won a ranked match against user ID ${match.players[winnerPos % 2].id} in less than 5 minutes`, `${DetailMinute(new Date(Date.now()))} UTC`);
+                const suspiciousAction = new SuspiciousAction(winnerId.toString(), `Won a ranked match against user ID ${match.players[winnerPos % 2].id} in less than 5 minutes`, `${DetailMinute(new Date(Date.now()))} UTC`);
                 SendNewSuspiciousAction(suspiciousAction);
             }
 
@@ -260,7 +261,7 @@ function CheckMatchWin(match, winnerId){
             continue;
         }
         winCount++;
-        if (winCount >= match.mode.rulesetData.setLength){
+        if (winCount >= match.setLength){
             return true;
         }
     }
@@ -274,7 +275,7 @@ async function HandleRankedMatchWin(match){
         match.status = matchStatuses.player2Win;
     }
 
-    if (!await FinishMatch(match)) return false;
+    if (!await FinishMatch(match)) return true;
 
     CheckPlacements(match.players[0].id);
     CheckPlacements(match.players[1].id);
@@ -300,7 +301,7 @@ export async function PlayerSentForfeit(playerId){
     result.newPlayerRatings = await HandleRankedMatchWin(match);
     if (!result.newPlayerRatings) return databaseErrors.matchFinishError;
 
-    const suspiciousAction = new SuspiciousAction(playerId.toString(), `User forfeited a ranked match against user ID ${match.players[playerPos % 2].id}`, `${DetailMinute(new Date(Date.now()))} UTC`);
+    const suspiciousAction = new SuspiciousAction(playerId.toString(), `Forfeited a ranked match against user ID ${match.players[playerPos % 2].id}`, `${DetailMinute(new Date(Date.now()))} UTC`);
     SendNewSuspiciousAction(suspiciousAction);
 
     return new ResponseData(201, result);
@@ -326,7 +327,7 @@ export async function PlayerSentCasualMatchEnd(playerId){
     if (!await FinishMatch(match)) return databaseErrors.matchFinishError;
 
     if (match.createdAt < Date.now() + (30 * 1000)){
-        const suspiciousAction = new SuspiciousAction(playerId.toString(), 'User ended a casual match within 30 seconds', `${DetailMinute(new Date(Date.now()))} UTC`);
+        const suspiciousAction = new SuspiciousAction(playerId.toString(), 'Ended a casual match within 30 seconds', `${DetailMinute(new Date(Date.now()))} UTC`);
         SendNewSuspiciousAction(suspiciousAction);
     }
 
@@ -374,6 +375,8 @@ export function PlayerSentMatchDispute(playerId){
     var match = FindMatchWithPlayer(playerId);
     if (!match) return nullErrors.noMatch;
 
+    if (match.privateBattle) return disputeErrors.privateBattle;
+
     if (match.status == matchStatuses.dispute) return disputeErrors.alreadyDispute;
 
     StartMatchDispute(match);
@@ -384,7 +387,7 @@ function StartMatchDispute(match){
     match.players[0].gameConfirmed = false;
     match.players[1].gameConfirmed = false;
     match.gamesArr[match.gamesArr.length - 1].winnerId = null;
-    match.status = matchStatuses.dispute;
+    if (!match.privateBattle) match.status = matchStatuses.dispute;
     SendDisputeMessage(GetDisputedMatchesList(), true);
 }
 

@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, PermissionFlagsBits } from "discord.js";
-import { GetQueAvailible, SetQueAvailible } from "../../queEnabled.js";
+import { GetQueAvailible, SetQueAvailible } from "../../queManager.js";
 import { BuildSimpleEmbed } from "../utils/embed.js";
 
 export const data = new SlashCommandBuilder()
