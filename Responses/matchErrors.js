@@ -45,6 +45,7 @@ export const chatMessageErrors = Object.freeze({
 
 export const disputeErrors = Object.freeze({ 
     alreadyDispute: new ResponseData(403, 'Match is already in dispute'),
+    privateBattle: new ResponseData(403, 'Match is a private battle'),
 });
 
 export const forfeitErrors = Object.freeze({ 

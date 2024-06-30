@@ -22,36 +22,39 @@ var channel;
 
 client.commands = new Collection();
 
-var folderPath = path.join(__dirname, 'commands');
-const commandFolder = fs.readdirSync(folderPath);
-
 var suspiciousActionsList = [];
 
 var disputeMessageId;
 var suspiciousActionsMessageId;
 
-for (const file of commandFolder) {
-    const filePath = `./commands/${file}`;
-	let command = await import (filePath);
-	// Set a new item in the Collection with the key as the command name and the value as the exported module
-    if ('data' in command && 'execute' in command) {
-		client.commands.set(command.data.name, command);
-	} else {
-		console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+
+async function GetCommands(){
+	var folderPath = path.join(__dirname, 'commands');
+	const commandFolder = fs.readdirSync(folderPath);
+
+	for (const file of commandFolder) {
+    	const filePath = `./commands/${file}`;
+		let command = await import (filePath);
+		// Set a new item in the Collection with the key as the command name and the value as the exported module
+    	if ('data' in command && 'execute' in command) {
+			client.commands.set(command.data.name, command);
+		} else {
+			console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+		}
 	}
-}
 
-folderPath = path.join(__dirname, 'guildCommands');
-const guildCommandFolder = fs.readdirSync(folderPath);
+	folderPath = path.join(__dirname, 'guildCommands');
+	const guildCommandFolder = fs.readdirSync(folderPath);
 
-for (const file of guildCommandFolder) {
-    const filePath = `./guildCommands/${file}`;
-	let command = await import (filePath);
-	// Set a new item in the Collection with the key as the command name and the value as the exported module
-    if ('data' in command && 'execute' in command) {
-		client.commands.set(command.data.name, command);
-	} else {
-		console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+	for (const file of guildCommandFolder) {
+    	const filePath = `./guildCommands/${file}`;
+		let command = await import (filePath);
+		// Set a new item in the Collection with the key as the command name and the value as the exported module
+    	if ('data' in command && 'execute' in command) {
+			client.commands.set(command.data.name, command);
+		} else {
+			console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+		}
 	}
 }
 
@@ -119,7 +122,8 @@ client.on(Events.InteractionCreate, async interaction => {
 	}
 });
 
-export function StartDiscordBot(){
+export async function StartDiscordBot(){
+	await GetCommands();
     client.login(token);
 }
 
@@ -181,9 +185,7 @@ export async function SendNewSuspiciousAction(suspiciousAction){
 			if (!user) continue;
 
 			var field = {
-				name: `User ${user.username}
-				ID ${user.id}
-				at ${suspiciousActionsList[i].timestamp}:`,
+				name: `User ${user.username}\nID ${user.id}\nat ${suspiciousActionsList[i].timestamp}:`,
 				value: suspiciousActionsList[i].description,
 			}
 			fields.push(field)

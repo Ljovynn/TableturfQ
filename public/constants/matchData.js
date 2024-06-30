@@ -125,7 +125,7 @@ export function Player(id){
     this.disputeResolveSent = false;
 }
 
-export function Match(id, player1Id, player2Id, matchMode)
+export function Match(id, player1Id, player2Id, matchMode, privateBattle = false, setLength = null)
 {
     this.id = id;
     var startingStatus = matchStatuses.stageSelection;
@@ -139,7 +139,11 @@ export function Match(id, player1Id, player2Id, matchMode)
     this.players = [player1, player2];
 
     this.mode = matchMode;
+    this.setLength = setLength;
+    if (!setLength) this.setLength = matchMode.rulesetData.setLength;
+
     this.gamesArr = [new Game()];
+    this.privateBattle = privateBattle;
     this.createdAt = Date.now();
     this.chat = [];
 }
