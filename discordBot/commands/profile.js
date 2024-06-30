@@ -5,6 +5,7 @@ import { DetailMinute } from "../../utils/date.js";
 import { embedColor } from '../utils/constants.js';
 import { BuildSimpleEmbed } from "../utils/embed.js";
 import { GetPlayerLeaderboardPosition } from "../../userListManager.js";
+import { SanitizeDiscordLog } from "../../utils/string.js";
 
 import dotenv from 'dotenv';
 
@@ -89,7 +90,7 @@ export async function execute(interaction) {
 		color: embedColor,
 		title: 'TableturfQ Profile',
 		author: {
-			name: `${user.username}`,
+			name: `${SanitizeDiscordLog(user.username)}`,
 			icon_url: `https://cdn.discordapp.com/avatars/${user.discord_id}/${user.discord_avatar_hash}.png`,
 			url: `${websiteURL}/profile?playerId=${user.id}`,
 		},

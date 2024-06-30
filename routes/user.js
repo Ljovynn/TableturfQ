@@ -126,7 +126,7 @@ router.post("/SearchUser", async (req, res) => {
 //user: id, username, role, g2_rating, discord_id, discord_avatar_hash, created_at, banned
 
 //quedata:
-//matchmode = matchMode object
+//matchmode = string
 //timeQueStarted = timestamp when que started
 //returns undefined if not in que
 
