@@ -32,7 +32,6 @@ var userID = 0;
 
 var timer = 0;
 var countdown;
-console.log(countdown);
 
 await setUserInfo();
 await getRecentMatches();
@@ -138,7 +137,8 @@ async function setUserInfo() {
             setReadyUp(userInfo.readyData);
         }
     } catch (error) {
-        window.location.href = '/';
+        console.log(error);
+        //window.location.href = '/';
     }
 }
 
@@ -146,6 +146,7 @@ function setQueueInfo(queueData) {
     var timeStarted = Math.floor( queueData.timeQueStarted / 1000 );
     var timeNow = Math.floor(Date.now() / 1000);
     var timeElapsed = timeNow - timeStarted;
+    queuedMatchMode = queueData.matchMode;
     timer = timeElapsed;
     queueInfo.style.display = 'block';
     mainTimer = window.setInterval(updateTimer, 1000);
