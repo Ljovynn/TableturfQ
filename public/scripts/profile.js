@@ -11,6 +11,8 @@ const userProfilePicture = document.getElementById('user-profile-picture');
 const userRankInfo = document.getElementById('user-rank-info');
 const userELO = document.getElementById('user-rank-elo');
 const userRank = document.getElementById('user-rank');
+const userCountry = document.getElementById('user-country');
+const userCountryValue = document.getElementById('user-country-value');
 
 // Interaction/edit elements
 const editDisplayName = document.getElementById('user-profile-edit-name');
@@ -18,6 +20,12 @@ const editDisplayNameForm = document.getElementById('user-profile-edit-name-form
 const displayNameInput = document.getElementById('user-profile-name-input');
 const displayNameSubmit = document.getElementById('user-profile-name-submit');
 const editDisplayNameClose = document.getElementById('user-profile-edit-close');
+
+const editCountry = document.getElementById('user-profile-edit-country');
+const editCountryForm = document.getElementById('user-profile-edit-country-form');
+const countryInput = document.getElementById('country-select');
+const countrySubmit = document.getElementById('user-profile-country-submit');
+const editCountryClose = document.getElementById('user-country-edit-close');
 
 const matchHistory = document.getElementById('user-match-history');
 
@@ -37,6 +45,7 @@ var discordAvatarHash;
 var userInfo;
 var eloRating;
 var rank;
+var countryFlag;
 
 var matchList;
 var matches;
@@ -68,6 +77,17 @@ editDisplayNameClose.addEventListener('click', (e) => {
     userDisplayNameContent.classList.toggle('editing');
 });
 
+editCountry.addEventListener('click', (e) => {
+    editCountryForm.classList.toggle('editing');
+    userCountry.classList.toggle('editing');
+});
+
+editCountryClose.addEventListener('click', (e) => {
+    editCountryForm.classList.toggle('editing');
+    userCountry.classList.toggle('editing');
+});
+
+
 displayNameSubmit.addEventListener('click', (e) => {
     var newDisplayName = displayNameInput.value;
     // Validate the name update
@@ -84,6 +104,24 @@ displayNameSubmit.addEventListener('click', (e) => {
     } else {
         alert('The submitted display name is invalid. Please try again.');
     }
+});
+
+countrySubmit.addEventListener('click', async (e) => {
+    var newCountry = countryInput.value;
+
+    var data = { country: newCountry };
+    var response = await postData('/user/SetUserCountry', data);
+
+    // On Success
+    console.log(response);
+
+    editCountryForm.classList.toggle('editing');
+    userCountry.classList.toggle('editing');
+    var countryElement = document.createElement('img');
+    countryElement.src = 'https://flagcdn.com/w20/' + newCountry.toLowerCase() + '.png';
+    countryFlag = countryElement;
+    userCountryValue.innerHTML = '';
+    userCountryValue.append(countryFlag);
 });
 
 logoutButton.addEventListener('click', async (e) => {
@@ -133,6 +171,16 @@ async function setUserInfo() {
         var avatarString = 'https://cdn.discordapp.com/avatars/' + discordId + '/' + discordAvatarHash + '.jpg' + '?size=512';
         userProfilePicture.src = avatarString;
 
+        if ( user.country ) {
+            var countryElement = document.createElement('img');
+            countryElement.src = 'https://flagcdn.com/w20/' + user.country + '.png';
+            countryFlag = countryElement;
+        } else {
+            countryFlag = 'No Country Set';
+        }
+
+        userCountryValue.append(countryFlag);
+
         if ( !user.hide_rank ) {
             eloRating = (Math.round(user.g2_rating * 100) / 100).toFixed(2);
             rank = await GetRank(eloRating);
@@ -143,7 +191,7 @@ async function setUserInfo() {
         hideNonUserElements();
     } catch (error) {
         console.log(error);
-        window.location.href = '/';
+        //window.location.href = '/';
     }
 }
 

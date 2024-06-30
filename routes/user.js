@@ -43,7 +43,7 @@ router.post("/SetUsername", async (req, res) => {
 router.post("/SetUserCountry", async (req, res) => {
     try{
         const userId = req.session.user;
-        const country = req.body.country;
+        var country = req.body.country;
 
         if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
         if (typeof(country) !== 'string') return SetResponse(res, definitionErrors.countryUndefined);
