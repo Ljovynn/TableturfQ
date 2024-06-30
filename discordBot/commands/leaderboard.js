@@ -28,15 +28,12 @@ export async function execute(interaction) {
     for (let i = 0; i < leaderboard.length; i++){
         const rank = GetRank(leaderboard[i].g2_rating);
 
-        var tagValue;
         const isMember = await interaction.guild.members.fetch(leaderboard[i].discord_id).then(() => true).catch(() => false);
-        if (isMember) {
-            tagValue = `<@${leaderboard[i].discord_id}>`;
-        } else{
-            tagValue = SanitizeDiscordLog(leaderboard[i].discord_username);
-        } 
+        const tagValue = (isMember) ? `<@${leaderboard[i].discord_id}>` : SanitizeDiscordLog(leaderboard[i].discord_username);
+        console.log(leaderboard[i].country);
+        const countryValue = (leaderboard[i].country !== null) ? `:flag_${leaderboard[i].country}: ` : '';
 
-        leaderboardsFields[0].value += `\n${startPosition + i}. <${rank.emoji}> ${tagValue} **${Math.floor(leaderboard[i].g2_rating)}**`;
+        leaderboardsFields[0].value += `\n${startPosition + i}. ${countryValue}${tagValue}   <${rank.emoji}> **${Math.floor(leaderboard[i].g2_rating)}**`;
     }
     leaderboardsFields[0].value += '\u200B';
     
