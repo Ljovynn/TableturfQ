@@ -352,6 +352,8 @@ async function setMatchInfo() {
     var player2Rank = await GetRank(player2ELO);
     console.log(player2Rank);
 
+    var countryElement;
+
     var player1AvatarString = 'https://cdn.discordapp.com/avatars/' + player1DiscordId + '/' + player1DiscordAvatar + '.jpg' + '?size=512';
     var player2AvatarString = 'https://cdn.discordapp.com/avatars/' + player2DiscordId + '/' + player2DiscordAvatar + '.jpg' + '?size=512';
 
@@ -368,7 +370,13 @@ async function setMatchInfo() {
     matchContainer.style.display = 'block';
     playerResolve.style.display = 'none';
 
-    player1InGameName.innerHTML = players[0].username;
+    if ( players[0].country ) {
+        countryElement = `<img src="https://flagcdn.com/w20/${players[0].country}.png" />&nbsp;`;
+    } else {
+        countryElement = '';
+    }
+
+    player1InGameName.innerHTML = countryElement + players[0].username;
     if ( players[0].discord_id ) {
         player1InGameName.href = '/profile?playerId=' + players[0].id;
         player1InGameName.setAttribute('target', '_blank');
@@ -382,7 +390,13 @@ async function setMatchInfo() {
         player1RankIcon.src = player1Rank.imageURL;
     }
 
-    player2InGameName.innerHTML = players[1].username;
+    if ( players[1].country ) {
+            countryElement = `<img src="https://flagcdn.com/w20/${players[1].country}.png" />&nbsp;`;
+    } else {
+        countryElement = '';
+    }
+
+    player2InGameName.innerHTML = countryElement + players[1].username;
     if ( players[1].discord_id ) {
         player2InGameName.href = '/profile?playerId=' + players[1].id;
         player2InGameName.setAttribute('target', '_blank');
