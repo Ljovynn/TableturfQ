@@ -213,7 +213,7 @@ export function RemovePlayerFromQue(playerId, matchMode){
         // Stringify both objects to check for equality
         if (ques[i].matchMode != matchMode) continue;
 
-        for (let j = 0; j < ques[i].queArr.length; i++){
+        for (let j = 0; j < ques[i].queArr.length; j++){
             if (ques[i].queArr[j].id == playerId){
                 ques[i].queArr.splice(j, 1);
                 return true;
