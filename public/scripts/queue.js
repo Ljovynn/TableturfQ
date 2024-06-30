@@ -216,6 +216,7 @@ function setReadyUp(readyData) {
     var timeStarted = Math.floor( readyData.timeWaitingStarted / 1000 );
     var timeNow = Math.floor(Date.now() / 1000);
     var timeElapsed = timeNow - timeStarted;
+    queuedMatchMode = readyData.matchMode;
     countdown = PublicQueDatas[queuedMatchMode].readyTimer;
     countdown = countdown - timeElapsed;
     matchMakingReady.style.display = 'block';
