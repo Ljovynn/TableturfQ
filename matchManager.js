@@ -53,11 +53,6 @@ export function MakeNewMatch(player1Id, player2Id, matchMode, privateBattle = fa
         player2Id = tempId;
     }
 
-    var isRanked = false;
-    if (matchMode == matchModes.ranked){
-        isRanked = true;
-    }
-
     const matchId = GenerateNanoId();
 
     var match = new Match(matchId, player1Id, player2Id, matchMode, privateBattle, setLength);

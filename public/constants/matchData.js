@@ -45,28 +45,13 @@ export const disputeResolveOptions = Object.freeze({
     matchWinPlayer2: 7
 });
 
-//add que variables here
-export function QueData(readyTimer, eloGrowthPerSecond, baseEloRange, maxEloRange, minEloStart, maxEloStart){
-    this.readyTimer = readyTimer;
-    this.eloGrowthPerSecond = eloGrowthPerSecond;
-    this.baseEloRange = baseEloRange;
-    this.maxEloRange = maxEloRange;
-    this.minEloStart = minEloStart;
-    this.maxEloStart = maxEloStart;
-}
-
-export function RulesetData(setLength, turnTimer, starterStagesArr, counterPickStagesArr, counterPickBans, DSR){
+function MatchMode(setLength, turnTimer, starterStagesArr, counterPickStagesArr, counterPickBans, DSR){
     this.setLength = setLength;
     this.turnTimer = turnTimer;
     this.starterStagesArr = starterStagesArr;
     this.counterPickStagesArr = counterPickStagesArr;
     this.counterPickBans = counterPickBans;
     this.dsr = DSR;
-}
-
-export function MatchMode(rulesetData, queData){
-    this.rulesetData = rulesetData;
-    this.queData = queData;
 }
 
 const currentRankedStarters = [
@@ -94,17 +79,13 @@ const currentRankedCounterpicks = [
     stages.overTheLine
 ];
 
-const rankedQueData = new QueData(20, 1, 100, 500, 500, 2500);
-const rankedRulesetData = new RulesetData(setLengths.bo5, turnTimer.s50, currentRankedStarters, currentRankedCounterpicks, 2, true)
-const rankedMatchMode = new MatchMode(rankedRulesetData, rankedQueData);
+const rankedMatchMode = new MatchMode(setLengths.bo5, turnTimer.s50, currentRankedStarters, currentRankedCounterpicks, 2, true)
 
-const casualQueData = new QueData(0, 7, 300, 2000, 500, 2500);
-const casualRulesetData = new RulesetData(setLengths.unlimited, turnTimer.unlimited, [], [], 0, false)
-const casualMatchMode = new MatchMode(casualRulesetData, casualQueData);
+const casualMatchMode = new MatchMode(setLengths.unlimited, turnTimer.unlimited, [], [], 0, false)
 
 export const matchModes = Object.freeze({ 
-    casual: casualMatchMode, 
-    ranked: rankedMatchMode
+    'casual': casualMatchMode, 
+    'ranked': rankedMatchMode
 });
 
 export function ChatMessage(content, ownerId){
@@ -129,7 +110,7 @@ export function Match(id, player1Id, player2Id, matchMode, privateBattle = false
 {
     this.id = id;
     var startingStatus = matchStatuses.stageSelection;
-    if (matchMode.rulesetData.setLength == setLengths.unlimited){
+    if (matchModes[matchMode].setLength == setLengths.unlimited || setLength == 0){
         startingStatus = matchStatuses.ingame;
     }
     this.status = startingStatus;
@@ -140,7 +121,7 @@ export function Match(id, player1Id, player2Id, matchMode, privateBattle = false
 
     this.mode = matchMode;
     this.setLength = setLength;
-    if (!setLength) this.setLength = matchMode.rulesetData.setLength;
+    if (!setLength) this.setLength = matchModes[matchMode].setLength;
 
     this.gamesArr = [new Game()];
     this.privateBattle = privateBattle;

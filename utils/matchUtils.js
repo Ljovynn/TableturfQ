@@ -1,4 +1,4 @@
-import { Match, Game, matchModes, ChatMessage } from "../public/constants/matchData.js";
+import { Match, Game, ChatMessage } from "../public/constants/matchData.js";
 
 export function FindPlayerPosInMatch(match, playerId){
     if (match.players[0].id === playerId){
@@ -10,9 +10,9 @@ export function FindPlayerPosInMatch(match, playerId){
 }
 
 export function ConvertDBMatchToMatch(matchData, gamesData, strikeData, chatMessages){
-    var matchMode = matchModes.casual;
+    var matchMode = 'casual';
     if (matchData.ranked || matchData.private_battle) {
-        matchMode = matchModes.ranked;
+        matchMode = 'ranked';
     }
 
     var match = new Match(matchData.id, matchData.player1_id, matchData.player2_id, matchMode, matchData.private_battle, matchData.set_length);

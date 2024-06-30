@@ -1,4 +1,4 @@
-import { matchModes } from "./public/constants/matchData.js";
+import { queDatas } from "./constants/queData.js";
 import { FindIfPlayerInMatch, MakeNewMatch } from "./matchManager.js";
 import { GetUserData } from "./database.js";
 import { userRoles } from "./public/constants/userData.js";
@@ -33,8 +33,8 @@ function MatchedPlayers(player1Id, player2Id, matchMode){
 }
 
 var ques = [
-    new Que(matchModes.casual),
-    new Que(matchModes.ranked)
+    new Que('casual'),
+    new Que('ranked')
 ]
 
 var matchingPlayersList = [];
@@ -64,12 +64,15 @@ async function TryAddPlayerToQue(que, playerId){
     var user = await GetUserData(playerId);
     if (!user) return enterQueErrors.noUser;
     if (user.banned == 1) return enterQueErrors.banned;
-    if (que.matchMode == matchModes.ranked){
+    if (que.matchMode == 'ranked'){
         if (user.role == userRoles.unverified) return enterQueErrors.unverified;
     }
 
-    var baseSearchElo = Math.max(user.g2_rating, que.matchMode.queData.minEloStart);
-    baseSearchElo = Math.min(user.g2_rating, que.matchMode.queData.maxEloStart);
+    var index = SearchMatchedPlayersList(matchingPlayersList, playerId);
+    if (index != -1) return enterQueErrors.inQue;
+
+    var baseSearchElo = Math.max(user.g2_rating, queDatas[que.matchMode].minEloStart);
+    baseSearchElo = Math.min(user.g2_rating, queDatas[que.matchMode].maxEloStart);
 
     que.queArr.push(new PlayerInQue(playerId, baseSearchElo));
     return new ResponseData(201);
@@ -90,7 +93,7 @@ export async function MatchMakingTick(){
 
     //set up match
     for (let i = 0; i < newlyMatchedPlayers.length; i++){
-        if (newlyMatchedPlayers[i].matchMode == matchModes.casual){
+        if (newlyMatchedPlayers[i].matchMode == 'casual'){
             RemovePlayersFromQue(ques[0].queArr, newlyMatchedPlayers[i].players[0], newlyMatchedPlayers[i].players[1]);
             var match = MakeNewMatch(newlyMatchedPlayers[i].players[0], newlyMatchedPlayers[i].players[1], newlyMatchedPlayers[i].matchMode);
 
@@ -116,7 +119,7 @@ async function QueTick(que){
     //set all players search range
     for (let i = 0; i < que.queArr.length; i++){
         var secondsPlayerWaited = (Date.now() - que.queArr[i].startedQue) / 1000;
-        que.queArr[i].eloSearchRange = Math.min(que.matchMode.queData.baseEloRange + (secondsPlayerWaited * que.matchMode.queData.eloGrowthPerSecond), que.matchMode.queData.maxEloRange);
+        que.queArr[i].eloSearchRange = Math.min(queDatas[que.matchMode].baseEloRange + (secondsPlayerWaited * queDatas[que.matchMode].eloGrowthPerSecond), queDatas[que.matchMode].maxEloRange);
     }
 
     return FindPlayersToMatch(que);
@@ -149,7 +152,7 @@ function FindPlayersToMatch(que){
 //checks if timer has run out for any matchmade players
 export function CheckMatchmadePlayers(){
     for (let i = matchingPlayersList.length - 1; i >= 0; i--){
-        if (Date.now - matchingPlayersList[i].createdAt > matchingPlayersList[i].matchMode.queData.readyTimer + readyTimerGracePeriod){
+        if (Date.now - matchingPlayersList[i].createdAt > queDatas[matchingPlayersList[i].matchMode].readyTimer + readyTimerGracePeriod){
             matchingPlayersList.splice(i, 1);
         }
     }

@@ -221,7 +221,8 @@ router.post("/GetMatchInfo", async (req, res) => {
 
         if (typeof(matchId) !== 'string') return SetResponse(res, definitionErrors.matchUndefined);
 
-        const userRole = await GetUserRole(userId);
+        var userRole = userRoles.unverified;
+        if (userId) userRole = await GetUserRole(userId);
 
         var matchHidden = true;
 
