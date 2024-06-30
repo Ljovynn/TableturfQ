@@ -280,6 +280,7 @@ function getMatchPlayer( matchUsers, playerId ) {
 function hideNonUserElements() {
     if ( userId != loggedInUserID ) {
         editDisplayName.style.display = 'none';
+        editCountry.style.display = 'none';
         logoutButton.style.display = 'none';
     }
 }
