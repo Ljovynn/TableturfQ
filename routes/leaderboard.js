@@ -1,5 +1,7 @@
 import { Router } from 'express';
 
+import { SetResponse } from '../Responses/ResponseData.js';
+import { definitionErrors, nullErrors, userErrors } from '../Responses/requestErrors.js';
 import { GetLeaderboardAtPos, SearchLeaderboard } from '../userListManager.js';
 
 const router = Router();

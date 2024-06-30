@@ -1,4 +1,5 @@
 const leaderBoard = document.getElementById('leaderboard');
+const leaderBoardForm = document.getElementById('leaderboard-form');
 
 const searchInput = document.getElementById('leaderboard-search');
 const searchButton = document.getElementById('leaderboard-search-button');
@@ -15,13 +16,16 @@ var totalPlayers;
 // Defaults of startPos 0 and 15 hitcounts
 setLeaderBoard(startPos, hitCount);
 
-searchButton.addEventListener('click', (e) => {
+leaderBoardForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
     var searchValue = searchInput.value;
 
     if ( validateSeach(searchValue) ) {
-        data = { search: searchValue };
-        response = postData('/search', data);
+        data = { input: searchValue };
+        response = await getData('/leaderboard/SearchLeaderboard', data);
 
+        console.log(response);
+        addSearchedUser(response);
         // If success, recreate the table with the retrieved results
     } else {
         alert('Please enter a valid username to search.');
@@ -115,9 +119,43 @@ async function setLeaderBoard(startPos, hitCount) {
     }
 }
 
+function addSearchedUser(users) {
+    refreshLeaderBoard(0,0);
+    for ( let user of users ) {
+
+        let row = document.createElement('div');
+        row.classList.add('leaderboard-row');
+
+        let placementCell = document.createElement('div');
+        placementCell.classList.add('leaderboard-placement');
+        placementCell.append(user.position);
+
+        let nameCell = document.createElement('div');
+        nameCell.classList.add('leaderboard-name');
+
+        let userLink = document.createElement('a');
+        userLink.href = '/profile?playerId=' + user.user.id;
+        userLink.setAttribute('target', '_blank');
+        userLink.append(user.user.username);
+        nameCell.append(userLink);
+
+        let eloCell = document.createElement('div');
+        eloCell.classList.add('leaderboard-ELO');
+        eloCell.append( (Math.round(user.user.g2_rating * 100) / 100).toFixed(2) );
+
+        row.append(placementCell);
+        row.append(nameCell);
+        row.append(eloCell);
+
+        leaderBoard.append(row);
+    }
+}
+
 async function refreshLeaderBoard(startPos, hitCount) {
     leaderBoard.replaceChildren(leaderBoard.firstElementChild);
-    setLeaderBoard(startPos, hitCount);
+    if ( startPos != 0 && hitCount != 0 ) {
+        setLeaderBoard(startPos, hitCount);
+    }
 }
 
 async function getLeaderBoard(startPos, hitCount) {
