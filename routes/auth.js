@@ -131,7 +131,11 @@ async function StoreUserData(accessToken, refreshToken, userId){
     var newUserId;
     if (!newUser){
         newUserId = GenerateNanoId();
-        await CreateUserWithDiscord(newUserId, response.data.username, response.data.id, accessToken, refreshToken, avatar);
+
+        var username = response.data.global_name;
+        if (!username) username = response.data.username;
+
+        await CreateUserWithDiscord(newUserId, username, response.data.id, response.data.username, accessToken, refreshToken, avatar);
     } else {
         newUserId = newUser.id;
         await SetUserDiscord(newUserId, response.data.id, response.data.username, accessToken, refreshToken, avatar); 

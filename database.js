@@ -218,9 +218,9 @@ export async function CreateUser(userId, username)
     await pool.execute(`INSERT INTO users (id, username, g2_rating, g2_rd, g2_vol) VALUES (?, ?, ?, ?, ?)`, [userId, username, settings.rating, settings.rd, settings.vol]);
 }
 
-export async function CreateUserWithDiscord(userId, discordUsername, discordId, discordAccessToken, discordRefreshToken, discordAvatarHash){
+export async function CreateUserWithDiscord(userId, username, discordId, discordUsername, discordAccessToken, discordRefreshToken, discordAvatarHash){
     await pool.execute(`INSERT INTO users (id, username, role, g2_rating, g2_rd, g2_vol, discord_id, discord_username, discord_access_token, discord_refresh_token, discord_avatar_hash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [userId, discordUsername, userRoles.verified, settings.rating, settings.rd, settings.vol, discordId, discordUsername, discordAccessToken, discordRefreshToken, discordAvatarHash]);
+    [userId, username, userRoles.verified, settings.rating, settings.rd, settings.vol, discordId, discordUsername, discordAccessToken, discordRefreshToken, discordAvatarHash]);
 }
 
 /*export async function CreateSession(sessionId, expiresAt, data){
