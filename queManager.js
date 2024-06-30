@@ -1,10 +1,11 @@
-import { matchModes } from "./public/constants/matchData.js";
+import { queDatas } from "./constants/queData.js";
 import { FindIfPlayerInMatch, MakeNewMatch } from "./matchManager.js";
 import { GetUserData } from "./database.js";
 import { userRoles } from "./public/constants/userData.js";
 import { SendEmptySocketMessage, SendSocketMessage } from "./socketManager.js";
 import { ResponseData } from "./Responses/ResponseData.js";
 import { enterQueErrors, readyUpErrors } from "./Responses/queErrors.js";
+import { matchModes } from "./public/constants/matchData.js";
 
 const readyTimerGracePeriod = 1000 * 3;
 const alreadyMatchedPlayersTime = 1000 * 60 * 20;
@@ -68,8 +69,11 @@ async function TryAddPlayerToQue(que, playerId){
         if (user.role == userRoles.unverified) return enterQueErrors.unverified;
     }
 
-    var baseSearchElo = Math.max(user.g2_rating, que.matchMode.queData.minEloStart);
-    baseSearchElo = Math.min(user.g2_rating, que.matchMode.queData.maxEloStart);
+    var index = SearchMatchedPlayersList(matchingPlayersList, playerId);
+    if (index != -1) return enterQueErrors.inQue;
+
+    var baseSearchElo = Math.max(user.g2_rating, queDatas[que.matchMode].minEloStart);
+    baseSearchElo = Math.min(user.g2_rating, queDatas[que.matchMode].maxEloStart);
 
     que.queArr.push(new PlayerInQue(playerId, baseSearchElo));
     return new ResponseData(201);
@@ -90,7 +94,7 @@ export async function MatchMakingTick(){
 
     //set up match
     for (let i = 0; i < newlyMatchedPlayers.length; i++){
-        if (newlyMatchedPlayers[i].matchMode == matchModes.casual){
+        if (queDatas[newlyMatchedPlayers[i].matchMode].readyTimer == 0){
             RemovePlayersFromQue(ques[0].queArr, newlyMatchedPlayers[i].players[0], newlyMatchedPlayers[i].players[1]);
             var match = MakeNewMatch(newlyMatchedPlayers[i].players[0], newlyMatchedPlayers[i].players[1], newlyMatchedPlayers[i].matchMode);
 
@@ -116,7 +120,7 @@ async function QueTick(que){
     //set all players search range
     for (let i = 0; i < que.queArr.length; i++){
         var secondsPlayerWaited = (Date.now() - que.queArr[i].startedQue) / 1000;
-        que.queArr[i].eloSearchRange = Math.min(que.matchMode.queData.baseEloRange + (secondsPlayerWaited * que.matchMode.queData.eloGrowthPerSecond), que.matchMode.queData.maxEloRange);
+        que.queArr[i].eloSearchRange = Math.min(queDatas[que.matchMode].baseEloRange + (secondsPlayerWaited * queDatas[que.matchMode].eloGrowthPerSecond), queDatas[que.matchMode].maxEloRange);
     }
 
     return FindPlayersToMatch(que);
@@ -149,7 +153,7 @@ function FindPlayersToMatch(que){
 //checks if timer has run out for any matchmade players
 export function CheckMatchmadePlayers(){
     for (let i = matchingPlayersList.length - 1; i >= 0; i--){
-        if (Date.now - matchingPlayersList[i].createdAt > matchingPlayersList[i].matchMode.queData.readyTimer + readyTimerGracePeriod){
+        if (Date.now - matchingPlayersList[i].createdAt > queDatas[matchingPlayersList[i].matchMode].readyTimer + readyTimerGracePeriod){
             matchingPlayersList.splice(i, 1);
         }
     }
@@ -181,17 +185,20 @@ export function FindIfPlayerInQue(playerId){
 
 export function FindIfPlayerWaitingForReady(playerId){
     var data = {
+    matchMode: null,
     ready: false,
     timeWaitingStarted: null,
     }
 
     for (let i = 0; i < matchingPlayersList.length; i++){
         if (matchingPlayersList[i].players[0].id == playerId){
+            data.matchMode = matchingPlayersList[i].matchMode;
             data.ready = matchingPlayersList[i].players[0].ready;
             data.timeWaitingStarted = matchingPlayersList[i].createdAt;
             return data;
         }
         else if (matchingPlayersList[i].players[1].id == playerId){
+            data.matchMode = matchingPlayersList[i].matchMode;
             data.ready = matchingPlayersList[i].players[1].ready;
             data.timeWaitingStarted = matchingPlayersList[i].createdAt;
             return data;
@@ -206,7 +213,7 @@ export function RemovePlayerFromQue(playerId, matchMode){
         // Stringify both objects to check for equality
         if (ques[i].matchMode != matchMode) continue;
 
-        for (let j = 0; j < ques[i].queArr.length; i++){
+        for (let j = 0; j < ques[i].queArr.length; j++){
             if (ques[i].queArr[j].id == playerId){
                 ques[i].queArr.splice(j, 1);
                 return true;

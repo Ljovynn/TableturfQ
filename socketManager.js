@@ -60,6 +60,7 @@ async function SocketJoinMatchRoom(socket, room){
     const userId = socket.request.session.user;
     const roomId = room.slice(5);
     if (!roomId) return;
+    if (!userId) return;
 
     //find if user in active match
     if (FindIfPlayerInMatch(userId)) socket.join(room);

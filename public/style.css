@@ -77,6 +77,16 @@ h3 {
     width: 50%;
 }
 
+#recent-matches {
+    display: none;
+    width: 50%;
+    margin: auto;
+}
+
+#recent-matches-list {
+    outline: 2px solid black;
+}
+
 #ranked-match-ready {
     display: none;
 }
@@ -420,6 +430,30 @@ h3 {
 
 .page-prev, .page-next {
     cursor: pointer;
+}
+
+/**** USER SEARCH STYLES ****/
+
+#user-search-results {
+    width: 50%;
+    margin: auto;
+}
+
+.user-search-rank-icon {
+    width: 30px;
+}
+
+.user-search-row {
+    display: inline-block;
+    padding: 20px;
+    border: 2px solid black;
+    margin: 10px 10px 20px 10px;
+    width: 200px;
+}
+
+.user-search-avatar {
+    width: 150px;
+    border-radius: 50%;
 }
 
 /**** MOBILE STLYES ****/

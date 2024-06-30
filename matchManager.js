@@ -1,4 +1,4 @@
-import {matchStatuses, matchModes, Game, Match, ChatMessage, disputeResolveOptions} from "./public/constants/matchData.js";
+import {matchStatuses, rulesets, Game, Match, ChatMessage, disputeResolveOptions, matchModes} from "./public/constants/matchData.js";
 import { GenerateNanoId } from "./nanoIdManager.js";
 import { stages } from "./public/constants/stageData.js";
 import { ApplyMatchEloResults, placementMatchCount } from "./glicko2Manager.js";
@@ -8,7 +8,7 @@ import { AddRecentlyMatchedPlayers } from "./queManager.js";
 import { SendDisputeMessage, SendNewSuspiciousAction, SuspiciousAction } from "./discordBot/discordBotManager.js";
 import { ResponseData } from "./Responses/ResponseData.js";
 import { casualMatchEndErrors, chatMessageErrors, disputeErrors, gameWinErrors, databaseErrors, resolveErrors, stagePickErrors, stageStrikeErrors, nullErrors, forfeitErrors } from "./Responses/matchErrors.js";
-import { HasBadWords } from "./utils/string.js";
+import { HasBadWords, SanitizeDiscordLog } from "./utils/string.js";
 import { DetailMinute } from "./utils/date.js";
 
 var matches = [];
@@ -53,11 +53,6 @@ export function MakeNewMatch(player1Id, player2Id, matchMode, privateBattle = fa
         player2Id = tempId;
     }
 
-    var isRanked = false;
-    if (matchMode == matchModes.ranked){
-        isRanked = true;
-    }
-
     const matchId = GenerateNanoId();
 
     var match = new Match(matchId, player1Id, player2Id, matchMode, privateBattle, setLength);
@@ -83,7 +78,7 @@ export function PlayerSentStageStrikes(playerId, stages){
 }
 
 function StarterStrikeLogic(match, playerPos, stages){
-    const stageList = match.mode.rulesetData.starterStagesArr;
+    const stageList = rulesets[match.mode].starterStagesArr;
     var game = match.gamesArr[0];
 
     var correctStagesLength = 2;
@@ -133,10 +128,10 @@ function CheckStarterStrikesFinished(game, stageList){
 }
 
 function CounterpickStrikingLogic(match, playerId, playerPos, stages){
-    const stageList = match.mode.rulesetData.counterPickStagesArr;
+    const stageList = rulesets[match.mode].counterPickStagesArr;
     var game = match.gamesArr[match.gamesArr.length - 1];
 
-    if (stages.length != match.mode.rulesetData.counterPickBans) return stageStrikeErrors.stageAmountIncorrect;
+    if (stages.length != rulesets[match.mode].counterPickBans) return stageStrikeErrors.stageAmountIncorrect;
 
     if (match.gamesArr[match.gamesArr.length - 2].winnerId != playerId) return stageStrikeErrors.wrongPlayer;
 
@@ -167,7 +162,7 @@ export function PlayerSentStagePick(playerId, stage){
 
     if (match.status != matchStatuses.stageSelection) return stagePickErrors.wrongStatus;
 
-    if (!match.mode.rulesetData.counterPickStagesArr.includes(stage)) return stagePickErrors.stageNotInStagelist;
+    if (!rulesets[match.mode].counterPickStagesArr.includes(stage)) return stagePickErrors.stageNotInStagelist;
 
     if (match.players[playerPos - 1].unpickableStagesArr.includes(stage)) return stagePickErrors.DSRunpickable;
 
@@ -175,7 +170,7 @@ export function PlayerSentStagePick(playerId, stage){
 
     var game = match.gamesArr[match.gamesArr.length - 1];
 
-    if (game.strikes.length < match.mode.rulesetData.counterPickBans) return stagePickErrors.notEnoughStrikes;
+    if (game.strikes.length < rulesets[match.mode].counterPickBans) return stagePickErrors.notEnoughStrikes;
 
     if (game.strikes.includes(stage)) return stagePickErrors.stageStriked;
 
@@ -225,7 +220,7 @@ export async function PlayerSentGameWin(playerId, winnerId){
     //check game verified
     if (match.players[0].gameConfirmed && match.players[1].gameConfirmed){
 
-        if (match.mode.rulesetData.dsr){
+        if (rulesets[match.mode].dsr){
             match.players[winnerPos - 1].unpickableStagesArr.push(game.stage);
         }
 
@@ -233,7 +228,7 @@ export async function PlayerSentGameWin(playerId, winnerId){
 
         if (CheckMatchWin(match, winnerId)){
             if (match.createdAt < Date.now() + (5 * 60 * 1000)){
-                const suspiciousAction = new SuspiciousAction(winnerId.toString(), `Won a ranked match against user ID ${match.players[winnerPos % 2].id} in less than 5 minutes`, `${DetailMinute(new Date(Date.now()))} UTC`);
+                const suspiciousAction = new SuspiciousAction(winnerId, `Won a ranked match against user ID ${SanitizeDiscordLog(match.players[winnerPos % 2].id)} in less than 5 minutes`, `${DetailMinute(new Date(Date.now()))} UTC`);
                 SendNewSuspiciousAction(suspiciousAction);
             }
 
@@ -303,7 +298,7 @@ export async function PlayerSentForfeit(playerId){
     if (!result.newPlayerRatings) return databaseErrors.matchFinishError;
 
     if (!match.privateBattle){
-        const suspiciousAction = new SuspiciousAction(playerId.toString(), `Forfeited a ranked match against user ID ${match.players[playerPos % 2].id}`, `${DetailMinute(new Date(Date.now()))} UTC`);
+        const suspiciousAction = new SuspiciousAction(playerId, `Forfeited a ranked match against user ID ${SanitizeDiscordLog(match.players[playerPos % 2].id)}`, `${DetailMinute(new Date(Date.now()))} UTC`);
         SendNewSuspiciousAction(suspiciousAction);
     }
 
@@ -330,7 +325,7 @@ export async function PlayerSentCasualMatchEnd(playerId){
     if (!await FinishMatch(match)) return databaseErrors.matchFinishError;
 
     if (match.createdAt < Date.now() + (30 * 1000)){
-        const suspiciousAction = new SuspiciousAction(playerId.toString(), 'Ended a casual match within 30 seconds', `${DetailMinute(new Date(Date.now()))} UTC`);
+        const suspiciousAction = new SuspiciousAction(playerId, 'Ended a casual match within 30 seconds', `${DetailMinute(new Date(Date.now()))} UTC`);
         SendNewSuspiciousAction(suspiciousAction);
     }
 
@@ -422,7 +417,7 @@ export async function PlayerSentResolveDispute(playerId){
         if (match.mode == matchModes.casual){
             match.status == matchStatuses.ingame;
             SendDisputeMessage(GetDisputedMatchesList(), false);
-            return new ResponseData(201, 'casual');
+            return new ResponseData(201, matchModes.casual);
         }
 
         var responseData = HandleNoChangesResolve(match);
@@ -444,7 +439,7 @@ export async function ResolveMatchDispute(matchId, resolveOption){
     if (match.mode == matchModes.casual){
         match.status == matchStatuses.ingame;
         SendDisputeMessage(GetDisputedMatchesList(), false);
-        return new ResponseData(201, 'casual');
+        return new ResponseData(201, matchModes.casual);
     }
 
     switch (resolveOption){
@@ -522,7 +517,7 @@ async function HandleDisputeGameWin(match, winnerIndex){
         winnerPos = 2;
     }
 
-    if (match.mode.rulesetData.dsr){
+    if (rulesets[match.mode].dsr && currentGame.stage != stages.unpicked){
         match.players[winnerPos - 1].unpickableStagesArr.push(currentGame.stage);
     }
 

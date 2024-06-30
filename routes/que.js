@@ -3,7 +3,7 @@ import { AddPlayerToQue, RemovePlayerFromQue, PlayerSentReady } from "../queMana
 import { CheckUserDefined } from "../utils/checkDefined.js";
 import { SendSocketMessage } from "../socketManager.js";
 import { definitionErrors, userErrors } from '../Responses/requestErrors.js';
-import { matchModes } from '../public/constants/matchData.js';
+import { rulesets } from '../public/constants/matchData.js';
 import { ResponseSucceeded, SetResponse } from '../Responses/ResponseData.js';
 
 const router = Router();
@@ -14,12 +14,10 @@ const router = Router();
 router.post("/PlayerEnterQue", async (req, res) => {
     try {
         const userId = req.session.user;
-        const matchModeInput = req.body.matchMode;
+        const matchMode = req.body.matchMode;
 
         if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
-        if (typeof(matchModeInput) === 'undefined') return SetResponse(res, definitionErrors.matchModeUndefined);
-
-        const matchMode = matchModes[matchModeInput];
+        if (typeof(matchMode) !== 'string') return SetResponse(res, definitionErrors.matchModeUndefined);
 
         var responseData = await AddPlayerToQue(userId, matchMode);
         if (!ResponseSucceeded(responseData.code)) return SetResponse(res, responseData);
@@ -35,12 +33,10 @@ router.post("/PlayerEnterQue", async (req, res) => {
 router.post("/PlayerLeaveQue", async (req, res) => {
     try {
         const userId = req.session.user;
-        const matchModeInput = req.body.matchMode;
+        const matchMode = req.body.matchMode;
 
         if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
-        if (typeof(matchModeInput) === 'undefined') return SetResponse(res, definitionErrors.matchModeUndefined);
-
-        const matchMode = matchModes[matchModeInput];
+        if (typeof(matchMode) !== 'string') return SetResponse(res, definitionErrors.matchModeUndefined);
 
         if (RemovePlayerFromQue(userId, matchMode)){
             res.sendStatus(201);

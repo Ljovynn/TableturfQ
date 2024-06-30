@@ -16,7 +16,7 @@ import { SendSocketMessage, SendEmptySocketMessage } from '../socketManager.js';
 
 import { definitionErrors, nullErrors, userErrors } from '../Responses/requestErrors.js';
 import { ResponseSucceeded, SetResponse } from '../Responses/ResponseData.js';
-import { disputeResolveOptions } from '../public/constants/matchData.js';
+import { disputeResolveOptions, matchModes } from '../public/constants/matchData.js';
 import { ApplyHideRank } from '../utils/userUtils.js';
 
 const router = Router();
@@ -169,7 +169,7 @@ router.post("/ResolveDispute", async (req, res) => {
         var responseData = await PlayerSentResolveDispute(userId);
         if (!ResponseSucceeded(responseData.code)) return SetResponse(res, responseData);
 
-        if (responseData.data === 'casual'){
+        if (responseData.data === matchModes.casual){
             res.sendStatus(responseData.code);
             SendSocketMessage('match' + matchId, "resolveDispute", disputeResolveOptions.noChanges);
             return;
@@ -221,7 +221,8 @@ router.post("/GetMatchInfo", async (req, res) => {
 
         if (typeof(matchId) !== 'string') return SetResponse(res, definitionErrors.matchUndefined);
 
-        const userRole = await GetUserRole(userId);
+        var userRole = userRoles.unverified;
+        if (userId) userRole = await GetUserRole(userId);
 
         var matchHidden = true;
 

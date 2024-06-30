@@ -111,6 +111,10 @@ router.post("/SearchUser", async (req, res) => {
 
         const users = SearchUser(input);
 
+        for (let i = 0; i < users.length; i++){
+            users[i].g2_rating = ApplyHideRank(users[i]);
+        }
+
         res.status(200).send(users);
     } catch(error){
         console.log(error);
@@ -126,11 +130,12 @@ router.post("/SearchUser", async (req, res) => {
 //user: id, username, role, g2_rating, discord_id, discord_avatar_hash, created_at, banned
 
 //quedata:
-//matchmode = matchMode object
+//matchmode = string
 //timeQueStarted = timestamp when que started
 //returns undefined if not in que
 
 //readyData:
+//matchMode: string
 //ready = bool if you pressed ready, 
 //timeWaitingStarted = timestamp since ready wait started
 //returns undefined if not in ready waiting

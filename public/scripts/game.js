@@ -1,4 +1,4 @@
-import { matchModes } from "../constants/matchData.js";
+import { matchModes, rulesets } from "../constants/matchData.js";
 import { GetRank } from "../constants/rankData.js";
 
 // Create variables for all the elements we need to interact with
@@ -100,6 +100,7 @@ var mapSelect = false;
 var starters = [];
 var counterpicks = [];
 var pickingStage = false;
+var privateMatch = false;
 
 // Suppress the opponent left socket if the current user is the one who left the match
 var userLeft = false;
@@ -245,10 +246,12 @@ needHelp.addEventListener('click', async (e) => {
 });
 
 playerRaiseDispute.addEventListener('click', async (e) => {
-    var data = { userId: userID };
-    var response = await postData('/match/Dispute', data);
-    console.log(response);
-    playerRaiseDispute.style.display = 'none';
+    if ( !privateMatch ) {
+        var data = { userId: userID };
+        var response = await postData('/match/Dispute', data);
+        console.log(response);
+        playerRaiseDispute.style.display = 'none';
+    }
 });
 
 playerResolveDispute.addEventListener('click', async (e) => {
@@ -287,11 +290,24 @@ async function getUserInfo() {
 
 
 async function setUserInfo() {
-    var userInfo = await getUserInfo(userID);
+    try {
+        var userInfo = await getUserInfo(userID);
 
-    user = userInfo.user;
-    username = user.username;
-    userID = user.id;
+        user = userInfo.user;
+        username = user.username;
+        userID = user.id;
+    } catch (error) {
+        await getMatchInfo(matchId);
+        match = matchInfo.match;
+        console.log(matchModes[match.mode]);
+        counterpicks = rulesets[ matchModes[match.mode] ].counterPickStagesArr;
+        chatForm.style.display = 'none';
+        chatLog.style.display = 'none';
+        console.log(match);
+        if ( match.status != 3 && match.status != 4 ) {
+            window.location.href = '/';  
+        }
+    }
 }
 
 async function getMatchInfo(matchId) {
@@ -319,9 +335,10 @@ async function setMatchInfo() {
     console.log(oppID);
 
     chat = match.chat;
-    starters = match.mode.rulesetData.starterStagesArr;
-    counterpicks = match.mode.rulesetData.counterPickStagesArr;
-    counterpickStrikeAmount = match.mode.rulesetData.counterPickBans;
+    starters = rulesets[ matchModes[match.mode] ].starterStagesArr;
+    counterpicks = rulesets[ matchModes[match.mode] ].counterPickStagesArr;
+    counterpickStrikeAmount = rulesets[ matchModes[match.mode] ].counterPickBans;
+    privateMatch = match.privateBattle;
 
     var player1DiscordId = players[0].discord_id;
     var player1DiscordAvatar = players[0].discord_avatar_hash;
@@ -379,8 +396,8 @@ async function setMatchInfo() {
         player2RankIcon.src = player2Rank.imageURL;
     }
 
-    setLength.innerHTML = 'Best of ' + bestOfSets[match.mode.rulesetData.setLength] + ' games';
-    turnTimer.innerHTML = ( match.mode.rulesetData.turnTimer * 10 ) + ' seconds';
+    setLength.innerHTML = 'Best of ' + ( privateMatch ? match.setLength : bestOfSets[rulesets[ matchModes[match.mode] ].setLength] ) + ' games';
+    turnTimer.innerHTML = ( rulesets[ matchModes[match.mode] ].turnTimer * 10 ) + ' seconds';
 
     addChatMessages(chat);
     if ( !casualMatch ) {
@@ -422,6 +439,8 @@ async function setMatchInfo() {
     } else {
         setCasualGame();
     }
+    checkPrivateMatch();
+    checkMatchOver();
 }
 
 // Grab all messages associated with the game and add them to the chat log
@@ -746,6 +765,22 @@ function setWinner(winnerId) {
     }
 }
 
+function checkPrivateMatch() {
+    if ( privateMatch ) {
+        playerRaiseDispute.style.display = 'none';
+    }
+}
+
+function checkMatchOver() {
+    console.log(matchInfo.match.status);
+    if ( matchInfo.match.status == 3 || matchInfo.match.status == 4 ) {
+        needHelp.style.display = 'none';
+        leaveMatch.style.display = 'none';
+        playerRaiseDispute.style.display = 'none';
+        strikerSection.style.display = 'none';
+    }
+}
+
 async function nextGame(winnerId) {
     mapSelect = false;
     playingStage.style.display = 'none';
@@ -805,7 +840,9 @@ function showModDispute() {
 }
 
 function showPlayerResolve() {
-    playerResolve.style.display = 'block';
+    if ( !privateMatch ) {
+        playerResolve.style.display = 'block';
+    }
 }
 
 async function getModUser(users) {
@@ -911,7 +948,9 @@ socket.on('forfeit', async (data) => {
 });
 
 socket.on('dispute', async () => {
-    alert('There has been a dispute in match results. Please wait for a moderator to resolve the issue. If the dispute was made by accident, please press the resolve dispute button and properly mark the winner.');
+    if ( !privateMatch ) {
+        alert('There has been a dispute in match results. Please wait for a moderator to resolve the issue. If the dispute was made by accident, please press the resolve dispute button and properly mark the winner.');
+    }
     await setMatchInfo();
     await showModDispute();
     await showPlayerResolve();
@@ -921,7 +960,9 @@ socket.on('dispute', async () => {
 
 socket.on('resolveDispute', async (resolveOption) => {
     console.log(resolveOption);
-    alert('The dispute has been resolved.');
+    if ( !privateMatch ) {
+        alert('The dispute has been resolved.');
+    }
     await setMatchInfo();
     console.log(match);
     // If the game or the match has to be reset, go through the reset function

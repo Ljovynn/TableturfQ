@@ -3,6 +3,7 @@ import { BanUser, GetUserByDiscordId, GetUserData, SetUserRole, SuspendUser, Unb
 import { BuildSimpleEmbed } from "../utils/embed.js";
 import { userRoles } from "../../public/constants/userData.js";
 import { idSize } from "../../nanoIdManager.js";
+import { SanitizeDiscordLog } from "../../utils/string.js";
 
 const banLengths = {
     '1 day': 24 * 60 * 60 * 1000,
@@ -124,18 +125,18 @@ export async function execute(interaction) {
             if (banLengthObject){
                 await SuspendUser(user.id, banLengths[banLength]);
                 await HandleBanUser(user.id);
-                const banEmbed = BuildSimpleEmbed('Ban successful', `Successfully suspended user **${user.username}**`, `The ban lasts for ${banLength}.`);
+                const banEmbed = BuildSimpleEmbed('Ban successful', `Successfully suspended user **${SanitizeDiscordLog(user.username)}**`, `The ban lasts for ${banLength}.`);
                 await interaction.reply({ embeds: [banEmbed] });
                 return;
             } else{
                 await BanUser(user.id);
                 await HandleBanUser(user.id);
-                const banEmbed = BuildSimpleEmbed('Ban successful', `Successfully banned user **${user.username}**`, 'The ban is permanent.');
+                const banEmbed = BuildSimpleEmbed('Ban successful', `Successfully banned user **${SanitizeDiscordLog(user.username)}**`, 'The ban is permanent.');
                 await interaction.reply({ embeds: [banEmbed] });
                 return;
         }
         } catch(error){
-            const banFailedEmbed = BuildSimpleEmbed('Ban failed', `Failed to ban user **${user.username}**. Error message:`, error.message);
+            const banFailedEmbed = BuildSimpleEmbed('Ban failed', `Failed to ban user **${SanitizeDiscordLog(user.username)}**. Error message:`, error.message);
             await interaction.reply({ embeds: [banFailedEmbed] });
             return;
         }
@@ -146,11 +147,11 @@ export async function execute(interaction) {
         try{
             await UnbanUser(user.id);
 
-            const unbanEmbed = BuildSimpleEmbed('Unban successful', `Successfully unbanned user **${user.username}**`, 'Good for them.');
+            const unbanEmbed = BuildSimpleEmbed('Unban successful', `Successfully unbanned user **${SanitizeDiscordLog(user.username)}**`, 'Good for them');
             await interaction.reply({ embeds: [unbanEmbed] });
             return;
         } catch(error){
-            const unbanFailedEmbed = BuildSimpleEmbed('Unban failed', `Failed to unban user **${user.username}**. Error message:`, error.message);
+            const unbanFailedEmbed = BuildSimpleEmbed('Unban failed', `Failed to unban user **${SanitizeDiscordLog(user.username)}**. Error message:`, error.message);
             await interaction.reply({embeds: [unbanFailedEmbed] });
             return;
         }
@@ -161,11 +162,11 @@ export async function execute(interaction) {
         const newRole = interaction.options.get('role').value;
         await SetUserRole(user.id, newRole);
 
-        const setRoleEmbed = BuildSimpleEmbed('Role set successfully', `Successfully set user **${user.username}** as role ${roleOptions[newRole - 1].name}`, `Discord user: <@${discordUser.id}>`);
+        const setRoleEmbed = BuildSimpleEmbed('Role set successfully', `Successfully set user **${SanitizeDiscordLog(user.username)}** as role ${roleOptions[newRole - 1].name}`, `Discord user: <@$discordUser.id}>`);
         await interaction.reply({ embeds: [setRoleEmbed] });
         return;
     } catch(error){
-        const setRoledFailedEmbed = BuildSimpleEmbed('Set role failed', `Failed to update role of user **${user.username}**`, `Discord user: <@${discordUser.id}>. Error message: ${error.message}`);
+        const setRoledFailedEmbed = BuildSimpleEmbed('Set role failed', `Failed to update role of user **${SanitizeDiscordLog(user.username)}**`, `Discord user: <@${discordUser.id}>. Error message: ${error.message}`);
         await interaction.reply({embeds: [setRoledFailedEmbed] });
         return;
     }

@@ -4,12 +4,12 @@ import { CheckUserDefined } from '../utils/checkDefined.js';
 import { BanUser, GetUserBanAndRole, GetUserRole, SuspendUser, UnbanUser } from '../database.js';
 import { userRoles } from '../public/constants/userData.js';
 
-import { SendEmptySocketMessage, SendSocketMessage } from '../socketManager.js';
-import { RemovePlayerFromAnyQue } from '../queManager.js';
-import { GetDisputedMatchesList, HandleBannedPlayerInMatch, ModSentChatMessage, ResolveMatchDispute, UserSentChatMessage } from '../matchManager.js';
+import { SendSocketMessage } from '../socketManager.js';
+import { GetDisputedMatchesList, ModSentChatMessage, ResolveMatchDispute } from '../matchManager.js';
 import { disputeResolveOptions, matchModes } from '../public/constants/matchData.js';
 import { ResponseSucceeded, SetResponse } from '../Responses/ResponseData.js';
 import { definitionErrors, userErrors } from '../Responses/requestErrors.js';
+import { HandleBanUser } from '../utils/userUtils.js';
 
 const router = Router();
 
@@ -31,7 +31,7 @@ router.post("/ResolveDispute", async (req, res) => {
         if (!ResponseSucceeded(responseData.code)) return SetResponse(res, responseData);
         var matchData = responseData.data;
 
-        if (responseData.data === 'casual'){
+        if (responseData.data === matchModes.casual){
             res.sendStatus(responseData.code);
             SendSocketMessage('match' + matchId, "resolveDispute", disputeResolveOptions.noChanges);
             return;
@@ -95,18 +95,7 @@ router.post("/BanUser", async (req, res) => {
         }
         console.log(`User ID ${bannedUserId} was banned by admin ID ${req.session.user}`);
 
-        RemovePlayerFromAnyQue(bannedUserId);
-        var matchData = await HandleBannedPlayerInMatch(bannedUserId);
-
-        switch (matchData.mode){
-            case matchModes.casual:
-                SendEmptySocketMessage(matchData.matchId, "matchEnd");
-                break;
-            case matchModes.ranked:
-                var data = [matchData.winnerId, matchData.newPlayerRatings]
-                SendSocketMessage('match' + matchData.matchId, "matchWin", data);
-                break;
-        }
+        await HandleBanUser(bannedUserId);
 
         res.sendStatus(201);
         return;

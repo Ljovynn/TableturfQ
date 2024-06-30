@@ -17,13 +17,11 @@
             <div id="loading">Loading...</div>
             <div id="competetive-queue" class="queue-section">
                 <h4>Competetive Queue</h4>
-                <p>There are currently 1234 players in the queue and 512 active matches</p>
-                <button id="join-competetive-queue">Join Queue</button>
+                <button id="join-competetive-queue" class="queue-button">Join Queue</button>
             </div>
             <div id="casual-queue" class="queue-section">
                 <h4>Casual Queue</h4>
-                <p>There are currently 12387 in the queue and 6742 active matches</p>
-                <button id="join-casual-queue">Join Queue</button>
+                <button id="join-casual-queue" class="queue-button">Join Queue</button>
             </div>
             <div id="queue-matchmaking">
                 <div id="queue-info">
@@ -32,8 +30,18 @@
                 </div>
                 <div id="ranked-match-ready">
                     <p id="ranked-match-found-message">Match found! Please ready up.</p>
-                    <p id="ranked-match-ready-countdown">05:00</p>
+                    <p id="ranked-match-ready-countdown">00:20</p>
                     <button id="ranked-match-ready-button" value="ready">Ready!</button>
+                </div>
+            </div>
+            <div id="recent-matches">
+                <p>Recent Matches</p>
+                <div id="recent-matches-list">
+                    <div class="match-row">
+                        <div id="match-date">Match Started</div>
+                        <div class="matchup">Matchup</div>
+                        <div class="match-outcome">Match Status</div>
+                    </div>
                 </div>
             </div>
         </main>

@@ -1,4 +1,4 @@
-import { Match, Game, matchModes, ChatMessage } from "../public/constants/matchData.js";
+import { Match, Game, ChatMessage, matchModes } from "../public/constants/matchData.js";
 
 export function FindPlayerPosInMatch(match, playerId){
     if (match.players[0].id === playerId){
