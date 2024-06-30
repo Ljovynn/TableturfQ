@@ -6,6 +6,7 @@ import { userRoles } from './public/constants/userData.js';
 import { FindPlayerPosInMatch } from './utils/matchUtils.js';
 import { settings } from './glicko2Manager.js';
 import { ConvertJSDateToTimestamp } from './utils/date.js';
+import { matchModes } from './public/constants/matchData.js';
 
 dotenv.config();
 
@@ -155,7 +156,7 @@ export async function GetFutureAnnouncements(){
 
 export async function SetMatchResult(match){
 
-    var ranked = (match.mode == 'ranked' && !match.privateBattle);
+    var ranked = (match.mode == matchModes.ranked && !match.privateBattle);
 
     await pool.execute(`INSERT INTO matches (id, player1_id, player2_id, ranked, set_length, result, private_battle) VALUES (?, ?, ?, ?, ?, ?, ?)`,
     [match.id, match.players[0].id, match.players[1].id, ranked, match.setLength, match.status, match.privateBattle]);
