@@ -1,6 +1,6 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, SlashCommandBuilder } from "discord.js";
 import { BuildSimpleEmbed } from "../utils/embed.js";
-import { setLengths } from "../../public/constants/matchData.js";
+import { matchModes, setLengths } from "../../public/constants/matchData.js";
 import { GetUserByDiscordId } from "../../database.js";
 import { FindIfPlayerInMatch, MakeNewMatch } from "../../matchManager.js";
 import { RemovePlayerFromAnyQue } from "../../queManager.js";
@@ -97,7 +97,7 @@ export async function execute(interaction) {
             RemovePlayerFromAnyQue(user.id);
             RemovePlayerFromAnyQue(challengedUser.id);
 
-            const match = MakeNewMatch(user.id, challengedUser.id, 'ranked', true, setLength);
+            const match = MakeNewMatch(user.id, challengedUser.id, matchModes.ranked, true, setLength);
             const acceptEmbed = BuildSimpleEmbed('Challenge accepted', 
                 `${setLengthOptions[setLength - 2].name}`,
                 `<@${discordUser.id}> VS <@${challengedDiscordUser.id}>\n[Link](${websiteURL}/game?matchID=${match.id})`);
