@@ -75,10 +75,7 @@ export async function execute(interaction) {
         return;
     }
 
-    var announcmentCalled = 'Announcement';
-    if (isEvent){
-        announcmentCalled = 'Event';
-    }
+    const announcmentCalled = (isEvent) ? 'Announcement' : 'Event';
 
     const embed = {
         color: embedColor,

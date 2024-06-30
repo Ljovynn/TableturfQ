@@ -114,19 +114,14 @@ export function Player(id){
 export function Match(id, player1Id, player2Id, matchMode, privateBattle = false, setLength = null)
 {
     this.id = id;
-    var startingStatus = matchStatuses.stageSelection;
-    if (rulesets[matchMode].setLength == setLengths.unlimited || setLength == 0){
-        startingStatus = matchStatuses.ingame;
-    }
-    this.status = startingStatus;
+    this.status = (rulesets[matchMode].setLength == setLengths.unlimited || setLength == 0) ? matchStatuses.ingame : matchStatuses.stageSelection;
 
     var player1 = new Player(player1Id);
     var player2 = new Player(player2Id);
     this.players = [player1, player2];
 
     this.mode = matchMode;
-    this.setLength = setLength;
-    if (!setLength) this.setLength = rulesets[matchMode].setLength;
+    this.setLength = (setLength) ? setLength : rulesets[matchMode].setLength;
 
     this.gamesArr = [new Game()];
     this.privateBattle = privateBattle;

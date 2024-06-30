@@ -117,8 +117,7 @@ export async function execute(interaction) {
     //ban
     if (subCommand === 'ban'){
         const banLengthObject = interaction.options.get('banlength', false);
-        var banLength = null;
-        if (banLengthObject) banLength = banLengthObject.value;
+        const banLength = (banLengthObject) ? banLengthObject.value : null;
 
         console.log("ban length: " + banLength);
         try{
