@@ -43,23 +43,26 @@ async function addSearchUser(users) {
         userLink.append(user.username);
         nameCell.append(userLink);
 
-        let eloCell = document.createElement('div');
-        eloCell.classList.add('user-search-ELO');
-        eloCell.append( (Math.round(user.g2_rating * 100) / 100).toFixed(2) );
-
-        let rankCell = document.createElement('div');
-        rankCell.classList.add('user-search-rank');
-        let userRank = await GetRank(user.g2_rating);
-        let rankImage = document.createElement('img');
-        rankImage.classList.add('user-search-rank-icon')
-        console.log(userRank);
-        rankImage.src = userRank.imageURL;
-        rankCell.append(rankImage);
-
         row.append(avatarCell);
         row.append(nameCell);
-        row.append(eloCell);
-        row.append(rankCell);
+
+        if ( !user.hide_rank ) {
+            let eloCell = document.createElement('div');
+            eloCell.classList.add('user-search-ELO');
+            eloCell.append( (Math.round(user.g2_rating * 100) / 100).toFixed(2) );
+
+            let rankCell = document.createElement('div');
+            rankCell.classList.add('user-search-rank');
+            let userRank = await GetRank(user.g2_rating);
+            let rankImage = document.createElement('img');
+            rankImage.classList.add('user-search-rank-icon')
+            console.log(userRank);
+            rankImage.src = userRank.imageURL;
+            rankCell.append(rankImage);
+
+            row.append(eloCell);
+            row.append(rankCell);
+        }
 
         searchResults.append(row);
     }
