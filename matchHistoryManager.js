@@ -11,5 +11,10 @@ export function GetGlobalMatchHistory(){
 }
 
 export async function UpdateRecentMatches(){
-    matchHistory = await GetRecentMatches(matchHistoryLength);
+    try {
+        matchHistory = await GetRecentMatches(matchHistoryLength);
+    }
+    catch(error){
+        console.log(error);
+    }
 }

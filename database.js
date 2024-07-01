@@ -291,8 +291,13 @@ export async function SetUserDiscordTokens(userId, discordAccessToken, discordRe
 export async function UpdateRankDecay(decay, timeThreshold){
     const cutoffDate = Date.now() - timeThreshold;
     let timeStamp = ConvertJSDateToTimestamp(new Date(cutoffDate));
-    await pool.execute(`UPDATE users u SET g2_rating = u.g2_rating - ? WHERE NOT EXISTS (SELECT * FROM matches m WHERE (m.player1_id = u.id OR m.player2_id = u.id) AND m.created_at > ?)`,
-    [decay, timeStamp]);
+    try {
+        await pool.execute(`UPDATE users u SET g2_rating = u.g2_rating - ? WHERE NOT EXISTS (SELECT * FROM matches m WHERE (m.player1_id = u.id OR m.player2_id = u.id) AND m.created_at > ?)`,
+        [decay, timeStamp]);
+    }
+    catch(error){
+        console.log(error);
+    }
 }
 
 //delete
@@ -316,7 +321,12 @@ export async function DeleteAllUserSessions(userId){
 export async function DeleteOldUnverifiedAccounts(ageThreshold){
     const cutoffDate = Date.now() - ageThreshold;
     let timeStamp = ConvertJSDateToTimestamp(new Date(cutoffDate));
-    await pool.execute(`DELETE FROM users WHERE role = ? AND created_at < ?`, [userRoles.unverified, timeStamp]);
+    try {
+        await pool.execute(`DELETE FROM users WHERE role = ? AND created_at < ?`, [userRoles.unverified, timeStamp]);
+    }
+    catch(error){
+        console.log(error);
+    }
 }
 
 export async function DeleteAnnouncement(announcementId){
@@ -335,5 +345,10 @@ export async function UnbanUser(userId){
 
 export async function DeleteOldSuspensions(){
     let timeStamp = ConvertJSDateToTimestamp(new Date());
-    await pool.execute(`DELETE FROM ban_list WHERE expires_at < ?`, [timeStamp]);
+    try {
+        await pool.execute(`DELETE FROM ban_list WHERE expires_at < ?`, [timeStamp]);
+    }
+    catch(error){
+        console.log(error);
+    }
 }
