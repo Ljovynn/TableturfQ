@@ -41,7 +41,7 @@ export function GetNextAnnouncementInfo(){
 export function GetUpcomingAnnouncementInfos(){
     var cutoffDate = Date.now() + upcomingAnnouncementCutoff;
     var result = [];
-    for (let i = 0; i < Announcements.length; i++){
+    for (let i = 0; i < announcements.length; i++){
         if (announcements[i].date >= cutoffDate) break;
 
         result.push(announcements[i]);
