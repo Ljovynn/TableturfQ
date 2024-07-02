@@ -331,7 +331,7 @@ export async function PlayerSentCasualMatchEnd(playerId){
 export async function UserSentChatMessage(matchId, playerId, content){
     if (HasBadWords(content)) return chatMessageErrors.badWords;
 
-    var match = FindMatchWithPlayer(playerId);
+    var match = FindMatch(matchId);
     if (!match){
         match = await GetMatch(matchId);
         if (!match) return nullErrors.matchDoesntExist;

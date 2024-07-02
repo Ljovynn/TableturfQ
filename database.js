@@ -80,8 +80,8 @@ export async function GetUserRole(userId){
 }
 
 export async function GetUserBanState(userId){
-    const [rows] = await pool.execute(`SELECT COUNT(*) AS banned FROM ban_list WHERE user_id = ?`, [userId]);
-    if (rows[0]) return rows[0].banned;
+    const [rows] = await pool.execute(`SELECT * FROM ban_list WHERE user_id = ?`, [userId]);
+    if (rows[0]) return rows[0];
 }
 
 export async function GetUserBanAndRole(userId){

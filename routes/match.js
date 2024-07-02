@@ -17,7 +17,7 @@ import { SendSocketMessage, SendEmptySocketMessage } from '../socketManager.js';
 import { definitionErrors, nullErrors, userErrors } from '../Responses/requestErrors.js';
 import { ResponseSucceeded, SetResponse } from '../Responses/ResponseData.js';
 import { disputeResolveOptions, matchModes } from '../public/constants/matchData.js';
-import { ApplyHideRank } from '../utils/userUtils.js';
+import { ApplyHideRank, CheckUserBanned } from '../utils/userUtils.js';
 
 const router = Router();
 
@@ -195,6 +195,7 @@ router.post("/SendChatMessage", async (req, res) => {
         const message = req.body.message;
 
         if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
+        if (CheckUserBanned(userId)) return SetResponse(res, userErrors.banned);
         if (typeof(matchId) !== 'string') return SetResponse(res, definitionErrors.matchUndefined);
         if (typeof(message) !== 'string') return SetResponse(res, definitionErrors.chatMessageUndefined);
 
