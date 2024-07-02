@@ -35,7 +35,12 @@ export async function CancelOldMatches(cutoffTime){
         if (matches[i].createdAt > cutoffDate) continue;
 
         matches[i].status = matchStatuses.noWinner;
-        if (await FinishMatch(matches[i]), true) result.push(matches[i].id);
+        try {
+            if (await FinishMatch(matches[i]), true) result.push(matches[i].id);
+        }
+        catch(error){
+            console.log(error);
+        }
     }
     return result;
 }

@@ -10,11 +10,20 @@ await UpdateUserList();
 var maxSearchUserHit = 10;
 
 export async function UpdateLeaderboard(){
-    leaderboard = await GetLeaderboard();
+    try {
+        leaderboard = await GetLeaderboard();
+    }catch(error){
+        console.log(error);
+    }
+    
 }
 
 export async function UpdateUserList(){
-    userList = await GetUserList();
+    try {
+        userList = await GetUserList();
+    } catch(error){
+        console.log(error);
+    }
 
     for (let i = 0; i < userList.length; i++){
         ApplyHideRank(userList[i]);
