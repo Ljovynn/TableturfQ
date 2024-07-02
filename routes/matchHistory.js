@@ -4,6 +4,7 @@ import { CheckUserDefined } from '../utils/checkDefined.js';
 import { SetResponse } from '../Responses/ResponseData.js';
 import { GetMultipleUserDatas, GetUserMatchHistory } from '../database.js';
 import { ApplyHideRank } from '../utils/userUtils.js';
+import { definitionErrors } from '../Responses/requestErrors.js';
 
 const router = Router();
 
@@ -27,7 +28,7 @@ router.post("/GetUserMatchHistory", async (req, res) => {
             pageNumber = 1;
         }
 
-        var matchHistory = await GetUserMatchHistory(userId, matchHistoryHitsPerPage, pageNumber);
+        const matchHistory = await GetUserMatchHistory(userId, matchHistoryHitsPerPage, pageNumber);
 
         var users = null;
         if (matchHistory.length > 0) users = await GetUsers(matchHistory);
