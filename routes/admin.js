@@ -75,7 +75,7 @@ router.post("/ResolveDispute", async (req, res) => {
 //bannedUserId, banLength (optional)
 router.post("/BanUser", async (req, res) => {
     try {
-        const bannedUserId = req.session.bannedUserId;
+        const bannedUserId = req.body.bannedUserId;
         const banLength = req.body.expiresAt;
 
         if (typeof(bannedUserId) !== 'string') return SetResponse(res, definitionErrors.bannedUserUndefined);
@@ -101,6 +101,7 @@ router.post("/BanUser", async (req, res) => {
         return;
         
     } catch (err){
+        console.error(err);
         res.sendStatus(500);
     }
 });
@@ -108,7 +109,7 @@ router.post("/BanUser", async (req, res) => {
 //unbannedUserId
 router.post("/UnbanUser", async (req, res) => {
     try {
-        const unbannedUserId = req.session.unbannedUserId;
+        const unbannedUserId = req.body.unbannedUserId;
 
         if (typeof(unbannedUserId) !== 'string') return SetResponse(res, definitionErrors.unbannedUserUndefined);
 

@@ -85,8 +85,8 @@ export async function GetUserBanState(userId){
 }
 
 export async function GetUserBanAndRole(userId){
-    await pool.execute(`SELECT role, (SELECT COUNT(*) FROM ban_list WHERE user_id = u.id) AS banned FROM users u WHERE id = ?`, [userId]);
-    return rows[0];
+    const [rows] = await pool.execute(`SELECT role, (SELECT COUNT(*) FROM ban_list WHERE user_id = u.id) AS banned FROM users u WHERE id = ?`, [userId]);
+    if (rows[0]) return rows[0];
 }
 
 export async function GetUserChatData(userIdArr){

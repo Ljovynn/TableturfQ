@@ -55,7 +55,7 @@ h3 {
 }
 
 #user-login, #guest-login {
-    display: inline-block;
+    display: block;
     width: 50%;
     margin: auto;
 }
@@ -520,4 +520,21 @@ h3 {
 
 .admin-dispute-resolve {
     margin: 0px 5px;
+}
+
+#admin-profile {
+    display: none;
+    margin-bottom: 20px;
+}
+
+#admin-ban-user:hover {
+    cursor: pointer;
+}
+
+#admin-ban-user-content {
+    display: none;
+}
+
+#admin-unban-user-content {
+    display: none;
 }

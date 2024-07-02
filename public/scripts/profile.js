@@ -32,6 +32,16 @@ const matchHistory = document.getElementById('user-match-history');
 // Logout
 const logoutButton = document.getElementById('logout-button');
 
+// Admin
+const adminContent = document.getElementById('admin-profile');
+const adminBanUser = document.getElementById('admin-ban-user');
+const adminBanUserContent = document.getElementById('admin-ban-user-content');
+const adminBanUserButton = document.getElementById('admin-ban-user-button');
+const adminUnbanUserContent = document.getElementById('admin-unban-user-content');
+const adminUnbanUserButton = document.getElementById('admin-unban-user-button');
+const adminBanDetails = document.getElementById('admin-ban-details');
+const adminBanLength = document.getElementById('admin-ban-user-length');
+
 var loggedInUserInfo;
 var loggedInUserID = '';
 
@@ -66,6 +76,7 @@ try {
 
 await setUserInfo();
 await setMatchHistory();
+await showAdminBanInfo();
 
 editDisplayName.addEventListener('click', (e) => {
     editDisplayNameForm.classList.toggle('editing');
@@ -129,8 +140,32 @@ logoutButton.addEventListener('click', async (e) => {
     if ( response == 201 ) {
         window.location.href = '/';
     }
-
 });
+
+if ( loggedInUserInfo.user.role== 2 ) {
+    adminBanUser.addEventListener('click', async (e) => {
+        adminBanUserContent.style.display = 'block';
+    });
+
+    adminBanLength.addEventListener('click', async (e) => {
+        adminBanLength.value = new Date().getTime() + 24 * 60 * 60 * 1000;
+        adminBanUserButton.innerHTML = 'Suspend User';
+    });
+
+    adminBanUserButton.addEventListener('click', async (e) => {
+        var data = { bannedUserId: userId, expiresAt: parseInt(adminBanLength.value) };
+        var response = await postData('/admin/BanUser', data);
+
+        console.log(response);
+    });
+
+    adminUnbanUserButton.addEventListener('click', async (e) => {
+        var data = { unbannedUserId: userId };
+        var response = await postData('/admin/UnbanUser', data);
+
+        console.log(response);
+    });
+}
 
 async function getUserInfo() {
     try {
@@ -282,6 +317,17 @@ function hideNonUserElements() {
         editDisplayName.style.display = 'none';
         editCountry.style.display = 'none';
         logoutButton.style.display = 'none';
+    }
+}
+
+async function showAdminBanInfo() {
+    if ( loggedInUserInfo.user.role == 2 ) {
+        adminContent.style.display = 'block';
+        if ( user.banned ) {
+            adminBanUserContent.style.display = 'none';
+            adminBanUser.style.display = 'none';
+            adminUnbanUserContent.style.display = 'block';
+        }
     }
 }
 
