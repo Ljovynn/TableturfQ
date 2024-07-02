@@ -7,7 +7,7 @@ import { ApplyHideRank, GetCurrentUser } from '../utils/userUtils.js';
 
 import { FindIfPlayerInQue, FindIfPlayerWaitingForReady } from '../queManager.js';
 import { FindMatchWithPlayer } from '../matchManager.js';
-import { DeleteAllUserSessions, GetMultipleUserDatas, GetUserMatchHistory, GetUserRankedMatchCount, SetUserCountry, SetUserDiscordTokens, SetUsername } from '../database.js';
+import { DeleteAllUserSessions, GetMultipleUserDatas, GetUserBanState, GetUserMatchHistory, GetUserRankedMatchCount, SetUserCountry, SetUserDiscordTokens, SetUsername } from '../database.js';
 import { definitionErrors, userErrors } from '../Responses/requestErrors.js';
 import { SetResponse } from '../Responses/ResponseData.js';
 import { usernameMaxLength, usernameMinLength } from '../public/constants/userData.js';
@@ -155,6 +155,22 @@ router.get("/GetUserInfo", async (req, res) => {
         var data = {user, queData, readyData, matchId};
 
         res.status(200).send(data);
+    } catch(error){
+        res.sendStatus(400);
+    }
+});
+
+//res: banned bool, expires_at timestamp (null if permanent ban)
+router.get("/GetUserBanInfo", async (req, res) => {
+    try{
+        const userId = req.session.user;
+        if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
+
+        var banInfo = await GetUserBanState(userId);
+        const banned = (banInfo) ? true : false;
+        const banLength = (banned) ? banInfo.expires_at : undefined;
+
+        res.status(200).send({banned, banLength});
     } catch(error){
         res.sendStatus(400);
     }
