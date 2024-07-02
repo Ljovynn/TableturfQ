@@ -155,25 +155,29 @@ export async function GetFutureAnnouncements(){
 //Create
 
 export async function SetMatchResult(match){
+    try{
+        var ranked = (match.mode == matchModes.ranked && !match.privateBattle);
 
-    var ranked = (match.mode == matchModes.ranked && !match.privateBattle);
+        await pool.execute(`INSERT INTO matches (id, player1_id, player2_id, ranked, set_length, result, private_battle) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [match.id, match.players[0].id, match.players[1].id, ranked, match.setLength, match.status, match.privateBattle]);
 
-    await pool.execute(`INSERT INTO matches (id, player1_id, player2_id, ranked, set_length, result, private_battle) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    [match.id, match.players[0].id, match.players[1].id, ranked, match.setLength, match.status, match.privateBattle]);
+        CreateFirstGameStrikes(match);
 
-    CreateFirstGameStrikes(match);
+        for (let i = 1; i < match.gamesArr.length; i++){
+            CreateCounterpickGameAndStrikes(match, i + 1);
+        }
 
-    for (let i = 1; i < match.gamesArr.length; i++){
-        CreateCounterpickGameAndStrikes(match, i + 1);
+        var chatData = [];
+        for (let i = 0; i < match.chat.length; i++){
+            chatData[i] = [match.id, i + 1, match.chat[i].ownerId, match.chat[i].content];
+        }
+
+        if (chatData.length == 0) return;
+        await pool.query(`INSERT INTO chat_messages (match_id, message_number, owner_id, content) VALUES ?`, 
+            [chatData.map(msg => [msg[0], msg[1], msg[2], msg[3]])]);
+    }catch(error){
+        console.log(error);
     }
-
-    var chatData = [];
-    for (let i = 0; i < match.chat.length; i++){
-        chatData[i] = [match.id, i + 1, match.chat[i].ownerId, match.chat[i].content];
-    }
-
-    if (chatData.length == 0) return;
-    await pool.query(`INSERT INTO chat_messages (match_id, message_number, owner_id, content) VALUES ?`, [chatData.map(msg => [msg[0], msg[1], msg[2], msg[3]])]);
 }
 
 async function CreateFirstGameStrikes(match){

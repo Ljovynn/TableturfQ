@@ -29,6 +29,7 @@ export function ApplyHideRank(user){
 export async function HandleBanUser(bannedUserId){
     RemovePlayerFromAnyQue(bannedUserId);
     var matchData = await HandleBannedPlayerInMatch(bannedUserId);
+    if (!matchData) return;
 
     switch (matchData.mode){
         case matchModes.casual:

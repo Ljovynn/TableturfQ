@@ -256,9 +256,9 @@ function CheckMatchWin(match, winnerId){
             continue;
         }
         winCount++;
-        if (winCount >= match.setLength){
-            return true;
-        }
+    }
+    if (winCount >= match.setLength){
+        return true;
     }
     return false;
 }
@@ -455,7 +455,7 @@ export async function ResolveMatchDispute(matchId, resolveOption){
             return new ResponseData(201);
         case disputeResolveOptions.cancelMatch:
             match.status = matchStatuses.noWinner;
-            await (FinishMatch(match, true));
+            if (!await FinishMatch(match, true)) return databaseErrors.matchFinishError;
             SendDisputeMessage(GetDisputedMatchesList(), false);
             return new ResponseData(201);
         case disputeResolveOptions.gameWinPlayer1:
@@ -550,7 +550,7 @@ export async function HandleBannedPlayerInMatch(playerId){
 
 
     if (match.mode == matchModes.casual){
-        await FinishMatch(match);
+        if (!await FinishMatch(match)) return databaseErrors.matchFinishError;
     } else{
         var playerPos = FindPlayerPosInMatch(match, playerId);
         var otherPos = (playerPos + 1) % 2;
