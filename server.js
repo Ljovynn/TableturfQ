@@ -87,7 +87,7 @@ async function TickCancelOldMatches(){
     }
 }
 
-if (process.env.NODE_ENV === 'production') app.set('trust proxy', 1);
+if (process.env.NODE_ENV === 'production') app.set('trust proxy', 2);
 app.use(sessionMiddleware);
 app.use(express.static('public',{extensions:['html']}));
 app.use(express.urlencoded({extended: true}));
