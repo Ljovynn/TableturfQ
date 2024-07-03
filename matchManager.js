@@ -36,7 +36,7 @@ export async function CancelOldMatches(cutoffTime){
 
         matches[i].status = matchStatuses.noWinner;
         try {
-            if (await FinishMatch(matches[i]), true) result.push(matches[i].id);
+            if (await FinishMatch(matches[i])) result.push(matches[i].id);
         }
         catch(error){
             console.log(error);
