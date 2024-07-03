@@ -34,7 +34,7 @@ const decayRankInterval = 24 * 60 * 60 * 1000;
 
 //Todo: test if account deletion when user is in match messes anything
 const unverifiedUserDeletionThreshold = 7 * 24 * 60 * 60 * 1000;
-const matchDeletionThreshold = 2 * 60 * 60 * 1000;
+const matchDeletionThreshold = 3 * 60 * 60 * 1000;
 
 const decayRankAmount = 10;
 const decayRankThreshold = 7 * 24 * 60 * 60 * 1000;
