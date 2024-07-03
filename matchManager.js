@@ -41,6 +41,10 @@ export async function CancelOldMatches(cutoffTime){
         catch(error){
             console.log(error);
         }
+        if (matches[i].mode == matchModes.ranked){
+            const suspiciousAction = new SuspiciousAction(matches[i].players[0].id, `Ranked match cancelled for taking too long, against player ID ${SanitizeDiscordLog(matches[i].players[1].id)}`, `${DetailMinute(new Date(Date.now()))} UTC`);
+            await SendNewSuspiciousAction(suspiciousAction);
+        }
     }
     return result;
 }
