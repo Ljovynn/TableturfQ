@@ -1,5 +1,7 @@
 import { stages } from "./stageData.js";
 
+export const poolCode = Object.freeze('TTBQ');
+
 export const matchStatuses = Object.freeze({ 
     stageSelection: 0,
     ingame: 1,
