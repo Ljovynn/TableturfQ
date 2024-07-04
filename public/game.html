@@ -33,7 +33,13 @@
                   <div id="admin-player1">
                     <p id="admin-user-player1-details"></p>
                     <div id="admin-ban-player1-content">
-                        <button id="admin-ban-player1-length" value="0">(TEMPORARY) Set Ban Length</button>
+                        <select id="admin-ban-player1-length">
+                            <option value="0">Indefinite</option>
+                            <option value="86400000">1 Day</option>
+                            <option value="259200000">3 Days</option>
+                            <option value="604800000">1 Week</option>
+                            <option value="2592000000">1 Month</option>
+                        </select>
                         <button id="admin-ban-player1-button">Ban User</button>
                     </div>
                     <div id="admin-unban-player1-content">
@@ -54,7 +60,13 @@
                   <div id="admin-player2">
                     <p id="admin-user-ban-details"></p>
                     <div id="admin-ban-player2-content">
-                        <button id="admin-ban-player2-length" value="0">(TEMPORARY) Set Ban Length</button>
+                        <select id="admin-ban-player2-length">
+                            <option value="0">Indefinite</option>
+                            <option value="86400000">1 Day</option>
+                            <option value="259200000">3 Days</option>
+                            <option value="604800000">1 Week</option>
+                            <option value="2592000000">1 Month</option>
+                        </select>
                         <button id="admin-ban-player2-button">Ban User</button>
                     </div>
                     <div id="admin-unban-player2-content">

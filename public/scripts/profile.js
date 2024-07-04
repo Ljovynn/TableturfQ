@@ -148,9 +148,12 @@ if ( loggedInUserInfo.user.role== 2 ) {
         adminBanUserContent.style.display = 'block';
     });
 
-    adminBanLength.addEventListener('click', async (e) => {
-        adminBanLength.value = Math.round( new Date().getTime()/1000 );
-        adminBanUserButton.innerHTML = 'Suspend User';
+    adminBanLength.addEventListener('change', async (e) => {
+        if ( adminBanLength.value != 0 ) {
+            adminBanUserButton.innerHTML = 'Suspend User';
+        } else {
+            adminBanUserButton.innerHTML = 'Ban User';
+        }
     });
 
     adminBanUserButton.addEventListener('click', async (e) => {

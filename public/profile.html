@@ -48,7 +48,13 @@
                     <p id="admin-user-ban-details"></p>
                     <a id="admin-ban-user">Ban User?</a>
                     <div id="admin-ban-user-content">
-                        <button id="admin-ban-user-length" value="0">(TEMPORARY) Set Ban Length</button>
+                        <select id="admin-ban-user-length">
+                            <option value="0">Indefinite</option>
+                            <option value="86400000">1 Day</option>
+                            <option value="259200000">3 Days</option>
+                            <option value="604800000">1 Week</option>
+                            <option value="2592000000">1 Month</option>
+                        </select>
                         <button id="admin-ban-user-button">Ban User</button>
                     </div>
                     <div id="admin-unban-user-content">
