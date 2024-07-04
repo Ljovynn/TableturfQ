@@ -142,13 +142,14 @@ logoutButton.addEventListener('click', async (e) => {
     }
 });
 
+// Admin actions
 if ( loggedInUserInfo.user.role== 2 ) {
     adminBanUser.addEventListener('click', async (e) => {
         adminBanUserContent.style.display = 'block';
     });
 
     adminBanLength.addEventListener('click', async (e) => {
-        adminBanLength.value = new Date().getTime() + 24 * 60 * 60 * 1000;
+        adminBanLength.value = Math.round( new Date().getTime()/1000 );
         adminBanUserButton.innerHTML = 'Suspend User';
     });
 
@@ -157,6 +158,11 @@ if ( loggedInUserInfo.user.role== 2 ) {
         var response = await postData('/admin/BanUser', data);
 
         console.log(response);
+        if ( response == 201 ) {
+            adminUnbanUserContent.style.display = 'block';
+            adminBanUser.style.display = 'none';
+            adminBanUserContent.style.display = 'none';
+        }
     });
 
     adminUnbanUserButton.addEventListener('click', async (e) => {
@@ -164,6 +170,10 @@ if ( loggedInUserInfo.user.role== 2 ) {
         var response = await postData('/admin/UnbanUser', data);
 
         console.log(response);
+        if ( response == 201 ) {
+            adminUnbanUserContent.style.display = 'none';
+            adminBanUser.style.display = 'block';
+        }
     });
 }
 

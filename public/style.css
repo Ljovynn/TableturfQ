@@ -538,3 +538,11 @@ h3 {
 #admin-unban-user-content {
     display: none;
 }
+
+#admin-player1, #admin-player2 {
+    display: none;
+}
+
+#admin-unban-player1-content, #admin-unban-player2-content {
+    display: none;
+}

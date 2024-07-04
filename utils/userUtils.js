@@ -14,7 +14,7 @@ export async function GetCurrentUser(req){
     return undefined;
 }
 
-export async function CheckUserBanned(userId){
+export async function CheckUserBanned(req){
     if (req.session && req.session.user){
         if (GetUserBanState(req.session.user)) return true;
         return false;

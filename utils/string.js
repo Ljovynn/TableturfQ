@@ -1,5 +1,5 @@
-import { disputeResolveOptions } from "../public/constants/matchData";
-import { stages } from "../public/constants/stageData";
+import { disputeResolveOptions } from "../public/constants/matchData.js";
+import { stages } from "../public/constants/stageData.js";
 
 //lowercase, remove special characters
 export function SanitizeString(string){

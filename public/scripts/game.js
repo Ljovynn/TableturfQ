@@ -41,6 +41,22 @@ const adminContent = document.getElementById('admin-content');
 const adminDisputeOptions = document.getElementById('admin-dispute-options');
 const adminResolveButton = document.getElementById('admin-resolve-dispute');
 
+const adminPlayer1 = document.getElementById('admin-player1');
+const adminPlayer2 = document.getElementById('admin-player2');
+const adminBanPlayer1Content = document.getElementById('admin-ban-player1-content');
+const adminBanPlayer1Button = document.getElementById('admin-ban-player1-button');
+const adminUnbanPlayer1Content = document.getElementById('admin-unban-player1-content');
+const adminUnbanPlayer1Button = document.getElementById('admin-unban-player1-button');
+const adminBanPlayer1Details = document.getElementById('admin-ban-player1-details');
+const adminBanPlayer1Length = document.getElementById('admin-ban-player1-length');
+
+const adminBanPlayer2Content = document.getElementById('admin-ban-player2-content');
+const adminBanPlayer2Button = document.getElementById('admin-ban-player2-button');
+const adminUnbanPlayer2Content = document.getElementById('admin-unban-player2-content');
+const adminUnbanPlayer2Button = document.getElementById('admin-unban-player2-button');
+const adminBanPlayer2Details = document.getElementById('admin-ban-player2-details');
+const adminBanPlayer2Length = document.getElementById('admin-ban-player2-length');
+
 // Match options
 const setLength = document.getElementById('set-length');
 const turnTimer = document.getElementById('timer-duration');
@@ -125,7 +141,8 @@ const socket = io();
 await setUserInfo();
 await setMatchInfo();
 // check if the match is in dispute on pageload for admins that come to check chat
-await showModDispute();
+await showAdminDispute();
+await showAdminBanInfo();
 
 // Set event listeners for interactable elements
 
@@ -232,15 +249,6 @@ strikeButton.addEventListener('click', async (e) => {
     }
 });
 
-adminResolveButton.addEventListener('click', async (e) => {
-    var data = { matchId: matchId, resolveOption: parseInt(adminDisputeOptions.value) };
-    var response = await postData('/admin/ResolveDispute', data);
-    console.log(response);
-    if ( response == 201 ) {
-        adminContent.style.display = 'none';
-    }
-});
-
 needHelp.addEventListener('click', async (e) => {
     playerRaiseDispute.style.display = 'inline-block';
 });
@@ -280,6 +288,51 @@ leaveMatch.addEventListener('click', async (e) => {
         }
     }
 });
+
+// Admin actions
+if ( user.role== 2 ) {
+    adminResolveButton.addEventListener('click', async (e) => {
+        var data = { matchId: matchId, resolveOption: parseInt(adminDisputeOptions.value) };
+        var response = await postData('/admin/ResolveDispute', data);
+        console.log(response);
+        if ( response == 201 ) {
+            adminContent.style.display = 'none';
+        }
+    });
+
+    adminBanPlayer1Length.addEventListener('click', async (e) => {
+        adminBanLength.value = new Date().getTime() + 24 * 60 * 60 * 1000;
+        adminBanUserButton.innerHTML = 'Suspend User';
+    });
+
+    adminBanPlayer1Button.addEventListener('click', async (e) => {
+        var data = { bannedUserId: players[0].id, expiresAt: parseInt(adminBanPlayer1Length.value) };
+        var response = await postData('/admin/BanUser', data);
+
+        console.log(response);
+    });
+
+    adminUnbanPlayer1Button.addEventListener('click', async (e) => {
+        var data = { unbannedUserId: players[0].id };
+        var response = await postData('/admin/UnbanUser', data);
+
+        console.log(response);
+    });
+
+    adminBanPlayer2Button.addEventListener('click', async (e) => {
+        var data = { bannedUserId: players[1].id, expiresAt: parseInt(adminBanPlayer2Length.value) };
+        var response = await postData('/admin/BanUser', data);
+
+        console.log(response);
+    });
+
+    adminUnbanPlayer2Button.addEventListener('click', async (e) => {
+        var data = { unbannedUserId: players[1].id };
+        var response = await postData('/admin/UnbanUser', data);
+
+        console.log(response);
+    });
+}
 
 // Page functions
 async function getUserInfo() {
@@ -847,9 +900,24 @@ function gameFinish(winnerId) {
     requeueButton.style.display = 'block';
 }
 
-function showModDispute() {
+function showAdminDispute() {
     if ( user.role == 2 && match.status == 2 ) {
         adminContent.style.display = 'block';
+    }
+}
+
+function showAdminBanInfo() {
+    if ( user.role == 2 ) {
+        adminPlayer1.style.display = 'block';
+        adminPlayer2.style.display = 'block';
+
+        if ( players[0].banned ) {
+            adminBanPlayer1Content.style.display = 'block';
+        }
+
+        if ( players[1].banned ) {
+            adminBanPlayer2Content.style.display = 'block';
+        }
     }
 }
 
