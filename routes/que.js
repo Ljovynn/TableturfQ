@@ -17,7 +17,7 @@ router.post("/PlayerEnterQue", async (req, res) => {
         const matchMode = req.body.matchMode;
 
         if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
-        if (await CheckUserBanned(req)) return SetResponse(res, userErrors.banned);
+        if (await CheckUserBanned(userId)) return SetResponse(res, userErrors.banned);
         if (typeof(matchMode) !== 'string') return SetResponse(res, definitionErrors.matchModeUndefined);
 
         var responseData = await AddPlayerToQue(userId, matchMode);
