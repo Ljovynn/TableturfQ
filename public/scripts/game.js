@@ -306,7 +306,7 @@ if ( user.role== 2 ) {
     });
 
     adminBanPlayer1Button.addEventListener('click', async (e) => {
-        var data = { bannedUserId: players[0].id, expiresAt: parseInt(adminBanPlayer1Length.value) };
+        var data = { bannedUserId: players[0].id, banLength: parseInt(adminBanPlayer1Length.value) };
         var response = await postData('/admin/BanUser', data);
 
         console.log(response);
@@ -320,7 +320,7 @@ if ( user.role== 2 ) {
     });
 
     adminBanPlayer2Button.addEventListener('click', async (e) => {
-        var data = { bannedUserId: players[1].id, expiresAt: parseInt(adminBanPlayer2Length.value) };
+        var data = { bannedUserId: players[1].id, banLength: parseInt(adminBanPlayer2Length.value) };
         var response = await postData('/admin/BanUser', data);
 
         console.log(response);

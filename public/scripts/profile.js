@@ -157,7 +157,7 @@ if ( loggedInUserInfo.user.role== 2 ) {
     });
 
     adminBanUserButton.addEventListener('click', async (e) => {
-        var data = { bannedUserId: userId, expiresAt: parseInt(adminBanLength.value) };
+        var data = { bannedUserId: userId, banLength: parseInt(adminBanLength.value) };
         var response = await postData('/admin/BanUser', data);
 
         console.log(response);

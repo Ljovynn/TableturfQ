@@ -76,7 +76,7 @@ router.post("/ResolveDispute", async (req, res) => {
 router.post("/BanUser", async (req, res) => {
     try {
         const bannedUserId = req.body.bannedUserId;
-        const banLength = req.body.expiresAt;
+        const banLength = req.body.banLength;
 
         if (typeof(bannedUserId) !== 'string') return SetResponse(res, definitionErrors.bannedUserUndefined);
         if (typeof(banLength) !== 'number' && typeof(banLength) !== 'undefined') return SetResponse(res, definitionErrors.banLengthWrongFormat);
