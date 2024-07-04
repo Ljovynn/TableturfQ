@@ -7,6 +7,7 @@ import { FindPlayerPosInMatch } from './utils/matchUtils.js';
 import { settings } from './glicko2Manager.js';
 import { ConvertJSDateToTimestamp } from './utils/date.js';
 import { matchModes } from './public/constants/matchData.js';
+import { HandleBanUser } from './utils/userUtils.js';
 
 dotenv.config();
 
@@ -326,6 +327,10 @@ export async function DeleteOldUnverifiedAccounts(ageThreshold){
     const cutoffDate = Date.now() - ageThreshold;
     let timeStamp = ConvertJSDateToTimestamp(new Date(cutoffDate));
     try {
+        const [rows] = await pool.execute(`SELECT id FROM users WHERE role = ? AND created_at < ?`, [userRoles.unverified, timeStamp]);
+        for (let i = 0; i < rows.length; i++){
+            HandleBanUser(rows[i].id);
+        }
         await pool.execute(`DELETE FROM users WHERE role = ? AND created_at < ?`, [userRoles.unverified, timeStamp]);
     }
     catch(error){
