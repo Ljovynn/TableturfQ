@@ -16,7 +16,7 @@ import { SendSocketMessage, SendEmptySocketMessage } from '../socketManager.js';
 
 import { definitionErrors, nullErrors, userErrors } from '../Responses/requestErrors.js';
 import { ResponseSucceeded, SetResponse } from '../Responses/ResponseData.js';
-import { chatLoadLimit, disputeResolveOptions, matchModes, systemId } from '../public/constants/matchData.js';
+import { chatLoadLimit, ChatMessage, disputeResolveOptions, matchModes, systemId } from '../public/constants/matchData.js';
 import { ApplyHideRank, CheckUserBanned } from '../utils/userUtils.js';
 
 const router = Router();
@@ -195,7 +195,7 @@ router.post("/SendChatMessage", async (req, res) => {
         const message = req.body.message;
 
         if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
-        if (CheckUserBanned(userId)) return SetResponse(res, userErrors.banned);
+        if (await CheckUserBanned(userId)) return SetResponse(res, userErrors.banned);
         if (typeof(matchId) !== 'string') return SetResponse(res, definitionErrors.matchUndefined);
         if (typeof(message) !== 'string') return SetResponse(res, definitionErrors.chatMessageUndefined);
 
@@ -209,6 +209,53 @@ router.post("/SendChatMessage", async (req, res) => {
         res.sendStatus(500);
     }
 });
+
+//matchId, loadedMessagesAmount: amount of messages client has already loaded
+router.post("/LoadChatMessages", async (req, res) => {
+    try {
+        const matchId = req.body.matchId;
+        const loadedMessagesAmount = req.body.loadedMessagesAmount;
+        const userId = req.session.user;
+
+        if (typeof(matchId) !== 'string') return SetResponse(res, definitionErrors.matchUndefined);
+        if (typeof(loadedMessagesAmount) !== 'number') return SetResponse(res, definitionErrors.chatMessageUndefined);
+        if (loadedMessagesAmount < chatLoadLimit) return SetResponse(res, definitionErrors.chatMessageUndefined);
+
+        var userRole = userRoles.unverified;
+        if (userId) userRole = await GetUserRole(userId);
+
+        var matchHidden = true;
+
+        //change after here, create match search first and DB query
+        var match = structuredClone(FindMatch(matchId));
+        var data = [];
+        if (!match){
+            matchHidden = false;
+            var chatMessages = await GetChatMessages(matchId, loadedMessagesAmount);
+
+            for (let i = 0; i < chatMessages.length; i++){
+                var chatMessage = new ChatMessage(chatMessages[i].content, chatMessages[i].owner_id, chatMessages[i].unix_date);
+                data.push(chatMessage);
+            }
+        } else{
+            data = match.chat;
+
+            let messageLimit = Math.min(data.length, loadedMessagesAmount);
+            data.splice(-messageLimit);
+            
+            if (data.length > chatLoadLimit ){
+                data.splice(0, data.length - chatLoadLimit);
+            }
+        }
+
+        res.status(200).send(data);
+        var socketMessage = {ownerId: userId, content: message, date: Date.now()};
+        SendSocketMessage('match' + matchId, "chatMessage", socketMessage);
+    } catch (err){
+        res.sendStatus(500);
+    }
+});
+
 
 //requests
 
@@ -265,10 +312,6 @@ router.post("/GetMatchInfo", async (req, res) => {
             }
         }
 
-        var chatLimit = Math.min(match.chat.length, chatLoadLimit);
-        for (let i = match.chat.length - chatLimit; i < match.chat.length; i++){
-
-        }
         if (match.chat.length > chatLoadLimit){
             match.chat.splice(0, match.chat.length - chatLoadLimit);
         }

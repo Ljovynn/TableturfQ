@@ -19,6 +19,7 @@ export const definitionErrors = Object.freeze({
     unbannedUserUndefined: new ResponseData(400, 'No user to ubnan submitted'),
     userNotDefined: new ResponseData(404, 'No user account exists with this ID'),
     chatMessageUndefined: new ResponseData(400, 'No chat message submitted'),
+    loadedMessageAmountUndefined: new ResponseData(400, 'No loaded chat message amount submitted'),
     winnerUndefined: new ResponseData(400, 'No winner ID submitted'),
     countryUndefined: new ResponseData(400, 'No country submitted'),
     countryWrongFormat: new ResponseData(400, 'Country not submitted correctly'),

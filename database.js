@@ -6,7 +6,7 @@ import { userRoles } from './public/constants/userData.js';
 import { FindPlayerPosInMatch } from './utils/matchUtils.js';
 import { settings } from './glicko2Manager.js';
 import { ConvertJSDateToTimestamp } from './utils/date.js';
-import { matchModes } from './public/constants/matchData.js';
+import { chatLoadLimit, matchModes, systemId } from './public/constants/matchData.js';
 import { HandleBanUser } from './utils/userUtils.js';
 
 dotenv.config();
@@ -127,8 +127,9 @@ export async function GetStageStrikes(gameId){
     return rows;
 }
 
-export async function GetChatMessages(matchId){
-    const [rows] = await pool.execute(`SELECT owner_id, content, UNIX_TIMESTAMP(date) AS unix_date FROM chat_messages WHERE match_id = ? ORDER BY id`, [matchId]);
+export async function GetChatMessages(matchId, loadedMessagesAmount = 0){
+    const [rows] = await pool.execute(`SELECT owner_id, content, UNIX_TIMESTAMP(date) AS unix_date FROM chat_messages WHERE match_id = ? ORDER BY id DESC LIMIT ? OFFSET ?`,
+    [matchId, chatLoadLimit, loadedMessagesAmount]);
     return rows;
 }
 
@@ -170,7 +171,8 @@ export async function SetMatchResult(match){
 
         var chatData = [];
         for (let i = 0; i < match.chat.length; i++){
-            chatData[i] = [match.id, match.chat[i].ownerId, match.chat[i].content, ConvertJSDateToTimestamp(new Date(match.chat[i].date))];
+            let ownerId = (match.chat[i].ownerId == systemId) ? null : match.chat[i].ownerId;
+            chatData[i] = [match.id, ownerId, match.chat[i].content, ConvertJSDateToTimestamp(new Date(match.chat[i].date))];
         }
 
         if (chatData.length == 0) return;
