@@ -17,6 +17,25 @@ export const stages = Object.freeze({
     overTheLine: 15
 });
 
+export const stageIdToName = Object.freeze({ 
+    0: 'Undefined',
+    1: 'Main Street',
+    2: 'Thunder Point',
+    3: 'X Marks the Garden',
+    4: 'Square Squared',
+    5: 'Lakefront Property',
+    6: 'Double Gemini',
+    7: 'River Drift',
+    8: 'Box Seats',
+    9: 'Girder for Battle',
+    10: 'Mask Mansion',
+    11: 'Sticky Thicket',
+    12: 'Cracker Snap',
+    13: 'Two-Lane Splattop',
+    14: 'Pedal to the Medal',
+    15: 'Over the Line',
+});
+
 export const stageImageSources = Object.freeze({ 
     0: 'Undefined-Stage-Icon.png',
     1: 'Main-Street-Icon.png', 

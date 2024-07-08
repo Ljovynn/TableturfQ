@@ -1,5 +1,5 @@
 import { disputeResolveOptions } from "../../constants/matchData.js";
-import { stages } from "../../constants/stageData.js";
+import { stageIdToName } from "../../constants/stageData.js";
 
 export function MatchStartChatMessage(){
     var result = 'Match started.';
@@ -10,7 +10,7 @@ export function MatchStartChatMessage(){
 export function StrikeStagesChatMessage(userId, stagesArray){
     var result = `<${userId}> striked `;
     for (let i = 0; i < stagesArray.length; i++){
-        result += stages[stagesArray[i]];
+        result += stageIdToName[stagesArray[i]];
         let addStr = (i == stagesArray.length - 1) ? '.' : ', ';
         result += addStr;
     }
@@ -19,7 +19,7 @@ export function StrikeStagesChatMessage(userId, stagesArray){
 
 //also takes stage id
 export function ChooseStageChatMessage(userId, stage){
-    var result = `<${userId}> chose to play on ${stages[stage]}.`;
+    var result = `<${userId}> chose to play on ${stageIdToName[stage]}.`;
     return result;
 }
 
