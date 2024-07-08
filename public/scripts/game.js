@@ -544,6 +544,10 @@ async function addMessage(chatData) {
     } else if ( players[1].id == userId ) {
         senderName = players[1].username;
     } else if ( 'System' == userId ) {
+        console.log(chatMessage);
+        chatMessage = chatMessage.replace('<' + players[0].id + '>', players[0].username);
+        chatMessage = chatMessage.replace('<' + players[1].id + '>', players[1].username);
+        console.log(chatMessage);
         senderName = 'System';
         senderClass = 'match-chat-system';
     } else {
