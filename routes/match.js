@@ -219,38 +219,47 @@ router.post("/LoadChatMessages", async (req, res) => {
 
         if (typeof(matchId) !== 'string') return SetResponse(res, definitionErrors.matchUndefined);
         if (typeof(loadedMessagesAmount) !== 'number') return SetResponse(res, definitionErrors.chatMessageUndefined);
-        if (loadedMessagesAmount < chatLoadLimit) return SetResponse(res, definitionErrors.chatMessageUndefined);
+        if (loadedMessagesAmount < 0) return SetResponse(res, definitionErrors.chatMessageUndefined);
 
         var userRole = userRoles.unverified;
         if (userId) userRole = await GetUserRole(userId);
 
-        var matchHidden = true;
-
         //change after here, create match search first and DB query
         var match = structuredClone(FindMatch(matchId));
+        var players = [];
         var data = [];
         if (!match){
-            matchHidden = false;
+            let matchData = await GetMatch(matchId);
+            if (!matchData) return SetResponse(res, nullErrors.noMatch);
+
             var chatMessages = await GetChatMessages(matchId, loadedMessagesAmount);
 
             for (let i = 0; i < chatMessages.length; i++){
                 var chatMessage = new ChatMessage(chatMessages[i].content, chatMessages[i].owner_id, chatMessages[i].unix_date);
                 data.push(chatMessage);
             }
+            players = [matchData.player1_id, matchData.player2_id];
         } else{
             data = match.chat;
 
             let messageLimit = Math.min(data.length, loadedMessagesAmount);
             data.splice(-messageLimit);
-            
+
             if (data.length > chatLoadLimit ){
                 data.splice(0, data.length - chatLoadLimit);
+            }
+            players = [match.players[0].id, match.players[1].id];
+        }
+
+        //check if user has access
+        if (!CheckIfPlayerIsId(players[0], userId) && !CheckIfPlayerIsId(players[1], userId)){
+            //mods cant see PBs
+            if (userRole != userRoles.mod || match.privateBattle){
+                return SetResponse(res, userErrors.noAccess);
             }
         }
 
         res.status(200).send(data);
-        var socketMessage = {ownerId: userId, content: message, date: Date.now()};
-        SendSocketMessage('match' + matchId, "chatMessage", socketMessage);
     } catch (err){
         console.error(err);
         res.sendStatus(500);

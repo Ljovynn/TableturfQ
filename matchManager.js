@@ -11,6 +11,7 @@ import { casualMatchEndErrors, chatMessageErrors, disputeErrors, gameWinErrors, 
 import { HasBadWords, SanitizeDiscordLog } from "./utils/string.js";
 import { DetailMinute } from "./utils/date.js";
 import { ChooseStageChatMessage, DisputeChatMessage, GameWinChatMessage, MatchStartChatMessage, MatchWinChatMessage, ResolveDisputeChatMessage, StrikeStagesChatMessage } from "./public/scripts/utils/systemChatMessages.js";
+import { CheckChatLimitReached, NewMessage } from "./chatRateLimitManager.js";
 
 var matches = [];
 
@@ -339,6 +340,7 @@ export async function PlayerSentCasualMatchEnd(playerId){
 export async function UserSentChatMessage(matchId, playerId, content){
     if (HasBadWords(content)) return chatMessageErrors.badWords;
     if (content.length > 256 || content.length == 0) return chatMessageErrors.tooLong;
+    if (CheckChatLimitReached(playerId)) return chatMessageErrors.rateLimitReached;
 
     var match = FindMatch(matchId);
     if (!match){
@@ -353,6 +355,7 @@ export async function UserSentChatMessage(matchId, playerId, content){
 
     var chatMessage = new ChatMessage(content, playerId);
     match.chat.push(chatMessage);
+    NewMessage(playerId);
     return new ResponseData(201);
 }
 
