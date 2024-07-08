@@ -300,11 +300,6 @@ if ( user.role== 2 ) {
         }
     });
 
-    adminBanPlayer1Length.addEventListener('click', async (e) => {
-        adminBanLength.value = new Date().getTime() + 24 * 60 * 60 * 1000;
-        adminBanUserButton.innerHTML = 'Suspend User';
-    });
-
     adminBanPlayer1Button.addEventListener('click', async (e) => {
         var data = { bannedUserId: players[0].id, banLength: parseInt(adminBanPlayer1Length.value) };
         var response = await postData('/admin/BanUser', data);
