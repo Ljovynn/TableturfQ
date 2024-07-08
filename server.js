@@ -38,6 +38,7 @@ const matchDeletionThreshold = 3 * 60 * 60 * 1000;
 
 const decayRankAmount = 10;
 const decayRankThreshold = 7 * 24 * 60 * 60 * 1000;
+const decayRatingLimit = 1700;
 
 const app = express();
 
@@ -70,7 +71,7 @@ const server = app.listen(port, () => {
 
     //rank decay
     setInterval(() => {
-        UpdateRankDecay(decayRankAmount, decayRankThreshold);
+        UpdateRankDecay(decayRankAmount, decayRankThreshold, decayRatingLimit);
     }, decayRankInterval);
     
     StartDiscordBot();

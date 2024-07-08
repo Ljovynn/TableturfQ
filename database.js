@@ -293,12 +293,12 @@ export async function SetUserDiscordTokens(userId, discordAccessToken, discordRe
     [discordAccessToken, discordRefreshToken, userId]);
 }
 
-export async function UpdateRankDecay(decay, timeThreshold){
+export async function UpdateRankDecay(decay, timeThreshold, ratingLimit){
     const cutoffDate = Date.now() - timeThreshold;
     let timeStamp = ConvertJSDateToTimestamp(new Date(cutoffDate));
     try {
-        await pool.execute(`UPDATE users u SET g2_rating = u.g2_rating - ? WHERE NOT EXISTS (SELECT * FROM matches m WHERE (m.player1_id = u.id OR m.player2_id = u.id) AND m.created_at > ?)`,
-        [decay, timeStamp]);
+        await pool.execute(`UPDATE users u SET g2_rating = u.g2_rating - ? WHERE NOT EXISTS (SELECT * FROM matches m WHERE (m.player1_id = u.id OR m.player2_id = u.id) AND m.created_at > ?) AND u.g2_rating > ?`,
+        [decay, timeStamp, ratingLimit]);
     }
     catch(error){
         console.log(error);
