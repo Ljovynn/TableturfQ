@@ -139,7 +139,7 @@ router.post("/GetUserBanInfo", async (req, res) => {
 
         var banInfo = await GetUserBanState(bannedUserId);
         const banned = (banInfo) ? true : false;
-        const banLength = (banned) ? banInfo.expires_at : undefined;
+        const banLength = (banned) ? banInfo.unix_expires_at : undefined;
 
         res.status(200).send({banned, banLength});
     } catch(error){
