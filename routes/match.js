@@ -219,7 +219,7 @@ router.post("/LoadChatMessages", async (req, res) => {
 
         if (typeof(matchId) !== 'string') return SetResponse(res, definitionErrors.matchUndefined);
         if (typeof(loadedMessagesAmount) !== 'number') return SetResponse(res, definitionErrors.chatMessageUndefined);
-        if (loadedMessagesAmount < chatLoadLimit) return SetResponse(res, definitionErrors.chatMessageUndefined);
+        if (loadedMessagesAmount < 0) return SetResponse(res, definitionErrors.chatMessageUndefined);
 
         var userRole = userRoles.unverified;
         if (userId) userRole = await GetUserRole(userId);
