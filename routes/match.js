@@ -234,7 +234,7 @@ router.post("/LoadChatMessages", async (req, res) => {
 
             var chatMessages = await GetChatMessages(matchId, loadedMessagesAmount);
 
-            for (let i = 0; i < chatMessages.length; i++){
+            for (let i = chatMessages.length - 1; i >= 0; i--){
                 var chatMessage = new ChatMessage(chatMessages[i].content, chatMessages[i].owner_id, chatMessages[i].unix_date);
                 data.push(chatMessage);
             }
