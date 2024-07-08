@@ -81,7 +81,7 @@ export async function GetUserRole(userId){
 }
 
 export async function GetUserBanState(userId){
-    const [rows] = await pool.execute(`SELECT user_id, UNIX_TIMESTAMP(expires_at) AS unix_expires_at FROM ban_list WHERE user_id = ?`, [userId]);
+    const [rows] = await pool.execute(`SELECT user_id, UNIX_TIMESTAMP(expires_at) AS unix_expires_at, reason FROM ban_list WHERE user_id = ?`, [userId]);
     if (rows[0]) return rows[0];
 }
 
@@ -241,14 +241,14 @@ export async function CreateAnnouncement(title, description, iconSrc, date, isEv
     return announcement[0].insertId;
 }
 
-export async function SuspendUser(userId, banLength){
+export async function SuspendUser(userId, banLength, reason){
     const unbanDate = Date.now() + banLength;
     let timeStamp = ConvertJSDateToTimestamp(new Date(unbanDate));
-    await pool.execute(`INSERT INTO ban_list (user_id, expires_at) VALUES (?, ?)`, [userId, timeStamp]);
+    await pool.execute(`INSERT INTO ban_list (user_id, expires_at, reason) VALUES (?, ?, ?)`, [userId, timeStamp, reason]);
 }
 
-export async function BanUser(userId){
-    await pool.execute(`INSERT INTO ban_list (user_id) VALUES (?)`, [userId]);
+export async function BanUser(userId, reason){
+    await pool.execute(`INSERT INTO ban_list (user_id, reason) VALUES (?, ?)`, [userId, reason]);
 }
 
 export async function AddChatMessage(matchId, ownerId, content){

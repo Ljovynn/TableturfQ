@@ -16,6 +16,8 @@ export const definitionErrors = Object.freeze({
     resolveOptionUndefined: new ResponseData(400, 'No resolve option submitted'),
     bannedUserUndefined: new ResponseData(400, 'No user to ban submitted'),
     banLengthWrongFormat: new ResponseData(400, 'Ban length not submitted correctly'),
+    banReasonWrongFormat: new ResponseData(400, 'Ban reason not submitted correctly'),
+    banReasonTooLong: new ResponseData(400, 'Ban reason too long'),
     unbannedUserUndefined: new ResponseData(400, 'No user to ubnan submitted'),
     userNotDefined: new ResponseData(404, 'No user account exists with this ID'),
     chatMessageUndefined: new ResponseData(400, 'No chat message submitted'),

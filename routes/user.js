@@ -167,10 +167,16 @@ router.get("/GetUserBanInfo", async (req, res) => {
         if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
 
         var banInfo = await GetUserBanState(userId);
-        const banned = (banInfo) ? true : false;
-        const banLength = (banned) ? banInfo.unix_expires_at : undefined;
+        var data = {
+            banned: false,
+        }
+        if (banInfo){
+            data.banned = true;
+            data.banLength = banInfo.unix_expires_at;
+            data.reason = banInfo.reason;
+        }
 
-        res.status(200).send({banned, banLength});
+        res.status(200).send(data);
     } catch(error){
         res.sendStatus(400);
     }
