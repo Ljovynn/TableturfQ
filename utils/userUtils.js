@@ -15,7 +15,7 @@ export async function GetCurrentUser(req){
 }
 
 export async function CheckUserBanned(userId){
-    if (GetUserBanState(userId)) return true;
+    if (await GetUserBanState(userId)) return true;
     return false;
 }
 
