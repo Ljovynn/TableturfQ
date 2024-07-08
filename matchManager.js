@@ -54,8 +54,6 @@ export async function CancelOldMatches(cutoffTime){
 export function MakeNewMatch(player1Id, player2Id, matchMode, privateBattle = false, setLength = null){
 
     //randomize player positions
-
-    var tempId;
     let r = Math.floor(Math.random() * 2);
     if (r == 1){
         let tempId = player1Id;
@@ -568,7 +566,7 @@ export async function HandleBannedPlayerInMatch(playerId){
     } else{
         var playerPos = FindPlayerPosInMatch(match, playerId);
         var otherPos = (playerPos + 1) % 2;
-        match.winnerId = match.players[otherPos].id;
+        match.winnerId = match.players[otherPos - 1].id;
         result.winnerId = match.winnerId;
         result.newPlayerRatings = await HandleRankedMatchWin(match);
     }
