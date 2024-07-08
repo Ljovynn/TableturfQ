@@ -1,4 +1,4 @@
-import {matchStatuses, rulesets, Game, Match, ChatMessage, disputeResolveOptions, matchModes} from "./public/constants/matchData.js";
+import {matchStatuses, rulesets, Game, Match, ChatMessage, disputeResolveOptions, matchModes, systemId} from "./public/constants/matchData.js";
 import { GenerateNanoId } from "./nanoIdManager.js";
 import { stages } from "./public/constants/stageData.js";
 import { ApplyMatchEloResults, placementMatchCount } from "./glicko2Manager.js";
@@ -8,7 +8,7 @@ import { AddRecentlyMatchedPlayers } from "./queManager.js";
 import { SendDisputeMessage, SendNewSuspiciousAction, SuspiciousAction } from "./discordBot/discordBotManager.js";
 import { ResponseData } from "./Responses/ResponseData.js";
 import { casualMatchEndErrors, chatMessageErrors, disputeErrors, gameWinErrors, databaseErrors, resolveErrors, stagePickErrors, stageStrikeErrors, nullErrors, forfeitErrors } from "./Responses/matchErrors.js";
-import { HasBadWords, SanitizeDiscordLog } from "./utils/string.js";
+import { HasBadWords, MatchStartChatMessage, SanitizeDiscordLog } from "./utils/string.js";
 import { DetailMinute } from "./utils/date.js";
 
 var matches = [];
@@ -65,6 +65,7 @@ export function MakeNewMatch(player1Id, player2Id, matchMode, privateBattle = fa
     const matchId = GenerateNanoId();
 
     var match = new Match(matchId, player1Id, player2Id, matchMode, privateBattle, setLength);
+    match.chat.push(new ChatMessage(MatchStartChatMessage(), systemId));
     matches.push(match);
     return match;
 }
@@ -334,6 +335,7 @@ export async function PlayerSentCasualMatchEnd(playerId){
 
 export async function UserSentChatMessage(matchId, playerId, content){
     if (HasBadWords(content)) return chatMessageErrors.badWords;
+    if (content.length > 256 || content.length == 0) return chatMessageErrors.tooLong;
 
     var match = FindMatch(matchId);
     if (!match){

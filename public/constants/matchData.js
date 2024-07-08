@@ -2,6 +2,7 @@ import { stages } from "./stageData.js";
 
 export const poolCode = Object.freeze('TTBQ');
 export const turnsBeforeDCLoss = Object.freeze(6);
+export const systemId = Object.freeze('System');
 
 export const matchStatuses = Object.freeze({ 
     stageSelection: 0,
@@ -96,9 +97,10 @@ export const matchModes = Object.freeze({
     ranked: 'ranked'
 });
 
-export function ChatMessage(content, ownerId){
+export function ChatMessage(content, ownerId, date = Date.now()){
     this.content = content;
     this.ownerId = ownerId;
+    this.date = date;
 }
 
 export function Game(){

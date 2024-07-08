@@ -16,7 +16,7 @@ import { SendSocketMessage, SendEmptySocketMessage } from '../socketManager.js';
 
 import { definitionErrors, nullErrors, userErrors } from '../Responses/requestErrors.js';
 import { ResponseSucceeded, SetResponse } from '../Responses/ResponseData.js';
-import { disputeResolveOptions, matchModes } from '../public/constants/matchData.js';
+import { disputeResolveOptions, matchModes, systemId } from '../public/constants/matchData.js';
 import { ApplyHideRank, CheckUserBanned } from '../utils/userUtils.js';
 
 const router = Router();
@@ -265,7 +265,7 @@ router.post("/GetMatchInfo", async (req, res) => {
             }
         }
 
-        var othersInChatIds = [];
+        var othersInChatIds = [systemId];
 
         for (let i = 0; i < match.chat.length; i++){
             if (!othersInChatIds.includes(match.chat[i].ownerId)) othersInChatIds.push(match.chat[i].ownerId);
@@ -275,7 +275,10 @@ router.post("/GetMatchInfo", async (req, res) => {
             if (othersInChatIds[i] == players[0].id || othersInChatIds[i] == players[1].id) othersInChatIds.splice(i, 1);
         }
 
-        var othersInChat = await GetUserChatData(othersInChatIds);
+        var othersInChat = [];
+        for (let i = 1; i < othersInChatIds.length; i++){
+            othersInChat[i] = await GetUserChatData(othersInChatIds);
+        }
 
         var data = {
             match: match,

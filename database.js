@@ -33,17 +33,17 @@ export const sessionStore = new MySQLStore(storeOptions, pool);
 
 //Get
 export async function GetMatch(matchId){
-    const [rows] = await pool.execute(`SELECT * FROM matches WHERE id = ?`, [matchId]);
+    const [rows] = await pool.execute(`SELECT id, player1_id, player2_id, ranked, set_length, result, private_battle, UNIX_TIMESTAMP(created_at) AS unix_created_at FROM matches WHERE id = ?`, [matchId]);
     return rows[0];
 }
 
 export async function GetRecentMatches(cutoff){
-    const [rows] = await pool.execute(`SELECT * FROM matches WHERE private_battle = FALSE ORDER BY created_at DESC LIMIT ?`, [cutoff.toString()]);
+    const [rows] = await pool.execute(`SELECT id, player1_id, player2_id, ranked, set_length, result, UNIX_TIMESTAMP(created_at) AS unix_created_at FROM matches WHERE private_battle = FALSE ORDER BY created_at DESC LIMIT ?`, [cutoff.toString()]);
     return rows;
 }
 
 export async function GetUserByDiscordId(discordId){
-    const [rows] = await pool.execute(`SELECT id, username, role, g2_rating, hide_rank, CAST(discord_id AS CHAR) discord_id, discord_username, discord_avatar_hash, country, created_at FROM users u WHERE discord_id = ?`, [discordId]);
+    const [rows] = await pool.execute(`SELECT id, username, role, g2_rating, hide_rank, CAST(discord_id AS CHAR) discord_id, discord_username, discord_avatar_hash, country, UNIX_TIMESTAMP(created_at) AS unix_created_at FROM users u WHERE discord_id = ?`, [discordId]);
     if (rows[0]){
         //console.log("insert id: " + rows[0].insertId); 
         //console.log("id: " + rows[0].id);
@@ -59,13 +59,13 @@ export async function GetUserLoginData(userId){
 }
 
 export async function GetUserData(userId){
-    const [rows] = await pool.execute(`SELECT id, username, role, g2_rating, hide_rank, CAST(discord_id AS CHAR) discord_id, discord_username, discord_avatar_hash, country, created_at, (SELECT COUNT(*) FROM ban_list WHERE user_id = u.id) AS banned FROM users u WHERE id = ?`,
+    const [rows] = await pool.execute(`SELECT id, username, role, g2_rating, hide_rank, CAST(discord_id AS CHAR) discord_id, discord_username, discord_avatar_hash, country, UNIX_TIMESTAMP(created_at) AS unix_created_at, (SELECT COUNT(*) FROM ban_list WHERE user_id = u.id) AS banned FROM users u WHERE id = ?`,
     [userId]);
     return rows[0];
 }
 
 export async function GetMultipleUserDatas(userIdlist){
-    const [rows] = await pool.query(`SELECT id, username, role, g2_rating, hide_rank, CAST(discord_id AS CHAR) discord_id, discord_username, discord_avatar_hash, country, created_at, (SELECT COUNT(*) FROM ban_list WHERE user_id = u.id) AS banned FROM users u WHERE id IN (?)`,
+    const [rows] = await pool.query(`SELECT id, username, role, g2_rating, hide_rank, CAST(discord_id AS CHAR) discord_id, discord_username, discord_avatar_hash, country, UNIX_TIMESTAMP(created_at) AS unix_created_at, (SELECT COUNT(*) FROM ban_list WHERE user_id = u.id) AS banned FROM users u WHERE id IN (?)`,
     [userIdlist]);
     return rows; 
 }
@@ -101,7 +101,7 @@ export async function GetUserChatData(userIdArr){
 export async function GetUserMatchHistory(userId, hitsPerPage, pageNumber)
 {
     var offset = (pageNumber - 1) * hitsPerPage;
-    const [rows] = await pool.execute(`SELECT * FROM matches WHERE (player1_id = ? OR player2_id = ?) AND private_battle = FALSE ORDER BY created_at DESC LIMIT ? OFFSET ?`, [userId, userId, hitsPerPage.toString(), offset.toString()]);
+    const [rows] = await pool.execute(`SELECT id, player1_id, player2_id, ranked, set_length, result, private_battle, UNIX_TIMESTAMP(created_at) AS unix_created_at FROM matches WHERE (player1_id = ? OR player2_id = ?) AND private_battle = FALSE ORDER BY created_at DESC LIMIT ? OFFSET ?`, [userId, userId, hitsPerPage.toString(), offset.toString()]);
     return rows;
 }
 
@@ -128,7 +128,7 @@ export async function GetStageStrikes(gameId){
 }
 
 export async function GetChatMessages(matchId){
-    const [rows] = await pool.execute(`SELECT * FROM chat_messages WHERE match_id = ? ORDER BY message_number`, [matchId]);
+    const [rows] = await pool.execute(`SELECT owner_id, content, UNIX_TIMESTAMP(date) AS unix_date FROM chat_messages WHERE match_id = ? ORDER BY id`, [matchId]);
     return rows;
 }
 
@@ -149,7 +149,7 @@ export async function GetLeaderboard(){
 
 export async function GetFutureAnnouncements(){
     let timeStamp = ConvertJSDateToTimestamp(new Date());
-    const [rows] = await pool.execute(`SELECT * FROM announcements WHERE date > ? ORDER BY date ASC`, [timeStamp]);
+    const [rows] = await pool.execute(`SELECT title, description, icon_src, UNIX_TIMESTAMP(date) AS unix_date, is_event FROM announcements WHERE date > ? ORDER BY date ASC`, [timeStamp]);
     return rows;
 }
 
@@ -170,11 +170,11 @@ export async function SetMatchResult(match){
 
         var chatData = [];
         for (let i = 0; i < match.chat.length; i++){
-            chatData[i] = [match.id, i + 1, match.chat[i].ownerId, match.chat[i].content];
+            chatData[i] = [match.id, match.chat[i].ownerId, match.chat[i].content, ConvertJSDateToTimestamp(new Date(match.chat[i].date))];
         }
 
         if (chatData.length == 0) return;
-        await pool.query(`INSERT INTO chat_messages (match_id, message_number, owner_id, content) VALUES ?`, 
+        await pool.query(`INSERT INTO chat_messages (match_id, owner_id, content, date) VALUES ?`, 
             [chatData.map(msg => [msg[0], msg[1], msg[2], msg[3]])]);
     }catch(error){
         console.log(error);
@@ -250,9 +250,7 @@ export async function BanUser(userId){
 }
 
 export async function AddChatMessage(matchId, ownerId, content){
-    const [count] = await pool.execute(`SELECT COUNT(*) AS chatCount FROM chat_messages WHERE match_id = ?`, [matchId]);
-    const messageNumber = count[0].chatCount + 1;
-    await pool.execute(`INSERT INTO chat_messages (match_id, message_number, owner_id, content) VALUES (?, ?, ?, ?)`, [matchId, messageNumber, ownerId, content]);
+    await pool.execute(`INSERT INTO chat_messages (match_id, owner_id, content) VALUES (?, ?, ?)`, [matchId, ownerId, content]);
 }
 
 
