@@ -126,6 +126,27 @@ router.post("/UnbanUser", async (req, res) => {
     }
 });
 
+//userId
+//res: banned bool, expires_at timestamp (null if permanent ban)
+router.post("/GetUserBanInfo", async (req, res) => {
+    try{
+        const bannedUserId = req.body.userId;
+
+        if (typeof(bannedUserId) !== 'string') return SetResponse(res, definitionErrors.unbannedUserUndefined);
+
+        var userError = await CheckIfNotAdmin(req);
+        if (userError) return SetResponse(res, userError);
+
+        var banInfo = await GetUserBanState(bannedUserId);
+        const banned = (banInfo) ? true : false;
+        const banLength = (banned) ? banInfo.expires_at : undefined;
+
+        res.status(200).send({banned, banLength});
+    } catch(error){
+        res.sendStatus(400);
+    }
+});
+
 //matchId, message
 router.post("/ModChatMessage", async (req, res) => {
     try {
