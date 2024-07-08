@@ -3,6 +3,7 @@ import { stages } from "./stageData.js";
 export const poolCode = Object.freeze('TTBQ');
 export const turnsBeforeDCLoss = Object.freeze(6);
 export const systemId = Object.freeze('System');
+export const chatLoadLimit = Object.freeze(50);
 
 export const matchStatuses = Object.freeze({ 
     stageSelection: 0,

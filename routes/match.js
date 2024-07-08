@@ -16,7 +16,7 @@ import { SendSocketMessage, SendEmptySocketMessage } from '../socketManager.js';
 
 import { definitionErrors, nullErrors, userErrors } from '../Responses/requestErrors.js';
 import { ResponseSucceeded, SetResponse } from '../Responses/ResponseData.js';
-import { disputeResolveOptions, matchModes, systemId } from '../public/constants/matchData.js';
+import { chatLoadLimit, disputeResolveOptions, matchModes, systemId } from '../public/constants/matchData.js';
 import { ApplyHideRank, CheckUserBanned } from '../utils/userUtils.js';
 
 const router = Router();
@@ -227,20 +227,20 @@ router.post("/GetMatchInfo", async (req, res) => {
 
         var matchHidden = true;
 
-        var match = FindMatch(matchId);
+        var match = structuredClone(FindMatch(matchId));
         if (!match){
             matchHidden = false;
 
-            var matchData = await GetMatch(matchId);
+            let matchData = await GetMatch(matchId);
             if (!matchData) return SetResponse(res, nullErrors.noMatch);
 
-            var gameData = await GetMatchGames(matchId);
-            var strikeData = [];
+            let gameData = await GetMatchGames(matchId);
+            let strikeData = [];
             for (let i = 0; i < gameData.length; i++){
                 strikeData[i] = await GetStageStrikes(gameData[i].id);
             }
 
-            var chatMessages = await GetChatMessages(matchId);
+            let chatMessages = await GetChatMessages(matchId);
 
             match = ConvertDBMatchToMatch(matchData, gameData, strikeData, chatMessages);
         }
@@ -263,6 +263,14 @@ router.post("/GetMatchInfo", async (req, res) => {
                 if (matchHidden) return SetResponse(res, userErrors.noAccess);
                 match.chat = [];
             }
+        }
+
+        var chatLimit = Math.min(match.chat.length, chatLoadLimit);
+        for (let i = match.chat.length - chatLimit; i < match.chat.length; i++){
+
+        }
+        if (match.chat.length > chatLoadLimit){
+            match.chat.splice(0, match.chat.length - chatLoadLimit);
         }
 
         var othersInChatIds = [systemId];
