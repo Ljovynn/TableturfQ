@@ -203,7 +203,7 @@ router.post("/SendChatMessage", async (req, res) => {
         if (!ResponseSucceeded(responseData.code)) return SetResponse(res, responseData);
 
         res.sendStatus(responseData.code);
-        var socketMessage = {ownerId: userId, content: message};
+        var socketMessage = {ownerId: userId, content: message, date: Date.now()};
         SendSocketMessage('match' + matchId, "chatMessage", socketMessage);
     } catch (err){
         res.sendStatus(500);
