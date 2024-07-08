@@ -167,6 +167,7 @@ h3 {
     text-shadow: none;
     color: black;
     margin: 0;
+    word-wrap: break-word;
 }
 
 .match-chat-player {

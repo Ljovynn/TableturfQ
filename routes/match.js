@@ -252,6 +252,7 @@ router.post("/LoadChatMessages", async (req, res) => {
         var socketMessage = {ownerId: userId, content: message, date: Date.now()};
         SendSocketMessage('match' + matchId, "chatMessage", socketMessage);
     } catch (err){
+        console.error(err);
         res.sendStatus(500);
     }
 });

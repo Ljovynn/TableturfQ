@@ -224,6 +224,12 @@ chatForm.addEventListener('submit', async (e) => {
     }
 });
 
+/*chatLog.addEventListener('scrollend', async (e) => {
+    console.log('trying to load new messages!');
+    var response = await getChatMessages(matchId, chatLog.childElementCount);
+    console.log(response);
+});*/
+
 // Confirm strikes/Select map to play on listener
 strikeButton.addEventListener('click', async (e) => {
     console.log(stageStrikes);
@@ -382,11 +388,11 @@ async function setMatchInfo() {
     }
     console.log(oppID);
 
-    chat = match.chat;
     starters = rulesets[ matchModes[match.mode] ].starterStagesArr;
     counterpicks = rulesets[ matchModes[match.mode] ].counterPickStagesArr;
     counterpickStrikeAmount = rulesets[ matchModes[match.mode] ].counterPickBans;
     privateMatch = match.privateBattle;
+    chat = match.chat;
 
     var player1DiscordId = players[0].discord_id;
     var player1DiscordAvatar = players[0].discord_avatar_hash;
@@ -505,8 +511,15 @@ async function setMatchInfo() {
     checkMatchOver();
 }
 
+async function getChatMessages(matchId, amountMessages) {
+    var data = { matchId: matchId, loadedMessagesAmount: amountMessages };
+    var response = getData('/match/LoadChatMessages', data);
+    console.log(response);
+    return response;
+}
+
 // Grab all messages associated with the game and add them to the chat log
-function addChatMessages(chat) {
+async function addChatMessages(chat) {
     var amountMessages = chatLog.childElementCount;
     console.log('Adding messages: ' + JSON.stringify(chat));
     var i = 1;
@@ -516,6 +529,18 @@ function addChatMessages(chat) {
         }
         i++;
     }
+    try {
+        console.log('Checking for more messages');
+        console.log(chatLog.childElementCount);
+        var moreMessages = await getChatMessages(matchId, chatLog.childElementCount);
+        if ( moreMessages ) {
+            addChatMessages(moreMessages);
+        }
+    } catch (error) {
+        console.log(error);
+        console.log('No new messages!');
+        // Cool, just move on
+    }
 }
 
 async function addMessage(chatData) {
@@ -523,12 +548,14 @@ async function addMessage(chatData) {
     console.log(chatData);
     var userId = chatData.ownerId;
     var chatMessage = chatData.content;
+    var chatDate = new Date(chatData.date);
     console.log(userId);
     console.log(chatMessage);
     var sentByCurrentPlayer = false;
     var senderName = '';
     var chatString = '';
     var senderClass = 'match-chat-opponent-player';
+
     console.log('players');
     console.log(players);
 
@@ -544,10 +571,8 @@ async function addMessage(chatData) {
     } else if ( players[1].id == userId ) {
         senderName = players[1].username;
     } else if ( 'System' == userId ) {
-        console.log(chatMessage);
         chatMessage = chatMessage.replace('<' + players[0].id + '>', players[0].username);
         chatMessage = chatMessage.replace('<' + players[1].id + '>', players[1].username);
-        console.log(chatMessage);
         senderName = 'System';
         senderClass = 'match-chat-system';
     } else {
@@ -562,7 +587,7 @@ async function addMessage(chatData) {
         // probably for mods
     }
 
-    chatString = '<div class="match-chat-message"><span class="match-chat-player ' + senderClass + '">' + senderName + ':&nbsp;</span>' + chatMessage + '</div>'
+    chatString = '<div class="match-chat-message"><span class="match-chat-player ' + senderClass + '">' + senderName + ' [' + chatDate.getHours() + ':' + chatDate.getMinutes() + ']:&nbsp;</span>' + chatMessage + '</div>'
 
     chatLog.insertAdjacentHTML( 'beforeend', chatString );
 
