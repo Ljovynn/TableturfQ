@@ -8,8 +8,9 @@ import { AddRecentlyMatchedPlayers } from "./queManager.js";
 import { SendDisputeMessage, SendNewSuspiciousAction, SuspiciousAction } from "./discordBot/discordBotManager.js";
 import { ResponseData } from "./Responses/ResponseData.js";
 import { casualMatchEndErrors, chatMessageErrors, disputeErrors, gameWinErrors, databaseErrors, resolveErrors, stagePickErrors, stageStrikeErrors, nullErrors, forfeitErrors } from "./Responses/matchErrors.js";
-import { HasBadWords, MatchStartChatMessage, SanitizeDiscordLog } from "./utils/string.js";
+import { HasBadWords, SanitizeDiscordLog } from "./utils/string.js";
 import { DetailMinute } from "./utils/date.js";
+import { ChooseStageChatMessage, DisputeChatMessage, GameWinChatMessage, MatchStartChatMessage, MatchWinChatMessage, ResolveDisputeChatMessage, StrikeStagesChatMessage } from "./public/scripts/utils/systemChatMessages.js";
 
 var matches = [];
 
@@ -84,6 +85,7 @@ export function PlayerSentStageStrikes(playerId, stages){
     } else{
         strikeResponse = CounterpickStrikingLogic(match, playerId, playerPos, stages);
     }
+    match.chat.push(new ChatMessage(StrikeStagesChatMessage(playerId, stages), systemId));
     return strikeResponse;
 }
 
@@ -186,6 +188,7 @@ export function PlayerSentStagePick(playerId, stage){
 
     game.stage = stage;
     match.status = matchStatuses.ingame;
+    match.chat.push(new ChatMessage(ChooseStageChatMessage(playerId, stage), systemId));
     return new ResponseData(201, match.id);
 }
 
@@ -240,9 +243,11 @@ export async function PlayerSentGameWin(playerId, winnerId){
             match.winnerId = winnerId;
             data.matchWin = true;
             data.newPlayerRatings = await HandleRankedMatchWin(match);
+            match.chat.push(new ChatMessage(MatchWinChatMessage(winnerId), systemId));
             if (data.newPlayerRatings) return new ResponseData(201, data);
             return databaseErrors.matchFinishError;
         } else{
+            match.chat.push(new ChatMessage(GameWinChatMessage(winnerId, match.gamesArr.length), systemId));
             match.gamesArr.push(new Game());
             match.players[0].gameConfirmed = false;
             match.players[1].gameConfirmed = false;
@@ -387,7 +392,9 @@ function StartMatchDispute(match){
     match.players[0].gameConfirmed = false;
     match.players[1].gameConfirmed = false;
     match.gamesArr[match.gamesArr.length - 1].winnerId = null;
-    if (!match.privateBattle) match.status = matchStatuses.dispute;
+    if (match.privateBattle) return;
+    match.chat.push(new ChatMessage(DisputeChatMessage(), systemId));
+    match.status = matchStatuses.dispute;
     SendDisputeMessage(GetDisputedMatchesList(), true);
 }
 
@@ -443,6 +450,7 @@ export async function ResolveMatchDispute(matchId, resolveOption){
         SendDisputeMessage(GetDisputedMatchesList(), false);
         return new ResponseData(201, matchModes.casual);
     }
+    match.chat.push(new ChatMessage(ResolveDisputeChatMessage(match.players[0].id, match.players[1].id, resolveOption), systemId));
 
     switch (resolveOption){
         case disputeResolveOptions.noChanges:
