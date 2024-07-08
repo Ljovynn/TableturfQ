@@ -81,7 +81,7 @@ export async function GetUserRole(userId){
 }
 
 export async function GetUserBanState(userId){
-    const [rows] = await pool.execute(`SELECT * FROM ban_list WHERE user_id = ?`, [userId]);
+    const [rows] = await pool.execute(`SELECT user_id, UNIX_TIMESTAMP(expires_at) AS unix_expires_at FROM ban_list WHERE user_id = ?`, [userId]);
     if (rows[0]) return rows[0];
 }
 
