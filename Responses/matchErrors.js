@@ -42,6 +42,7 @@ export const chatMessageErrors = Object.freeze({
     badWords: new ResponseData(403, 'Message includes a blacklisted word'),
     notInMatch: new ResponseData(403, 'User is not a player in that match'),
     tooLong: new ResponseData(403, 'Chat message needs to be within 1 and 256 in length'),
+    rateLimitReached: new ResponseData(403, 'Chat rate limit reached'),
 });
 
 export const disputeErrors = Object.freeze({ 
