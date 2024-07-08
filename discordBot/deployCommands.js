@@ -1,5 +1,4 @@
-//run this file to declare new commands:
-//node discordBot/deployCommands.js
+//call Deploy() at runtime to deploy commands (calling at start wont work due to circular dependancy)
 
 import { REST, Routes } from 'discord.js';
 import { fileURLToPath } from 'url';
