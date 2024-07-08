@@ -240,8 +240,8 @@ export async function PlayerSentGameWin(playerId, winnerId){
 
             match.winnerId = winnerId;
             data.matchWin = true;
-            data.newPlayerRatings = await HandleRankedMatchWin(match);
             match.chat.push(new ChatMessage(MatchWinChatMessage(winnerId), systemId));
+            data.newPlayerRatings = await HandleRankedMatchWin(match);
             if (data.newPlayerRatings) return new ResponseData(201, data);
             return databaseErrors.matchFinishError;
         } else{
