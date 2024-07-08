@@ -71,7 +71,7 @@ router.post("/DeleteUserLoginData", async (req, res) => {
 
         await DeleteAllUserSessions(userId);
         await SetUserDiscordTokens(userId, null, null);
-        req.session.user = undefined;
+        //req.session.user = undefined;
         res.sendStatus(201);
     } catch(error){
         console.log(error);

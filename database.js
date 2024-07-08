@@ -320,7 +320,7 @@ export async function DeleteSession(sessionId){
 }
 
 export async function DeleteAllUserSessions(userId){
-    await pool.execute(`DELETE FROM sessions WHERE data LIKE '%"user":?%'`, [userId]);
+    await pool.execute(`DELETE FROM sessions WHERE data LIKE ?`, [`%"user":"${userId}"%`]);
 }
 
 export async function DeleteOldUnverifiedAccounts(ageThreshold){
