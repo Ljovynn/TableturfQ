@@ -528,12 +528,14 @@ async function addMessage(chatData) {
     var sentByCurrentPlayer = false;
     var senderName = '';
     var chatString = '';
+    var senderClass = 'match-chat-opponent-player';
     console.log('players');
     console.log(players);
 
     // Check if the incoming message is from the current user to set the sender color
     if ( userId == user.id ) {
         sentByCurrentPlayer = true;
+        senderClass = 'match-chat-current-player';
     }
 
     // Get the sender username
@@ -541,6 +543,9 @@ async function addMessage(chatData) {
         senderName = players[0].username;
     } else if ( players[1].id == userId ) {
         senderName = players[1].username;
+    } else if ( 'System' == userId ) {
+        senderName = 'System';
+        senderClass = 'match-chat-system';
     } else {
         var modUser = await getModUser([userId]);
         // Admin message
@@ -548,11 +553,12 @@ async function addMessage(chatData) {
             senderName = matchInfo.user.username + ' (Admin)';
         }*/
         senderName = modUser[0].username + ' (Moderator)';
+        senderClass = 'match-chat-moderator';
         // idk who sent this
         // probably for mods
     }
 
-    chatString = '<div class="match-chat-message"><span class="match-chat-player ' + ( sentByCurrentPlayer ? 'match-chat-current-player' : 'match-chat-opponent-player') + '">' + senderName + ':&nbsp;</span>' + chatMessage + '</div>'
+    chatString = '<div class="match-chat-message"><span class="match-chat-player ' + senderClass + '">' + senderName + ':&nbsp;</span>' + chatMessage + '</div>'
 
     chatLog.insertAdjacentHTML( 'beforeend', chatString );
 

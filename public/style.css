@@ -182,6 +182,14 @@ h3 {
     color: black;
 }
 
+.match-chat-system {
+    color: grey;
+}
+
+.match-chat-moderator {
+    color: purple;
+}
+
 #player-raise-dispute {
     width: 50%;
     margin: auto;

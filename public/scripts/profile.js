@@ -332,17 +332,12 @@ async function setUserBanLength() {
         var banInfo = await getUserBanLength();
         if ( banInfo.banned ) {
             if ( banInfo.banLength ) {
-                var banLengthArr = banInfo.banLength.split('T');
-                var banDate = banLengthArr[0];
-                var banTime = banLengthArr[1];
-
-                var readableDate = new Date( banInfo.banLength ).getTime() / 1000;
-                console.log(readableDate);
+                var banLength = banInfo.banLength
                 var currentTime = new Date().getTime() / 1000;
-                var remainingTime = readableDate - currentTime;
+                var remainingTime = banLength - currentTime;
                 var readableLength = getReadableTime(remainingTime);
 
-                banDetails.innerHTML = 'You are suspened from using TableturfQ until ' + banDate + ' ' + banTime.substring(0, banTime.length - 5) + `<br />` + 'Which is ' + readableLength + ' from now';
+                banDetails.innerHTML = 'You are suspened from using TableturfQ until ' + new Date(banLength*1000) + `<br />` + 'Which is ' + readableLength + ' from now';
                 banDetails.style.display = 'block';
             } else {
                 banDetails.innerHTML = 'You are banned from using TableturfQ';
@@ -363,17 +358,13 @@ async function setAdminBanLength(userID) {
     var banInfo = await getAdminBanLength(userID);
     if ( banInfo.banned ) {
         if ( banInfo.banLength ) {
-            var banLengthArr = banInfo.banLength.split('T');
-            var banDate = banLengthArr[0];
-            var banTime = banLengthArr[1];
 
-            var readableDate = new Date( banInfo.banLength ).getTime() / 1000;
-            console.log(readableDate);
+            var banLength = banInfo.banLength
             var currentTime = new Date().getTime() / 1000;
-            var remainingTime = readableDate - currentTime;
+            var remainingTime = banLength - currentTime;
             var readableLength = getReadableTime(remainingTime);
 
-            banDetails.innerHTML = 'User is suspended from using TableturfQ until ' + banDate + ' ' + banTime.substring(0, banTime.length - 5)+ `<br />` + 'Which is ' + readableLength + ' from now';
+            banDetails.innerHTML = 'User is suspended from using TableturfQ until ' + new Date(banLength*1000) + `<br />` + 'Which is ' + readableLength + ' from now';
             banDetails.style.display = 'block';
         } else {
             banDetails.innerHTML = 'User is banned from using TableturfQ';
