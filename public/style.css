@@ -357,6 +357,10 @@ h3 {
     width: 30px;
 }
 
+#user-ban-details {
+    display: none;
+}
+
 #user-match-info {
     display: inline-block;
     width: 50%;

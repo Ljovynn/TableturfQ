@@ -13,6 +13,7 @@ const userELO = document.getElementById('user-rank-elo');
 const userRank = document.getElementById('user-rank');
 const userCountry = document.getElementById('user-country');
 const userCountryValue = document.getElementById('user-country-value');
+const banDetails = document.getElementById('user-ban-details');
 
 // Interaction/edit elements
 const editDisplayName = document.getElementById('user-profile-edit-name');
@@ -39,7 +40,6 @@ const adminBanUserContent = document.getElementById('admin-ban-user-content');
 const adminBanUserButton = document.getElementById('admin-ban-user-button');
 const adminUnbanUserContent = document.getElementById('admin-unban-user-content');
 const adminUnbanUserButton = document.getElementById('admin-unban-user-button');
-const adminBanDetails = document.getElementById('admin-ban-details');
 const adminBanLength = document.getElementById('admin-ban-user-length');
 
 var loggedInUserInfo;
@@ -76,6 +76,8 @@ try {
 
 await setUserInfo();
 await setMatchHistory();
+await setUserBanLength();
+
 await showAdminBanInfo();
 
 editDisplayName.addEventListener('click', (e) => {
@@ -165,6 +167,7 @@ if ( loggedInUserInfo.user.role== 2 ) {
             adminUnbanUserContent.style.display = 'block';
             adminBanUser.style.display = 'none';
             adminBanUserContent.style.display = 'none';
+            await setAdminBanLength(userId);
         }
     });
 
@@ -175,6 +178,7 @@ if ( loggedInUserInfo.user.role== 2 ) {
         console.log(response);
         if ( response == 201 ) {
             adminUnbanUserContent.style.display = 'none';
+            banDetails.style.display = 'none';
             adminBanUser.style.display = 'block';
         }
     });
@@ -261,62 +265,128 @@ async function setMatchHistory() {
     matches = matchList.matchHistory;
     matchUsers = matchList.users;
 
-    for ( let match of matches ) {
-        let row = document.createElement('div');
-        row.classList.add('match-row');
+    if ( matches ) {
+        for ( let match of matches ) {
+            console.log(match);
+            let row = document.createElement('div');
+            row.classList.add('match-row');
 
-        let dateCell = document.createElement('div');
-        dateCell.classList.add('match-date');
-        var matchDate = match.created_at.split('T')[0];
-        dateCell.append(matchDate);
+            let dateCell = document.createElement('div');
+            dateCell.classList.add('match-date');
+            var matchDate = new Date( match.unix_created_at * 1000 ).toLocaleDateString('en-us', { year:"numeric", month:"short", day:"numeric"}) ;
+            dateCell.append(matchDate);
 
-        let matchupCell = document.createElement('div');
-       // var players = await getMatchUsers( [match.player1_id, match.player2_id] );
-        var player1 = getMatchPlayer(matchUsers, match.player1_id);
-        var player2 = getMatchPlayer(matchUsers, match.player2_id);
-        matchupCell.classList.add('matchup');
-        matchupCell.append(player1[0].username + ' vs ' + player2[0].username);
+            let matchupCell = document.createElement('div');
+           // var players = await getMatchUsers( [match.player1_id, match.player2_id] );
+            var player1 = getMatchPlayer(matchUsers, match.player1_id);
+            var player2 = getMatchPlayer(matchUsers, match.player2_id);
+            matchupCell.classList.add('matchup');
+            matchupCell.append(player1[0].username + ' vs ' + player2[0].username);
 
-        let outcomeCell = document.createElement('div');
-        outcomeCell.classList.add('match-outcome');
-        let outcome = '';
-        switch ( match.result ) {
-            case 0:
-            case 1:
-            case 2:
-                outcome = 'In Game';
-                break;
-            case 3:
-                // player 1 win
-                if ( player1[0].id == userId )
-                    outcome = 'Victory';
-                else
-                    outcome = 'Defeat';
-                break;
-            case 4:
-                // player 2 win
-                if ( player2[0].id == userId )
-                    outcome = 'Victory';
-                else
-                    outcome = 'Defeat';
-                break;
-            default:
-                outcome = 'No Winner';
-                break;
+            let outcomeCell = document.createElement('div');
+            outcomeCell.classList.add('match-outcome');
+            let outcome = '';
+            switch ( match.result ) {
+                case 0:
+                case 1:
+                case 2:
+                    outcome = 'In Game';
+                    break;
+                case 3:
+                    // player 1 win
+                    if ( player1[0].id == userId )
+                        outcome = 'Victory';
+                    else
+                        outcome = 'Defeat';
+                    break;
+                case 4:
+                    // player 2 win
+                    if ( player2[0].id == userId )
+                        outcome = 'Victory';
+                    else
+                        outcome = 'Defeat';
+                    break;
+                default:
+                    outcome = 'No Winner';
+                    break;
+            }
+            outcomeCell.append(outcome);
+
+            row.append(dateCell);
+            row.append(matchupCell);
+            row.append(outcomeCell);
+
+            matchHistory.append(row);
         }
-        outcomeCell.append(outcome);
-
-        row.append(dateCell);
-        row.append(matchupCell);
-        row.append(outcomeCell);
-
-        matchHistory.append(row);
     }
 }
 
 async function getMatchUsers(users) {
     var data = { userIdList: users };
     var result = await getData('/user/GetUsers', data);
+    return result;
+}
+
+async function setUserBanLength() {
+    if ( user.banned && user.id == loggedInUserID ) {
+        var banInfo = await getUserBanLength();
+        if ( banInfo.banned ) {
+            if ( banInfo.banLength ) {
+                var banLengthArr = banInfo.banLength.split('T');
+                var banDate = banLengthArr[0];
+                var banTime = banLengthArr[1];
+
+                var readableDate = new Date( banInfo.banLength ).getTime() / 1000;
+                console.log(readableDate);
+                var currentTime = new Date().getTime() / 1000;
+                var remainingTime = readableDate - currentTime;
+                var readableLength = getReadableTime(remainingTime);
+
+                banDetails.innerHTML = 'You are suspened from using TableturfQ until ' + banDate + ' ' + banTime.substring(0, banTime.length - 5) + `<br />` + 'Which is ' + readableLength + ' from now';
+                banDetails.style.display = 'block';
+            } else {
+                banDetails.innerHTML = 'You are banned from using TableturfQ';
+                banDetails.style.display = 'block';
+            }
+        }
+    }
+}
+
+async function getUserBanLength() {
+    //var data = { user: userID };
+    var result = await fetchData('/user/GetUserBanInfo');
+    console.log(result);
+    return result;
+}
+
+async function setAdminBanLength(userID) {
+    var banInfo = await getAdminBanLength(userID);
+    if ( banInfo.banned ) {
+        if ( banInfo.banLength ) {
+            var banLengthArr = banInfo.banLength.split('T');
+            var banDate = banLengthArr[0];
+            var banTime = banLengthArr[1];
+
+            var readableDate = new Date( banInfo.banLength ).getTime() / 1000;
+            console.log(readableDate);
+            var currentTime = new Date().getTime() / 1000;
+            var remainingTime = readableDate - currentTime;
+            var readableLength = getReadableTime(remainingTime);
+
+            banDetails.innerHTML = 'User is suspended from using TableturfQ until ' + banDate + ' ' + banTime.substring(0, banTime.length - 5)+ `<br />` + 'Which is ' + readableLength + ' from now';
+            banDetails.style.display = 'block';
+        } else {
+            banDetails.innerHTML = 'User is banned from using TableturfQ';
+            banDetails.style.display = 'block';
+        }
+    }
+}
+
+async function getAdminBanLength(userID) {
+    console.log(userID);
+    var data = { userId: userID };
+    var result = await getData('/admin/GetUserBanInfo', data);
+    console.log(result);
     return result;
 }
 
@@ -340,8 +410,24 @@ async function showAdminBanInfo() {
             adminBanUserContent.style.display = 'none';
             adminBanUser.style.display = 'none';
             adminUnbanUserContent.style.display = 'block';
+
+            await setAdminBanLength(user.id);
         }
     }
+}
+
+function getReadableTime(time) {
+    time = Number(time);
+    var d = Math.floor(time / (3600*24));
+    var h = Math.floor(time % (3600*24) / 3600);
+    var m = Math.floor(time % 3600 / 60);
+    var s = Math.floor(time % 60);
+
+    var dDisplay = d > 0 ? d + (d == 1 ? " day, " : " days, ") : "";
+    var hDisplay = h > 0 ? h + (h == 1 ? " hour, " : " hours, ") : "";
+    var mDisplay = m > 0 ? m + (m == 1 ? " minute, " : " minutes, ") : "";
+    var sDisplay = s > 0 ? s + (s == 1 ? " second" : " seconds") : "";
+    return dDisplay + hDisplay + mDisplay + sDisplay;
 }
 
 function validateDisplayName(newDisplayName) {

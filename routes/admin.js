@@ -1,7 +1,7 @@
 import { Router } from 'express';
 
 import { CheckUserDefined } from '../utils/checkDefined.js';
-import { BanUser, GetUserBanAndRole, GetUserRole, SuspendUser, UnbanUser } from '../database.js';
+import { BanUser, GetUserBanAndRole, GetUserRole, SuspendUser, UnbanUser, GetUserBanState } from '../database.js';
 import { userRoles } from '../public/constants/userData.js';
 
 import { SendSocketMessage } from '../socketManager.js';
@@ -143,6 +143,7 @@ router.post("/GetUserBanInfo", async (req, res) => {
 
         res.status(200).send({banned, banLength});
     } catch(error){
+        console.error(error);
         res.sendStatus(400);
     }
 });
