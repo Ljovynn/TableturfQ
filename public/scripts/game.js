@@ -118,6 +118,8 @@ var counterpicks = [];
 var pickingStage = false;
 var privateMatch = false;
 
+var loadingMessages = false;
+
 // Suppress the opponent left socket if the current user is the one who left the match
 var userLeft = false;
 
@@ -228,11 +230,15 @@ chatForm.addEventListener('submit', async (e) => {
 chatLog.addEventListener('scroll', async (e) => {
     console.log(chatLog.scrollTop);
     if ( chatLog.scrollTop <= 10 ) {
-        console.log('trying to load new messages!');
-        var response = await getChatMessages(matchId, chatLog.childElementCount);
-        console.log(response);
-        if ( response ) {
-            await addChatMessages(response, true);
+        if ( !loadingMessages ) {
+            loadingMessages = true;
+            console.log('trying to load new messages!');
+            var response = await getChatMessages(matchId, chatLog.childElementCount);
+            console.log(response);
+            if ( response ) {
+                response = response.reverse();
+                await addChatMessages(response, true);
+            }
         }
     }
 });
@@ -522,6 +528,7 @@ async function getChatMessages(matchId, amountMessages) {
     var data = { matchId: matchId, loadedMessagesAmount: amountMessages };
     var response = await getData('/match/LoadChatMessages', data);
     console.log(response);
+    loadingMessages = false;
     return response;
 }
 
@@ -531,9 +538,15 @@ async function addChatMessages(chat, prepend = false) {
     console.log(prepend);
     console.log('Adding messages: ' + JSON.stringify(chat));
     var amountMessages = chatLog.childElementCount;
-    var i = amountMessages + 1;
+    var i;
+    if ( !prepend ) {
+        i = 1;
+    } else {
+        i = amountMessages + 1;
+    }
     for ( const message of chat ) {
         console.log(i);
+        console.log(amountMessages);
         if ( i > amountMessages ) {
             var messageString = await getMessageString(message);
             console.log(messageString);
@@ -979,6 +992,36 @@ async function getModUser(users) {
     return result;
 }
 
+async function setStrikeSystemMessages(currentStriker, receivedStrikes) {
+    // {ownerId: '23M2UCi0s6BUdfFr', content: '50', date: 1720538721390}
+    var strikeString = '';
+    var i = 1;
+    var arrLength = receivedStrikes.length;
+    for (let strike of receivedStrikes) {
+        var stage = document.querySelectorAll('[stage-value="' + strike + '"]')[0];
+        var stageValue = stage.children[0].innerHTML;
+        strikeString += stageValue;
+        ( i < arrLength ? strikeString += ', ' : strikeString += '.' );
+        i++;
+    }
+    var systemMessage = { ownerId: 'System', content: '<' + currentStriker + '> striked ' + strikeString, date: Date.now() }
+    var messageString = await getMessageString(systemMessage);
+    await addMessage(messageString);
+}
+
+async function setPickSystemMessage(currentStriker, selectedStage) {
+    var strikeString = '';
+    var stage = document.querySelectorAll('[stage-value="' + selectedStage[0] + '"]')[0];
+    var stageValue = stage.children[0].innerHTML;
+    strikeString += stageValue;
+    var systemMessage = { ownerId: 'System', content: '<' + currentStriker + '> chose to play on ' + strikeString + '.', date: Date.now() }
+    console.log(systemMessage);
+    var messageString = await getMessageString(systemMessage);
+    await addMessage(messageString);
+    return;
+}
+
+
 // Strike validation
 function validateStrikes(strikes, strikeAmount) {
     if ( strikes.length != strikeAmount ) {
@@ -1012,6 +1055,7 @@ socket.on('chatMessage', async (chatData) => {
 socket.on('stageStrikes', (receivedStrikes) => {
     console.log('Striking stages');
     setStrikes(receivedStrikes);
+    setStrikeSystemMessages(currentStriker, receivedStrikes);
     setStrikeAmount();
     setCurrentStriker();
     isPlayerStriker();
@@ -1027,6 +1071,7 @@ socket.on('stagePick', (selectedStage) => {
     console.log('Stage was selected!');
     console.log(selectedStage);
     setSelectedStage(selectedStage);
+    setPickSystemMessage(currentStriker, selectedStage);
     startGame();
 });
 
