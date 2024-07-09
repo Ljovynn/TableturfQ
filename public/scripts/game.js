@@ -41,6 +41,22 @@ const adminContent = document.getElementById('admin-content');
 const adminDisputeOptions = document.getElementById('admin-dispute-options');
 const adminResolveButton = document.getElementById('admin-resolve-dispute');
 
+const adminPlayer1 = document.getElementById('admin-player1');
+const adminPlayer2 = document.getElementById('admin-player2');
+const adminBanPlayer1Content = document.getElementById('admin-ban-player1-content');
+const adminBanPlayer1Button = document.getElementById('admin-ban-player1-button');
+const adminUnbanPlayer1Content = document.getElementById('admin-unban-player1-content');
+const adminUnbanPlayer1Button = document.getElementById('admin-unban-player1-button');
+const adminBanPlayer1Details = document.getElementById('admin-ban-player1-details');
+const adminBanPlayer1Length = document.getElementById('admin-ban-player1-length');
+
+const adminBanPlayer2Content = document.getElementById('admin-ban-player2-content');
+const adminBanPlayer2Button = document.getElementById('admin-ban-player2-button');
+const adminUnbanPlayer2Content = document.getElementById('admin-unban-player2-content');
+const adminUnbanPlayer2Button = document.getElementById('admin-unban-player2-button');
+const adminBanPlayer2Details = document.getElementById('admin-ban-player2-details');
+const adminBanPlayer2Length = document.getElementById('admin-ban-player2-length');
+
 // Match options
 const setLength = document.getElementById('set-length');
 const turnTimer = document.getElementById('timer-duration');
@@ -102,6 +118,8 @@ var counterpicks = [];
 var pickingStage = false;
 var privateMatch = false;
 
+var loadingMessages = false;
+
 // Suppress the opponent left socket if the current user is the one who left the match
 var userLeft = false;
 
@@ -125,7 +143,8 @@ const socket = io();
 await setUserInfo();
 await setMatchInfo();
 // check if the match is in dispute on pageload for admins that come to check chat
-await showModDispute();
+await showAdminDispute();
+await showAdminBanInfo();
 
 // Set event listeners for interactable elements
 
@@ -207,6 +226,23 @@ chatForm.addEventListener('submit', async (e) => {
     }
 });
 
+// make this shit work when you scroll upwards instead I guess
+chatLog.addEventListener('scroll', async (e) => {
+    console.log(chatLog.scrollTop);
+    if ( chatLog.scrollTop <= 10 ) {
+        if ( !loadingMessages ) {
+            loadingMessages = true;
+            console.log('trying to load new messages!');
+            var response = await getChatMessages(matchId, chatLog.childElementCount);
+            console.log(response);
+            if ( response ) {
+                response = response.reverse();
+                await addChatMessages(response, true);
+            }
+        }
+    }
+});
+
 // Confirm strikes/Select map to play on listener
 strikeButton.addEventListener('click', async (e) => {
     console.log(stageStrikes);
@@ -229,15 +265,6 @@ strikeButton.addEventListener('click', async (e) => {
         // If strikes are accepted
     } else {
         alert('Invalid strikes. Please submit again.');
-    }
-});
-
-adminResolveButton.addEventListener('click', async (e) => {
-    var data = { matchId: matchId, resolveOption: parseInt(adminDisputeOptions.value) };
-    var response = await postData('/admin/ResolveDispute', data);
-    console.log(response);
-    if ( response == 201 ) {
-        adminContent.style.display = 'none';
     }
 });
 
@@ -280,6 +307,46 @@ leaveMatch.addEventListener('click', async (e) => {
         }
     }
 });
+
+// Admin actions
+if ( user.role== 2 ) {
+    adminResolveButton.addEventListener('click', async (e) => {
+        var data = { matchId: matchId, resolveOption: parseInt(adminDisputeOptions.value) };
+        var response = await postData('/admin/ResolveDispute', data);
+        console.log(response);
+        if ( response == 201 ) {
+            adminContent.style.display = 'none';
+        }
+    });
+
+    adminBanPlayer1Button.addEventListener('click', async (e) => {
+        var data = { bannedUserId: players[0].id, banLength: parseInt(adminBanPlayer1Length.value) };
+        var response = await postData('/admin/BanUser', data);
+
+        console.log(response);
+    });
+
+    adminUnbanPlayer1Button.addEventListener('click', async (e) => {
+        var data = { unbannedUserId: players[0].id };
+        var response = await postData('/admin/UnbanUser', data);
+
+        console.log(response);
+    });
+
+    adminBanPlayer2Button.addEventListener('click', async (e) => {
+        var data = { bannedUserId: players[1].id, banLength: parseInt(adminBanPlayer2Length.value) };
+        var response = await postData('/admin/BanUser', data);
+
+        console.log(response);
+    });
+
+    adminUnbanPlayer2Button.addEventListener('click', async (e) => {
+        var data = { unbannedUserId: players[1].id };
+        var response = await postData('/admin/UnbanUser', data);
+
+        console.log(response);
+    });
+}
 
 // Page functions
 async function getUserInfo() {
@@ -334,11 +401,11 @@ async function setMatchInfo() {
     }
     console.log(oppID);
 
-    chat = match.chat;
     starters = rulesets[ matchModes[match.mode] ].starterStagesArr;
     counterpicks = rulesets[ matchModes[match.mode] ].counterPickStagesArr;
     counterpickStrikeAmount = rulesets[ matchModes[match.mode] ].counterPickBans;
     privateMatch = match.privateBattle;
+    chat = match.chat;
 
     var player1DiscordId = players[0].discord_id;
     var player1DiscordAvatar = players[0].discord_avatar_hash;
@@ -457,35 +524,77 @@ async function setMatchInfo() {
     checkMatchOver();
 }
 
+async function getChatMessages(matchId, amountMessages) {
+    var data = { matchId: matchId, loadedMessagesAmount: amountMessages };
+    var response = await getData('/match/LoadChatMessages', data);
+    console.log(response);
+    loadingMessages = false;
+    return response;
+}
+
 // Grab all messages associated with the game and add them to the chat log
-function addChatMessages(chat) {
-    var amountMessages = chatLog.childElementCount;
+async function addChatMessages(chat, prepend = false) {
+    console.log(chat);
+    console.log(prepend);
     console.log('Adding messages: ' + JSON.stringify(chat));
-    var i = 1;
+    var amountMessages = chatLog.childElementCount;
+    var i;
+    if ( !prepend ) {
+        i = 1;
+    } else {
+        i = amountMessages + 1;
+    }
     for ( const message of chat ) {
+        console.log(i);
+        console.log(amountMessages);
         if ( i > amountMessages ) {
-            addMessage(message);
+            var messageString = await getMessageString(message);
+            console.log(messageString);
+            if ( !prepend ) {
+                console.log('adding message');
+                await addMessage(messageString);
+            } else {
+                console.log('prepending message');
+                await prependMessage(messageString);
+            }
         }
         i++;
     }
 }
 
-async function addMessage(chatData) {
+async function addMessage(chatString) {
+    chatLog.insertAdjacentHTML( 'beforeend', chatString );
+    chatLog.scrollTop = chatLog.scrollHeight;
+}
+
+async function prependMessage(chatString) {
+    var chatMessage = document.createElement('div');
+    console.log(chatMessage);
+    chatMessage.innerHTML = chatString.trim();
+    console.log(chatMessage);
+    chatLog.insertBefore( chatMessage.firstChild, chatLog.firstChild );
+}
+
+async function getMessageString(chatData) {
     console.log('Addming message');
     console.log(chatData);
     var userId = chatData.ownerId;
     var chatMessage = chatData.content;
+    var chatDate = new Date(chatData.date);
     console.log(userId);
     console.log(chatMessage);
     var sentByCurrentPlayer = false;
     var senderName = '';
     var chatString = '';
+    var senderClass = 'match-chat-opponent-player';
+
     console.log('players');
     console.log(players);
 
     // Check if the incoming message is from the current user to set the sender color
     if ( userId == user.id ) {
         sentByCurrentPlayer = true;
+        senderClass = 'match-chat-current-player';
     }
 
     // Get the sender username
@@ -493,6 +602,11 @@ async function addMessage(chatData) {
         senderName = players[0].username;
     } else if ( players[1].id == userId ) {
         senderName = players[1].username;
+    } else if ( 'System' == userId || userId === null ) {
+        chatMessage = chatMessage.replace('<' + players[0].id + '>', players[0].username);
+        chatMessage = chatMessage.replace('<' + players[1].id + '>', players[1].username);
+        senderName = 'System';
+        senderClass = 'match-chat-system';
     } else {
         var modUser = await getModUser([userId]);
         // Admin message
@@ -500,15 +614,13 @@ async function addMessage(chatData) {
             senderName = matchInfo.user.username + ' (Admin)';
         }*/
         senderName = modUser[0].username + ' (Moderator)';
+        senderClass = 'match-chat-moderator';
         // idk who sent this
         // probably for mods
     }
 
-    chatString = '<div class="match-chat-message"><span class="match-chat-player ' + ( sentByCurrentPlayer ? 'match-chat-current-player' : 'match-chat-opponent-player') + '">' + senderName + ':&nbsp;</span>' + chatMessage + '</div>'
-
-    chatLog.insertAdjacentHTML( 'beforeend', chatString );
-
-    chatLog.scrollTop = chatLog.scrollHeight;
+    chatString = '<div class="match-chat-message"><span class="match-chat-player ' + senderClass + '">' + senderName + ' [' + chatDate.getHours() + ':' + ( '0' + chatDate.getMinutes() ).slice(-2) + ']:&nbsp;</span>' + chatMessage + '</div>';
+    return chatString;
 }
 
 function setScores() {
@@ -847,9 +959,24 @@ function gameFinish(winnerId) {
     requeueButton.style.display = 'block';
 }
 
-function showModDispute() {
+function showAdminDispute() {
     if ( user.role == 2 && match.status == 2 ) {
         adminContent.style.display = 'block';
+    }
+}
+
+function showAdminBanInfo() {
+    if ( user.role == 2 ) {
+        adminPlayer1.style.display = 'block';
+        adminPlayer2.style.display = 'block';
+
+        if ( players[0].banned ) {
+            adminBanPlayer1Content.style.display = 'block';
+        }
+
+        if ( players[1].banned ) {
+            adminBanPlayer2Content.style.display = 'block';
+        }
     }
 }
 
@@ -864,6 +991,36 @@ async function getModUser(users) {
     var result = await getData('/user/GetUsers', data);
     return result;
 }
+
+async function setStrikeSystemMessages(currentStriker, receivedStrikes) {
+    // {ownerId: '23M2UCi0s6BUdfFr', content: '50', date: 1720538721390}
+    var strikeString = '';
+    var i = 1;
+    var arrLength = receivedStrikes.length;
+    for (let strike of receivedStrikes) {
+        var stage = document.querySelectorAll('[stage-value="' + strike + '"]')[0];
+        var stageValue = stage.children[0].innerHTML;
+        strikeString += stageValue;
+        ( i < arrLength ? strikeString += ', ' : strikeString += '.' );
+        i++;
+    }
+    var systemMessage = { ownerId: 'System', content: '<' + currentStriker + '> striked ' + strikeString, date: Date.now() }
+    var messageString = await getMessageString(systemMessage);
+    await addMessage(messageString);
+}
+
+async function setPickSystemMessage(currentStriker, selectedStage) {
+    var strikeString = '';
+    var stage = document.querySelectorAll('[stage-value="' + selectedStage[0] + '"]')[0];
+    var stageValue = stage.children[0].innerHTML;
+    strikeString += stageValue;
+    var systemMessage = { ownerId: 'System', content: '<' + currentStriker + '> chose to play on ' + strikeString + '.', date: Date.now() }
+    console.log(systemMessage);
+    var messageString = await getMessageString(systemMessage);
+    await addMessage(messageString);
+    return;
+}
+
 
 // Strike validation
 function validateStrikes(strikes, strikeAmount) {
@@ -889,14 +1046,16 @@ function validateChatMessage(chatMessage) {
 
 socket.emit('join', 'match' + matchId);
 
-socket.on('chatMessage', (chatData) => {
+socket.on('chatMessage', async (chatData) => {
     console.log(chatData);
-    addMessage(chatData);
+    var chatString = await getMessageString(chatData);
+    await addMessage(chatString);
 });
 
 socket.on('stageStrikes', (receivedStrikes) => {
     console.log('Striking stages');
     setStrikes(receivedStrikes);
+    setStrikeSystemMessages(currentStriker, receivedStrikes);
     setStrikeAmount();
     setCurrentStriker();
     isPlayerStriker();
@@ -912,6 +1071,7 @@ socket.on('stagePick', (selectedStage) => {
     console.log('Stage was selected!');
     console.log(selectedStage);
     setSelectedStage(selectedStage);
+    setPickSystemMessage(currentStriker, selectedStage);
     startGame();
 });
 
@@ -966,7 +1126,7 @@ socket.on('dispute', async () => {
         alert('There has been a dispute in match results. Please wait for a moderator to resolve the issue. If the dispute was made by accident, please press the resolve dispute button and properly mark the winner.');
     }
     await setMatchInfo();
-    await showModDispute();
+    await showAdminDispute();
     await showPlayerResolve();
     confirmationMessage.innerHTML = 'Please wait for a moderator to resolve the match dispute. If the dispute was made by accident, please press the resolve dispute button and properly mark the winner.';
     console.log(match);

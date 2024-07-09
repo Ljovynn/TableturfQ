@@ -41,10 +41,27 @@
                     </select>
                     <input type="button" id="user-profile-country-submit" value="Edit Country" />
                 </div>
-
                 <button id="logout-button" value="logout">Logout</button>
-
                 </div>
+
+                <p id="user-ban-details"></p>
+                <div id="admin-profile">
+                    <a id="admin-ban-user">Ban User?</a>
+                    <div id="admin-ban-user-content">
+                        <select id="admin-ban-user-length">
+                            <option value="0">Indefinite</option>
+                            <option value="86400000">1 Day</option>
+                            <option value="259200000">3 Days</option>
+                            <option value="604800000">1 Week</option>
+                            <option value="2592000000">1 Month</option>
+                        </select>
+                        <button id="admin-ban-user-button">Ban User</button>
+                    </div>
+                    <div id="admin-unban-user-content">
+                        <button id="admin-unban-user-button">Unban User</button>
+                    </div>
+                </div>
+
                 <div id="user-match-info">
                     <div id="user-rank-info">
                         <p>ELO Rating: <span id="user-rank-elo">1500</span></p>

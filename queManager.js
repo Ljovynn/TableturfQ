@@ -58,13 +58,13 @@ export async function AddPlayerToQue(playerId, matchMode){
     return enterQueErrors.illegalMatchMode;
 }
 
+//ban check is in post
 async function TryAddPlayerToQue(que, playerId){
     if (FindIfPlayerInQue(playerId)) return enterQueErrors.inQue;
     if (FindIfPlayerInMatch(playerId)) return enterQueErrors.inMatch; 
 
     var user = await GetUserData(playerId);
     if (!user) return enterQueErrors.noUser;
-    if (user.banned == 1) return enterQueErrors.banned;
     if (que.matchMode == matchModes.ranked){
         if (user.role == userRoles.unverified) return enterQueErrors.unverified;
     }

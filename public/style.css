@@ -55,7 +55,7 @@ h3 {
 }
 
 #user-login, #guest-login {
-    display: inline-block;
+    display: block;
     width: 50%;
     margin: auto;
 }
@@ -167,6 +167,7 @@ h3 {
     text-shadow: none;
     color: black;
     margin: 0;
+    word-wrap: break-word;
 }
 
 .match-chat-player {
@@ -180,6 +181,14 @@ h3 {
 
 .match-chat-opponent-player {
     color: black;
+}
+
+.match-chat-system {
+    color: grey;
+}
+
+.match-chat-moderator {
+    color: purple;
 }
 
 #player-raise-dispute {
@@ -357,6 +366,10 @@ h3 {
     width: 30px;
 }
 
+#user-ban-details {
+    display: none;
+}
+
 #user-match-info {
     display: inline-block;
     width: 50%;
@@ -520,4 +533,29 @@ h3 {
 
 .admin-dispute-resolve {
     margin: 0px 5px;
+}
+
+#admin-profile {
+    display: none;
+    margin-bottom: 20px;
+}
+
+#admin-ban-user:hover {
+    cursor: pointer;
+}
+
+#admin-ban-user-content {
+    display: none;
+}
+
+#admin-unban-user-content {
+    display: none;
+}
+
+#admin-player1, #admin-player2 {
+    display: none;
+}
+
+#admin-unban-player1-content, #admin-unban-player2-content {
+    display: none;
 }

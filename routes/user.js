@@ -7,12 +7,13 @@ import { ApplyHideRank, GetCurrentUser } from '../utils/userUtils.js';
 
 import { FindIfPlayerInQue, FindIfPlayerWaitingForReady } from '../queManager.js';
 import { FindMatchWithPlayer } from '../matchManager.js';
-import { DeleteAllUserSessions, GetMultipleUserDatas, GetUserMatchHistory, GetUserRankedMatchCount, SetUserCountry, SetUserDiscordTokens, SetUsername } from '../database.js';
+import { DeleteAllUserSessions, GetMultipleUserDatas, GetUserBanState, GetUserMatchHistory, GetUserRankedMatchCount, GetUserRatingHistory, SetUserCountry, SetUserDiscordTokens, SetUsername } from '../database.js';
 import { definitionErrors, userErrors } from '../Responses/requestErrors.js';
 import { SetResponse } from '../Responses/ResponseData.js';
 import { usernameMaxLength, usernameMinLength } from '../public/constants/userData.js';
 import { SearchUser } from '../userListManager.js';
 import { HasBadWords } from '../utils/string.js';
+import { ratingHistoryOptions } from '../public/constants/ratingData.js';
 
 const router = Router();
 
@@ -71,7 +72,7 @@ router.post("/DeleteUserLoginData", async (req, res) => {
 
         await DeleteAllUserSessions(userId);
         await SetUserDiscordTokens(userId, null, null);
-        req.session.user = undefined;
+        //req.session.user = undefined;
         res.sendStatus(201);
     } catch(error){
         console.log(error);
@@ -122,6 +123,36 @@ router.post("/SearchUser", async (req, res) => {
     }
 });
 
+//req: userId (optional), ratingHistoryOption (from ratingData.js), seasonId(optional, not supported yet)
+//res: array of {match_id, old_rating, new_rating, unix_date}
+//ratings are truncated
+router.post("/GetUserRatingHistory", async (req, res) => {
+    try{
+        var userId = req.body.userId;
+        const ratingHistoryOption = req.body.ratingHistoryOption;
+
+        if (!userId){
+            if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
+            userId = req.session.user;
+        }
+
+        if (typeof(input) !== 'number') return SetResponse(res, definitionErrors.ratingHistoryOptionUndefined);
+        if (!ratingHistoryOptions.includes(ratingHistoryOption)) return SetResponse(res, definitionErrors.ratingHistoryOptionWrongFormat);
+
+        //todo implement season
+        if (ratingHistoryOption === ratingHistoryOptions.season) return res.sendStatus(501);
+        const cutoffDate = (ratingHistoryOption == 0) ? Date.now() : Date.now() - ratingHistoryOption;
+
+        const endCutoffDate = Date.now();
+
+        const data = await GetUserRatingHistory(userId, cutoffDate, endCutoffDate);
+
+        res.status(200).send(data);
+    } catch(error){
+        res.sendStatus(400);
+    }
+});
+
 
 //requests
 
@@ -153,6 +184,28 @@ router.get("/GetUserInfo", async (req, res) => {
         var matchId = FindMatchWithPlayer(user.id);
 
         var data = {user, queData, readyData, matchId};
+
+        res.status(200).send(data);
+    } catch(error){
+        res.sendStatus(400);
+    }
+});
+
+//res: banned bool, expires_at timestamp (null if permanent ban)
+router.get("/GetUserBanInfo", async (req, res) => {
+    try{
+        const userId = req.session.user;
+        if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
+
+        var banInfo = await GetUserBanState(userId);
+        var data = {
+            banned: false,
+        }
+        if (banInfo){
+            data.banned = true;
+            data.banLength = banInfo.unix_expires_at;
+            data.reason = banInfo.reason;
+        }
 
         res.status(200).send(data);
     } catch(error){

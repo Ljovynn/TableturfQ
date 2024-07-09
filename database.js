@@ -6,7 +6,8 @@ import { userRoles } from './public/constants/userData.js';
 import { FindPlayerPosInMatch } from './utils/matchUtils.js';
 import { settings } from './glicko2Manager.js';
 import { ConvertJSDateToTimestamp } from './utils/date.js';
-import { matchModes } from './public/constants/matchData.js';
+import { chatLoadLimit, matchModes, systemId } from './public/constants/matchData.js';
+import { HandleBanUser } from './utils/userUtils.js';
 
 dotenv.config();
 
@@ -32,17 +33,20 @@ export const sessionStore = new MySQLStore(storeOptions, pool);
 
 //Get
 export async function GetMatch(matchId){
-    const [rows] = await pool.execute(`SELECT * FROM matches WHERE id = ?`, [matchId]);
+    const [rows] = await pool.execute(`SELECT id, player1_id, player2_id, ranked, set_length, result, private_battle, UNIX_TIMESTAMP(created_at) AS unix_created_at FROM matches WHERE id = ?`,
+        [matchId]);
     return rows[0];
 }
 
 export async function GetRecentMatches(cutoff){
-    const [rows] = await pool.execute(`SELECT * FROM matches WHERE private_battle = FALSE ORDER BY created_at DESC LIMIT ?`, [cutoff.toString()]);
+    const [rows] = await pool.execute(`SELECT id, player1_id, player2_id, ranked, set_length, result, UNIX_TIMESTAMP(created_at) AS unix_created_at FROM matches
+        WHERE private_battle = FALSE ORDER BY created_at DESC LIMIT ?`, [cutoff.toString()]);
     return rows;
 }
 
 export async function GetUserByDiscordId(discordId){
-    const [rows] = await pool.execute(`SELECT id, username, role, g2_rating, hide_rank, CAST(discord_id AS CHAR) discord_id, discord_username, discord_avatar_hash, country, created_at FROM users u WHERE discord_id = ?`, [discordId]);
+    const [rows] = await pool.execute(`SELECT id, username, role, g2_rating, hide_rank, CAST(discord_id AS CHAR) discord_id, discord_username, discord_avatar_hash, country,
+        UNIX_TIMESTAMP(created_at) AS unix_created_at FROM users u WHERE discord_id = ?`, [discordId]);
     if (rows[0]){
         //console.log("insert id: " + rows[0].insertId); 
         //console.log("id: " + rows[0].id);
@@ -58,13 +62,17 @@ export async function GetUserLoginData(userId){
 }
 
 export async function GetUserData(userId){
-    const [rows] = await pool.execute(`SELECT id, username, role, g2_rating, hide_rank, CAST(discord_id AS CHAR) discord_id, discord_username, discord_avatar_hash, country, created_at, (SELECT COUNT(*) FROM ban_list WHERE user_id = u.id) AS banned FROM users u WHERE id = ?`,
+    const [rows] = await pool.execute(`SELECT id, username, role, g2_rating, hide_rank, CAST(discord_id AS CHAR) discord_id,
+        discord_username, discord_avatar_hash, country, UNIX_TIMESTAMP(created_at) AS unix_created_at,
+        (SELECT COUNT(*) FROM ban_list WHERE user_id = u.id) AS banned FROM users u WHERE id = ?`,
     [userId]);
     return rows[0];
 }
 
 export async function GetMultipleUserDatas(userIdlist){
-    const [rows] = await pool.query(`SELECT id, username, role, g2_rating, hide_rank, CAST(discord_id AS CHAR) discord_id, discord_username, discord_avatar_hash, country, created_at, (SELECT COUNT(*) FROM ban_list WHERE user_id = u.id) AS banned FROM users u WHERE id IN (?)`,
+    const [rows] = await pool.query(`SELECT id, username, role, g2_rating, hide_rank, CAST(discord_id AS CHAR) discord_id,
+        discord_username, discord_avatar_hash, country, UNIX_TIMESTAMP(created_at) AS unix_created_at,
+        (SELECT COUNT(*) FROM ban_list WHERE user_id = u.id) AS banned FROM users u WHERE id IN (?)`,
     [userIdlist]);
     return rows; 
 }
@@ -80,27 +88,25 @@ export async function GetUserRole(userId){
 }
 
 export async function GetUserBanState(userId){
-    const [rows] = await pool.execute(`SELECT COUNT(*) AS banned FROM ban_list WHERE user_id = ?`, [userId]);
-    if (rows[0]) return rows[0].banned;
+    const [rows] = await pool.execute(`SELECT user_id, UNIX_TIMESTAMP(expires_at) AS unix_expires_at, reason FROM ban_list WHERE user_id = ?`, [userId]);
+    if (rows[0]) return rows[0];
 }
 
 export async function GetUserBanAndRole(userId){
-    await pool.execute(`SELECT role, (SELECT COUNT(*) FROM ban_list WHERE user_id = u.id) AS banned FROM users u WHERE id = ?`, [userId]);
-    return rows[0];
+    const [rows] = await pool.execute(`SELECT role, (SELECT COUNT(*) FROM ban_list WHERE user_id = u.id) AS banned FROM users u WHERE id = ?`, [userId]);
+    if (rows[0]) return rows[0];
 }
 
-export async function GetUserChatData(userIdArr){
-    const rows = [];
-    for (let i = 0; i < userIdArr.length; i++){
-        rows[i] = await pool.execute(`SELECT id, username, role, CAST(discord_id AS CHAR) discord_id, discord_username FROM users WHERE id = ?`, [userIdArr[i]]);
-    }
+export async function GetUserChatData(userIdlist){
+    const [rows] = await pool.query(`SELECT id, username, role, CAST(discord_id AS CHAR) discord_id, discord_username FROM users WHERE id IN (?)`, [userIdlist]);
     return rows;
 }
 
 export async function GetUserMatchHistory(userId, hitsPerPage, pageNumber)
 {
     var offset = (pageNumber - 1) * hitsPerPage;
-    const [rows] = await pool.execute(`SELECT * FROM matches WHERE (player1_id = ? OR player2_id = ?) AND private_battle = FALSE ORDER BY created_at DESC LIMIT ? OFFSET ?`, [userId, userId, hitsPerPage.toString(), offset.toString()]);
+    const [rows] = await pool.execute(`SELECT id, player1_id, player2_id, ranked, set_length, result, private_battle, UNIX_TIMESTAMP(created_at) AS unix_created_at FROM matches
+        WHERE (player1_id = ? OR player2_id = ?) AND private_battle = FALSE ORDER BY created_at DESC LIMIT ? OFFSET ?`, [userId, userId, hitsPerPage.toString(), offset.toString()]);
     return rows;
 }
 
@@ -116,6 +122,21 @@ export async function GetUserRankedMatchCount(userId)
     if (count[0]) return count[0].matchCount;
 }
 
+export async function GetUserRatingHistory(userId, cutoffDate, endCutoffDate = Date.now())
+{
+    let timeStamp = ConvertJSDateToTimestamp(new Date(cutoffDate));
+    let endTimeStamp = ConvertJSDateToTimestamp(new Date(endCutoffDate));
+    const [rows] = await pool.execute(`SELECT match_ratings.match_id,
+        IF (m.player1_id = ?, (match_ratings.player1_old_rating), match_ratings.player2_old_rating) AS old_rating,
+        IF (m.player1_id = ?, (match_ratings.player1_new_rating), match_ratings.player2_new_rating) AS new_rating,
+        UNIX_TIMESTAMP(m.created_at) AS unix_date
+        FROM match_ratings INNER JOIN matches m ON match_ratings.match_id=m.id
+        WHERE (m.player1_id = ? OR m.player2_id = ?) AND m.created_at > ? AND m.created_at <= ?
+        ORDER BY m.created_at ASC`,
+    [userId, userId, userId, userId, timeStamp, endTimeStamp]);
+    return rows;
+}
+
 export async function GetMatchGames(matchId){
     const [rows] = await pool.execute(`SELECT * FROM games WHERE match_id = ? ORDER BY id`, [matchId]);
     return rows;
@@ -126,8 +147,9 @@ export async function GetStageStrikes(gameId){
     return rows;
 }
 
-export async function GetChatMessages(matchId){
-    const [rows] = await pool.execute(`SELECT * FROM chat_messages WHERE match_id = ? ORDER BY message_number`, [matchId]);
+export async function GetChatMessages(matchId, loadedMessagesAmount = 0){
+    const [rows] = await pool.execute(`SELECT owner_id, content, UNIX_TIMESTAMP(date) AS unix_date FROM chat_messages WHERE match_id = ? ORDER BY id DESC LIMIT ? OFFSET ?`,
+    [matchId, chatLoadLimit.toString(), loadedMessagesAmount.toString()]);
     return rows;
 }
 
@@ -137,43 +159,50 @@ export async function GetSession(sessionId){
 }
 
 export async function GetUserList(){
-    const [rows] = await pool.execute (`SELECT id, username, g2_rating, hide_rank, CAST(discord_id AS CHAR) discord_id, discord_username, discord_avatar_hash, country FROM users u WHERE NOT EXISTS (SELECT * FROM ban_list WHERE user_id = u.id) AND role != 0`);
+    const [rows] = await pool.execute (`SELECT id, username, g2_rating, hide_rank, CAST(discord_id AS CHAR) discord_id, discord_username, discord_avatar_hash, country FROM users u
+        WHERE NOT EXISTS (SELECT * FROM ban_list WHERE user_id = u.id) AND role != 0`);
     return rows;
 }
 
 export async function GetLeaderboard(){
-    const [rows] = await pool.execute (`SELECT id, username, g2_rating, CAST(discord_id AS CHAR) discord_id, discord_username, discord_avatar_hash, country FROM users u WHERE NOT EXISTS (SELECT * FROM ban_list WHERE user_id = u.id) AND hide_rank = FALSE ORDER BY g2_rating DESC`);
+    const [rows] = await pool.execute (`SELECT id, username, g2_rating, CAST(discord_id AS CHAR) discord_id, discord_username, discord_avatar_hash, country FROM users u
+        WHERE NOT EXISTS (SELECT * FROM ban_list WHERE user_id = u.id) AND hide_rank = FALSE ORDER BY g2_rating DESC`);
     return rows;
 }
 
 export async function GetFutureAnnouncements(){
     let timeStamp = ConvertJSDateToTimestamp(new Date());
-    const [rows] = await pool.execute(`SELECT * FROM announcements WHERE date > ? ORDER BY date ASC`, [timeStamp]);
+    const [rows] = await pool.execute(`SELECT title, description, icon_src, UNIX_TIMESTAMP(date) AS unix_date, is_event FROM announcements WHERE date > ? ORDER BY date ASC`, [timeStamp]);
     return rows;
 }
 
 //Create
 
 export async function SetMatchResult(match){
+    try{
+        var ranked = (match.mode == matchModes.ranked && !match.privateBattle);
 
-    var ranked = (match.mode == matchModes.ranked && !match.privateBattle);
+        await pool.execute(`INSERT INTO matches (id, player1_id, player2_id, ranked, set_length, result, private_battle) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [match.id, match.players[0].id, match.players[1].id, ranked, match.setLength, match.status, match.privateBattle]);
 
-    await pool.execute(`INSERT INTO matches (id, player1_id, player2_id, ranked, set_length, result, private_battle) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    [match.id, match.players[0].id, match.players[1].id, ranked, match.setLength, match.status, match.privateBattle]);
+        CreateFirstGameStrikes(match);
 
-    CreateFirstGameStrikes(match);
+        for (let i = 1; i < match.gamesArr.length; i++){
+            CreateCounterpickGameAndStrikes(match, i + 1);
+        }
 
-    for (let i = 1; i < match.gamesArr.length; i++){
-        CreateCounterpickGameAndStrikes(match, i + 1);
+        var chatData = [];
+        for (let i = 0; i < match.chat.length; i++){
+            let ownerId = (match.chat[i].ownerId == systemId) ? null : match.chat[i].ownerId;
+            chatData[i] = [match.id, ownerId, match.chat[i].content, ConvertJSDateToTimestamp(new Date(match.chat[i].date))];
+        }
+
+        if (chatData.length == 0) return;
+        await pool.query(`INSERT INTO chat_messages (match_id, owner_id, content, date) VALUES ?`, 
+            [chatData.map(msg => [msg[0], msg[1], msg[2], msg[3]])]);
+    }catch(error){
+        console.log(error);
     }
-
-    var chatData = [];
-    for (let i = 0; i < match.chat.length; i++){
-        chatData[i] = [match.id, i + 1, match.chat[i].ownerId, match.chat[i].content];
-    }
-
-    if (chatData.length == 0) return;
-    await pool.query(`INSERT INTO chat_messages (match_id, message_number, owner_id, content) VALUES ?`, [chatData.map(msg => [msg[0], msg[1], msg[2], msg[3]])]);
 }
 
 async function CreateFirstGameStrikes(match){
@@ -213,13 +242,20 @@ async function CreateCounterpickGameAndStrikes(match, gameNumber){
     await pool.query(`INSERT INTO stage_strikes (game_id, stage, strike_owner) VALUES ?`, [data.map(strike => [strike[0], strike[1], strike[2]])]);
 }
 
+export async function AddMatchRatings(matchId, p1OldRating, p2OldRating, p1NewRating, p2NewRating)
+{
+    await pool.execute(`INSERT INTO match_ratings (match_id, player1_old_rating, player2_old_rating, player1_new_rating, player2_new_rating) VALUES (?, ?, ?, ?, ?)`,
+    [matchId, p1OldRating, p2OldRating, p1NewRating, p2NewRating]);
+}
+
 export async function CreateUser(userId, username)
 {
     await pool.execute(`INSERT INTO users (id, username, g2_rating, g2_rd, g2_vol) VALUES (?, ?, ?, ?, ?)`, [userId, username, settings.rating, settings.rd, settings.vol]);
 }
 
 export async function CreateUserWithDiscord(userId, username, discordId, discordUsername, discordAccessToken, discordRefreshToken, discordAvatarHash){
-    await pool.execute(`INSERT INTO users (id, username, role, g2_rating, g2_rd, g2_vol, discord_id, discord_username, discord_access_token, discord_refresh_token, discord_avatar_hash) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    await pool.execute(`INSERT INTO users (id, username, role, g2_rating, g2_rd, g2_vol, discord_id, discord_username, discord_access_token, discord_refresh_token, discord_avatar_hash)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [userId, username, userRoles.verified, settings.rating, settings.rd, settings.vol, discordId, discordUsername, discordAccessToken, discordRefreshToken, discordAvatarHash]);
 }
 
@@ -234,20 +270,18 @@ export async function CreateAnnouncement(title, description, iconSrc, date, isEv
     return announcement[0].insertId;
 }
 
-export async function SuspendUser(userId, banLength){
+export async function SuspendUser(userId, banLength, reason){
     const unbanDate = Date.now() + banLength;
     let timeStamp = ConvertJSDateToTimestamp(new Date(unbanDate));
-    await pool.execute(`INSERT INTO ban_list (user_id, expires_at) VALUES (?, ?)`, [userId, timeStamp]);
+    await pool.execute(`INSERT INTO ban_list (user_id, expires_at, reason) VALUES (?, ?, ?)`, [userId, timeStamp, reason]);
 }
 
-export async function BanUser(userId){
-    await pool.execute(`INSERT INTO ban_list (user_id) VALUES (?)`, [userId]);
+export async function BanUser(userId, reason){
+    await pool.execute(`INSERT INTO ban_list (user_id, reason) VALUES (?, ?)`, [userId, reason]);
 }
 
 export async function AddChatMessage(matchId, ownerId, content){
-    const [count] = await pool.execute(`SELECT COUNT(*) AS chatCount FROM chat_messages WHERE match_id = ?`, [matchId]);
-    const messageNumber = count[0].chatCount + 1;
-    await pool.execute(`INSERT INTO chat_messages (match_id, message_number, owner_id, content) VALUES (?, ?, ?, ?)`, [matchId, messageNumber, ownerId, content]);
+    await pool.execute(`INSERT INTO chat_messages (match_id, owner_id, content) VALUES (?, ?, ?)`, [matchId, ownerId, content]);
 }
 
 
@@ -288,12 +322,13 @@ export async function SetUserDiscordTokens(userId, discordAccessToken, discordRe
     [discordAccessToken, discordRefreshToken, userId]);
 }
 
-export async function UpdateRankDecay(decay, timeThreshold){
+export async function UpdateRankDecay(decay, timeThreshold, ratingLimit){
     const cutoffDate = Date.now() - timeThreshold;
     let timeStamp = ConvertJSDateToTimestamp(new Date(cutoffDate));
     try {
-        await pool.execute(`UPDATE users u SET g2_rating = u.g2_rating - ? WHERE NOT EXISTS (SELECT * FROM matches m WHERE (m.player1_id = u.id OR m.player2_id = u.id) AND m.created_at > ?)`,
-        [decay, timeStamp]);
+        await pool.execute(`UPDATE users u SET g2_rating = u.g2_rating - ? WHERE NOT EXISTS (SELECT * FROM matches m
+            WHERE (m.player1_id = u.id OR m.player2_id = u.id) AND m.created_at > ?) AND u.g2_rating > ?`,
+        [decay, timeStamp, ratingLimit]);
     }
     catch(error){
         console.log(error);
@@ -315,13 +350,17 @@ export async function DeleteSession(sessionId){
 }
 
 export async function DeleteAllUserSessions(userId){
-    await pool.execute(`DELETE FROM sessions WHERE data LIKE '%"user":?%'`, [userId]);
+    await pool.execute(`DELETE FROM sessions WHERE data LIKE ?`, [`%"user":"${userId}"%`]);
 }
 
 export async function DeleteOldUnverifiedAccounts(ageThreshold){
     const cutoffDate = Date.now() - ageThreshold;
     let timeStamp = ConvertJSDateToTimestamp(new Date(cutoffDate));
     try {
+        const [rows] = await pool.execute(`SELECT id FROM users WHERE role = ? AND created_at < ?`, [userRoles.unverified, timeStamp]);
+        for (let i = 0; i < rows.length; i++){
+            HandleBanUser(rows[i].id);
+        }
         await pool.execute(`DELETE FROM users WHERE role = ? AND created_at < ?`, [userRoles.unverified, timeStamp]);
     }
     catch(error){

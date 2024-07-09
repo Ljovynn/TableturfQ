@@ -14,6 +14,7 @@ import { StartDiscordBot } from "./discordBot/discordBotManager.js";
 import { DeleteOldSuspensions, DeleteOldUnverifiedAccounts, DeleteUnfinishedMatches, UpdateRankDecay } from "./database.js";
 import { CancelOldMatches } from "./matchManager.js";
 import { DeletePastAnnouncements } from "./announcementManager.js";
+import { CleanupChatRateLimitList } from "./chatRateLimitManager.js";
 
 dotenv.config();
 
@@ -31,17 +32,22 @@ const deleteOldUnverifiedUsersInterval = 24 * 60 * 60 * 1000;
 const deleteOldSuspensionsInterval = 60 * 60 * 1000;
 const deleteOldAnnouncementsInterval = 2 * 60 * 60 * 1000;
 const decayRankInterval = 24 * 60 * 60 * 1000;
+const cleanupChatRateLimitInterval = 30 * 1000;
 
 //Todo: test if account deletion when user is in match messes anything
 const unverifiedUserDeletionThreshold = 7 * 24 * 60 * 60 * 1000;
-const matchDeletionThreshold = 2 * 60 * 60 * 1000;
+const matchDeletionThreshold = 3 * 60 * 60 * 1000;
 
 const decayRankAmount = 10;
 const decayRankThreshold = 7 * 24 * 60 * 60 * 1000;
+const decayRatingLimit = 1700;
 
 const app = express();
 
+//import { Deploy } from "./discordBot/deployCommands.js";
+
 const server = app.listen(port, () => {
+    //Deploy();
     console.log(`TableturfQ is up at port ${port}`);
 
     //que
@@ -70,8 +76,11 @@ const server = app.listen(port, () => {
 
     //rank decay
     setInterval(() => {
-        UpdateRankDecay(decayRankAmount, decayRankThreshold);
+        UpdateRankDecay(decayRankAmount, decayRankThreshold, decayRatingLimit);
     }, decayRankInterval);
+
+    //chat rate limit
+    setInterval(CleanupChatRateLimitList, cleanupChatRateLimitInterval);
     
     StartDiscordBot();
 

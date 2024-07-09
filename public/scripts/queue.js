@@ -126,22 +126,26 @@ async function setUserInfo() {
     try {
         var userInfo = await getUserInfo();
         user = userInfo.user;
-        userID = user.id;
-        loading.style.display = 'none';
-        if ( !user.discord_id ) {
-            isCasual = true;
-            casualQueue.style.display = 'block';
+        if ( !user.banned ) {
+            userID = user.id;
+            loading.style.display = 'none';
+            if ( !user.discord_id ) {
+                isCasual = true;
+                casualQueue.style.display = 'block';
+            } else {
+                competetiveQueue.style.display = 'inline-block';
+                casualQueue.style.display = 'inline-block';
+            }
+
+            if ( userInfo.queData ) {
+                setQueueInfo(userInfo.queData);
+            }
+
+            if ( userInfo.readyData ) {
+                setReadyUp(userInfo.readyData);
+            }
         } else {
-            competetiveQueue.style.display = 'inline-block';
-            casualQueue.style.display = 'inline-block';
-        }
-
-        if ( userInfo.queData ) {
-            setQueueInfo(userInfo.queData);
-        }
-
-        if ( userInfo.readyData ) {
-            setReadyUp(userInfo.readyData);
+            window.location.href = '/profile?playerId=' + user.id;
         }
     } catch (error) {
         console.log(error);
@@ -176,9 +180,9 @@ function displayRecentMatches(recentMatchData) {
 
             let dateCell = document.createElement('div');
             dateCell.classList.add('match-date');
-            var matchDate = match.created_at;
+            var matchDate = match.unix_created_at;
             matchDate = new Date(matchDate);
-            matchDate = matchDate.getTime() / 1000;
+            matchDate = matchDate.getTime();
             var timeNow = Math.floor(Date.now() / 1000);
             var timeElapsed = timeNow - matchDate;
             var readableTime = getReadableTime(timeElapsed);

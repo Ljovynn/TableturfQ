@@ -1,7 +1,7 @@
 import { Router } from 'express';
 
 import { CheckUserDefined } from '../utils/checkDefined.js';
-import { BanUser, GetUserBanAndRole, GetUserRole, SuspendUser, UnbanUser } from '../database.js';
+import { BanUser, GetUserBanAndRole, GetUserRole, SuspendUser, UnbanUser, GetUserBanState } from '../database.js';
 import { userRoles } from '../public/constants/userData.js';
 
 import { SendSocketMessage } from '../socketManager.js';
@@ -72,14 +72,17 @@ router.post("/ResolveDispute", async (req, res) => {
     }
 });
 
-//bannedUserId, banLength (optional)
+//bannedUserId, banLength (optional), reason (optional)
 router.post("/BanUser", async (req, res) => {
     try {
-        const bannedUserId = req.session.bannedUserId;
-        const banLength = req.body.expiresAt;
+        const bannedUserId = req.body.bannedUserId;
+        const banLength = req.body.banLength;
+        const reason = req.body.reason;
 
         if (typeof(bannedUserId) !== 'string') return SetResponse(res, definitionErrors.bannedUserUndefined);
         if (typeof(banLength) !== 'number' && typeof(banLength) !== 'undefined') return SetResponse(res, definitionErrors.banLengthWrongFormat);
+        if (typeof(banLength) !== 'string' && typeof(banLength) !== 'undefined') return SetResponse(res, definitionErrors.banReasonWrongFormat);
+        if (reason.length > 128) return SetResponse(res, definitionErrors.banReasonTooLong);
 
         var userError = await CheckIfNotAdmin(req);
         if (userError) return SetResponse(res, userError);
@@ -88,10 +91,12 @@ router.post("/BanUser", async (req, res) => {
 
         if (!bannedUser) return SetResponse(res, definitionErrors.userNotDefined);
 
+        if (!reason) reason = null;
+
         if (!banLength){
-            BanUser(bannedUserId);
+            BanUser(bannedUserId, reason);
         } else{
-            SuspendUser(bannedUserId, banLength);
+            SuspendUser(bannedUserId, banLength, reason);
         }
         console.log(`User ID ${bannedUserId} was banned by admin ID ${req.session.user}`);
 
@@ -101,6 +106,7 @@ router.post("/BanUser", async (req, res) => {
         return;
         
     } catch (err){
+        console.error(err);
         res.sendStatus(500);
     }
 });
@@ -108,7 +114,7 @@ router.post("/BanUser", async (req, res) => {
 //unbannedUserId
 router.post("/UnbanUser", async (req, res) => {
     try {
-        const unbannedUserId = req.session.unbannedUserId;
+        const unbannedUserId = req.body.unbannedUserId;
 
         if (typeof(unbannedUserId) !== 'string') return SetResponse(res, definitionErrors.unbannedUserUndefined);
 
@@ -122,6 +128,35 @@ router.post("/UnbanUser", async (req, res) => {
         
     } catch (err){
         res.sendStatus(500);
+    }
+});
+
+//userId
+//res: banned bool, expires_at timestamp (null if permanent ban)
+router.post("/GetUserBanInfo", async (req, res) => {
+    try{
+        const bannedUserId = req.body.userId;
+
+        if (typeof(bannedUserId) !== 'string') return SetResponse(res, definitionErrors.unbannedUserUndefined);
+
+        var userError = await CheckIfNotAdmin(req);
+        if (userError) return SetResponse(res, userError);
+
+        var banInfo = await GetUserBanState(bannedUserId);
+
+        var data = {
+            banned: false,
+        }
+        if (banInfo){
+            data.banned = true;
+            data.banLength = banInfo.unix_expires_at;
+            data.reason = banInfo.reason;
+        }
+
+        res.status(200).send(data);
+    } catch(error){
+        console.error(error);
+        res.sendStatus(400);
     }
 });
 
@@ -142,7 +177,7 @@ router.post("/ModChatMessage", async (req, res) => {
         if (!ResponseSucceeded(responseData.code)) return SetResponse(res, responseData);
 
         res.sendStatus(responseData.code);
-        var socketMessage = {ownerId: userId, content: message};
+        var socketMessage = {ownerId: userId, content: message, date: Date.now()};
         SendSocketMessage('match' + matchId, "chatMessage", socketMessage);
     } catch (err){
         console.error(err);

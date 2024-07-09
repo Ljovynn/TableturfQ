@@ -16,8 +16,8 @@ import { SendSocketMessage, SendEmptySocketMessage } from '../socketManager.js';
 
 import { definitionErrors, nullErrors, userErrors } from '../Responses/requestErrors.js';
 import { ResponseSucceeded, SetResponse } from '../Responses/ResponseData.js';
-import { disputeResolveOptions, matchModes } from '../public/constants/matchData.js';
-import { ApplyHideRank } from '../utils/userUtils.js';
+import { chatLoadLimit, ChatMessage, disputeResolveOptions, matchModes, systemId } from '../public/constants/matchData.js';
+import { ApplyHideRank, CheckUserBanned } from '../utils/userUtils.js';
 
 const router = Router();
 
@@ -195,6 +195,7 @@ router.post("/SendChatMessage", async (req, res) => {
         const message = req.body.message;
 
         if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
+        if (await CheckUserBanned(userId)) return SetResponse(res, userErrors.banned);
         if (typeof(matchId) !== 'string') return SetResponse(res, definitionErrors.matchUndefined);
         if (typeof(message) !== 'string') return SetResponse(res, definitionErrors.chatMessageUndefined);
 
@@ -202,12 +203,69 @@ router.post("/SendChatMessage", async (req, res) => {
         if (!ResponseSucceeded(responseData.code)) return SetResponse(res, responseData);
 
         res.sendStatus(responseData.code);
-        var socketMessage = {ownerId: userId, content: message};
+        var socketMessage = {ownerId: userId, content: message, date: Date.now()};
         SendSocketMessage('match' + matchId, "chatMessage", socketMessage);
     } catch (err){
         res.sendStatus(500);
     }
 });
+
+//matchId, loadedMessagesAmount: amount of messages client has already loaded
+router.post("/LoadChatMessages", async (req, res) => {
+    try {
+        const matchId = req.body.matchId;
+        const loadedMessagesAmount = req.body.loadedMessagesAmount;
+        const userId = req.session.user;
+
+        if (typeof(matchId) !== 'string') return SetResponse(res, definitionErrors.matchUndefined);
+        if (typeof(loadedMessagesAmount) !== 'number') return SetResponse(res, definitionErrors.chatMessageUndefined);
+        if (loadedMessagesAmount < 0) return SetResponse(res, definitionErrors.chatMessageUndefined);
+
+        var userRole = userRoles.unverified;
+        if (userId) userRole = await GetUserRole(userId);
+
+        //change after here, create match search first and DB query
+        var match = structuredClone(FindMatch(matchId));
+        var players = [];
+        var data = [];
+        if (!match){
+            let matchData = await GetMatch(matchId);
+            if (!matchData) return SetResponse(res, nullErrors.noMatch);
+
+            var chatMessages = await GetChatMessages(matchId, loadedMessagesAmount);
+
+            for (let i = chatMessages.length - 1; i >= 0; i--){
+                var chatMessage = new ChatMessage(chatMessages[i].content, chatMessages[i].owner_id, chatMessages[i].unix_date);
+                data.push(chatMessage);
+            }
+            players = [matchData.player1_id, matchData.player2_id];
+        } else{
+            data = match.chat;
+
+            let messageLimit = Math.min(data.length, loadedMessagesAmount);
+            data.splice(-messageLimit);
+
+            if (data.length > chatLoadLimit ){
+                data.splice(0, data.length - chatLoadLimit);
+            }
+            players = [match.players[0].id, match.players[1].id];
+        }
+
+        //check if user has access
+        if (!players[0] == userId && !players[1] == userId){
+            //mods cant see PBs
+            if (userRole != userRoles.mod || match.privateBattle){
+                return SetResponse(res, userErrors.noAccess);
+            }
+        }
+
+        res.status(200).send(data);
+    } catch (err){
+        console.error(err);
+        res.sendStatus(500);
+    }
+});
+
 
 //requests
 
@@ -226,20 +284,20 @@ router.post("/GetMatchInfo", async (req, res) => {
 
         var matchHidden = true;
 
-        var match = FindMatch(matchId);
+        var match = structuredClone(FindMatch(matchId));
         if (!match){
             matchHidden = false;
 
-            var matchData = await GetMatch(matchId);
+            let matchData = await GetMatch(matchId);
             if (!matchData) return SetResponse(res, nullErrors.noMatch);
 
-            var gameData = await GetMatchGames(matchId);
-            var strikeData = [];
+            let gameData = await GetMatchGames(matchId);
+            let strikeData = [];
             for (let i = 0; i < gameData.length; i++){
                 strikeData[i] = await GetStageStrikes(gameData[i].id);
             }
 
-            var chatMessages = await GetChatMessages(matchId);
+            let chatMessages = await GetChatMessages(matchId);
 
             match = ConvertDBMatchToMatch(matchData, gameData, strikeData, chatMessages);
         }
@@ -264,17 +322,19 @@ router.post("/GetMatchInfo", async (req, res) => {
             }
         }
 
-        var othersInChatIds = [];
+        if (match.chat.length > chatLoadLimit){
+            match.chat.splice(0, match.chat.length - chatLoadLimit);
+        }
+
+        var othersInChatIds = [null, players[0].id, players[1].id];
 
         for (let i = 0; i < match.chat.length; i++){
             if (!othersInChatIds.includes(match.chat[i].ownerId)) othersInChatIds.push(match.chat[i].ownerId);
         }
 
-        for (let i = othersInChatIds.length - 1; i >= 0; i--){
-            if (othersInChatIds[i] == players[0].id || othersInChatIds[i] == players[1].id) othersInChatIds.splice(i, 1);
-        }
+        othersInChatIds.splice(0, 3);
 
-        var othersInChat = await GetUserChatData(othersInChatIds);
+        const othersInChat = (othersInChatIds.length > 0) ? await GetUserChatData(othersInChatIds) : [];
 
         var data = {
             match: match,

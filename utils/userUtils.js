@@ -1,4 +1,4 @@
-import { GetUserData } from "../database.js"
+import { GetUserBanState, GetUserData } from "../database.js"
 import { HandleBannedPlayerInMatch } from "../matchManager.js";
 import { matchModes } from "../public/constants/matchData.js";
 import { RemovePlayerFromAnyQue } from "../queManager.js";
@@ -14,6 +14,11 @@ export async function GetCurrentUser(req){
     return undefined;
 }
 
+export async function CheckUserBanned(userId){
+    if (await GetUserBanState(userId)) return true;
+    return false;
+}
+
 export function ApplyHideRank(user){
     if (user.hide_rank == false) return user.g2_rating;
     return null;
@@ -22,6 +27,7 @@ export function ApplyHideRank(user){
 export async function HandleBanUser(bannedUserId){
     RemovePlayerFromAnyQue(bannedUserId);
     var matchData = await HandleBannedPlayerInMatch(bannedUserId);
+    if (!matchData) return;
 
     switch (matchData.mode){
         case matchModes.casual:

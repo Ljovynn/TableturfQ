@@ -26,6 +26,7 @@ export function CreateSocketConnection (server){
     
         //join match id as room
         socket.on('join', function(room){
+            if (typeof(room) !== 'string') return;
             const userId = socket.request.session.user;
             if (room == 'queRoom'){
                 if (!userId) return; 
@@ -46,6 +47,16 @@ export function CreateSocketConnection (server){
         instrument(io, {
             auth: false,
             mode: "development",
+        });
+    } else if (process.env.ADMIN_IO_ENABLED === 'true'){
+        console.log("Setting up socket production admin page");
+        instrument(io, {
+            auth: {
+                type: "basic",
+                username: process.env.ADMIN_IO_USERNAME,
+                password: process.env.ADMIN_IO_PASSWORD
+            },
+            mode: "production",
         });
     }
 

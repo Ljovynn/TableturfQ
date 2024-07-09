@@ -3,8 +3,8 @@ import { AddPlayerToQue, RemovePlayerFromQue, PlayerSentReady } from "../queMana
 import { CheckUserDefined } from "../utils/checkDefined.js";
 import { SendSocketMessage } from "../socketManager.js";
 import { definitionErrors, userErrors } from '../Responses/requestErrors.js';
-import { rulesets } from '../public/constants/matchData.js';
 import { ResponseSucceeded, SetResponse } from '../Responses/ResponseData.js';
+import { CheckUserBanned } from '../utils/userUtils.js';
 
 const router = Router();
 
@@ -17,6 +17,7 @@ router.post("/PlayerEnterQue", async (req, res) => {
         const matchMode = req.body.matchMode;
 
         if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
+        if (await CheckUserBanned(userId)) return SetResponse(res, userErrors.banned);
         if (typeof(matchMode) !== 'string') return SetResponse(res, definitionErrors.matchModeUndefined);
 
         var responseData = await AddPlayerToQue(userId, matchMode);

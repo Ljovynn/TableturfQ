@@ -1,5 +1,6 @@
 const loginContent = document.getElementById('login-content');
 const loggedInLinks = document.getElementsByClassName('index-logged-in-link');
+const profileDiv = document.getElementById('index-profile-div');
 const profileLink = document.getElementById('profile-link');
 const matchDiv = document.getElementById('index-match-div');
 const matchLink = document.getElementById('index-match-link');
@@ -53,7 +54,9 @@ function setLoggedInLinks() {
     }
 
     if ( !userInfo.user.discord_id ) {
-        profileLink.style.display = 'none';
+        profileDiv.style.display = 'none';
+    } else {
+        profileLink.href = '/profile?playerId=' + userInfo.user.id;
     }
 }
 
