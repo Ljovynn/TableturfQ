@@ -129,7 +129,7 @@ export async function GetUserRatingHistory(userId, cutoffDate, endCutoffDate = D
 {
     let timeStamp = ConvertJSDateToTimestamp(new Date(cutoffDate));
     let endTimeStamp = ConvertJSDateToTimestamp(new Date(endCutoffDate));
-    const [rows] = await pool.execute(`select match_ratings.match_id,
+    const [rows] = await pool.execute(`SELECT match_ratings.match_id,
         IF (m.player1_id = ?, (match_ratings.player1_old_rating), match_ratings.player2_old_rating) AS old_rating,
         IF (m.player1_id = ?, (match_ratings.player1_new_rating), match_ratings.player2_new_rating) AS new_rating
         FROM match_ratings INNER JOIN matches m ON match_ratings.match_id=m.id
