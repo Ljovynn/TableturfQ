@@ -619,7 +619,7 @@ async function getMessageString(chatData) {
         // probably for mods
     }
 
-    chatString = '<div class="match-chat-message"><span class="match-chat-player ' + senderClass + '">' + senderName + ' [' + chatDate.getHours() + ':' + chatDate.getMinutes() + ']:&nbsp;</span>' + chatMessage + '</div>';
+    chatString = '<div class="match-chat-message"><span class="match-chat-player ' + senderClass + '">' + senderName + ' [' + chatDate.getHours() + ':' + ( '0' + chatDate.getMinutes() ).slice(-2) + ']:&nbsp;</span>' + chatMessage + '</div>';
     return chatString;
 }
 
@@ -1126,7 +1126,7 @@ socket.on('dispute', async () => {
         alert('There has been a dispute in match results. Please wait for a moderator to resolve the issue. If the dispute was made by accident, please press the resolve dispute button and properly mark the winner.');
     }
     await setMatchInfo();
-    await showModDispute();
+    await showAdminDispute();
     await showPlayerResolve();
     confirmationMessage.innerHTML = 'Please wait for a moderator to resolve the match dispute. If the dispute was made by accident, please press the resolve dispute button and properly mark the winner.';
     console.log(match);
