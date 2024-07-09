@@ -28,6 +28,8 @@ export const definitionErrors = Object.freeze({
     usernameUndefined: new ResponseData(400, 'No username submitted'),
     usernameWrongFormat: new ResponseData(400, 'Username not submitted correctly'),
     usernameContainsBadWord: new ResponseData(400, 'Username contains blacklisted word'),
+    ratingHistoryOptionUndefined: new ResponseData(400, 'No rating history option submitted'),
+    ratingHistoryOptionWrongFormat: new ResponseData(400, 'Rating history option not submitted correctly'),
 });
 
 export const nullErrors = Object.freeze({

@@ -7,12 +7,13 @@ import { ApplyHideRank, GetCurrentUser } from '../utils/userUtils.js';
 
 import { FindIfPlayerInQue, FindIfPlayerWaitingForReady } from '../queManager.js';
 import { FindMatchWithPlayer } from '../matchManager.js';
-import { DeleteAllUserSessions, GetMultipleUserDatas, GetUserBanState, GetUserMatchHistory, GetUserRankedMatchCount, SetUserCountry, SetUserDiscordTokens, SetUsername } from '../database.js';
+import { DeleteAllUserSessions, GetMultipleUserDatas, GetUserBanState, GetUserMatchHistory, GetUserRankedMatchCount, GetUserRatingHistory, SetUserCountry, SetUserDiscordTokens, SetUsername } from '../database.js';
 import { definitionErrors, userErrors } from '../Responses/requestErrors.js';
 import { SetResponse } from '../Responses/ResponseData.js';
 import { usernameMaxLength, usernameMinLength } from '../public/constants/userData.js';
 import { SearchUser } from '../userListManager.js';
 import { HasBadWords } from '../utils/string.js';
+import { ratingHistoryOptions } from '../public/constants/ratingData.js';
 
 const router = Router();
 
@@ -118,6 +119,36 @@ router.post("/SearchUser", async (req, res) => {
         res.status(200).send(users);
     } catch(error){
         console.log(error);
+        res.sendStatus(400);
+    }
+});
+
+//req: userId (optional), ratingHistoryOption (from ratingData.js), seasonId(optional, not supported yet)
+//res: array of {matchId, oldRating, newRating}
+//ratings are truncated
+router.post("/GetUserRatingHistory", async (req, res) => {
+    try{
+        var userId = req.body.userId;
+        const ratingHistoryOption = req.body.ratingHistoryOption;
+
+        if (!userId){
+            if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
+            userId = req.session.user;
+        }
+        
+        if (typeof(input) !== 'number') return SetResponse(res, definitionErrors.ratingHistoryOptionUndefined);
+        if (!ratingHistoryOptions.includes(ratingHistoryOption)) return SetResponse(res, definitionErrors.ratingHistoryOptionWrongFormat);
+
+        //todo implement season
+        if (ratingHistoryOption === ratingHistoryOptions.season) return res.sendStatus(501);
+        const cutoffDate = (ratingHistoryOption == 0) ? Date.now() : Date.now() - ratingHistoryOption;
+
+        const endCutoffDate = Date.now();
+
+        const data = await GetUserRatingHistory(userId, cutoffDate, endCutoffDate);
+
+        res.status(200).send(data);
+    } catch(error){
         res.sendStatus(400);
     }
 });

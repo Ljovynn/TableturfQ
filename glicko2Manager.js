@@ -1,5 +1,5 @@
 import glicko2 from "glicko2";
-import { GetUserRankData, SetUserRating } from "./database.js";
+import { AddMatchRatings, GetUserRankData, SetUserRating } from "./database.js";
 import { matchStatuses } from "./public/constants/matchData.js";
 
 export const placementMatchCount = 5;
@@ -49,8 +49,13 @@ export async function ApplyMatchEloResults(match){
   var newPlayer2Rating = player2.getRating();
 
   //update database
-  await SetUserRating(match.players[0].id, newPlayer1Rating, player1.getRd(), player1.getVol());
-  await SetUserRating(match.players[1].id, newPlayer2Rating, player2.getRd(), player2.getVol());
+  try {
+    await SetUserRating(match.players[0].id, newPlayer1Rating, player1.getRd(), player1.getVol());
+    await SetUserRating(match.players[1].id, newPlayer2Rating, player2.getRd(), player2.getVol());
+    await AddMatchRatings(match.id, Math.floor(player1Data.g2_rating), Math.floor(player2Data.g2_rating), Math.floor(newPlayer1Rating), Math.floor(newPlayer2Rating));
+  } catch(error){
+    console.log(error);
+  }
 
   if (player1Data.hide_rank) newPlayer1Rating = null;
   if (player2Data.hide_rank) newPlayer2Rating = null;
