@@ -42,24 +42,17 @@ export function CreateSocketConnection (server){
         });
     });
 
-    if (process.env.NODE_ENV === 'development') {
+    if (process.env.ADMIN_IO_ENABLED === 'true'){
         console.log("Setting up socket admin page");
-        instrument(io, {
-            auth: false,
-            mode: "development",
-        });
-    } else if (process.env.ADMIN_IO_ENABLED === 'true'){
-        console.log("Setting up socket production admin page");
         instrument(io, {
             auth: {
                 type: "basic",
-                username: process.env.ADMIN_IO_USERNAME,
-                password: process.env.ADMIN_IO_PASSWORD
+                username: 'admin',
+                password: "$2b$10$TgmL4SJUGCI42Kh1GN8vDuiEMw7bJHHtWnkQM7gyEWv6KtiR/YjaO"
             },
             mode: "production",
         });
     }
-
     connected = true;
 };
 
