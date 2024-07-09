@@ -332,10 +332,9 @@ router.post("/GetMatchInfo", async (req, res) => {
             if (!othersInChatIds.includes(match.chat[i].ownerId)) othersInChatIds.push(match.chat[i].ownerId);
         }
 
-        var othersInChat = [];
-        for (let i = 3; i < othersInChatIds.length; i++){
-            othersInChat[i - 1] = await GetUserChatData(othersInChatIds[i]);
-        }
+        othersInChatIds.splice(0, 3);
+
+        const othersInChat = (othersInChatIds.length > 0) ? await GetUserChatData(othersInChatIds) : [];
 
         var data = {
             match: match,

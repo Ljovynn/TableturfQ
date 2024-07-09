@@ -97,9 +97,9 @@ export async function GetUserBanAndRole(userId){
     if (rows[0]) return rows[0];
 }
 
-export async function GetUserChatData(userId){
-    const [rows] = await pool.execute(`SELECT id, username, role, CAST(discord_id AS CHAR) discord_id, discord_username FROM users WHERE id = ?`, [userId]);
-    if (rows[0]) return rows[0];
+export async function GetUserChatData(userIdlist){
+    const [rows] = await pool.query(`SELECT id, username, role, CAST(discord_id AS CHAR) discord_id, discord_username FROM users WHERE id IN (?)`, [userIdlist]);
+    return rows;
 }
 
 export async function GetUserMatchHistory(userId, hitsPerPage, pageNumber)
