@@ -430,6 +430,7 @@ export async function PlayerSentResolveDispute(playerId){
             return new ResponseData(201, matchModes.casual);
         }
 
+        match.chat.push(new ChatMessage(ResolveDisputeChatMessage(match.players[0].id, match.players[1].id, disputeResolveOptions.noChanges), systemId));
         var responseData = HandleNoChangesResolve(match);
         responseData.data = match.id;
         return responseData;
