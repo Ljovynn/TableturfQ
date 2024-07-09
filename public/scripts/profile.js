@@ -138,7 +138,7 @@ countrySubmit.addEventListener('click', async (e) => {
 });
 
 logoutButton.addEventListener('click', async (e) => {
-    response = await postData('/user/DeleteUserLoginData');
+    var response = await postData('/user/DeleteUserLoginData');
     if ( response == 201 ) {
         window.location.href = '/';
     }
