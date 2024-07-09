@@ -4,6 +4,7 @@ import { BuildSimpleEmbed } from "../utils/embed.js";
 import { userRoles } from "../../public/constants/userData.js";
 import { idSize } from "../../nanoIdManager.js";
 import { SanitizeDiscordLog } from "../../utils/string.js";
+import { HandleBanUser } from "../../utils/userUtils.js";
 
 const banLengths = {
     '1 day': 24 * 60 * 60 * 1000,
@@ -47,7 +48,11 @@ export const data = new SlashCommandBuilder()
                     .addStringOption(option =>
                         option.setName('banlength')
                         .setDescription('The length of the ban')
-                        .addChoices(banLengthDiscordOptions)))
+                        .addChoices(banLengthDiscordOptions))
+                    .addStringOption(option =>
+                        option.setName('reason')
+                        .setDescription('The reason for the ban')
+                        .setMaxLength(128)))
             .addSubcommand(subCommand => 
                 subCommand
                     .setName('pardon')
@@ -85,7 +90,11 @@ export const data = new SlashCommandBuilder()
                     .addStringOption(option =>
                         option.setName('banlength')
                         .setDescription('The length of the ban')
-                        .addChoices(banLengthDiscordOptions)))
+                        .addChoices(banLengthDiscordOptions))
+                    .addStringOption(option =>
+                        option.setName('reason')
+                        .setDescription('The reason for the ban')
+                        .setMaxLength(128)))
             .addSubcommand(subCommand => 
                 subCommand
                     .setName('pardon')
@@ -118,19 +127,20 @@ export async function execute(interaction) {
     if (subCommand === 'ban'){
         const banLengthObject = interaction.options.get('banlength', false);
         const banLength = (banLengthObject) ? banLengthObject.value : null;
+        const reason = interaction.options.getString('reason', false);
+        var reasonEmbedText = (reason) ? reason : 'No reason provided.';
 
-        console.log("ban length: " + banLength);
         try{
             if (banLengthObject){
-                await SuspendUser(user.id, banLengths[banLength]);
+                await SuspendUser(user.id, banLengths[banLength], reason);
                 await HandleBanUser(user.id);
-                const banEmbed = BuildSimpleEmbed('Ban successful', `Successfully suspended user **${SanitizeDiscordLog(user.username)}**`, `The ban lasts for ${banLength}.`);
+                const banEmbed = BuildSimpleEmbed('Ban successful', `Successfully suspended user **${SanitizeDiscordLog(user.username)}**`, `The ban lasts for ${banLength}.\nReason: ${reasonEmbedText}`);
                 await interaction.reply({ embeds: [banEmbed] });
                 return;
             } else{
-                await BanUser(user.id);
+                await BanUser(user.id, reason);
                 await HandleBanUser(user.id);
-                const banEmbed = BuildSimpleEmbed('Ban successful', `Successfully banned user **${SanitizeDiscordLog(user.username)}**`, 'The ban is permanent.');
+                const banEmbed = BuildSimpleEmbed('Ban successful', `Successfully banned user **${SanitizeDiscordLog(user.username)}**`, `The ban is permanent.\nReason: ${reasonEmbedText}`);
                 await interaction.reply({ embeds: [banEmbed] });
                 return;
         }

@@ -72,14 +72,17 @@ router.post("/ResolveDispute", async (req, res) => {
     }
 });
 
-//bannedUserId, banLength (optional)
+//bannedUserId, banLength (optional), reason (optional)
 router.post("/BanUser", async (req, res) => {
     try {
         const bannedUserId = req.body.bannedUserId;
         const banLength = req.body.banLength;
+        const reason = req.body.reason;
 
         if (typeof(bannedUserId) !== 'string') return SetResponse(res, definitionErrors.bannedUserUndefined);
         if (typeof(banLength) !== 'number' && typeof(banLength) !== 'undefined') return SetResponse(res, definitionErrors.banLengthWrongFormat);
+        if (typeof(banLength) !== 'string' && typeof(banLength) !== 'undefined') return SetResponse(res, definitionErrors.banReasonWrongFormat);
+        if (reason.length > 128) return SetResponse(res, definitionErrors.banReasonTooLong);
 
         var userError = await CheckIfNotAdmin(req);
         if (userError) return SetResponse(res, userError);
@@ -88,10 +91,12 @@ router.post("/BanUser", async (req, res) => {
 
         if (!bannedUser) return SetResponse(res, definitionErrors.userNotDefined);
 
+        if (!reason) reason = null;
+
         if (!banLength){
-            BanUser(bannedUserId);
+            BanUser(bannedUserId, reason);
         } else{
-            SuspendUser(bannedUserId, banLength);
+            SuspendUser(bannedUserId, banLength, reason);
         }
         console.log(`User ID ${bannedUserId} was banned by admin ID ${req.session.user}`);
 
@@ -138,10 +143,17 @@ router.post("/GetUserBanInfo", async (req, res) => {
         if (userError) return SetResponse(res, userError);
 
         var banInfo = await GetUserBanState(bannedUserId);
-        const banned = (banInfo) ? true : false;
-        const banLength = (banned) ? banInfo.unix_expires_at : undefined;
 
-        res.status(200).send({banned, banLength});
+        var data = {
+            banned: false,
+        }
+        if (banInfo){
+            data.banned = true;
+            data.banLength = banInfo.unix_expires_at;
+            data.reason = banInfo.reason;
+        }
+
+        res.status(200).send(data);
     } catch(error){
         console.error(error);
         res.sendStatus(400);

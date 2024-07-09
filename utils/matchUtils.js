@@ -30,7 +30,7 @@ export function ConvertDBMatchToMatch(matchData, gamesData, strikeData, chatMess
         }
     }
 
-    for (let i = 0; i < chatMessages.length; i++){
+    for (let i = chatMessages.length - 1; i >= 0; i--){
         var chatMessage = new ChatMessage(chatMessages[i].content, chatMessages[i].owner_id, chatMessages[i].unix_date);
         match.chat.push(chatMessage);
     }

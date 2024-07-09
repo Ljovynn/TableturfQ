@@ -44,7 +44,10 @@ const decayRatingLimit = 1700;
 
 const app = express();
 
+//import { Deploy } from "./discordBot/deployCommands.js";
+
 const server = app.listen(port, () => {
+    //Deploy();
     console.log(`TableturfQ is up at port ${port}`);
 
     //que
