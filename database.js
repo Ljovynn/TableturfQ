@@ -131,7 +131,8 @@ export async function GetUserRatingHistory(userId, cutoffDate, endCutoffDate = D
     let endTimeStamp = ConvertJSDateToTimestamp(new Date(endCutoffDate));
     const [rows] = await pool.execute(`SELECT match_ratings.match_id,
         IF (m.player1_id = ?, (match_ratings.player1_old_rating), match_ratings.player2_old_rating) AS old_rating,
-        IF (m.player1_id = ?, (match_ratings.player1_new_rating), match_ratings.player2_new_rating) AS new_rating
+        IF (m.player1_id = ?, (match_ratings.player1_new_rating), match_ratings.player2_new_rating) AS new_rating,
+        UNIX_TIMESTAMP(m.created_at) AS unix_date
         FROM match_ratings INNER JOIN matches m ON match_ratings.match_id=m.id
         WHERE (m.player1_id = ? OR m.player2_id = ?) AND m.created_at > ? AND m.created_at <= ?
         ORDER BY m.created_at ASC`,

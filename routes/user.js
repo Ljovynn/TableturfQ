@@ -124,7 +124,7 @@ router.post("/SearchUser", async (req, res) => {
 });
 
 //req: userId (optional), ratingHistoryOption (from ratingData.js), seasonId(optional, not supported yet)
-//res: array of {match_id, old_rating, new_rating}
+//res: array of {match_id, old_rating, new_rating, unix_date}
 //ratings are truncated
 router.post("/GetUserRatingHistory", async (req, res) => {
     try{
