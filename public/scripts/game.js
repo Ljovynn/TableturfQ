@@ -224,11 +224,18 @@ chatForm.addEventListener('submit', async (e) => {
     }
 });
 
-/*chatLog.addEventListener('scrollend', async (e) => {
-    console.log('trying to load new messages!');
-    var response = await getChatMessages(matchId, chatLog.childElementCount);
-    console.log(response);
-});*/
+// make this shit work when you scroll upwards instead I guess
+chatLog.addEventListener('scroll', async (e) => {
+    console.log(chatLog.scrollTop);
+    if ( chatLog.scrollTop <= 10 ) {
+        console.log('trying to load new messages!');
+        var response = await getChatMessages(matchId, chatLog.childElementCount);
+        console.log(response);
+        if ( response ) {
+            await addChatMessages(response, true);
+        }
+    }
+});
 
 // Confirm strikes/Select map to play on listener
 strikeButton.addEventListener('click', async (e) => {
@@ -513,37 +520,49 @@ async function setMatchInfo() {
 
 async function getChatMessages(matchId, amountMessages) {
     var data = { matchId: matchId, loadedMessagesAmount: amountMessages };
-    var response = getData('/match/LoadChatMessages', data);
+    var response = await getData('/match/LoadChatMessages', data);
     console.log(response);
     return response;
 }
 
 // Grab all messages associated with the game and add them to the chat log
-async function addChatMessages(chat) {
-    var amountMessages = chatLog.childElementCount;
+async function addChatMessages(chat, prepend = false) {
+    console.log(chat);
+    console.log(prepend);
     console.log('Adding messages: ' + JSON.stringify(chat));
-    var i = 1;
+    var amountMessages = chatLog.childElementCount;
+    var i = amountMessages + 1;
     for ( const message of chat ) {
+        console.log(i);
         if ( i > amountMessages ) {
-            addMessage(message);
+            var messageString = await getMessageString(message);
+            console.log(messageString);
+            if ( !prepend ) {
+                console.log('adding message');
+                await addMessage(messageString);
+            } else {
+                console.log('prepending message');
+                await prependMessage(messageString);
+            }
         }
         i++;
     }
-    try {
-        console.log('Checking for more messages');
-        console.log(chatLog.childElementCount);
-        var moreMessages = await getChatMessages(matchId, chatLog.childElementCount);
-        if ( moreMessages ) {
-            addChatMessages(moreMessages);
-        }
-    } catch (error) {
-        console.log(error);
-        console.log('No new messages!');
-        // Cool, just move on
-    }
 }
 
-async function addMessage(chatData) {
+async function addMessage(chatString) {
+    chatLog.insertAdjacentHTML( 'beforeend', chatString );
+    chatLog.scrollTop = chatLog.scrollHeight;
+}
+
+async function prependMessage(chatString) {
+    var chatMessage = document.createElement('div');
+    console.log(chatMessage);
+    chatMessage.innerHTML = chatString.trim();
+    console.log(chatMessage);
+    chatLog.insertBefore( chatMessage.firstChild, chatLog.firstChild );
+}
+
+async function getMessageString(chatData) {
     console.log('Addming message');
     console.log(chatData);
     var userId = chatData.ownerId;
@@ -587,11 +606,8 @@ async function addMessage(chatData) {
         // probably for mods
     }
 
-    chatString = '<div class="match-chat-message"><span class="match-chat-player ' + senderClass + '">' + senderName + ' [' + chatDate.getHours() + ':' + chatDate.getMinutes() + ']:&nbsp;</span>' + chatMessage + '</div>'
-
-    chatLog.insertAdjacentHTML( 'beforeend', chatString );
-
-    chatLog.scrollTop = chatLog.scrollHeight;
+    chatString = '<div class="match-chat-message"><span class="match-chat-player ' + senderClass + '">' + senderName + ' [' + chatDate.getHours() + ':' + chatDate.getMinutes() + ']:&nbsp;</span>' + chatMessage + '</div>';
+    return chatString;
 }
 
 function setScores() {
@@ -987,9 +1003,10 @@ function validateChatMessage(chatMessage) {
 
 socket.emit('join', 'match' + matchId);
 
-socket.on('chatMessage', (chatData) => {
+socket.on('chatMessage', async (chatData) => {
     console.log(chatData);
-    addMessage(chatData);
+    var chatString = await getMessageString(chatData);
+    await addMessage(chatString);
 });
 
 socket.on('stageStrikes', (receivedStrikes) => {
