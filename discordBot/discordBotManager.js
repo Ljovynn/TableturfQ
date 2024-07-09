@@ -138,7 +138,7 @@ export async function SendDisputeMessage(matchDisputes, sendNewMessage){
 
 		for (let i = 0; i < limit; i++){
 			var field = {
-				name: `Match id ${SanitizeDiscordLog(matchDisputes[i].id)}`,
+				name: `Match ID ${SanitizeDiscordLog(matchDisputes[i].id)}`,
 				value: `[Link](${websiteURL}/game?matchID=${matchDisputes[i].id})`,
 			}
 			fields.push(field)
