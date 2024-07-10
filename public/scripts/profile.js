@@ -357,13 +357,14 @@ async function setELOGraph(timeframe = 'month') {
 
 function drawELOChart() {
 
-    /*var testData = [
+    var testData = [
         {unix_date: 1719835276, old_rating: 1458, new_rating: 1479 },
-        {unix_date: 1720440076, old_rating: 1479, new_rating: 1491 },
+        {unix_date: 1719975276, old_rating: 1479, new_rating: 1485 },
+        {unix_date: 1720440076, old_rating: 1463, new_rating: 1491 },
         {unix_date: 1720454006, old_rating: 1491, new_rating: 1503 },
         {unix_date: 1720461676, old_rating: 1472, new_rating: 1463 },
         {unix_date: 1720463596, old_rating: 1463, new_rating: 1475 }
-    ];*/
+    ];
 
     /*var dataArray = [
         ['Date', 'Match Rating', 'Rating Decay/Manual Adjustments']
@@ -387,7 +388,8 @@ function drawELOChart() {
 
             var endDate = new Date(currentMatch.unix_date*1000);
             //dateString = getMatchDateString(endDate);
-            dataArray.push([endDate, null, currentMatch.new_rating]);
+            dataArray.push([endDate, null, currentMatch.old_rating]);
+            dataArray.push([endDate, currentMatch.old_rating, null]);
             dataArray.push([endDate, currentMatch.new_rating, null]);
         }
         previousMatch = match;
