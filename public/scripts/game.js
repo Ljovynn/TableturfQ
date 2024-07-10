@@ -602,7 +602,7 @@ async function getMessageString(chatData) {
         senderName = players[0].username;
     } else if ( players[1].id == userId ) {
         senderName = players[1].username;
-    } else if ( 'System' == userId ) {
+    } else if ( 'System' == userId || userId === null ) {
         chatMessage = chatMessage.replace('<' + players[0].id + '>', players[0].username);
         chatMessage = chatMessage.replace('<' + players[1].id + '>', players[1].username);
         senderName = 'System';

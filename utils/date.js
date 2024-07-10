@@ -1,4 +1,4 @@
-export function DetailMinute(date){
+/*export function DetailMinute(date){
     var result = date.getUTCFullYear() + '-';
 
     var month = date.getUTCMonth() + 1;
@@ -18,7 +18,7 @@ export function DetailMinute(date){
     result += minute;
     
     return result;
-}
+}*/
 
 export function ConvertJSDateToTimestamp(date){
     //comment this out if prod railway timezone is off

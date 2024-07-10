@@ -97,11 +97,8 @@ export async function GetUserBanAndRole(userId){
     if (rows[0]) return rows[0];
 }
 
-export async function GetUserChatData(userIdArr){
-    const rows = [];
-    for (let i = 0; i < userIdArr.length; i++){
-        rows[i] = await pool.execute(`SELECT id, username, role, CAST(discord_id AS CHAR) discord_id, discord_username FROM users WHERE id = ?`, [userIdArr[i]]);
-    }
+export async function GetUserChatData(userIdlist){
+    const [rows] = await pool.query(`SELECT id, username, role, CAST(discord_id AS CHAR) discord_id, discord_username FROM users WHERE id IN (?)`, [userIdlist]);
     return rows;
 }
 
@@ -152,7 +149,7 @@ export async function GetStageStrikes(gameId){
 
 export async function GetChatMessages(matchId, loadedMessagesAmount = 0){
     const [rows] = await pool.execute(`SELECT owner_id, content, UNIX_TIMESTAMP(date) AS unix_date FROM chat_messages WHERE match_id = ? ORDER BY id DESC LIMIT ? OFFSET ?`,
-    [matchId, chatLoadLimit, loadedMessagesAmount]);
+    [matchId, chatLoadLimit.toString(), loadedMessagesAmount.toString()]);
     return rows;
 }
 

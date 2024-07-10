@@ -326,20 +326,15 @@ router.post("/GetMatchInfo", async (req, res) => {
             match.chat.splice(0, match.chat.length - chatLoadLimit);
         }
 
-        var othersInChatIds = [systemId];
+        var othersInChatIds = [null, players[0].id, players[1].id];
 
         for (let i = 0; i < match.chat.length; i++){
             if (!othersInChatIds.includes(match.chat[i].ownerId)) othersInChatIds.push(match.chat[i].ownerId);
         }
 
-        for (let i = othersInChatIds.length - 1; i >= 0; i--){
-            if (othersInChatIds[i] == players[0].id || othersInChatIds[i] == players[1].id) othersInChatIds.splice(i, 1);
-        }
+        othersInChatIds.splice(0, 3);
 
-        var othersInChat = [];
-        for (let i = 1; i < othersInChatIds.length; i++){
-            othersInChat[i] = await GetUserChatData(othersInChatIds);
-        }
+        const othersInChat = (othersInChatIds.length > 0) ? await GetUserChatData(othersInChatIds) : [];
 
         var data = {
             match: match,

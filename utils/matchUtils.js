@@ -1,4 +1,4 @@
-import { Match, Game, ChatMessage, matchModes } from "../public/constants/matchData.js";
+import { Match, Game, ChatMessage, matchModes, systemId } from "../public/constants/matchData.js";
 
 export function FindPlayerPosInMatch(match, playerId){
     if (match.players[0].id === playerId){
@@ -31,7 +31,8 @@ export function ConvertDBMatchToMatch(matchData, gamesData, strikeData, chatMess
     }
 
     for (let i = chatMessages.length - 1; i >= 0; i--){
-        var chatMessage = new ChatMessage(chatMessages[i].content, chatMessages[i].owner_id, chatMessages[i].unix_date);
+        var ownerId = (chatMessages[i].owner_id) ? chatMessages[i].owner_id : systemId;
+        var chatMessage = new ChatMessage(chatMessages[i].content, ownerId, chatMessages[i].unix_date);
         match.chat.push(chatMessage);
     }
 

@@ -1,7 +1,6 @@
 import { SlashCommandBuilder } from "discord.js";
 import { GetUserByDiscordId, GetUserMatchCount, GetUserMatchHistory } from "../../database.js";
 import { GetRank, unranked } from "../../public/constants/rankData.js";
-import { DetailMinute } from "../../utils/date.js";
 import { embedColor } from '../utils/constants.js';
 import { BuildSimpleEmbed } from "../utils/embed.js";
 import { GetPlayerLeaderboardPosition } from "../../userListManager.js";
@@ -36,16 +35,9 @@ export async function execute(interaction) {
 	var leaderboardPosition = GetPlayerLeaderboardPosition(user.id);
 	if (leaderboardPosition == 0) leaderboardPosition = 'N/A';
     const matches = await GetUserMatchHistory(user.id, 1, 1);
-    if (matches[0]){
-        var lastPlayed = matches[0].created_at;
-    }
 
     //buildembed
-	var lastPlayedValue = 'Never';
-	if (lastPlayed){
-		lastPlayedValue = DetailMinute(lastPlayed);
-	}
-
+	var lastPlayedValue = (matches[0]) ? `<t:${matches[0].unix_created_at}:R>` : 'Never';
 	var rank = unranked;
 	var ratingValue = 'N/A';
 	if (!user.hide_rank) {

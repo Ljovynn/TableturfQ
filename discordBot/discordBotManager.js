@@ -82,7 +82,6 @@ async function SetLogChannel(){
 
 		const disputeMessage = await channel.send({ embeds: [disputeEmbed] });
 		disputeMessageId = disputeMessage.id;
-
 	} catch(error){
 		console.log(error);
 	}
@@ -167,7 +166,7 @@ export async function SendDisputeMessage(matchDisputes, sendNewMessage){
 export function SuspiciousAction(userId, description, timestamp){
     this.userId = userId;
     this.description = description;
-    this.timestamp = timestamp;
+    this.timestamp = Math.floor(timestamp / 1000);
 }
 
 export async function SendNewSuspiciousAction(suspiciousAction){
@@ -186,8 +185,8 @@ export async function SendNewSuspiciousAction(suspiciousAction){
 			if (!user) continue;
 
 			var field = {
-				name: `User ${SanitizeDiscordLog(user.username)}\nID ${SanitizeDiscordLog(user.id)}\nat ${suspiciousActionsList[i].timestamp}:`,
-				value: suspiciousActionsList[i].description,
+				name: `User ${SanitizeDiscordLog(user.username)}\nID ${SanitizeDiscordLog(user.id)}`,
+				value: `${suspiciousActionsList[i].description}\n\n<t:${suspiciousActionsList[i].timestamp}:f>`,
 			}
 			fields.push(field)
 		}
