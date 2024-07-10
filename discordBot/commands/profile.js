@@ -37,7 +37,7 @@ export async function execute(interaction) {
     const matches = await GetUserMatchHistory(user.id, 1, 1);
 
     //buildembed
-	var lastPlayedValue = (matches[0]) ? `<t:${new Date(matches[0].unix_created_at).valueOf()}:R>` : 'Never';
+	var lastPlayedValue = (matches[0]) ? `<t:${matches[0].unix_created_at}:R>` : 'Never';
 	var rank = unranked;
 	var ratingValue = 'N/A';
 	if (!user.hide_rank) {

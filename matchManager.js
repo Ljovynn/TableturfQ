@@ -9,7 +9,6 @@ import { SendDisputeMessage, SendNewSuspiciousAction, SuspiciousAction } from ".
 import { ResponseData } from "./Responses/ResponseData.js";
 import { casualMatchEndErrors, chatMessageErrors, disputeErrors, gameWinErrors, databaseErrors, resolveErrors, stagePickErrors, stageStrikeErrors, nullErrors, forfeitErrors } from "./Responses/matchErrors.js";
 import { HasBadWords, SanitizeDiscordLog } from "./utils/string.js";
-import { DetailMinute } from "./utils/date.js";
 import { ChooseStageChatMessage, DisputeChatMessage, GameWinChatMessage, MatchStartChatMessage, MatchWinChatMessage, ResolveDisputeChatMessage, StrikeStagesChatMessage } from "./public/scripts/utils/systemChatMessages.js";
 import { CheckChatLimitReached, NewMessage } from "./chatRateLimitManager.js";
 
@@ -44,7 +43,7 @@ export async function CancelOldMatches(cutoffTime){
             console.log(error);
         }
         if (matches[i].mode == matchModes.ranked){
-            const suspiciousAction = new SuspiciousAction(matches[i].players[0].id, `Ranked match cancelled for taking too long, against player ID ${SanitizeDiscordLog(matches[i].players[1].id)}`, `${DetailMinute(new Date(Date.now()))} UTC`);
+            const suspiciousAction = new SuspiciousAction(matches[i].players[0].id, `Ranked match cancelled for taking too long, against player ID ${SanitizeDiscordLog(matches[i].players[1].id)}`, Date.now());
             await SendNewSuspiciousAction(suspiciousAction);
         }
     }
@@ -235,7 +234,7 @@ export async function PlayerSentGameWin(playerId, winnerId){
 
         if (CheckMatchWin(match, winnerId)){
             if (match.createdAt > Date.now() - (5 * 60 * 1000)){
-                const suspiciousAction = new SuspiciousAction(winnerId, `Won a ranked match against user ID ${SanitizeDiscordLog(match.players[winnerPos % 2].id)} in less than 5 minutes`, `${DetailMinute(new Date(Date.now()))} UTC`);
+                const suspiciousAction = new SuspiciousAction(winnerId, `Won a ranked match against user ID ${SanitizeDiscordLog(match.players[winnerPos % 2].id)} in less than 5 minutes`, Date.now());
                 SendNewSuspiciousAction(suspiciousAction);
             }
 
@@ -303,7 +302,7 @@ export async function PlayerSentForfeit(playerId){
     if (!result.newPlayerRatings) return databaseErrors.matchFinishError;
 
     if (!match.privateBattle){
-        const suspiciousAction = new SuspiciousAction(playerId, `Forfeited a ranked match against user ID ${SanitizeDiscordLog(match.players[playerPos % 2].id)}`, `${DetailMinute(new Date(Date.now()))} UTC`);
+        const suspiciousAction = new SuspiciousAction(playerId, `Forfeited a ranked match against user ID ${SanitizeDiscordLog(match.players[playerPos % 2].id)}`, Date.now());
         SendNewSuspiciousAction(suspiciousAction);
     }
 
@@ -330,7 +329,7 @@ export async function PlayerSentCasualMatchEnd(playerId){
     if (!await FinishMatch(match)) return databaseErrors.matchFinishError;
 
     if (match.createdAt > Date.now() - (30 * 1000)){
-        const suspiciousAction = new SuspiciousAction(playerId, 'Ended a casual match within 30 seconds', `${DetailMinute(new Date(Date.now()))} UTC`);
+        const suspiciousAction = new SuspiciousAction(playerId, 'Ended a casual match within 30 seconds', Date.now());
         SendNewSuspiciousAction(suspiciousAction);
     }
 
