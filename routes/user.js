@@ -136,8 +136,8 @@ router.post("/GetUserRatingHistory", async (req, res) => {
             userId = req.session.user;
         }
 
-        if (typeof(input) !== 'number') return SetResponse(res, definitionErrors.ratingHistoryOptionUndefined);
-        if (!ratingHistoryOptions.includes(ratingHistoryOption)) return SetResponse(res, definitionErrors.ratingHistoryOptionWrongFormat);
+        if (typeof(ratingHistoryOption) !== 'number') return SetResponse(res, definitionErrors.ratingHistoryOptionUndefined);
+        if (!Object.values(ratingHistoryOptions).includes(ratingHistoryOption)) return SetResponse(res, definitionErrors.ratingHistoryOptionWrongFormat);
 
         //todo implement season
         if (ratingHistoryOption === ratingHistoryOptions.season) return res.sendStatus(501);
@@ -149,6 +149,7 @@ router.post("/GetUserRatingHistory", async (req, res) => {
 
         res.status(200).send(data);
     } catch(error){
+        console.error(error);
         res.sendStatus(400);
     }
 });

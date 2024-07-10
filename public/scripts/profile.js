@@ -1,4 +1,5 @@
 import { GetRank } from "../constants/rankData.js";
+import { ratingHistoryOptions } from "../constants/ratingData.js";
 
 // User elements
 const loadingSection = document.getElementById('page-loading');
@@ -29,6 +30,9 @@ const countrySubmit = document.getElementById('user-profile-country-submit');
 const editCountryClose = document.getElementById('user-country-edit-close');
 
 const matchHistory = document.getElementById('user-match-history');
+
+const graphTimeframe = document.getElementById('user-rating-graph-timeframe');
+const graphSubmit = document.getElementById('user-rating-graph-submit');
 
 // Logout
 const logoutButton = document.getElementById('logout-button');
@@ -62,6 +66,8 @@ var matches;
 var matchUsers;
 var playerID = '';
 
+var graphData;
+
 try {
     const url = window.location.href;
     const searchParams = new URL(url).searchParams;
@@ -76,6 +82,7 @@ try {
 
 await setUserInfo();
 await setMatchHistory();
+await setELOGraph();
 await setUserBanLength();
 
 await showAdminBanInfo();
@@ -142,6 +149,10 @@ logoutButton.addEventListener('click', async (e) => {
     if ( response == 201 ) {
         window.location.href = '/';
     }
+});
+
+graphSubmit.addEventListener('click', async (e) => {
+    await setELOGraph(graphTimeframe.value);
 });
 
 // Admin actions
@@ -325,6 +336,45 @@ async function getMatchUsers(users) {
     var data = { userIdList: users };
     var result = await getData('/user/GetUsers', data);
     return result;
+}
+
+async function getELOGraph(timeframe) {
+    var data = { userId: userId, ratingHistoryOption: ratingHistoryOptions[timeframe] };
+    var result = await getData('/user/GetUserRatingHistory', data);
+    console.log(result);
+    return result;
+}
+
+async function setELOGraph(timeframe = 'month') {
+    graphData = await getELOGraph(timeframe);
+
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(drawELOChart);
+
+    // Other stuff
+}
+
+function drawELOChart() {
+    var dataArray = [
+        ['Date', 'Rating']
+    ]
+    for ( let match of graphData ) {
+        var matchDate = new Date(match.unix_date*1000);
+        var dateString = matchDate.getFullYear() + '-' + matchDate.getMonth() + '-' + matchDate.getDate() + ' ' + ( '0' + matchDate.getHours() ).slice(-2) + ':' + ( '0' + matchDate.getMinutes() ).slice(-2);
+        dataArray.push([dateString, match.new_rating]);
+    }
+
+
+    var data = google.visualization.arrayToDataTable(dataArray);
+
+        var options = {
+          title: 'User Rating History',
+          legend: { position: 'bottom' }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+
+        chart.draw(data, options);
 }
 
 async function setUserBanLength() {
