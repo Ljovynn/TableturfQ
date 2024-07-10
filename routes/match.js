@@ -326,7 +326,9 @@ router.post("/GetMatchInfo", async (req, res) => {
             match.chat.splice(0, match.chat.length - chatLoadLimit);
         }
 
-        var othersInChatIds = [null, players[0].id, players[1].id];
+        var othersInChatIds = [null, 
+        (players[0]) ? players[0].id : null,
+        (players[1]) ? players[1].id : null];
 
         for (let i = 0; i < match.chat.length; i++){
             if (!othersInChatIds.includes(match.chat[i].ownerId)) othersInChatIds.push(match.chat[i].ownerId);
