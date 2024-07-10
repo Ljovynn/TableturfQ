@@ -36,16 +36,9 @@ export async function execute(interaction) {
 	var leaderboardPosition = GetPlayerLeaderboardPosition(user.id);
 	if (leaderboardPosition == 0) leaderboardPosition = 'N/A';
     const matches = await GetUserMatchHistory(user.id, 1, 1);
-    if (matches[0]){
-        var lastPlayed = matches[0].created_at;
-    }
 
     //buildembed
-	var lastPlayedValue = 'Never';
-	if (lastPlayed){
-		lastPlayedValue = DetailMinute(lastPlayed);
-	}
-
+	var lastPlayedValue = (matches[0]) ? DetailMinute(new Date(matches[0].unix_created_at * 1000)) : 'Never';
 	var rank = unranked;
 	var ratingValue = 'N/A';
 	if (!user.hide_rank) {
