@@ -355,27 +355,75 @@ async function setELOGraph(timeframe = 'month') {
 }
 
 function drawELOChart() {
+    /*graphData = [
+        [1720440076000, 1479, null],
+        [1720454006000, 1491, null ],
+        [1720454006000, null, 1491 ],
+        [1720458386000, null, 1475 ],
+        [1720461676000, null, 1463 ],
+        [1720461676000, 1463, null],
+        [1720463596000, 1475, null]
+    ];*/
+
+    graphData = [
+        {unix_date: 1719835276, old_rating: 1458, new_rating: 1479 },
+        {unix_date: 1720440076, old_rating: 1479, new_rating: 1491 },
+        {unix_date: 1720454006, old_rating: 1491, new_rating: 1503 },
+        {unix_date: 1720461676, old_rating: 1472, new_rating: 1463 },
+        {unix_date: 1720463596, old_rating: 1463, new_rating: 1475 }
+    ];
+
     var dataArray = [
-        ['Date', 'Rating']
-    ]
+        ['Date', 'Match Rating', 'Rating Decay/Manual Adjustments']
+    ];
+
+    var currentMatch;
+    var previousMatch;
     for ( let match of graphData ) {
-        var matchDate = new Date(match.unix_date*1000);
-        var dateString = matchDate.getFullYear() + '-' + matchDate.getMonth() + '-' + matchDate.getDate() + ' ' + ( '0' + matchDate.getHours() ).slice(-2) + ':' + ( '0' + matchDate.getMinutes() ).slice(-2);
-        dataArray.push([dateString, match.new_rating]);
+        console.log(match);
+        currentMatch = match;
+        console.log(currentMatch);
+        console.log(previousMatch);
+        var dateString = '';
+        if ( !previousMatch || currentMatch.old_rating == previousMatch.new_rating ) {
+            var matchDate = new Date(match.unix_date*1000);
+            //dateString = getMatchDateString(matchDate);
+            dataArray.push([matchDate, match.new_rating, null]);
+        } else {
+            // Set up the rating decay graph
+            var startDate = new Date(previousMatch.unix_date*1000);
+            //dateString = getMatchDateString(startDate);
+            dataArray.push([startDate, null, previousMatch.new_rating]);
+
+            var endDate = new Date(currentMatch.unix_date*1000);
+            //dateString = getMatchDateString(endDate);
+            dataArray.push([endDate, null, currentMatch.new_rating]);
+            dataArray.push([endDate, currentMatch.new_rating, null]);
+        }
+        previousMatch = match;
     }
+
+    console.log(dataArray);
 
 
     var data = google.visualization.arrayToDataTable(dataArray);
 
         var options = {
           title: 'User Rating History',
-          legend: { position: 'bottom' }
+          legend: { position: 'bottom' },
+
         };
 
-        var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+        var chart = new google.visualization.LineChart(document.getElementById('user-graph'));
 
         chart.draw(data, options);
 }
+
+/* we probably don't need this function but I'll keep it handy for a bit
+function getMatchDateString(matchDate) {
+    return matchDate.getFullYear() + '-' + matchDate.getMonth() + '-' + matchDate.getDate() + ' ' + ( '0' + matchDate.getHours() ).slice(-2) + ':' + ( '0' + matchDate.getMinutes() ).slice(-2);
+}
+*/
 
 async function setUserBanLength() {
     if ( user.banned && user.id == loggedInUserID ) {
