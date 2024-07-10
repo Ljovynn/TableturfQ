@@ -2,7 +2,6 @@ import { SlashCommandBuilder, PermissionFlagsBits } from "discord.js";
 import { CheckIfAnnouncementExistsById, DeleteAnnouncementById, SetNewAnnouncement } from "../../announcementManager.js";
 import { BuildSimpleEmbed } from "../utils/embed.js";
 import { embedColor } from "../utils/constants.js";
-import { DetailMinute } from "../../utils/date.js";
 
 export const data = new SlashCommandBuilder()
     .setName('announcement')
@@ -85,7 +84,7 @@ export async function execute(interaction) {
             value: description,
         },{
             name: 'Date:',
-            value: `${DetailMinute(new Date(date * 1000))} UTC`,
+            value: `<t:${date}:F>`,
         }],
         thumbnail: {
 			url: iconSrc,
