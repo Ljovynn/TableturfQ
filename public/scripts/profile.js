@@ -250,6 +250,7 @@ async function setUserInfo() {
             userELO.innerHTML = eloRating;
             userRank.src = rank.imageURL;
             userRankInfo.style.display = 'block';
+            userRank.parentElement.innerHTML += rank.name;
         }
         hideNonUserElements();
     } catch (error) {

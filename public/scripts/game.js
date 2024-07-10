@@ -455,6 +455,7 @@ async function setMatchInfo() {
     player1Score.setAttribute('player-id', players[0].id);
     if ( !players[0].hide_rank ) {
         player1RankIcon.src = player1Rank.imageURL;
+        player1RankIcon.parentElement.innerHTML += player1Rank.name;
     }
 
     if ( players[1].country ) {
@@ -475,6 +476,7 @@ async function setMatchInfo() {
     player2Score.setAttribute('player-id', players[1].id);
     if ( !players[1].hide_rank ) {
         player2RankIcon.src = player2Rank.imageURL;
+        player2RankIcon.parentElement.innerHTML += player2Rank.name;
     }
 
     setLength.innerHTML = 'Best of ' + ( privateMatch ? match.setLength : bestOfSets[rulesets[ matchModes[match.mode] ].setLength] ) + ' games';
