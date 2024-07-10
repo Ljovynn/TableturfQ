@@ -373,7 +373,7 @@ function drawELOChart() {
 
     var currentMatch;
     var previousMatch;
-    for ( let match of testData ) {
+    for ( let match of graphData ) {
         currentMatch = match;
         var dateString = '';
         if ( !previousMatch || currentMatch.old_rating == previousMatch.new_rating ) {
