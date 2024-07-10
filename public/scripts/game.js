@@ -291,7 +291,7 @@ playerResolveDispute.addEventListener('click', async (e) => {
 });
 
 leaveMatch.addEventListener('click', async (e) => {
-    if ( casualMatch ) {
+    if ( casualMatch || privateMatch ) {
         userLeft = true;
         var data = {userId: userID};
         var response = await postData('/match/CasualMatchEnd', data);
