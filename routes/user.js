@@ -7,7 +7,7 @@ import { ApplyHideRank, GetCurrentUser } from '../utils/userUtils.js';
 
 import { FindIfPlayerInQue, FindIfPlayerWaitingForReady } from '../queManager.js';
 import { FindMatchWithPlayer } from '../matchManager.js';
-import { DeleteAllUserSessions, GetMultipleUserDatas, GetUserBanState, GetUserMatchHistory, GetUserRankedMatchCount, GetUserRatingHistory, SetUserCountry, SetUserDiscordTokens, SetUsername } from '../database.js';
+import { DeleteAllUserSessions, GetMultipleUserDatas, GetUserBanState, GetUserMatchHistory, GetUserRankData, GetUserRankedMatchCount, GetUserRatingHistory, SetUserCountry, SetUserDiscordTokens, SetUsername } from '../database.js';
 import { definitionErrors, userErrors } from '../Responses/requestErrors.js';
 import { SetResponse } from '../Responses/ResponseData.js';
 import { usernameMaxLength, usernameMinLength } from '../public/constants/userData.js';
@@ -139,8 +139,17 @@ router.post("/GetUserRatingHistory", async (req, res) => {
         if (typeof(ratingHistoryOption) !== 'number') return SetResponse(res, definitionErrors.ratingHistoryOptionUndefined);
         if (!Object.values(ratingHistoryOptions).includes(ratingHistoryOption)) return SetResponse(res, definitionErrors.ratingHistoryOptionWrongFormat);
 
+        var ignoreHideRank = false;
         //todo implement season
-        if (ratingHistoryOption === ratingHistoryOptions.season) return res.sendStatus(501);
+        if (ratingHistoryOption === ratingHistoryOptions.season){
+            return res.sendStatus(501);
+        }
+
+        if (!ignoreHideRank){
+            var userRankData = await GetUserRankData(userId);
+            if (!userRankData) return SetResponse(res, definitionErrors.userNotDefined);
+            if (userRankData.hide_rank) return res.status(200).send([]);
+        }
         const cutoffDate = (ratingHistoryOption == 0) ? Date.now() : Date.now() - ratingHistoryOption;
 
         const endCutoffDate = Date.now();
