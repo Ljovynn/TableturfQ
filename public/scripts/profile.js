@@ -355,35 +355,24 @@ async function setELOGraph(timeframe = 'month') {
 }
 
 function drawELOChart() {
-    /*graphData = [
-        [1720440076000, 1479, null],
-        [1720454006000, 1491, null ],
-        [1720454006000, null, 1491 ],
-        [1720458386000, null, 1475 ],
-        [1720461676000, null, 1463 ],
-        [1720461676000, 1463, null],
-        [1720463596000, 1475, null]
-    ];*/
 
-    graphData = [
+    /*var testData = [
         {unix_date: 1719835276, old_rating: 1458, new_rating: 1479 },
         {unix_date: 1720440076, old_rating: 1479, new_rating: 1491 },
         {unix_date: 1720454006, old_rating: 1491, new_rating: 1503 },
         {unix_date: 1720461676, old_rating: 1472, new_rating: 1463 },
         {unix_date: 1720463596, old_rating: 1463, new_rating: 1475 }
-    ];
+    ];*/
 
-    var dataArray = [
+    /*var dataArray = [
         ['Date', 'Match Rating', 'Rating Decay/Manual Adjustments']
-    ];
+    ];*/
+    var dataArray = [];
 
     var currentMatch;
     var previousMatch;
     for ( let match of graphData ) {
-        console.log(match);
         currentMatch = match;
-        console.log(currentMatch);
-        console.log(previousMatch);
         var dateString = '';
         if ( !previousMatch || currentMatch.old_rating == previousMatch.new_rating ) {
             var matchDate = new Date(match.unix_date*1000);
@@ -403,20 +392,21 @@ function drawELOChart() {
         previousMatch = match;
     }
 
-    console.log(dataArray);
+    var data = new google.visualization.DataTable();
+    data.addColumn('date', 'Date');
+    data.addColumn('number', 'Match Rating');
+    data.addColumn('number', 'Rating Decay/Manual/Adjustments');
+    data.addRows(dataArray);
 
+    var options = {
+      title: 'User Rating History',
+      legend: { position: 'bottom' },
 
-    var data = google.visualization.arrayToDataTable(dataArray);
+    };
 
-        var options = {
-          title: 'User Rating History',
-          legend: { position: 'bottom' },
+    var chart = new google.visualization.LineChart(document.getElementById('user-graph'));
 
-        };
-
-        var chart = new google.visualization.LineChart(document.getElementById('user-graph'));
-
-        chart.draw(data, options);
+    chart.draw(data, options);
 }
 
 /* we probably don't need this function but I'll keep it handy for a bit
