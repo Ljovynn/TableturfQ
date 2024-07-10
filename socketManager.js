@@ -50,7 +50,7 @@ export function CreateSocketConnection (server){
                 username: 'admin',
                 password: "$2b$10$TgmL4SJUGCI42Kh1GN8vDuiEMw7bJHHtWnkQM7gyEWv6KtiR/YjaO"
             },
-            mode: "production",
+            mode: (process.env.ADMIN_IO_ADVANCED === 'true') ? "development" : "production",
         });
     }
     connected = true;

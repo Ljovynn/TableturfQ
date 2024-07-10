@@ -234,7 +234,7 @@ export async function PlayerSentGameWin(playerId, winnerId){
         match.status = matchStatuses.stageSelection;
 
         if (CheckMatchWin(match, winnerId)){
-            if (match.createdAt < Date.now() + (5 * 60 * 1000)){
+            if (match.createdAt > Date.now() - (5 * 60 * 1000)){
                 const suspiciousAction = new SuspiciousAction(winnerId, `Won a ranked match against user ID ${SanitizeDiscordLog(match.players[winnerPos % 2].id)} in less than 5 minutes`, `${DetailMinute(new Date(Date.now()))} UTC`);
                 SendNewSuspiciousAction(suspiciousAction);
             }
@@ -329,7 +329,7 @@ export async function PlayerSentCasualMatchEnd(playerId){
     match.status = matchStatuses.noWinner;
     if (!await FinishMatch(match)) return databaseErrors.matchFinishError;
 
-    if (match.createdAt < Date.now() + (30 * 1000)){
+    if (match.createdAt > Date.now() - (30 * 1000)){
         const suspiciousAction = new SuspiciousAction(playerId, 'Ended a casual match within 30 seconds', `${DetailMinute(new Date(Date.now()))} UTC`);
         SendNewSuspiciousAction(suspiciousAction);
     }
