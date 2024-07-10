@@ -401,6 +401,10 @@ h3 {
     color: red;
 }
 
+#user-graph text {
+    text-shadow: none;
+}
+
 #user-rating-graph {
     width: 50%;
     margin: auto;
