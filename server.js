@@ -39,6 +39,7 @@ const unverifiedUserDeletionThreshold = 7 * 24 * 60 * 60 * 1000;
 const matchDeletionThreshold = 3 * 60 * 60 * 1000;
 
 const decayRankAmount = 10;
+const rdIncrease = 1;
 const decayRankThreshold = 7 * 24 * 60 * 60 * 1000;
 const decayRatingLimit = 1700;
 
@@ -76,7 +77,7 @@ const server = app.listen(port, () => {
 
     //rank decay
     setInterval(() => {
-        UpdateRankDecay(decayRankAmount, decayRankThreshold, decayRatingLimit);
+        UpdateRankDecay(decayRankAmount, rdIncrease, decayRankThreshold, decayRatingLimit);
     }, decayRankInterval);
 
     //chat rate limit
