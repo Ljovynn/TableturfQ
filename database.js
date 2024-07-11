@@ -189,18 +189,20 @@ export async function SetMatchResult(match){
 
         var chatData = [];
         for (let i = 0; i < match.chat.length; i++){
-            let ownerId = (match.chat[i].ownerId == systemId) ? null : `'${match.chat[i].ownerId}'`;
+            let ownerId = (match.chat[i].ownerId == systemId) ? null : match.chat[i].ownerId;
             chatData[i] = [match.id, ownerId, match.chat[i].content, Math.round(match.chat[i].date / 1000)];
         }
 
         if (chatData.length == 0) return true;
-        
-        var queryString = `INSERT INTO chat_messages (match_id, owner_id, content, date) VALUES ('${chatData[0][0]}', ${chatData[0][1]}, '${chatData[0][2]}', FROM_UNIXTIME(${chatData[0][3]}))`;
-        for (let i = 1; i < chatData.length; i++){
-            queryString += `, ('${chatData[i][0]}', ${chatData[i][1]}, '${chatData[i][2]}', FROM_UNIXTIME(${chatData[i][3]}))`
-        }
 
-        await pool.query(queryString);
+        const chunkSize = 500;
+        for (let i = 0; i < (chatData.length / chunkSize); i++){
+            const startingPoint = i * chunkSize;
+            const chunkData = chatData.slice(startingPoint, startingPoint + chunkSize);
+
+            const values = Array(chunkData.length).fill('(?, ?, ?, FROM_UNIXTIME(?))').join(', ');
+            await pool.query(`INSERT INTO chat_messages (match_id, owner_id, content, date) VALUES ${values}`, chunkData.flatMap(msg => [msg[0], msg[1], msg[2], msg[3]]));
+        }
         return true;
     }catch(error){
         console.log(error);
@@ -217,12 +219,7 @@ async function CreateFirstGameStrikes(match){
 
     var data = [];
     for (let i = 0; i < game.strikes.length; i++){
-        var strikePos;
-        if ((i + 1) % 4 < 2){
-            strikePos = 1;
-        } else{
-            strikePos = 2;
-        }
+        const strikePos = ((i + 1) % 4 < 2) ? 1 : 2;
         data[i] = [gameId, game.strikes[i], strikePos];
     }
 
