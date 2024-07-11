@@ -20,8 +20,8 @@
     return result;
 }*/
 
-export function ConvertJSDateToTimestamp(date){
+/*export function ConvertJSDateToTimestamp(date){
     //comment this out if prod railway timezone is off
     //date.setTime(date.getTime() - (date.getTimezoneOffset() * 1000 * 60))
     return date.toISOString().slice(0, 19).replace('T', ' ');
-}
+}*/
