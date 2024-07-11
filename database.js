@@ -5,7 +5,6 @@ import expressMySqlSession from 'express-mysql-session';
 import { userRoles } from './public/constants/userData.js';
 import { FindPlayerPosInMatch } from './utils/matchUtils.js';
 import { settings } from './glicko2Manager.js';
-import { ConvertJSDateToTimestamp } from './utils/date.js';
 import { chatLoadLimit, matchModes, systemId } from './public/constants/matchData.js';
 import { HandleBanUser } from './utils/userUtils.js';
 
@@ -124,16 +123,14 @@ export async function GetUserRankedMatchCount(userId)
 
 export async function GetUserRatingHistory(userId, cutoffDate, endCutoffDate = Date.now())
 {
-    let timeStamp = ConvertJSDateToTimestamp(new Date(cutoffDate));
-    let endTimeStamp = ConvertJSDateToTimestamp(new Date(endCutoffDate));
     const [rows] = await pool.execute(`SELECT match_ratings.match_id,
         IF (m.player1_id = ?, (match_ratings.player1_old_rating), match_ratings.player2_old_rating) AS old_rating,
         IF (m.player1_id = ?, (match_ratings.player1_new_rating), match_ratings.player2_new_rating) AS new_rating,
         UNIX_TIMESTAMP(m.created_at) AS unix_date
         FROM match_ratings INNER JOIN matches m ON match_ratings.match_id=m.id
-        WHERE (m.player1_id = ? OR m.player2_id = ?) AND m.created_at > ? AND m.created_at <= ?
+        WHERE (m.player1_id = ? OR m.player2_id = ?) AND m.created_at > FROM_UNIXTIME(?) AND m.created_at <= FROM_UNIXTIME(?)
         ORDER BY m.created_at ASC`,
-    [userId, userId, userId, userId, timeStamp, endTimeStamp]);
+    [userId, userId, userId, userId, Math.round(cutoffDate / 1000), Math.round(endCutoffDate / 1000)]);
     return rows;
 }
 
@@ -171,8 +168,7 @@ export async function GetLeaderboard(){
 }
 
 export async function GetFutureAnnouncements(){
-    let timeStamp = ConvertJSDateToTimestamp(new Date());
-    const [rows] = await pool.execute(`SELECT title, description, icon_src, UNIX_TIMESTAMP(date) AS unix_date, is_event FROM announcements WHERE date > ? ORDER BY date ASC`, [timeStamp]);
+    const [rows] = await pool.execute(`SELECT title, description, icon_src, UNIX_TIMESTAMP(date) AS unix_date, is_event FROM announcements WHERE date > current_timestamp ORDER BY date ASC`);
     return rows;
 }
 
@@ -193,15 +189,22 @@ export async function SetMatchResult(match){
 
         var chatData = [];
         for (let i = 0; i < match.chat.length; i++){
-            let ownerId = (match.chat[i].ownerId == systemId) ? null : match.chat[i].ownerId;
-            chatData[i] = [match.id, ownerId, match.chat[i].content, ConvertJSDateToTimestamp(new Date(match.chat[i].date))];
+            let ownerId = (match.chat[i].ownerId == systemId) ? null : `'${match.chat[i].ownerId}'`;
+            chatData[i] = [match.id, ownerId, match.chat[i].content, Math.round(match.chat[i].date / 1000)];
         }
 
-        if (chatData.length == 0) return;
-        await pool.query(`INSERT INTO chat_messages (match_id, owner_id, content, date) VALUES ?`, 
-            [chatData.map(msg => [msg[0], msg[1], msg[2], msg[3]])]);
+        if (chatData.length == 0) return true;
+        
+        var queryString = `INSERT INTO chat_messages (match_id, owner_id, content, date) VALUES ('${chatData[0][0]}', ${chatData[0][1]}, '${chatData[0][2]}', FROM_UNIXTIME(${chatData[0][3]}))`;
+        for (let i = 1; i < chatData.length; i++){
+            queryString += `, ('${chatData[i][0]}', ${chatData[i][1]}, '${chatData[i][2]}', FROM_UNIXTIME(${chatData[i][3]}))`
+        }
+
+        await pool.query(queryString);
+        return true;
     }catch(error){
         console.log(error);
+        return false;
     }
 }
 
@@ -264,16 +267,14 @@ export async function CreateUserWithDiscord(userId, username, discordId, discord
 }*/
 
 export async function CreateAnnouncement(title, description, iconSrc, date, isEvent){
-    let timeStamp = ConvertJSDateToTimestamp(new Date(date * 1000));
-    var announcement = await pool.execute(`INSERT INTO announcements (title, description, icon_src, date, is_event) VALUES (?, ?, ?, ?, ?)`,
-    [title, description, iconSrc, timeStamp, isEvent]);
+    var announcement = await pool.execute(`INSERT INTO announcements (title, description, icon_src, date, is_event) VALUES (?, ?, ?, FROM_UNIXTIME(?), ?)`,
+    [title, description, iconSrc, date, isEvent]);
     return announcement[0].insertId;
 }
 
 export async function SuspendUser(userId, banLength, reason){
     const unbanDate = Date.now() + banLength;
-    let timeStamp = ConvertJSDateToTimestamp(new Date(unbanDate));
-    await pool.execute(`INSERT INTO ban_list (user_id, expires_at, reason) VALUES (?, ?, ?)`, [userId, timeStamp, reason]);
+    await pool.execute(`INSERT INTO ban_list (user_id, expires_at, reason) VALUES (?, FROM_UNIXTIME(?), ?)`, [userId, Math.round(unbanDate / 1000), reason]);
 }
 
 export async function BanUser(userId, reason){
@@ -324,11 +325,10 @@ export async function SetUserDiscordTokens(userId, discordAccessToken, discordRe
 
 export async function UpdateRankDecay(ratingDecay, rdIncrease, timeThreshold, ratingLimit){
     const cutoffDate = Date.now() - timeThreshold;
-    let timeStamp = ConvertJSDateToTimestamp(new Date(cutoffDate));
     try {
         await pool.execute(`UPDATE users u SET g2_rating = u.g2_rating - ?, g2_rd = u.g2_rd + ? WHERE NOT EXISTS (SELECT * FROM matches m
-            WHERE (m.player1_id = u.id OR m.player2_id = u.id) AND m.created_at > ?) AND u.g2_rating > ?`,
-        [ratingDecay, rdIncrease, timeStamp, ratingLimit]);
+            WHERE (m.player1_id = u.id OR m.player2_id = u.id) AND m.created_at > FROM_UNIXTIME(?)) AND u.g2_rating > ?`,
+        [ratingDecay, rdIncrease, Math.round(cutoffDate / 1000), ratingLimit]);
     }
     catch(error){
         console.log(error);
@@ -355,13 +355,14 @@ export async function DeleteAllUserSessions(userId){
 
 export async function DeleteOldUnverifiedAccounts(ageThreshold){
     const cutoffDate = Date.now() - ageThreshold;
-    let timeStamp = ConvertJSDateToTimestamp(new Date(cutoffDate));
+    let convertedDate = Math.round(cutoffDate / 1000);
     try {
-        const [rows] = await pool.execute(`SELECT id FROM users WHERE role = ? AND created_at < ?`, [userRoles.unverified, timeStamp]);
+        const [rows] = await pool.execute(`SELECT id FROM users WHERE role = ? AND created_at < FROM_UNIXTIME(?)`,
+        [userRoles.unverified, convertedDate]);
         for (let i = 0; i < rows.length; i++){
             HandleBanUser(rows[i].id);
         }
-        await pool.execute(`DELETE FROM users WHERE role = ? AND created_at < ?`, [userRoles.unverified, timeStamp]);
+        await pool.execute(`DELETE FROM users WHERE role = ? AND created_at < FROM_UNIXTIME(?)`, [userRoles.unverified, convertedDate]);
     }
     catch(error){
         console.log(error);
@@ -383,9 +384,8 @@ export async function UnbanUser(userId){
 }
 
 export async function DeleteOldSuspensions(){
-    let timeStamp = ConvertJSDateToTimestamp(new Date());
     try {
-        await pool.execute(`DELETE FROM ban_list WHERE expires_at < ?`, [timeStamp]);
+        await pool.execute(`DELETE FROM ban_list WHERE expires_at < current_timestamp`);
     }
     catch(error){
         console.log(error);
