@@ -166,7 +166,7 @@ export async function SendDisputeMessage(matchDisputes, sendNewMessage){
 export function SuspiciousAction(userId, description, timestamp){
     this.userId = userId;
     this.description = description;
-    this.timestamp = Math.floor(timestamp / 1000);
+    this.timestamp = Math.round(timestamp / 1000);
 }
 
 export async function SendNewSuspiciousAction(suspiciousAction){
