@@ -604,7 +604,9 @@ export function FindMatchWithPlayer(playerId){
 }
 
 async function FinishMatch(match, cancelled = false){
-    if (!cancelled) await SetMatchResult(match);
+    if (!cancelled) {
+        if (!await SetMatchResult(match)) return false;
+    }
 
     const matchIndex = matches.indexOf(match);
     if (matchIndex == -1) return false;
