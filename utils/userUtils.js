@@ -34,7 +34,7 @@ export async function HandleBanUser(bannedUserId){
             SendEmptySocketMessage(matchData.matchId, "matchEnd");
             break;
         case matchModes.ranked:
-            var data = [matchData.winnerId, matchData.newPlayerRatings]
+            var data = {winnerId: winnerId, newPlayerRatings: matchData.newPlayerRatings};
             SendSocketMessage('match' + matchData.matchId, "matchWin", data);
             break;
     }
