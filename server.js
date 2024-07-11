@@ -45,6 +45,7 @@ const decayRatingLimit = 1700;
 
 const app = express();
 
+//import { TESTMATCH } from "./matchManager.js";
 //import { Deploy } from "./discordBot/deployCommands.js";
 
 const server = app.listen(port, () => {

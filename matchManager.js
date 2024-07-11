@@ -26,8 +26,13 @@ matches.push(m2);*/
 
 //Ljovynn testing
 
-/*var m1 = await MakeNewMatch(1, 2, matchModes.ranked);
-await PlayerSentForfeit(2);*/
+/*export async function TESTMATCH(){
+    var m1 = await MakeNewMatch('_Ff5JrWoX2xll6uJ', 'zJ_XilI__FFQxP7_', matchModes.casual);
+    for (let i = 0; i < 10; i++){
+        await ModSentChatMessage(m1.id, '_Ff5JrWoX2xll6uJ', 'test' + i.toString());
+    }
+    await PlayerSentCasualMatchEnd('_Ff5JrWoX2xll6uJ');
+}*/
 
 export async function CancelOldMatches(cutoffTime){
     var result = [];
