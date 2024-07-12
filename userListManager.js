@@ -62,7 +62,7 @@ function ListSearch(list, input, includePosition = false){
     var result = [];
     var nameIncludesResult = [];
     
-    if (input.length < 2) return result;
+    if (input.length < 1) return result;
     input = input.toLowerCase();
 
     for (let i = 0; i < list.length; i++){
