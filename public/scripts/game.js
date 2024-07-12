@@ -407,17 +407,25 @@ async function setMatchInfo() {
     privateMatch = match.privateBattle;
     chat = match.chat;
 
-    var player1DiscordId = players[0].discord_id;
-    var player1DiscordAvatar = players[0].discord_avatar_hash;
-    var player1ELO = players[0].g2_rating;
-    var player1Rank = await GetRank(player1ELO);
-    console.log(player1Rank);
+    try {
+        var player1DiscordId = players[0].discord_id;
+        var player1DiscordAvatar = players[0].discord_avatar_hash;
+        var player1ELO = players[0].g2_rating;
+        var player1Rank = await GetRank(player1ELO);
+        console.log(player1Rank);
+    } catch (error) {
+        // Set Deleted player 1 stuff
+    }
 
-    var player2DiscordId = players[1].discord_id;
-    var player2DiscordAvatar  = players[1].discord_avatar_hash;
-    var player2ELO = players[1].g2_rating;
-    var player2Rank = await GetRank(player2ELO);
-    console.log(player2Rank);
+    try {
+        var player2DiscordId = players[1].discord_id;
+        var player2DiscordAvatar  = players[1].discord_avatar_hash;
+        var player2ELO = players[1].g2_rating;
+        var player2Rank = await GetRank(player2ELO);
+        console.log(player2Rank);
+    } catch (error) {
+        // Set Deleted player 2 stuff
+    }
 
     var countryElement;
 
@@ -437,46 +445,56 @@ async function setMatchInfo() {
     matchContainer.style.display = 'block';
     playerResolve.style.display = 'none';
 
-    if ( players[0].country ) {
-        countryElement = `<img src="https://flagcdn.com/w20/${players[0].country}.png" />&nbsp;`;
-    } else {
-        countryElement = '';
+    try {
+        if ( players[0].country ) {
+            countryElement = `<img src="https://flagcdn.com/w20/${players[0].country}.png" />&nbsp;`;
+        } else {
+            countryElement = '';
+        }
+
+        player1InGameName.innerHTML = countryElement + players[0].username;
+        if ( players[0].discord_id ) {
+            player1InGameName.href = '/profile?playerId=' + players[0].id;
+            player1InGameName.setAttribute('target', '_blank');
+            player1DiscordName.style.display = 'block';
+            player1Name.innerHTML = players[0].discord_username;
+            player1Avatar.src = player1AvatarString;
+        }
+        player1VictoryButton.value = players[0].id;
+        player1Score.setAttribute('player-id', players[0].id);
+        if ( !players[0].hide_rank ) {
+            player1RankIcon.src = player1Rank.imageURL;
+            player1RankIcon.parentElement.innerHTML += player1Rank.name;
+        }
+    } catch (error) {
+        // deleted player 1 country
+        player1InGameName.innerHTML = 'Deleted User';
     }
 
-    player1InGameName.innerHTML = countryElement + players[0].username;
-    if ( players[0].discord_id ) {
-        player1InGameName.href = '/profile?playerId=' + players[0].id;
-        player1InGameName.setAttribute('target', '_blank');
-        player1DiscordName.style.display = 'block';
-        player1Name.innerHTML = players[0].discord_username;
-        player1Avatar.src = player1AvatarString;
-    }
-    player1VictoryButton.value = players[0].id;
-    player1Score.setAttribute('player-id', players[0].id);
-    if ( !players[0].hide_rank ) {
-        player1RankIcon.src = player1Rank.imageURL;
-        player1RankIcon.parentElement.innerHTML += player1Rank.name;
-    }
+    try {
+        if ( players[1].country ) {
+                countryElement = `<img src="https://flagcdn.com/w20/${players[1].country}.png" />&nbsp;`;
+        } else {
+            countryElement = '';
+        }
 
-    if ( players[1].country ) {
-            countryElement = `<img src="https://flagcdn.com/w20/${players[1].country}.png" />&nbsp;`;
-    } else {
-        countryElement = '';
-    }
-
-    player2InGameName.innerHTML = countryElement + players[1].username;
-    if ( players[1].discord_id ) {
-        player2InGameName.href = '/profile?playerId=' + players[1].id;
-        player2InGameName.setAttribute('target', '_blank');
-        player2DiscordName.style.display = 'block';
-        player2Name.innerHTML = players[1].discord_username;
-        player2Avatar.src = player2AvatarString;
-    }
-    player2VictoryButton.value = players[1].id;
-    player2Score.setAttribute('player-id', players[1].id);
-    if ( !players[1].hide_rank ) {
-        player2RankIcon.src = player2Rank.imageURL;
-        player2RankIcon.parentElement.innerHTML += player2Rank.name;
+        player2InGameName.innerHTML = countryElement + players[1].username;
+        if ( players[1].discord_id ) {
+            player2InGameName.href = '/profile?playerId=' + players[1].id;
+            player2InGameName.setAttribute('target', '_blank');
+            player2DiscordName.style.display = 'block';
+            player2Name.innerHTML = players[1].discord_username;
+            player2Avatar.src = player2AvatarString;
+        }
+        player2VictoryButton.value = players[1].id;
+        player2Score.setAttribute('player-id', players[1].id);
+        if ( !players[1].hide_rank ) {
+            player2RankIcon.src = player2Rank.imageURL;
+            player2RankIcon.parentElement.innerHTML += player2Rank.name;
+        }
+    } catch (error) {
+        // deleted player 2 country
+        player2InGameName.innerHTML = 'Deleted User';
     }
 
     setLength.innerHTML = 'Best of ' + ( privateMatch ? match.setLength : bestOfSets[rulesets[ matchModes[match.mode] ].setLength] ) + ' games';
