@@ -21,50 +21,57 @@ userSearchForm.addEventListener('submit', async (e) => {
 
 async function addSearchUser(users) {
     refreshSearch();
+    console.log(users);
+    if ( users.length != 0 ) {
+        for (  let user of users ) {
+            let row = document.createElement('div');
+            row.classList.add('user-search-row');
 
-    for (  let user of users ) {
-        let row = document.createElement('div');
-        row.classList.add('user-search-row');
+            let avatarCell = document.createElement('div');
 
-        let avatarCell = document.createElement('div');
+            let avatarImage = document.createElement('img');
+            avatarImage.classList.add('user-search-avatar')
+            let avatarString = 'https://cdn.discordapp.com/avatars/' + user.discord_id + '/' + user.discord_avatar_hash + '.jpg' + '?size=512';
+            avatarImage.src = avatarString;
+            avatarCell.append(avatarImage);
 
-        let avatarImage = document.createElement('img');
-        avatarImage.classList.add('user-search-avatar')
-        let avatarString = 'https://cdn.discordapp.com/avatars/' + user.discord_id + '/' + user.discord_avatar_hash + '.jpg' + '?size=512';
-        avatarImage.src = avatarString;
-        avatarCell.append(avatarImage);
+            let nameCell = document.createElement('div');
+            nameCell.classList.add('user-search-name');
 
-        let nameCell = document.createElement('div');
-        nameCell.classList.add('user-search-name');
+            let userLink = document.createElement('a');
+            userLink.href = '/profile?playerId=' + user.id;
+            userLink.setAttribute('target', '_blank');
+            userLink.append(user.username);
+            nameCell.append(userLink);
 
-        let userLink = document.createElement('a');
-        userLink.href = '/profile?playerId=' + user.id;
-        userLink.setAttribute('target', '_blank');
-        userLink.append(user.username);
-        nameCell.append(userLink);
+            row.append(avatarCell);
+            row.append(nameCell);
 
-        row.append(avatarCell);
-        row.append(nameCell);
+            if ( !user.hide_rank ) {
+                let eloCell = document.createElement('div');
+                eloCell.classList.add('user-search-ELO');
+                eloCell.append( (Math.round(user.g2_rating * 100) / 100).toFixed(2) );
 
-        if ( !user.hide_rank ) {
-            let eloCell = document.createElement('div');
-            eloCell.classList.add('user-search-ELO');
-            eloCell.append( (Math.round(user.g2_rating * 100) / 100).toFixed(2) );
+                let rankCell = document.createElement('div');
+                rankCell.classList.add('user-search-rank');
+                let userRank = await GetRank(user.g2_rating);
+                let rankImage = document.createElement('img');
+                rankImage.classList.add('user-search-rank-icon')
+                console.log(userRank);
+                rankImage.src = userRank.imageURL;
+                rankCell.append(rankImage);
 
-            let rankCell = document.createElement('div');
-            rankCell.classList.add('user-search-rank');
-            let userRank = await GetRank(user.g2_rating);
-            let rankImage = document.createElement('img');
-            rankImage.classList.add('user-search-rank-icon')
-            console.log(userRank);
-            rankImage.src = userRank.imageURL;
-            rankCell.append(rankImage);
+                row.append(eloCell);
+                row.append(rankCell);
+            }
 
-            row.append(eloCell);
-            row.append(rankCell);
+            searchResults.append(row);
         }
-
-        searchResults.append(row);
+    } else {
+        let noResultsCell = document.createElement('div');
+        noResultsCell.classList.add('user-search-no-results');
+        noResultsCell.innerHTML = 'No users found.';
+        searchResults.append(noResultsCell);
     }
 }
 
