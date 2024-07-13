@@ -19,8 +19,10 @@ const player1Avatar = document.getElementById('player1-avatar');
 const player2Avatar = document.getElementById('player2-avatar');
 const player1RankContent = document.getElementById('player1-rank');
 const player1RankIcon = document.getElementById('player1-rank-icon');
+const player1RankLabel = document.getElementById('player1-rank-label');
 const player2RankContent = document.getElementById('player2-rank');
 const player2RankIcon = document.getElementById('player2-rank-icon');
+const player2RankLabel = document.getElementById('player2-rank-label');
 const player1VictoryButton = document.getElementById('player1-victory-button');
 const player2VictoryButton = document.getElementById('player2-victory-button');
 const player1Score = document.getElementById('player1-score');
@@ -464,9 +466,10 @@ async function setMatchInfo() {
         player1Score.setAttribute('player-id', players[0].id);
         if ( !players[0].hide_rank ) {
             player1RankIcon.src = player1Rank.imageURL;
-            player1RankIcon.parentElement.innerHTML += player1Rank.name;
+            player1RankLabel.innerHTML = player1Rank.name;
         }
     } catch (error) {
+        console.log(error);
         // deleted player 1 country
         player1InGameName.innerHTML = 'Deleted User';
     }
@@ -490,9 +493,10 @@ async function setMatchInfo() {
         player2Score.setAttribute('player-id', players[1].id);
         if ( !players[1].hide_rank ) {
             player2RankIcon.src = player2Rank.imageURL;
-            player2RankIcon.parentElement.innerHTML += player2Rank.name;
+            player2RankLabel.innerHTML = player2Rank.name;
         }
     } catch (error) {
+        console.log(error);
         // deleted player 2 country
         player2InGameName.innerHTML = 'Deleted User';
     }
@@ -523,14 +527,16 @@ async function setMatchInfo() {
                 currentStrikerName.style.display = 'none';
                 gameMessage.innerHTML = players[0].username + ' has won the match!';
                 requeueButton.style.display = 'block';
+                confirmationMessage.style.display = 'none';
                 break;
             case 4:
                 console.log('setting winner - player2');
                 // player 2 win
                 stageList.style.display = 'none';
                 currentStrikerName.style.display = 'none';
-                gameMessage.innerHTML = players[0].username + ' has won the match!';
+                gameMessage.innerHTML = players[1].username + ' has won the match!';
                 requeueButton.style.display = 'block';
+                confirmationMessage.style.display = 'none';
                 break;
             case 5:
                 // No Winner
@@ -954,6 +960,7 @@ async function resetGame() {
 }
 
 async function gameFinish(winnerId) {
+    console.log('winner id: ' + winnerId);
     setScores();
     // Do this one last time to update the score when we can't get new match data
     setWinner(winnerId);
@@ -964,11 +971,15 @@ async function gameFinish(winnerId) {
     strikerSection.style.display = 'block';
     currentStrikerName.style.display = 'none';
 
+    console.log(players);
+
     if ( players[0].id == winnerId ) {
         name = players[0].username;
     } else {
         name = players[1].username;
     }
+
+    console.log('winner name: ' + name);
 
     leaveMatch.style.display = 'none';
 
@@ -1116,9 +1127,10 @@ socket.on('gameWin', async (winnerId) => {
 
 socket.on('matchWin', async (data) => {
     console.log('Match win socket!');
-    console.log(data[0]);
+    console.log(data);
+    console.log(data.winnerId);
     //await getMatchInfo(matchId);
-    await gameFinish(data[0]);
+    await gameFinish(data.winnerId);
     confirmationMessage.style.display = 'none';
     // Unhide return to queue button
     // Do any final things
