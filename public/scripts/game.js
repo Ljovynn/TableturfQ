@@ -191,10 +191,10 @@ for (let victoryButton of victoryButtons ) {
         console.log(response);
         if ( response == 201 ) {
             console.log('Winner was marked at least');
-            confirmationMessage.innerHTML = 'Waiting for opponent to confirm the winner.';
             confirmationMessage.style.display = 'block';
             player1VictoryButton.style.display = 'none';
             player2VictoryButton.style.display = 'none';
+            confirmationMessage.innerHTML = 'Waiting for opponent to confirm the winner.';
         }
     });
 }
@@ -953,7 +953,7 @@ async function resetGame() {
     mapSelect = false;
 }
 
-function gameFinish(winnerId) {
+async function gameFinish(winnerId) {
     setScores();
     // Do this one last time to update the score when we can't get new match data
     setWinner(winnerId);
@@ -1031,7 +1031,7 @@ async function setStrikeSystemMessages(currentStriker, receivedStrikes) {
 
 async function setPickSystemMessage(currentStriker, selectedStage) {
     var strikeString = '';
-    var stage = document.querySelectorAll('[stage-value="' + selectedStage[0] + '"]')[0];
+    var stage = document.querySelectorAll('[stage-value="' + selectedStage + '"]')[0];
     var stageValue = stage.children[0].innerHTML;
     strikeString += stageValue;
     var systemMessage = { ownerId: 'System', content: '<' + currentStriker + '> chose to play on ' + strikeString + '.', date: Date.now() }
@@ -1118,7 +1118,8 @@ socket.on('matchWin', async (data) => {
     console.log('Match win socket!');
     console.log(data[0]);
     //await getMatchInfo(matchId);
-    gameFinish(data[0]);
+    await gameFinish(data[0]);
+    confirmationMessage.style.display = 'none';
     // Unhide return to queue button
     // Do any final things
 });
