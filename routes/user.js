@@ -3,16 +3,16 @@
 import { Router } from 'express';
 
 import { CheckIfArray, CheckUserDefined } from '../utils/checkDefined.js';
-import { ApplyHideRank, GetCurrentUser } from '../utils/userUtils.js';
+import { GetCurrentUser } from '../utils/userUtils.js';
 
 import { FindIfPlayerInQue, FindIfPlayerWaitingForReady } from '../queManager.js';
 import { FindMatchWithPlayer } from '../matchManager.js';
-import { DeleteAllUserSessions, GetMultipleUserDatas, GetUserBanState, GetUserMatchHistory, GetUserRankData, GetUserRankedMatchCount, GetUserRatingHistory, SetUserCountry, SetUserDiscordTokens, SetUsername } from '../database.js';
+import { DeleteAllUserSessions, GetMultipleUserDatas, GetUserBanState, GetUserRankData, GetUserRankedMatchCount, GetUserRatingHistory, SearchUser,
+    SearchUserExact, SetUserCountry, SetUserDiscordTokens, SetUsername } from '../database.js';
 import { definitionErrors, userErrors } from '../Responses/requestErrors.js';
 import { SetResponse } from '../Responses/ResponseData.js';
 import { usernameMaxLength, usernameMinLength } from '../public/constants/userData.js';
-import { SearchUser } from '../userListManager.js';
-import { HasBadWords } from '../utils/string.js';
+import { HasBadWords, SanitizeFulltextSearch } from '../utils/string.js';
 import { ratingHistoryOptions } from '../public/constants/ratingData.js';
 
 const router = Router();
@@ -82,17 +82,13 @@ router.post("/DeleteUserLoginData", async (req, res) => {
 
 //req: userIdList
 //res: users
-//user: id, username, role, g2_rating, hide_rank, discord_id, discord_username, discord_avatar_hash, country, created_at, banned
+//user: id, username, role, g2_rating, discord_id, discord_username, discord_avatar_hash, country, created_at, banned
 router.post("/GetUsers", async (req, res) => {
     try{
         const userIdList = req.body.userIdList;
         if (!CheckIfArray(userIdList) || userIdList.length == 0) return SetResponse(res, definitionErrors.userNotDefined);
 
         const users = await GetMultipleUserDatas(userIdList);
-
-        for (let i = 0; i < users.length; i++){
-            users[i].g2_rating = ApplyHideRank(users[i]);
-        }
 
         res.status(200).send(users);
     } catch(error){
@@ -103,18 +99,17 @@ router.post("/GetUsers", async (req, res) => {
 
 //req: input
 //res: users
-//user: id, username, g2_rating, hide_rank, discord_avatar_hash, country,
+//user: id, username, g2_rating, discord_avatar_hash, country,
 router.post("/SearchUser", async (req, res) => {
     try{
         const input = req.body.input;
 
         if (typeof(input) !== 'string') return SetResponse(res, definitionErrors.usernameUndefined);
+        if (input.length < 1) return SetResponse(res, definitionErrors.usernameUndefined);
 
-        const users = SearchUser(input);
+        const sanitizedInput = SanitizeFulltextSearch(input);
 
-        for (let i = 0; i < users.length; i++){
-            users[i].g2_rating = ApplyHideRank(users[i]);
-        }
+        const users = (sanitizedInput.length < 4) ? await SearchUserExact(input) : await SearchUser(sanitizedInput);
 
         res.status(200).send(users);
     } catch(error){
@@ -186,8 +181,6 @@ router.get("/GetUserInfo", async (req, res) => {
     try{
         var user = await GetCurrentUser(req);
         if (!user) return SetResponse(res, userErrors.notLoggedIn);
-
-        user.g2_rating = ApplyHideRank(user);
 
         var queData = FindIfPlayerInQue(user.id);
         var readyData = FindIfPlayerWaitingForReady(user.id);

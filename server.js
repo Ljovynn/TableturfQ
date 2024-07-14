@@ -7,13 +7,13 @@ import path from 'path';
 import { sessionMiddleware } from "./utils/session.js";
 
 import { MatchMakingTick, CheckMatchmadePlayers } from "./queManager.js";
-import { UpdateLeaderboard, UpdateUserList } from "./userListManager.js";
-import { UpdateRecentMatches } from "./matchHistoryManager.js";
 
 import { StartDiscordBot } from "./discordBot/discordBotManager.js";
 import { DeleteOldSuspensions, DeleteOldUnverifiedAccounts, DeleteUnfinishedMatches, UpdateRankDecay } from "./database.js";
 import { CancelOldMatches } from "./matchManager.js";
-import { DeletePastAnnouncements } from "./announcementManager.js";
+import { AnnouncementManagerSetup, DeletePastAnnouncements } from "./TempDatabaseManagers/announcementManager.js";
+import { LeaderboardSizeSetup, UpdateLeaderboardSize } from "./TempDatabaseManagers/leaderboardSize.js";
+import { MatchHistoryManagerSetup } from "./TempDatabaseManagers/matchHistoryManager.js";
 import { CleanupChatRateLimitList } from "./chatRateLimitManager.js";
 
 dotenv.config();
@@ -25,9 +25,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const matchmakingTickInterval = 5 * 1000;
 const checkMatchmadePlayersInterval = 60 * 1000;
 const cancelLongMatchesInterval = 3 * 60 * 1000;
-const updateLeaderboardInterval = 5 * 60 * 1000;
-const updateUserListInterval = 30 * 60 * 1000;
-const updateGlobalMatchHistoryInterval = 60 * 1000;
+const updateLeaderboardSizeInterval = 5 * 60 * 1000;
 const deleteOldUnverifiedUsersInterval = 24 * 60 * 60 * 1000;
 const deleteOldSuspensionsInterval = 60 * 60 * 1000;
 const deleteOldAnnouncementsInterval = 2 * 60 * 60 * 1000;
@@ -60,18 +58,14 @@ const server = app.listen(port, () => {
     //match
     setInterval(TickCancelOldMatches, cancelLongMatchesInterval);
 
-    //user lists
-    setInterval(UpdateLeaderboard, updateLeaderboardInterval);
-    setInterval(UpdateUserList, updateUserListInterval);
-
-    //match history
-    setInterval(UpdateRecentMatches, updateGlobalMatchHistoryInterval);
-
     //users
     setInterval(() => {
         DeleteOldUnverifiedAccounts(unverifiedUserDeletionThreshold);
     }, deleteOldUnverifiedUsersInterval);
     setInterval(DeleteOldSuspensions, deleteOldSuspensionsInterval);
+
+    //leaderboard
+    setInterval(UpdateLeaderboardSize, updateLeaderboardSizeInterval);
 
     //announcements
     setInterval(DeletePastAnnouncements, deleteOldAnnouncementsInterval);
@@ -87,6 +81,10 @@ const server = app.listen(port, () => {
     StartDiscordBot();
 
     DeleteUnfinishedMatches();
+
+    AnnouncementManagerSetup();
+    LeaderboardSizeSetup();
+    MatchHistoryManagerSetup();
 });
 
 CreateSocketConnection(server);

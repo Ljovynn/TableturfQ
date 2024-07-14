@@ -1,4 +1,4 @@
-import { CreateAnnouncement, DeleteAnnouncement, GetFutureAnnouncements } from "./database.js";
+import { CreateAnnouncement, DeleteAnnouncement, GetFutureAnnouncements } from "../database.js";
 
 const announcementLifeAfterDate = 3 * 60 * 60 * 1000;
 
@@ -15,12 +15,14 @@ function Announcement(id, title, description, iconSrc, date, isEvent){
 
 var announcements = [];
 
-AnnouncementManagerSetup();
-
-async function AnnouncementManagerSetup(){
-    var data = await GetFutureAnnouncements();
+export async function AnnouncementManagerSetup(){
+    try {
+        var data = await GetFutureAnnouncements();
+    } catch (error){
+        console.log(error);
+    }
     for (let i = 0; i < data.length; i++){
-        announcements.push(new Announcement(data[i].id, data[i].title, data[i].description, data[i].icon_src, data[i].date, data[i].is_event));
+        announcements.push(new Announcement(data[i].id, data[i].title, data[i].description, data[i].icon_src, data[i].unix_date, data[i].is_event));
     }
 }
 

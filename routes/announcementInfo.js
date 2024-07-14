@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { GetNextAnnouncementInfo, GetUpcomingAnnouncementInfos } from '../announcementManager.js';
+import { GetNextAnnouncementInfo, GetUpcomingAnnouncementInfos } from '../TempDatabaseManagers/announcementManager.js';
 
 const router = Router();
 

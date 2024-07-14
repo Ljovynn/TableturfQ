@@ -11,6 +11,7 @@ import { casualMatchEndErrors, chatMessageErrors, disputeErrors, gameWinErrors, 
 import { HasBadWords, SanitizeDiscordLog } from "./utils/string.js";
 import { ChooseStageChatMessage, DisputeChatMessage, GameWinChatMessage, MatchStartChatMessage, MatchWinChatMessage, ResolveDisputeChatMessage, StrikeStagesChatMessage } from "./public/scripts/utils/systemChatMessages.js";
 import { CheckChatLimitReached, NewMessage } from "./chatRateLimitManager.js";
+import { UpdateRecentMatches } from "./TempDatabaseManagers/matchHistoryManager.js";
 
 var matches = [];
 
@@ -611,6 +612,7 @@ export function FindMatchWithPlayer(playerId){
 async function FinishMatch(match, cancelled = false){
     if (!cancelled) {
         if (!await SetMatchResult(match)) return false;
+        UpdateRecentMatches(match);
     }
 
     const matchIndex = matches.indexOf(match);

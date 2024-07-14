@@ -1,9 +1,8 @@
 import { Router } from 'express';
-import { GetGlobalMatchHistory } from '../matchHistoryManager.js';
+import { GetGlobalMatchHistory } from '../TempDatabaseManagers/matchHistoryManager.js';
 import { CheckUserDefined } from '../utils/checkDefined.js';
 import { SetResponse } from '../Responses/ResponseData.js';
 import { GetMultipleUserDatas, GetUserMatchHistory } from '../database.js';
-import { ApplyHideRank } from '../utils/userUtils.js';
 import { definitionErrors } from '../Responses/requestErrors.js';
 
 const router = Router();
@@ -51,7 +50,7 @@ router.get("/GetRecentMatches", async (req, res) => {
 
         res.status(200).send({recentMatches, users});
     } catch(error){
-        res.sendStatus(400);
+        res.status(500).send(error);
     }
 });
 
@@ -63,10 +62,6 @@ async function GetUsers(matches){
     }
 
     const users = await GetMultipleUserDatas(userIdList);
-
-    for (let i = 0; i < users.length; i++){
-        users[i].g2_rating = ApplyHideRank(users[i]);
-    }
 
     return users;
 }

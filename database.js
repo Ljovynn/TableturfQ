@@ -7,6 +7,7 @@ import { FindPlayerPosInMatch } from './utils/matchUtils.js';
 import { settings } from './glicko2Manager.js';
 import { chatLoadLimit, matchModes, systemId } from './public/constants/matchData.js';
 import { HandleBanUser } from './utils/userUtils.js';
+import { leaderboardLimit, userSearchLimit } from './public/constants/searchData.js';
 
 dotenv.config();
 
@@ -37,9 +38,11 @@ export async function GetMatch(matchId){
     return rows[0];
 }
 
+//only do this at server startup
 export async function GetRecentMatches(cutoff){
-    const [rows] = await pool.execute(`SELECT id, player1_id, player2_id, ranked, set_length, result, UNIX_TIMESTAMP(created_at) AS unix_created_at FROM matches
-        WHERE private_battle = FALSE ORDER BY created_at DESC LIMIT ?`, [cutoff.toString()]);
+    const [rows] = await pool.query(`SELECT id, player1_id, player2_id, ranked, set_length, result, UNIX_TIMESTAMP(created_at) AS unix_created_at FROM matches
+        WHERE created_at > SUBDATE(CURRENT_TIMESTAMP, INTERVAL 1 MONTH)
+	    ORDER BY created_at DESC LIMIT ?`, [cutoff]);
     return rows;
 }
 
@@ -61,7 +64,7 @@ export async function GetUserLoginData(userId){
 }
 
 export async function GetUserData(userId){
-    const [rows] = await pool.execute(`SELECT id, username, role, g2_rating, hide_rank, CAST(discord_id AS CHAR) discord_id,
+    const [rows] = await pool.execute(`SELECT id, username, role, IF(hide_rank, NULL, g2_rating) g2_rating, CAST(discord_id AS CHAR) discord_id,
         discord_username, discord_avatar_hash, country, UNIX_TIMESTAMP(created_at) AS unix_created_at,
         (SELECT COUNT(*) FROM ban_list WHERE user_id = u.id) AS banned FROM users u WHERE id = ?`,
     [userId]);
@@ -69,7 +72,7 @@ export async function GetUserData(userId){
 }
 
 export async function GetMultipleUserDatas(userIdlist){
-    const [rows] = await pool.query(`SELECT id, username, role, g2_rating, hide_rank, CAST(discord_id AS CHAR) discord_id,
+    const [rows] = await pool.query(`SELECT id, username, role, g2_rating, IF(hide_rank, NULL, g2_rating) g2_rating, CAST(discord_id AS CHAR) discord_id,
         discord_username, discord_avatar_hash, country, UNIX_TIMESTAMP(created_at) AS unix_created_at,
         (SELECT COUNT(*) FROM ban_list WHERE user_id = u.id) AS banned FROM users u WHERE id IN (?)`,
     [userIdlist]);
@@ -105,42 +108,59 @@ export async function GetUserMatchHistory(userId, hitsPerPage, pageNumber)
 {
     var offset = (pageNumber - 1) * hitsPerPage;
     const [rows] = await pool.execute(`SELECT id, player1_id, player2_id, ranked, set_length, result, private_battle, UNIX_TIMESTAMP(created_at) AS unix_created_at FROM matches
-        WHERE (player1_id = ? OR player2_id = ?) AND private_battle = FALSE ORDER BY created_at DESC LIMIT ? OFFSET ?`, [userId, userId, hitsPerPage.toString(), offset.toString()]);
+        WHERE player1_id = ? AND created_at > SUBDATE(CURRENT_TIMESTAMP, INTERVAL 3 MONTH) AND private_battle = FALSE 
+        UNION SELECT id, player1_id, player2_id, ranked, set_length, result, private_battle, UNIX_TIMESTAMP(created_at) AS unix_created_at FROM matches
+        WHERE player2_id = ? AND created_at > SUBDATE(CURRENT_TIMESTAMP, INTERVAL 3 MONTH) AND private_battle = FALSE
+        ORDER BY unix_created_at DESC LIMIT ? OFFSET ?`, [userId, userId, hitsPerPage.toString(), offset.toString()]);
     return rows;
 }
 
 export async function GetUserMatchCount(userId)
 {
-    const [count] = await pool.execute(`SELECT COUNT(*) AS matchCount FROM matches WHERE (player1_id = ? OR player2_id = ?) AND private_battle = FALSE`, [userId, userId]);
-    if (count[0]) return count[0].matchCount;
+    const [count] = await pool.execute(`SELECT SUM(total) FROM (SELECT COUNT(*) AS total FROM matches WHERE player1_id = ? AND private_battle = FALSE
+        UNION SELECT COUNT(*) AS total FROM matches WHERE player2_id = ? AND private_battle = FALSE) x`, [userId, userId]);
+    if (count[0]) return count[0].total;
 }
 
 export async function GetUserRankedMatchCount(userId)
 {
-    const [count] = await pool.execute(`SELECT COUNT(*) AS matchCount FROM matches WHERE ranked = TRUE AND (player1_id = ? OR player2_id = ?)`, [userId, userId]);
-    if (count[0]) return count[0].matchCount;
+    const [count] = await pool.execute(`SELECT SUM(total) FROM (SELECT COUNT(*) AS total FROM matches WHERE player1_id = ? AND ranked = TRUE
+        UNION SELECT COUNT(*) AS total FROM matches WHERE player2_id = ? AND ranked = TRUE) x`, [userId, userId]);
+    if (count[0]) return count[0].total;
 }
 
 export async function GetUserRatingHistory(userId, cutoffDate, endCutoffDate = Date.now())
 {
     const [rows] = await pool.execute(`SELECT match_ratings.match_id,
-        IF (m.player1_id = ?, (match_ratings.player1_old_rating), match_ratings.player2_old_rating) AS old_rating,
-        IF (m.player1_id = ?, (match_ratings.player1_new_rating), match_ratings.player2_new_rating) AS new_rating,
-        UNIX_TIMESTAMP(m.created_at) AS unix_date
-        FROM match_ratings INNER JOIN matches m ON match_ratings.match_id=m.id
-        WHERE (m.player1_id = ? OR m.player2_id = ?) AND m.created_at > FROM_UNIXTIME(?) AND m.created_at <= FROM_UNIXTIME(?)
-        ORDER BY m.created_at ASC`,
-    [userId, userId, userId, userId, Math.round(cutoffDate / 1000), Math.round(endCutoffDate / 1000)]);
+        match_ratings.player1_old_rating AS old_rating, match_ratings.player1_new_rating AS new_rating,
+        UNIX_TIMESTAMP(matches.created_at) AS unix_date
+        FROM match_ratings INNER JOIN matches ON match_ratings.match_id=matches.id
+        WHERE matches.player1_id = ? AND matches.created_at > FROM_UNIXTIME(?) AND matches.created_at <=FROM_UNIXTIME(?)
+        UNION SELECT match_ratings.match_id,
+        match_ratings.player2_old_rating AS old_rating, match_ratings.player2_new_rating AS new_rating,
+        UNIX_TIMESTAMP(matches.created_at) AS unix_date
+        FROM match_ratings INNER JOIN matches ON match_ratings.match_id=matches.id
+		WHERE matches.player2_id = ? AND matches.created_at > FROM_UNIXTIME(?) AND matches.created_at <= FROM_UNIXTIME(?)
+        ORDER BY unix_date ASC`,
+    [userId, Math.round(cutoffDate / 1000), Math.round(endCutoffDate / 1000), userId, Math.round(cutoffDate / 1000), Math.round(endCutoffDate / 1000)]);
     return rows;
 }
 
+export async function GetUserLeaderboardPosition(userId)
+{
+    const [count] = await pool.execute(`SELECT (SELECT 1 + COUNT(*) AS position FROM users c WHERE c.g2_rating >
+        u.g2_rating AND c.hide_rank = FALSE) AS position
+        FROM users u WHERE id = ?`, [userId, userId]);
+    if (count[0]) return count[0].total;
+}
+
 export async function GetMatchGames(matchId){
-    const [rows] = await pool.execute(`SELECT * FROM games WHERE match_id = ? ORDER BY id`, [matchId]);
+    const [rows] = await pool.execute(`SELECT match_id, stage, result FROM games WHERE match_id = ? ORDER BY id`, [matchId]);
     return rows;
 }
 
 export async function GetStageStrikes(gameId){
-    const [rows] = await pool.execute(`SELECT * FROM stage_strikes WHERE game_id = ?`, [gameId]);
+    const [rows] = await pool.execute(`SELECT stage, strike_owner FROM stage_strikes WHERE game_id = ?`, [gameId]);
     return rows;
 }
 
@@ -155,18 +175,37 @@ export async function GetSession(sessionId){
     return rows[0];
 }
 
-export async function GetUserList(){
-    const [rows] = await pool.execute (`SELECT id, username, g2_rating, hide_rank, CAST(discord_id AS CHAR) discord_id, discord_username, discord_avatar_hash, country FROM users u
-        WHERE NOT EXISTS (SELECT * FROM ban_list WHERE user_id = u.id) AND role != 0`);
+//case insensitive
+export async function SearchUserExact(name){
+    const [rows] = await pool.execute (`SELECT id, username, IF(hide_rank, NULL, g2_rating) g2_rating, CAST(discord_id AS CHAR) discord_id, discord_username, discord_avatar_hash, country
+    FROM users WHERE username = ?
+    UNION SELECT id, username, IF(hide_rank, NULL, g2_rating) g2_rating, CAST(discord_id AS CHAR) discord_id, discord_username, discord_avatar_hash, country
+    FROM users WHERE discord_username = ? LIMIT ?`, [name, name, userSearchLimit.toString()]);
     return rows;
 }
 
-export async function GetLeaderboard(){
-    const [rows] = await pool.execute (`SELECT id, username, g2_rating, CAST(discord_id AS CHAR) discord_id, discord_username, discord_avatar_hash, country FROM users u
-        WHERE NOT EXISTS (SELECT * FROM ban_list WHERE user_id = u.id) AND hide_rank = FALSE ORDER BY g2_rating DESC`);
+export async function SearchUser(sanitizedName){
+    const [rows] = await pool.execute (`SELECT id, username, IF(hide_rank, NULL, g2_rating) g2_rating, CAST(discord_id AS CHAR) discord_id, discord_username, discord_avatar_hash, country FROM users
+        WHERE MATCH (discord_username, username) AGAINST (? IN BOOLEAN MODE) LIMIT ?`, [sanitizedName, userSearchLimit.toString()]);
     return rows;
 }
 
+export async function GetLeaderboard(startPosition, limit = leaderboardLimit){
+    if (limit > leaderboardLimit) limit = leaderboardLimit;
+    const [rows] = await pool.execute (`SELECT id, username, g2_rating, CAST(discord_id AS CHAR) discord_id, discord_username, discord_avatar_hash, country
+        FROM users u LEFT JOIN ban_list b ON b.user_id = u.id WHERE hide_rank = FALSE AND b.user_id IS NULL
+        ORDER BY g2_rating DESC LIMIT ? OFFSET ?`, [limit.toString(), startPosition.toString()]);
+    return rows;
+}
+
+export async function GetLeaderboardCount(){
+    const [count] = await pool.execute (`SELECT COUNT(*) AS count from users u
+        LEFT JOIN ban_list b ON b.user_id = u.id
+        WHERE b.user_id IS NULL AND hide_rank = false`);
+    return count[0].count;
+}
+
+//todo optimize
 export async function GetFutureAnnouncements(){
     const [rows] = await pool.execute(`SELECT title, description, icon_src, UNIX_TIMESTAMP(date) AS unix_date, is_event FROM announcements WHERE date > current_timestamp ORDER BY date ASC`);
     return rows;
@@ -321,11 +360,14 @@ export async function SetUserDiscordTokens(userId, discordAccessToken, discordRe
 }
 
 export async function UpdateRankDecay(ratingDecay, rdIncrease, timeThreshold, ratingLimit){
-    const cutoffDate = Date.now() - timeThreshold;
+    const cutoffDate = Math.round((Date.now() - timeThreshold) / 1000);
     try {
-        await pool.execute(`UPDATE users u SET g2_rating = u.g2_rating - ?, g2_rd = u.g2_rd + ? WHERE NOT EXISTS (SELECT * FROM matches m
-            WHERE (m.player1_id = u.id OR m.player2_id = u.id) AND m.created_at > FROM_UNIXTIME(?)) AND u.g2_rating > ?`,
-        [ratingDecay, rdIncrease, Math.round(cutoffDate / 1000), ratingLimit]);
+        await pool.execute(`UPDATE users u SET g2_rating = u.g2_rating - ?, g2_rd = u.g2_rd + ? WHERE NOT EXISTS (SELECT id FROM matches m
+			WHERE (m.player1_id = u.id) AND m.created_at > FROM_UNIXTIME(?)
+            UNION SELECT * FROM matches m
+            WHERE (m.player2_id = u.id) AND m.created_at > FROM_UNIXTIME(?))
+            AND u.g2_rating > ? AND hide_rank = FALSE`,
+        [ratingDecay, rdIncrease, cutoffDate, cutoffDate, ratingLimit]);
     }
     catch(error){
         console.log(error);

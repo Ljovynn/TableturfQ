@@ -19,11 +19,6 @@ export async function CheckUserBanned(userId){
     return false;
 }
 
-export function ApplyHideRank(user){
-    if (user.hide_rank == false) return user.g2_rating;
-    return null;
-}
-
 export async function HandleBanUser(bannedUserId){
     RemovePlayerFromAnyQue(bannedUserId);
     var matchData = await HandleBannedPlayerInMatch(bannedUserId);

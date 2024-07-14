@@ -17,7 +17,7 @@ import { SendSocketMessage, SendEmptySocketMessage } from '../socketManager.js';
 import { definitionErrors, nullErrors, userErrors } from '../Responses/requestErrors.js';
 import { ResponseSucceeded, SetResponse } from '../Responses/ResponseData.js';
 import { chatLoadLimit, ChatMessage, disputeResolveOptions, matchModes, systemId } from '../public/constants/matchData.js';
-import { ApplyHideRank, CheckUserBanned } from '../utils/userUtils.js';
+import { CheckUserBanned } from '../utils/userUtils.js';
 
 const router = Router();
 
@@ -305,12 +305,10 @@ router.post("/GetMatchInfo", async (req, res) => {
         var players = [null, null]
         if (match.players[0].id !== null){
             players[0] = await GetUserData(match.players[0].id);
-            players[0].g2_rating = ApplyHideRank(players[0]);
         }
 
         if (match.players[1].id !== null){
             players[1] = await GetUserData(match.players[1].id);
-            players[1].g2_rating = ApplyHideRank(players[1]);
         }
 
         //check if user has access

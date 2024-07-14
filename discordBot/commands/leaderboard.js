@@ -1,14 +1,15 @@
 import { SlashCommandBuilder } from "discord.js";
-import { GetLeaderboardAtPos } from "../../userListManager.js";
 import { embedColor } from '../utils/constants.js';
 import { GetRank } from "../../public/constants/rankData.js";
 import { SanitizeDiscordLog } from "../../utils/string.js";
+import { GetLeaderboard } from "../../database.js";
+import { GetLeaderboardSize } from "../../TempDatabaseManagers/leaderboardSize.js";
 
-const hitsPerPage = 15;
+const limit = 15;
 
 export const data = new SlashCommandBuilder()
     .setName('leaderboard')
-    .setDescription(`Get the current leaderboard, listing ${hitsPerPage} players`)
+    .setDescription(`Get the current leaderboard, listing ${limit} players`)
     .addIntegerOption(option =>
 		option.setName('position')
 			.setDescription('Starting position')
@@ -16,8 +17,7 @@ export const data = new SlashCommandBuilder()
 
 export async function execute(interaction) { 
     const startPosition = interaction.options.getInteger('position') ?? 1;
-    var leaderboardData = GetLeaderboardAtPos(startPosition - 1, hitsPerPage);
-    var leaderboard = leaderboardData.result;
+    const leaderboard = GetLeaderboard(startPosition - 1, limit);
 
     var leaderboardsFields = [ 
     {
@@ -41,7 +41,7 @@ export async function execute(interaction) {
         title: `🏆 TableturfQ Leaderboard [${startPosition}-${startPosition + leaderboard.length - 1}] 🏆`,
         fields: leaderboardsFields,
         footer: {
-        text: `Total ranked players: ${leaderboardData.totalPlayers}`,
+        text: `Total ranked players: ${GetLeaderboardSize()}`,
         }
     };
 
