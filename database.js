@@ -298,10 +298,6 @@ export async function CreateUserWithDiscord(userId, username, discordId, discord
     [userId, username, userRoles.verified, settings.rating, settings.rd, settings.vol, discordId, discordUsername, discordAccessToken, discordRefreshToken, discordAvatarHash]);
 }
 
-/*export async function CreateSession(sessionId, expiresAt, data){
-    await pool.query(`INSERT INTO sessions (id, expires_at, data) VALUES (?, ?, ?)`, [sessionId, expiresAt, data]);
-}*/
-
 export async function CreateAnnouncement(title, description, iconSrc, date, isEvent){
     var announcement = await pool.execute(`INSERT INTO announcements (title, description, icon_src, date, is_event) VALUES (?, ?, ?, FROM_UNIXTIME(?), ?)`,
     [title, description, iconSrc, date, isEvent]);
@@ -376,20 +372,8 @@ export async function UpdateRankDecay(ratingDecay, rdIncrease, timeThreshold, ra
 
 //delete
 
-/*export async function DeleteChatMessage(matchId, messageNumber){
-    await pool.execute(`DELETE FROM chat_messages WHERE match_id = ? AND message_number = ?`, [matchId, messageNumber]);
-}*/
-
 export async function DeleteUnfinishedMatches(){
     await pool.query(`DELETE FROM matches WHERE result = 0`);
-}
-
-export async function DeleteSession(sessionId){
-    await pool.execute(`DELETE FROM sessions WHERE session_id = ?`, [sessionId]);
-}
-
-export async function DeleteAllUserSessions(userId){
-    await pool.execute(`DELETE FROM sessions WHERE data LIKE ?`, [`%"user":"${userId}"%`]);
 }
 
 export async function DeleteOldUnverifiedAccounts(ageThreshold){
