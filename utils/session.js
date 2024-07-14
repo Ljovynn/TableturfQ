@@ -24,5 +24,7 @@ export const sessionMiddleware = session({
 
 export async function SerializeSession(req, userId){
     req.session.user = userId;
-    req.session.touch();
+    req.session.regenerate(function (err) {
+        req.session.user = userId;
+    });
 }

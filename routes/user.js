@@ -7,7 +7,7 @@ import { GetCurrentUser } from '../utils/userUtils.js';
 
 import { FindIfPlayerInQue, FindIfPlayerWaitingForReady } from '../queManager.js';
 import { FindMatchWithPlayer } from '../matchManager.js';
-import { DeleteAllUserSessions, GetMultipleUserDatas, GetUserBanState, GetUserRankData, GetUserRankedMatchCount, GetUserRatingHistory, SearchUser,
+import { GetMultipleUserDatas, GetUserBanState, GetUserRankData, GetUserRankedMatchCount, GetUserRatingHistory, SearchUser,
     SearchUserExact, SetUserCountry, SetUserDiscordTokens, SetUsername } from '../database.js';
 import { definitionErrors, userErrors } from '../Responses/requestErrors.js';
 import { SetResponse } from '../Responses/ResponseData.js';
@@ -70,7 +70,8 @@ router.post("/DeleteUserLoginData", async (req, res) => {
         const userId = req.session.user;
         if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
 
-        await DeleteAllUserSessions(userId);
+        //await DeleteAllUserSessions(userId);
+        req.session.destroy();
         await SetUserDiscordTokens(userId, null, null);
         //req.session.user = undefined;
         res.sendStatus(201);
