@@ -17,7 +17,7 @@ export const data = new SlashCommandBuilder()
 
 export async function execute(interaction) { 
     const startPosition = interaction.options.getInteger('position') ?? 1;
-    const leaderboard = GetLeaderboard(startPosition - 1, limit);
+    const leaderboard = await GetLeaderboard(startPosition - 1, limit);
 
     var leaderboardsFields = [ 
     {

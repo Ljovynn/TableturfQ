@@ -117,7 +117,7 @@ export async function GetUserMatchHistory(userId, hitsPerPage, pageNumber)
 
 export async function GetUserMatchCount(userId)
 {
-    const [count] = await pool.execute(`SELECT SUM(total) FROM (SELECT COUNT(*) AS total FROM matches WHERE player1_id = ? AND private_battle = FALSE
+    const [count] = await pool.execute(`SELECT SUM(total) AS total FROM (SELECT COUNT(*) AS total FROM matches WHERE player1_id = ? AND private_battle = FALSE
         UNION SELECT COUNT(*) AS total FROM matches WHERE player2_id = ? AND private_battle = FALSE) x`, [userId, userId]);
     if (count[0]) return count[0].total;
 }
@@ -150,8 +150,8 @@ export async function GetUserLeaderboardPosition(userId)
 {
     const [count] = await pool.execute(`SELECT (SELECT 1 + COUNT(*) AS position FROM users c WHERE c.g2_rating >
         u.g2_rating AND c.hide_rank = FALSE) AS position
-        FROM users u WHERE id = ?`, [userId, userId]);
-    if (count[0]) return count[0].total;
+        FROM users u WHERE id = ?`, [userId]);
+    if (count[0]) return count[0].position;
 }
 
 export async function GetMatchGames(matchId){
@@ -202,7 +202,7 @@ export async function GetLeaderboardCount(){
     const [count] = await pool.execute (`SELECT COUNT(*) AS count from users u
         LEFT JOIN ban_list b ON b.user_id = u.id
         WHERE b.user_id IS NULL AND hide_rank = false`);
-    return count[0].count;
+    if (count[0]) return count[0].count;
 }
 
 //todo optimize
