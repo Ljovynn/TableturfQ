@@ -86,6 +86,7 @@ router.post("/WinGame", async (req, res) => {
         if (!ResponseSucceeded(responseData.code)) return SetResponse(res, responseData);
 
         res.sendStatus(responseData.code);
+        SendSocketMessage('match' + matchData.matchId, "playerConfirmedWin", {userId: userId, winnerId: winnerId});
         var matchData = responseData.data;
         if (matchData.dispute){
             SendEmptySocketMessage('match' + matchData.matchId, "dispute");
@@ -94,8 +95,6 @@ router.post("/WinGame", async (req, res) => {
             SendSocketMessage('match' + matchData.matchId, "matchWin", data);
         } else if (matchData.confirmed){
             SendSocketMessage('match' + matchData.matchId, "gameWin", winnerId);
-        } else{
-            SendSocketMessage('match' + matchData.matchId, "playerConfirmedWin", winnerId);
         }
     } catch (err){
         console.error(err);
