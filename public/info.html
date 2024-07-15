@@ -15,17 +15,114 @@
         </header>
         <main class="main">
             <div class="content-section">
-                <h4>Rules for using the queue</h4>
-                <p>Don't be a dick</p>
+                <h4>TableturfQ</h4>
+                <p>TableturfQ is an unofficial matchmaking service for the Tableturf Battle card game within Splatoon 3. Unlike every other multiplayer mode in Splatoon 3, Nintendo doesn’t offer any ingame matchmaking for Tableturf Battle. This has made it difficult for players to find others to battle against. The TableturfQ team’s goal is to offer Tableturf players a way to solve this problem by bringing together the Tableturf Battle community into one place where they can easily find others to play against.</p>
+                <p>TableturfQ does not include a simulation of Tableturf Battle, and you are expected to play the actual official game with your opponent after getting matched together, using the pool code</p>
             </div>
             <div class="content-section">
-                <h4>Game rules</h4>
-                <p>Standard TBO ruleset is being used right now with players playing the best of 5 games</p>
+                <h4>Casual Matchmaking</h4>
+                <p>For casual matchmaking, the goal is not to enforce any ruleset or restrict the players to how long they can play with each other. The only purpose for casual matchmaking is to let you find other players to battle against in a low-stress environment. Therefore, you do not record any game or match wins, and you may play however many matches you want with your opponent.</p>
+                <p>There is no restriction on the decks, timer, or stages being played in casual matches. You may end the session at any time by simply clicking the "Leave match" button.</p>
             </div>
             <div class="content-section">
-                <h4>Ranks</h4>
-                <p>As you win games you will increase ranks. We're still not sure of the ranks yet but maybe you can be Legendary</p>
+                <h4>Ranked Matchmaking</h4>
+                <p>In ranked matches, you will play a best of <span id="ranked-best-of"></span> set against your opponent, using the standard competitive <a href="https://docs.google.com/document/d/1m_PbIJ8xr1bs5zWlEIaNGfVIHYaz5mRc09xxrdiQo2c/edit#heading=h.urjviui7vp6l" target="_blank">TBO ruleset</a>. You must record every game win / loss, as the match will only progress to the next game once both players have confirmed a game’s result. Once a match has finished, the players ratings will change. If you leave a ranked match, it counts as a forfeit.</p>
+            </div>
+            <div class="content-section">
+                <h4>Ratings and Ranks</h4>
+                <p>TableturfQ uses the Glicko-2 rating system for matchmaking and the leaderboard. You need to play 5 ranked matches before you can see your rating and appear on the leaderboard. The rank you have is determined by your current rating.</p>
+            </div>
+            <div class="content-section">
+                <h4>Disputes</h4>
+                <p>If your opponent is being absent or uncooperative, you can call for a moderator to resolve the situation by pressing the dispute button. Please try to communicate with your opponent about the issue before putting a match into a dispute.</p>
+
+                <p>Disputes can be resolved by the players themselves, if both players click on the “Resolve dispute” button. In that case, the match will continue with no changes.</p>
+
+                <p>Matches are automatically put into a dispute when both players confirm contradicting results for a game. If this happens due to a misclick, it can easily be reverted by both players resolving the dispute by themselves.</p>
+
+                <p>Disputes are mainly meant to deal with absent players, players that take too long joining lobbies / choosing stages, or when players don’t record the game wins properly. If you want to report misconduct in the chat, it is better to send a support ticket in the TBS Discord server.</p>
+            </div>
+            <div class="content-section">
+                <p>Moderators can view any match’s chat at any time. Other regular users that aren’t part of the match can not view the chat. This is the case even for when matches have ended.</p>
+
+                <p>Players have the responsibility to show respect to their opponents in the chat. All rules regarding the use of chats can be read <a href="#site-rules">here</a>.</p>
+            </div>
+            <div class="content-section">
+                <h4>Private Battles</h4>
+                <p>Right now, private battles can only be created through the /challenge command in our TableturfQ Discord bot.</p>
+                <p>Your rating is not affected by the result of a private battle, and disputes are not available in Private Battles. Otherwise, private battles function just like ranked battles.</p>
+            </div>
+            <div class="content-section">
+                <h4>Misc.</h4>
+                <p>Matches that have been active for over 3 hours will be automatically cancelled. For ranked matches, this means that no winner is declared, and player ratings won’t be adjusted.</p>
+            </div>
+
+
+            <h3 id="rules">Match Rulesets</h3>
+
+
+            <div class="content-section">
+                <h4>Casual Ruleset</h4>
+                <p>There is no rulset for casual matches</p>
+            </div>
+            <div class="content-section">
+                <h4>Ranked Ruleset</h4>
+                <p>For the first game, both players will take turns striking stages from the list of starter stages, until there is only one stage left. The remaining stage will be played.</p>
+                <p>Starter stages: <span id="ranked-starters"></span></p>
+
+                <p>For game 2 and onward, the winner of the previous game will strike <span id="counterpick-amount"></span> stages from the list of counterpick stages. The other player may then choose to play on any of the counterpick stages that weren’t striked.</p>
+                <p><span id="dsr-enabled">You can’t choose to play on a stage that you have previously won.</span></p>
+                <p>Counterpick stages: <span id="ranked-counters"></span></p>
+
+                <p>There are no deck restrictions.</p>
+            </div>
+            <div class="content-section">
+                <h4>Draws</h4>
+                <p>If a game ends with a draw, the players have to play on the same stage with the same decks they used in the drawn game. This process is repeated until someone wins the game.</p>
+            </div>
+            <div class="content-section">
+                <h4>Wrong Timer, Stage, or Deck</h4>
+                <p>If you accidentally choose the wrong timer, stage, or deck, you are allowed to replay. Let your opponent know in the chat, then give up before the 2nd turn. Then, you can restart the match with the correct settings. If you play out the first turn, you are not allowed to replay that game.</p>
+
+                <p>You are only allowed one replay per set from choosing the wrong deck. If you choose the wrong deck more than once, you have to play with that deck.</p>
+
+                <p>If you choose to play on a stage that neither player has unlocked, the stage for that game defaults to Main Street instead.</p>
+            </div>
+            <div class="content-section">
+                <h4>Time Limits</h4>
+                <p>If you are in a lobby and have shared the optional password with your opponent, they have 15 minutes to join the lobby. For every 15 minutes they haven’t joined, you receive 1 game win. If you have problems connecting to a lobby, it is advised to try switching the host or remaking the lobby.</p>
+
+                <p>If your opponent takes more than 15 minutes to strike / choose stages, you receive 1 game win.</p>
+            </div>
+            <div class="content-section">
+                <h4>Communication Errors</h4>
+                <p>If you unintentionally disconnect with 7 or more turns remaining in the game, you are allowed one replay per set. Play with the same deck and stage, just like after a drawn game. If you disconnected with less than 7 turns remaining, or if you have already been granted a replay from a previous disconnect during the set, then you will automatically lose that game.</p>
+
+                <p>To determine who disconnected, the player who left the lobby after the match was canceled is the player who disconnected. In rare cases where both players left the lobby, the game is counted as a draw, and you will have to play with the same deck and stage.</p>
+            </div>
+
+            <h3 id="site-rules">Site Rules</h3>
+
+            <div class="content-section">
+                <h4>Chat Rules</h4>
+                <p>Using any kind of discriminatory language is forbidden. It is also not allowed to be overly disrespectful and hateful towards other users.</p>
+            </div>
+            <div class="content-section">
+                <h4>Slow Play</h4>
+                <p>Deliberately being slow with actions such as striking and choosing stages is not allowed. You can sometimes need more time than usual for bathroom breaks, looking at decks, etc. But in general, the average time to strike or choose stages should be less than 3 minutes.</p>
+            </div>
+            <div class="content-section">
+                <h4>System Abuse Rules</h4>
+                <p>Intentionally losing a ranked match to boost the other player’s rating and/or tank your own rating is strictly forbidden. Refrain from causing a dispute without any reason. Repetitive and vast misuse of the dispute feature is not allowed. It is strictly forbidden to use alternate accounts to avoid bans / suspensions, win trade, or smurf.</p>
+            </div>
+            <div class="content-section">
+                <h4>Repercussions</h4>
+                <p>If you are found to break any rules you can get banned or suspended, depending on the severity of your rule breaks.</p>
+
+                <p>Banned players lose access to joining any que, can not use the chat, and won’t appear on the leaderboard. Suspensions and bans are the same thing, except bans are permanent, while suspensions are only limited to a timeframe.</p>
             </div>
         </main>
     </body>
+    <script type="text/javascript" src="./scripts/dataPOST.js"></script>
+    <script type="module" src="./scripts/info.js"></script>
 </html>
