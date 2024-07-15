@@ -35,7 +35,7 @@ router.post("/GetUserMatchHistory", async (req, res) => {
         res.status(200).send({matchHistory, users});
     } catch(error){
         console.error(error);
-        res.sendStatus(400);
+        res.sendStatus(500);
     }
 });
 
@@ -50,6 +50,7 @@ router.get("/GetRecentMatches", async (req, res) => {
 
         res.status(200).send({recentMatches, users});
     } catch(error){
+        console.log(error)
         res.status(500).send(error);
     }
 });
@@ -61,6 +62,7 @@ async function GetUsers(matches){
         if (!userIdList.some((player) => player.id === matches[i].player2_id) && matches[i].player2_id !== null) userIdList.push(matches[i].player2_id);
     }
 
+    if (userIdList.length == 0) return [];
     const users = await GetMultipleUserDatas(userIdList);
 
     return users;
