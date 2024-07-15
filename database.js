@@ -176,14 +176,6 @@ export async function GetSession(sessionId){
 }
 
 //case insensitive
-export async function SearchUserExact(name){
-    const [rows] = await pool.execute (`SELECT id, username, IF(hide_rank, NULL, g2_rating) g2_rating, CAST(discord_id AS CHAR) discord_id, discord_username, discord_avatar_hash, country
-    FROM users WHERE username = ?
-    UNION SELECT id, username, IF(hide_rank, NULL, g2_rating) g2_rating, CAST(discord_id AS CHAR) discord_id, discord_username, discord_avatar_hash, country
-    FROM users WHERE discord_username = ? LIMIT ?`, [name, name, userSearchLimit.toString()]);
-    return rows;
-}
-
 export async function SearchUser(sanitizedName){
     const [rows] = await pool.execute (`SELECT id, username, IF(hide_rank, NULL, g2_rating) g2_rating, CAST(discord_id AS CHAR) discord_id, discord_username, discord_avatar_hash, country FROM users
         WHERE MATCH (discord_username, username) AGAINST (? IN BOOLEAN MODE) LIMIT ?`, [sanitizedName, userSearchLimit.toString()]);

@@ -8,7 +8,7 @@ import { GetCurrentUser } from '../utils/userUtils.js';
 import { FindIfPlayerInQue, FindIfPlayerWaitingForReady } from '../queManager.js';
 import { FindMatchWithPlayer } from '../matchManager.js';
 import { GetMultipleUserDatas, GetUserBanState, GetUserRankData, GetUserRankedMatchCount, GetUserRatingHistory, SearchUser,
-    SearchUserExact, SetUserCountry, SetUserDiscordTokens, SetUsername } from '../database.js';
+    SetUserCountry, SetUserDiscordTokens, SetUsername } from '../database.js';
 import { definitionErrors, userErrors } from '../Responses/requestErrors.js';
 import { SetResponse } from '../Responses/ResponseData.js';
 import { usernameMaxLength, usernameMinLength } from '../public/constants/userData.js';
@@ -110,7 +110,7 @@ router.post("/SearchUser", async (req, res) => {
 
         const sanitizedInput = SanitizeFulltextSearch(input);
 
-        const users = (sanitizedInput.length < 4) ? await SearchUserExact(input) : await SearchUser(sanitizedInput);
+        const users = await SearchUser(sanitizedInput);
 
         res.status(200).send(users);
     } catch(error){
