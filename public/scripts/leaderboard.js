@@ -178,8 +178,8 @@ function addSearchedUser(users) {
 
 async function refreshLeaderBoard(startPos, hitCount) {
     leaderBoard.replaceChildren(leaderBoard.firstElementChild);
-    if ( startPos != 0 && hitCount != 0 ) {
-        setLeaderBoard(startPos, hitCount);
+    if ( startPos != 0 || hitCount != 0 ) {
+        await setLeaderBoard(startPos, hitCount);
     }
 }
 
