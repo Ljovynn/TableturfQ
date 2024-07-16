@@ -32,7 +32,7 @@ export function ConvertDBMatchToMatch(matchData, gamesData, strikeData, chatMess
 
     for (let i = chatMessages.length - 1; i >= 0; i--){
         var ownerId = (chatMessages[i].owner_id) ? chatMessages[i].owner_id : systemId;
-        var chatMessage = new ChatMessage(chatMessages[i].content, ownerId, chatMessages[i].unix_date);
+        var chatMessage = new ChatMessage(chatMessages[i].content, ownerId, (chatMessages[i].unix_date * 1000));
         match.chat.push(chatMessage);
     }
 

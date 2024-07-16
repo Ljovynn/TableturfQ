@@ -1,4 +1,5 @@
 import { GetRank } from "../constants/rankData.js";
+import { ratingHistoryOptions } from "../constants/ratingData.js";
 
 // User elements
 const loadingSection = document.getElementById('page-loading');
@@ -29,6 +30,9 @@ const countrySubmit = document.getElementById('user-profile-country-submit');
 const editCountryClose = document.getElementById('user-country-edit-close');
 
 const matchHistory = document.getElementById('user-match-history');
+
+const graphTimeframe = document.getElementById('user-rating-graph-timeframe');
+const graphSubmit = document.getElementById('user-rating-graph-submit');
 
 // Logout
 const logoutButton = document.getElementById('logout-button');
@@ -62,6 +66,8 @@ var matches;
 var matchUsers;
 var playerID = '';
 
+var graphData;
+
 try {
     const url = window.location.href;
     const searchParams = new URL(url).searchParams;
@@ -76,6 +82,7 @@ try {
 
 await setUserInfo();
 await setMatchHistory();
+await setELOGraph();
 await setUserBanLength();
 
 await showAdminBanInfo();
@@ -142,6 +149,10 @@ logoutButton.addEventListener('click', async (e) => {
     if ( response == 201 ) {
         window.location.href = '/';
     }
+});
+
+graphSubmit.addEventListener('click', async (e) => {
+    await setELOGraph(graphTimeframe.value);
 });
 
 // Admin actions
@@ -239,6 +250,7 @@ async function setUserInfo() {
             userELO.innerHTML = eloRating;
             userRank.src = rank.imageURL;
             userRankInfo.style.display = 'block';
+            userRank.parentElement.innerHTML += rank.name;
         }
         hideNonUserElements();
     } catch (error) {
@@ -326,6 +338,85 @@ async function getMatchUsers(users) {
     var result = await getData('/user/GetUsers', data);
     return result;
 }
+
+async function getELOGraph(timeframe) {
+    var data = { userId: userId, ratingHistoryOption: ratingHistoryOptions[timeframe] };
+    var result = await getData('/user/GetUserRatingHistory', data);
+    console.log(result);
+    return result;
+}
+
+async function setELOGraph(timeframe = 'month') {
+    graphData = await getELOGraph(timeframe);
+
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(drawELOChart);
+
+    // Other stuff
+}
+
+function drawELOChart() {
+
+    var testData = [
+        {unix_date: 1719835276, old_rating: 1458, new_rating: 1479 },
+        {unix_date: 1719975276, old_rating: 1479, new_rating: 1485 },
+        {unix_date: 1720440076, old_rating: 1463, new_rating: 1491 },
+        {unix_date: 1720454006, old_rating: 1491, new_rating: 1503 },
+        {unix_date: 1720461676, old_rating: 1472, new_rating: 1463 },
+        {unix_date: 1720463596, old_rating: 1463, new_rating: 1475 }
+    ];
+
+    /*var dataArray = [
+        ['Date', 'Match Rating', 'Rating Decay/Manual Adjustments']
+    ];*/
+    var dataArray = [];
+
+    var currentMatch;
+    var previousMatch;
+    for ( let match of graphData ) {
+        currentMatch = match;
+        var dateString = '';
+        if ( !previousMatch || currentMatch.old_rating == previousMatch.new_rating ) {
+            var matchDate = new Date(match.unix_date*1000);
+            //dateString = getMatchDateString(matchDate);
+            dataArray.push([matchDate, match.new_rating, null]);
+        } else {
+            // Set up the rating decay graph
+            var startDate = new Date(previousMatch.unix_date*1000);
+            //dateString = getMatchDateString(startDate);
+            dataArray.push([startDate, null, previousMatch.new_rating]);
+
+            var endDate = new Date(currentMatch.unix_date*1000);
+            //dateString = getMatchDateString(endDate);
+            dataArray.push([endDate, null, currentMatch.old_rating]);
+            dataArray.push([endDate, currentMatch.old_rating, null]);
+            dataArray.push([endDate, currentMatch.new_rating, null]);
+        }
+        previousMatch = match;
+    }
+
+    var data = new google.visualization.DataTable();
+    data.addColumn('date', 'Date');
+    data.addColumn('number', 'Match Rating');
+    data.addColumn('number', 'Rating Decay/Manual/Adjustments');
+    data.addRows(dataArray);
+
+    var options = {
+      title: 'User Rating History',
+      legend: { position: 'bottom' },
+
+    };
+
+    var chart = new google.visualization.LineChart(document.getElementById('user-graph'));
+
+    chart.draw(data, options);
+}
+
+/* we probably don't need this function but I'll keep it handy for a bit
+function getMatchDateString(matchDate) {
+    return matchDate.getFullYear() + '-' + matchDate.getMonth() + '-' + matchDate.getDate() + ' ' + ( '0' + matchDate.getHours() ).slice(-2) + ':' + ( '0' + matchDate.getMinutes() ).slice(-2);
+}
+*/
 
 async function setUserBanLength() {
     if ( user.banned && user.id == loggedInUserID ) {

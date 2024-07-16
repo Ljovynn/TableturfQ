@@ -9,8 +9,9 @@ import { SendDisputeMessage, SendNewSuspiciousAction, SuspiciousAction } from ".
 import { ResponseData } from "./Responses/ResponseData.js";
 import { casualMatchEndErrors, chatMessageErrors, disputeErrors, gameWinErrors, databaseErrors, resolveErrors, stagePickErrors, stageStrikeErrors, nullErrors, forfeitErrors } from "./Responses/matchErrors.js";
 import { HasBadWords, SanitizeDiscordLog } from "./utils/string.js";
-import { ChooseStageChatMessage, DisputeChatMessage, GameWinChatMessage, MatchStartChatMessage, MatchWinChatMessage, ResolveDisputeChatMessage, StrikeStagesChatMessage } from "./public/scripts/utils/systemChatMessages.js";
+import { ChooseStageChatMessage, DisputeChatMessage, GamePlayerConfirmMessage, GameWinChatMessage, MatchStartChatMessage, MatchWinChatMessage, ResolveDisputeChatMessage, StrikeStagesChatMessage } from "./public/scripts/utils/systemChatMessages.js";
 import { CheckChatLimitReached, NewMessage } from "./chatRateLimitManager.js";
+import { UpdateRecentMatches } from "./TempDatabaseManagers/matchHistoryManager.js";
 
 var matches = [];
 
@@ -26,8 +27,13 @@ matches.push(m2);*/
 
 //Ljovynn testing
 
-/*var m1 = await MakeNewMatch(1, 2, matchModes.ranked);
-await PlayerSentForfeit(2);*/
+/*export async function TESTMATCH(){
+    var m1 = await MakeNewMatch('_Ff5JrWoX2xll6uJ', 'zJ_XilI__FFQxP7_', matchModes.casual);
+    for (let i = 0; i < 10; i++){
+        await ModSentChatMessage(m1.id, '_Ff5JrWoX2xll6uJ', 'test' + i.toString());
+    }
+    await PlayerSentCasualMatchEnd('_Ff5JrWoX2xll6uJ');
+}*/
 
 export async function CancelOldMatches(cutoffTime){
     var result = [];
@@ -213,6 +219,8 @@ export async function PlayerSentGameWin(playerId, winnerId){
     match.players[playerPos - 1].gameConfirmed = true;
 
     var game = match.gamesArr[match.gamesArr.length - 1];
+
+    match.chat.push(new ChatMessage(GamePlayerConfirmMessage(playerId, winnerId), systemId));
 
     if (game.winnerId == null){
         game.winnerId = winnerId;
@@ -604,7 +612,10 @@ export function FindMatchWithPlayer(playerId){
 }
 
 async function FinishMatch(match, cancelled = false){
-    if (!cancelled) await SetMatchResult(match);
+    if (!cancelled) {
+        if (!await SetMatchResult(match)) return false;
+        UpdateRecentMatches(match);
+    }
 
     const matchIndex = matches.indexOf(match);
     if (matchIndex == -1) return false;

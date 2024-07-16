@@ -1,6 +1,6 @@
 //lowercase, remove special characters
 export function SanitizeString(string){
-    let result;
+    var result;
     result = string.toLowerCase();
     result = result.replace(/\s|-|\'|\.|#/g, '');
     return result;
@@ -8,6 +8,21 @@ export function SanitizeString(string){
 
 export function SanitizeDiscordLog(string){
     let result = string.replace(/-/g, '\\-').replace(/_/g, '\\_');
+    return result;
+}
+export function SanitizeFulltextSearch(string){
+    string = string.replace(/\@|\+|\*|,|\(|\)|~|%|<|>|-|\'|\.|#/g, '');
+    const words = string.split(' ');
+    var result = '';
+    for (let i = 0; i < words.length; i++){
+        if (words[i].length > 0){
+            result += ' +' + words[i];
+        }
+    }
+    result += '*';
+
+    //slice unused space in normal string, slice * when empty
+    result = result.slice(1);
     return result;
 }
 

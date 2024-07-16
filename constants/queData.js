@@ -9,9 +9,9 @@ function QueData(readyTimer, eloGrowthPerSecond, baseEloRange, maxEloRange, minE
     this.maxEloStart = maxEloStart;
 }
 
-const casualQueData = new QueData(PublicQueDatas['casual'], 7, 300, 2000, 500, 2500);
+const casualQueData = new QueData(PublicQueDatas['casual'].readyTimer, 7, 300, 2000, 500, 2500);
 
-const rankedQueData = new QueData(PublicQueDatas['ranked'], 1, 100, 500, 500, 2500);
+const rankedQueData = new QueData(PublicQueDatas['ranked'].readyTimer, 1, 100, 500, 500, 2500);
 
 export const queDatas = Object.freeze({ 
     'casual': casualQueData, 

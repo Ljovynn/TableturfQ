@@ -3,16 +3,16 @@
 import { Router } from 'express';
 
 import { CheckIfArray, CheckUserDefined } from '../utils/checkDefined.js';
-import { ApplyHideRank, GetCurrentUser } from '../utils/userUtils.js';
+import { GetCurrentUser } from '../utils/userUtils.js';
 
 import { FindIfPlayerInQue, FindIfPlayerWaitingForReady } from '../queManager.js';
 import { FindMatchWithPlayer } from '../matchManager.js';
-import { DeleteAllUserSessions, GetMultipleUserDatas, GetUserBanState, GetUserMatchHistory, GetUserRankedMatchCount, GetUserRatingHistory, SetUserCountry, SetUserDiscordTokens, SetUsername } from '../database.js';
+import { GetMultipleUserDatas, GetUserBanState, GetUserRankData, GetUserRankedMatchCount, GetUserRatingHistory, SearchUser,
+    SetUserCountry, SetUserDiscordTokens, SetUsername } from '../database.js';
 import { definitionErrors, userErrors } from '../Responses/requestErrors.js';
 import { SetResponse } from '../Responses/ResponseData.js';
 import { usernameMaxLength, usernameMinLength } from '../public/constants/userData.js';
-import { SearchUser } from '../userListManager.js';
-import { HasBadWords } from '../utils/string.js';
+import { HasBadWords, SanitizeFulltextSearch } from '../utils/string.js';
 import { ratingHistoryOptions } from '../public/constants/ratingData.js';
 
 const router = Router();
@@ -70,7 +70,8 @@ router.post("/DeleteUserLoginData", async (req, res) => {
         const userId = req.session.user;
         if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
 
-        await DeleteAllUserSessions(userId);
+        //await DeleteAllUserSessions(userId);
+        req.session.destroy();
         await SetUserDiscordTokens(userId, null, null);
         //req.session.user = undefined;
         res.sendStatus(201);
@@ -82,17 +83,13 @@ router.post("/DeleteUserLoginData", async (req, res) => {
 
 //req: userIdList
 //res: users
-//user: id, username, role, g2_rating, hide_rank, discord_id, discord_username, discord_avatar_hash, country, created_at, banned
+//user: id, username, role, g2_rating, discord_id, discord_username, discord_avatar_hash, country, created_at, banned
 router.post("/GetUsers", async (req, res) => {
     try{
         const userIdList = req.body.userIdList;
         if (!CheckIfArray(userIdList) || userIdList.length == 0) return SetResponse(res, definitionErrors.userNotDefined);
 
         const users = await GetMultipleUserDatas(userIdList);
-
-        for (let i = 0; i < users.length; i++){
-            users[i].g2_rating = ApplyHideRank(users[i]);
-        }
 
         res.status(200).send(users);
     } catch(error){
@@ -103,18 +100,17 @@ router.post("/GetUsers", async (req, res) => {
 
 //req: input
 //res: users
-//user: id, username, g2_rating, hide_rank, discord_avatar_hash, country,
+//user: id, username, g2_rating, discord_avatar_hash, country,
 router.post("/SearchUser", async (req, res) => {
     try{
         const input = req.body.input;
 
         if (typeof(input) !== 'string') return SetResponse(res, definitionErrors.usernameUndefined);
+        if (input.length < 1) return SetResponse(res, definitionErrors.usernameUndefined);
 
-        const users = SearchUser(input);
+        const sanitizedInput = SanitizeFulltextSearch(input);
 
-        for (let i = 0; i < users.length; i++){
-            users[i].g2_rating = ApplyHideRank(users[i]);
-        }
+        const users = await SearchUser(sanitizedInput);
 
         res.status(200).send(users);
     } catch(error){
@@ -136,11 +132,20 @@ router.post("/GetUserRatingHistory", async (req, res) => {
             userId = req.session.user;
         }
 
-        if (typeof(input) !== 'number') return SetResponse(res, definitionErrors.ratingHistoryOptionUndefined);
-        if (!ratingHistoryOptions.includes(ratingHistoryOption)) return SetResponse(res, definitionErrors.ratingHistoryOptionWrongFormat);
+        if (typeof(ratingHistoryOption) !== 'number') return SetResponse(res, definitionErrors.ratingHistoryOptionUndefined);
+        if (!Object.values(ratingHistoryOptions).includes(ratingHistoryOption)) return SetResponse(res, definitionErrors.ratingHistoryOptionWrongFormat);
 
+        var ignoreHideRank = false;
         //todo implement season
-        if (ratingHistoryOption === ratingHistoryOptions.season) return res.sendStatus(501);
+        if (ratingHistoryOption === ratingHistoryOptions.season){
+            return res.sendStatus(501);
+        }
+
+        if (!ignoreHideRank){
+            var userRankData = await GetUserRankData(userId);
+            if (!userRankData) return SetResponse(res, definitionErrors.userNotDefined);
+            if (userRankData.hide_rank) return res.status(200).send([]);
+        }
         const cutoffDate = (ratingHistoryOption == 0) ? Date.now() : Date.now() - ratingHistoryOption;
 
         const endCutoffDate = Date.now();
@@ -149,6 +154,7 @@ router.post("/GetUserRatingHistory", async (req, res) => {
 
         res.status(200).send(data);
     } catch(error){
+        console.error(error);
         res.sendStatus(400);
     }
 });
@@ -176,8 +182,6 @@ router.get("/GetUserInfo", async (req, res) => {
     try{
         var user = await GetCurrentUser(req);
         if (!user) return SetResponse(res, userErrors.notLoggedIn);
-
-        user.g2_rating = ApplyHideRank(user);
 
         var queData = FindIfPlayerInQue(user.id);
         var readyData = FindIfPlayerWaitingForReady(user.id);

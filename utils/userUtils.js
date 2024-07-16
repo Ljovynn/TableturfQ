@@ -19,11 +19,6 @@ export async function CheckUserBanned(userId){
     return false;
 }
 
-export function ApplyHideRank(user){
-    if (user.hide_rank == false) return user.g2_rating;
-    return null;
-}
-
 export async function HandleBanUser(bannedUserId){
     RemovePlayerFromAnyQue(bannedUserId);
     var matchData = await HandleBannedPlayerInMatch(bannedUserId);
@@ -34,7 +29,7 @@ export async function HandleBanUser(bannedUserId){
             SendEmptySocketMessage(matchData.matchId, "matchEnd");
             break;
         case matchModes.ranked:
-            var data = [matchData.winnerId, matchData.newPlayerRatings]
+            var data = {winnerId: winnerId, newPlayerRatings: matchData.newPlayerRatings};
             SendSocketMessage('match' + matchData.matchId, "matchWin", data);
             break;
     }

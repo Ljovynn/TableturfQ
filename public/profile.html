@@ -75,9 +75,23 @@
                         </div>
                     </div>
                 </div>
+
+                <div id="user-rating-graph">
+                    <div id="user-rating-graph-options">
+                        <select id="user-rating-graph-timeframe">
+                            <option value="season" disabled>Season</option>
+                            <option value="week">Week</option>
+                            <option value="month" selected>Month</option>
+                        </select>
+                        <input id="user-rating-graph-submit" type="submit" />
+                    </div>
+                    <div id="user-graph">
+                    </div>
+                </div>
             </div>
         </main>
     </body>
     <script type="text/javascript" src="./scripts/dataPOST.js"></script>
     <script type="module" src="./scripts/profile.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 </html>

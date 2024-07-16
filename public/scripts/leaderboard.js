@@ -1,8 +1,8 @@
 const leaderBoard = document.getElementById('leaderboard');
-const leaderBoardForm = document.getElementById('leaderboard-form');
+//const leaderBoardForm = document.getElementById('leaderboard-form');
 
-const searchInput = document.getElementById('leaderboard-search');
-const searchButton = document.getElementById('leaderboard-search-button');
+//const searchInput = document.getElementById('leaderboard-search');
+//const searchButton = document.getElementById('leaderboard-search-button');
 const pageFilter = document.getElementById('leaderboard-page-amount');
 const prevButtons = document.getElementsByClassName('page-prev');
 const nextButtons = document.getElementsByClassName('page-next');
@@ -16,7 +16,7 @@ var totalPlayers;
 // Defaults of startPos 0 and 15 hitcounts
 setLeaderBoard(startPos, hitCount);
 
-leaderBoardForm.addEventListener('submit', async (e) => {
+/*leaderBoardForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     var searchValue = searchInput.value;
 
@@ -37,7 +37,7 @@ searchInput.addEventListener('input', async (e) => {
         refreshLeaderBoard(startPos, hitCount);
         setLeaderBoard(startPos, hitCount);
     }
-});
+});*/
 
 pageFilter.addEventListener('change', (e) => {
     hitCount = pageFilter.value;
@@ -178,8 +178,8 @@ function addSearchedUser(users) {
 
 async function refreshLeaderBoard(startPos, hitCount) {
     leaderBoard.replaceChildren(leaderBoard.firstElementChild);
-    if ( startPos != 0 && hitCount != 0 ) {
-        setLeaderBoard(startPos, hitCount);
+    if ( startPos != 0 || hitCount != 0 ) {
+        await setLeaderBoard(startPos, hitCount);
     }
 }
 

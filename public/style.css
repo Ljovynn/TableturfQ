@@ -401,6 +401,16 @@ h3 {
     color: red;
 }
 
+#user-graph text {
+    text-shadow: none;
+}
+
+#user-rating-graph {
+    width: 50%;
+    margin: auto;
+    margin-top: 20px;
+}
+
 /**** MOBILE STLYES ****/
 @media only screen and (max-width: 600px) {
     #user-match-history {
@@ -488,6 +498,10 @@ h3 {
 .user-search-avatar {
     width: 150px;
     border-radius: 50%;
+}
+
+.user-search-no-results {
+    margin: 20px;
 }
 
 /**** MOBILE STLYES ****/

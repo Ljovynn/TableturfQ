@@ -51,6 +51,7 @@ joinCompetetive.addEventListener('click', async (e) => {
         }
         // Do queue frontend stuff
         alert('Successfully joined the queue!');
+        timer = 0;
         queueInfo.style.display = 'block';
         mainTimer = window.setInterval(updateTimer, 1000);
         // Socket matchfound code
@@ -175,55 +176,59 @@ function displayRecentMatches(recentMatchData) {
     var matches = recentMatchData.recentMatches;
     if ( matches.length > 0 ) {
         for ( let match of matches ) {
-            let row = document.createElement('div');
-            row.classList.add('match-row');
+            try {
+                let row = document.createElement('div');
+                row.classList.add('match-row');
 
-            let dateCell = document.createElement('div');
-            dateCell.classList.add('match-date');
-            var matchDate = match.unix_created_at;
-            matchDate = new Date(matchDate);
-            matchDate = matchDate.getTime();
-            var timeNow = Math.floor(Date.now() / 1000);
-            var timeElapsed = timeNow - matchDate;
-            var readableTime = getReadableTime(timeElapsed);
+                let dateCell = document.createElement('div');
+                dateCell.classList.add('match-date');
+                var matchDate = match.unix_created_at;
+                matchDate = new Date(matchDate);
+                matchDate = matchDate.getTime();
+                var timeNow = Math.floor(Date.now() / 1000);
+                var timeElapsed = timeNow - matchDate;
+                var readableTime = getReadableTime(timeElapsed);
 
-            dateCell.append(readableTime);
+                dateCell.append(readableTime);
 
-            let matchupCell = document.createElement('div');
-           // var players = await getMatchUsers( [match.player1_id, match.player2_id] );
-            var player1 = getMatchPlayer(players, match.player1_id);
-            var player2 = getMatchPlayer(players, match.player2_id);
-            matchupCell.classList.add('matchup');
-            matchupCell.append(player1[0].username + ' vs ' + player2[0].username);
+                let matchupCell = document.createElement('div');
+               // var players = await getMatchUsers( [match.player1_id, match.player2_id] );
+                var player1 = getMatchPlayer(players, match.player1_id);
+                var player2 = getMatchPlayer(players, match.player2_id);
+                matchupCell.classList.add('matchup');
+                matchupCell.append(player1[0].username + ' vs ' + player2[0].username);
 
-            let outcomeCell = document.createElement('div');
-            outcomeCell.classList.add('match-outcome');
-            let outcome = '';
-            switch ( match.result ) {
-                case 0:
-                case 1:
-                case 2:
-                    outcome = 'In Game';
-                    break;
-                case 3:
-                    // player 1 win
-                    outcome = player1[0].username + ' Victory';
-                    break;
-                case 4:
-                    // player 2 win
-                    outcome = player2[0].username + ' Victory';
-                    break;
-                default:
-                    outcome = 'No Winner';
-                    break;
+                let outcomeCell = document.createElement('div');
+                outcomeCell.classList.add('match-outcome');
+                let outcome = '';
+                switch ( match.result ) {
+                    case 0:
+                    case 1:
+                    case 2:
+                        outcome = 'In Game';
+                        break;
+                    case 3:
+                        // player 1 win
+                        outcome = player1[0].username + ' Victory';
+                        break;
+                    case 4:
+                        // player 2 win
+                        outcome = player2[0].username + ' Victory';
+                        break;
+                    default:
+                        outcome = 'No Winner';
+                        break;
+                }
+                outcomeCell.append(outcome);
+
+                row.append(dateCell);
+                row.append(matchupCell);
+                row.append(outcomeCell);
+
+                recentMatchesList.append(row);
+            } catch (error) {
+                // idk user not found handling
             }
-            outcomeCell.append(outcome);
-
-            row.append(dateCell);
-            row.append(matchupCell);
-            row.append(outcomeCell);
-
-            recentMatchesList.append(row);
         }
         recentMatches.style.display = 'block';
     }
@@ -281,7 +286,15 @@ function countdownTimer() {
 
 function clearTimer(intervalId) {
     timer = 0;
+    countdown = PublicQueDatas[queuedMatchMode].readyTimer;
     clearInterval(intervalId);
+
+    // Reset the timers
+    var time = secondsToHMS(timer);
+    queueTimer.innerHTML = 'Finding Match... ' + time;
+
+    var time = secondsToMS(countdown);
+    readyCountdown.innerHTML = time;
 }
 
 function secondsToHMS(d) {
@@ -351,14 +364,17 @@ socket.emit('join', 'queRoom');
 socket.on('matchFound', () => {
     console.log('Socket event match ready');
     timer = 0;
+    clearTimer(mainTimer);
     countdown = PublicQueDatas[queuedMatchMode].readyTimer;
     queueInfo.style.display = 'none';
     matchMakingReady.style.display = 'block';
+    readyButton.style.display = 'inline-block';
     ready = false;
     readyUp = window.setInterval(countdownTimer, 1000);
 });
 
 socket.on('matchReady', (matchID) => {
+    clearTimer(readyUp);
     console.log('/game?matchID=' + matchID);
     window.location.href = '/game?matchID=' + matchID;
 });

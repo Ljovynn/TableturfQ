@@ -19,8 +19,10 @@ const player1Avatar = document.getElementById('player1-avatar');
 const player2Avatar = document.getElementById('player2-avatar');
 const player1RankContent = document.getElementById('player1-rank');
 const player1RankIcon = document.getElementById('player1-rank-icon');
+const player1RankLabel = document.getElementById('player1-rank-label');
 const player2RankContent = document.getElementById('player2-rank');
 const player2RankIcon = document.getElementById('player2-rank-icon');
+const player2RankLabel = document.getElementById('player2-rank-label');
 const player1VictoryButton = document.getElementById('player1-victory-button');
 const player2VictoryButton = document.getElementById('player2-victory-button');
 const player1Score = document.getElementById('player1-score');
@@ -191,10 +193,10 @@ for (let victoryButton of victoryButtons ) {
         console.log(response);
         if ( response == 201 ) {
             console.log('Winner was marked at least');
-            confirmationMessage.innerHTML = 'Waiting for opponent to confirm the winner.';
             confirmationMessage.style.display = 'block';
             player1VictoryButton.style.display = 'none';
             player2VictoryButton.style.display = 'none';
+            confirmationMessage.innerHTML = 'Waiting for opponent to confirm the winner.';
         }
     });
 }
@@ -291,7 +293,7 @@ playerResolveDispute.addEventListener('click', async (e) => {
 });
 
 leaveMatch.addEventListener('click', async (e) => {
-    if ( casualMatch ) {
+    if ( casualMatch || privateMatch ) {
         userLeft = true;
         var data = {userId: userID};
         var response = await postData('/match/CasualMatchEnd', data);
@@ -407,17 +409,25 @@ async function setMatchInfo() {
     privateMatch = match.privateBattle;
     chat = match.chat;
 
-    var player1DiscordId = players[0].discord_id;
-    var player1DiscordAvatar = players[0].discord_avatar_hash;
-    var player1ELO = players[0].g2_rating;
-    var player1Rank = await GetRank(player1ELO);
-    console.log(player1Rank);
+    try {
+        var player1DiscordId = players[0].discord_id;
+        var player1DiscordAvatar = players[0].discord_avatar_hash;
+        var player1ELO = players[0].g2_rating;
+        var player1Rank = await GetRank(player1ELO);
+        console.log(player1Rank);
+    } catch (error) {
+        // Set Deleted player 1 stuff
+    }
 
-    var player2DiscordId = players[1].discord_id;
-    var player2DiscordAvatar  = players[1].discord_avatar_hash;
-    var player2ELO = players[1].g2_rating;
-    var player2Rank = await GetRank(player2ELO);
-    console.log(player2Rank);
+    try {
+        var player2DiscordId = players[1].discord_id;
+        var player2DiscordAvatar  = players[1].discord_avatar_hash;
+        var player2ELO = players[1].g2_rating;
+        var player2Rank = await GetRank(player2ELO);
+        console.log(player2Rank);
+    } catch (error) {
+        // Set Deleted player 2 stuff
+    }
 
     var countryElement;
 
@@ -437,44 +447,58 @@ async function setMatchInfo() {
     matchContainer.style.display = 'block';
     playerResolve.style.display = 'none';
 
-    if ( players[0].country ) {
-        countryElement = `<img src="https://flagcdn.com/w20/${players[0].country}.png" />&nbsp;`;
-    } else {
-        countryElement = '';
+    try {
+        if ( players[0].country ) {
+            countryElement = `<img src="https://flagcdn.com/w20/${players[0].country}.png" />&nbsp;`;
+        } else {
+            countryElement = '';
+        }
+
+        player1InGameName.innerHTML = countryElement + players[0].username;
+        if ( players[0].discord_id ) {
+            player1InGameName.href = '/profile?playerId=' + players[0].id;
+            player1InGameName.setAttribute('target', '_blank');
+            player1DiscordName.style.display = 'block';
+            player1Name.innerHTML = players[0].discord_username;
+            player1Avatar.src = player1AvatarString;
+        }
+        player1VictoryButton.value = players[0].id;
+        player1Score.setAttribute('player-id', players[0].id);
+        if ( !players[0].hide_rank ) {
+            player1RankIcon.src = player1Rank.imageURL;
+            player1RankLabel.innerHTML = player1Rank.name;
+        }
+    } catch (error) {
+        console.log(error);
+        // deleted player 1 country
+        player1InGameName.innerHTML = 'Deleted User';
     }
 
-    player1InGameName.innerHTML = countryElement + players[0].username;
-    if ( players[0].discord_id ) {
-        player1InGameName.href = '/profile?playerId=' + players[0].id;
-        player1InGameName.setAttribute('target', '_blank');
-        player1DiscordName.style.display = 'block';
-        player1Name.innerHTML = players[0].discord_username;
-        player1Avatar.src = player1AvatarString;
-    }
-    player1VictoryButton.value = players[0].id;
-    player1Score.setAttribute('player-id', players[0].id);
-    if ( !players[0].hide_rank ) {
-        player1RankIcon.src = player1Rank.imageURL;
-    }
+    try {
+        if ( players[1].country ) {
+                countryElement = `<img src="https://flagcdn.com/w20/${players[1].country}.png" />&nbsp;`;
+        } else {
+            countryElement = '';
+        }
 
-    if ( players[1].country ) {
-            countryElement = `<img src="https://flagcdn.com/w20/${players[1].country}.png" />&nbsp;`;
-    } else {
-        countryElement = '';
-    }
-
-    player2InGameName.innerHTML = countryElement + players[1].username;
-    if ( players[1].discord_id ) {
-        player2InGameName.href = '/profile?playerId=' + players[1].id;
-        player2InGameName.setAttribute('target', '_blank');
-        player2DiscordName.style.display = 'block';
-        player2Name.innerHTML = players[1].discord_username;
-        player2Avatar.src = player2AvatarString;
-    }
-    player2VictoryButton.value = players[1].id;
-    player2Score.setAttribute('player-id', players[1].id);
-    if ( !players[1].hide_rank ) {
-        player2RankIcon.src = player2Rank.imageURL;
+        player2InGameName.innerHTML = countryElement + players[1].username;
+        if ( players[1].discord_id ) {
+            player2InGameName.href = '/profile?playerId=' + players[1].id;
+            player2InGameName.setAttribute('target', '_blank');
+            player2DiscordName.style.display = 'block';
+            player2Name.innerHTML = players[1].discord_username;
+            player2Avatar.src = player2AvatarString;
+        }
+        player2VictoryButton.value = players[1].id;
+        player2Score.setAttribute('player-id', players[1].id);
+        if ( !players[1].hide_rank ) {
+            player2RankIcon.src = player2Rank.imageURL;
+            player2RankLabel.innerHTML = player2Rank.name;
+        }
+    } catch (error) {
+        console.log(error);
+        // deleted player 2 country
+        player2InGameName.innerHTML = 'Deleted User';
     }
 
     setLength.innerHTML = 'Best of ' + ( privateMatch ? match.setLength : bestOfSets[rulesets[ matchModes[match.mode] ].setLength] ) + ' games';
@@ -503,14 +527,16 @@ async function setMatchInfo() {
                 currentStrikerName.style.display = 'none';
                 gameMessage.innerHTML = players[0].username + ' has won the match!';
                 requeueButton.style.display = 'block';
+                confirmationMessage.style.display = 'none';
                 break;
             case 4:
                 console.log('setting winner - player2');
                 // player 2 win
                 stageList.style.display = 'none';
                 currentStrikerName.style.display = 'none';
-                gameMessage.innerHTML = players[0].username + ' has won the match!';
+                gameMessage.innerHTML = players[1].username + ' has won the match!';
                 requeueButton.style.display = 'block';
+                confirmationMessage.style.display = 'none';
                 break;
             case 5:
                 // No Winner
@@ -576,7 +602,7 @@ async function prependMessage(chatString) {
 }
 
 async function getMessageString(chatData) {
-    console.log('Addming message');
+    console.log('Adding message');
     console.log(chatData);
     var userId = chatData.ownerId;
     var chatMessage = chatData.content;
@@ -603,8 +629,8 @@ async function getMessageString(chatData) {
     } else if ( players[1].id == userId ) {
         senderName = players[1].username;
     } else if ( 'System' == userId || userId === null ) {
-        chatMessage = chatMessage.replace('<' + players[0].id + '>', players[0].username);
-        chatMessage = chatMessage.replace('<' + players[1].id + '>', players[1].username);
+        chatMessage = chatMessage.replaceAll('<' + players[0].id + '>', players[0].username);
+        chatMessage = chatMessage.replaceAll('<' + players[1].id + '>', players[1].username);
         senderName = 'System';
         senderClass = 'match-chat-system';
     } else {
@@ -619,7 +645,7 @@ async function getMessageString(chatData) {
         // probably for mods
     }
 
-    chatString = '<div class="match-chat-message"><span class="match-chat-player ' + senderClass + '">' + senderName + ' [' + chatDate.getHours() + ':' + ( '0' + chatDate.getMinutes() ).slice(-2) + ']:&nbsp;</span>' + chatMessage + '</div>';
+    chatString = '<div class="match-chat-message"><span class="match-chat-player ' + senderClass + '">' + senderName + ' [' + ( '0' + chatDate.getHours() ).slice(-2) + ':' + ( '0' + chatDate.getMinutes() ).slice(-2) + ']:&nbsp;</span>' + chatMessage + '</div>';
     return chatString;
 }
 
@@ -933,7 +959,8 @@ async function resetGame() {
     mapSelect = false;
 }
 
-function gameFinish(winnerId) {
+async function gameFinish(winnerId) {
+    console.log('winner id: ' + winnerId);
     setScores();
     // Do this one last time to update the score when we can't get new match data
     setWinner(winnerId);
@@ -944,11 +971,15 @@ function gameFinish(winnerId) {
     strikerSection.style.display = 'block';
     currentStrikerName.style.display = 'none';
 
+    console.log(players);
+
     if ( players[0].id == winnerId ) {
         name = players[0].username;
     } else {
         name = players[1].username;
     }
+
+    console.log('winner name: ' + name);
 
     leaveMatch.style.display = 'none';
 
@@ -1011,11 +1042,21 @@ async function setStrikeSystemMessages(currentStriker, receivedStrikes) {
 
 async function setPickSystemMessage(currentStriker, selectedStage) {
     var strikeString = '';
-    var stage = document.querySelectorAll('[stage-value="' + selectedStage[0] + '"]')[0];
+    var stage = document.querySelectorAll('[stage-value="' + selectedStage + '"]')[0];
     var stageValue = stage.children[0].innerHTML;
     strikeString += stageValue;
     var systemMessage = { ownerId: 'System', content: '<' + currentStriker + '> chose to play on ' + strikeString + '.', date: Date.now() }
     console.log(systemMessage);
+    var messageString = await getMessageString(systemMessage);
+    await addMessage(messageString);
+    return;
+}
+
+async function setConfirmPlayerMessage(playerId, winnerId) {
+    console.log(playerId);
+    console.log(winnerId);
+    var confirmString = '';
+    var systemMessage = { ownerId: 'System', content: '<' + playerId + '> marked <' + winnerId + '> as the winner.', date: Date.now() }
     var messageString = await getMessageString(systemMessage);
     await addMessage(messageString);
     return;
@@ -1075,9 +1116,8 @@ socket.on('stagePick', (selectedStage) => {
     startGame();
 });
 
-socket.on('playerConfirmedWin', (winnerId) => {
-    console.log('Player ' + winnerId + ' has won the game!!!');
-    console.log('Waiting for confirmation');
+socket.on('playerConfirmedWin', (data) => {
+    setConfirmPlayerMessage(data.playerId, data.winnerId);
     //setWinner(winnerId);
     // Get the match info again to update the local match object
     //getMatchInfo(matchId);
@@ -1096,9 +1136,11 @@ socket.on('gameWin', async (winnerId) => {
 
 socket.on('matchWin', async (data) => {
     console.log('Match win socket!');
-    console.log(data[0]);
+    console.log(data);
+    console.log(data.winnerId);
     //await getMatchInfo(matchId);
-    gameFinish(data[0]);
+    await gameFinish(data.winnerId);
+    confirmationMessage.style.display = 'none';
     // Unhide return to queue button
     // Do any final things
 });

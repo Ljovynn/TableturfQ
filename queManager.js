@@ -11,7 +11,7 @@ const readyTimerGracePeriod = 1000 * 3;
 const alreadyMatchedPlayersTime = 1000 * 60 * 20;
 
 function Que(matchMode){
-    this.queArr = [];
+    this.players = [];
     this.matchMode = matchMode;
 }
 
@@ -50,16 +50,13 @@ export function SetQueAvailible(availible){
 //also uses MathedPlayers function
 var recentlyMatchedPlayersList = [];
 
+//ban check is in post
 export async function AddPlayerToQue(playerId, matchMode){
     if (!queAvailible) return enterQueErrors.queUnavailible;
-    for (let i = 0; i < ques.length; i++){
-        if (ques[i].matchMode == matchMode) return await TryAddPlayerToQue(ques[i], playerId);
-    }
-    return enterQueErrors.illegalMatchMode;
-}
 
-//ban check is in post
-async function TryAddPlayerToQue(que, playerId){
+    var que = GetQueFromMatchmode(matchMode);
+    if (!que) return enterQueErrors.illegalMatchMode;
+    
     if (FindIfPlayerInQue(playerId)) return enterQueErrors.inQue;
     if (FindIfPlayerInMatch(playerId)) return enterQueErrors.inMatch; 
 
@@ -75,7 +72,7 @@ async function TryAddPlayerToQue(que, playerId){
     var baseSearchElo = Math.max(user.g2_rating, queDatas[que.matchMode].minEloStart);
     baseSearchElo = Math.min(user.g2_rating, queDatas[que.matchMode].maxEloStart);
 
-    que.queArr.push(new PlayerInQue(playerId, baseSearchElo));
+    que.players.push(new PlayerInQue(playerId, baseSearchElo));
     return new ResponseData(201);
 }
 
@@ -90,12 +87,15 @@ export async function MatchMakingTick(){
         if (matchedPlayers) newlyMatchedPlayers.push(matchedPlayers);
     }
 
-    //console.log("Matchmaking tick: " + JSON.stringify(ques[1].queArr));
+    //console.log("Matchmaking tick: " + JSON.stringify(ques[0].players));
+    //console.log("matched players tick: " + JSON.stringify(matchingPlayersList));
+    //console.log("recently matched players tick: " + JSON.stringify(recentlyMatchedPlayersList));
 
     //set up match
     for (let i = 0; i < newlyMatchedPlayers.length; i++){
+        var que = GetQueFromMatchmode(newlyMatchedPlayers[i].matchMode);
         if (queDatas[newlyMatchedPlayers[i].matchMode].readyTimer == 0){
-            RemovePlayersFromQue(ques[0].queArr, newlyMatchedPlayers[i].players[0], newlyMatchedPlayers[i].players[1]);
+            RemovePlayersFromQue(que.players, newlyMatchedPlayers[i].players[0], newlyMatchedPlayers[i].players[1]);
             var match = MakeNewMatch(newlyMatchedPlayers[i].players[0], newlyMatchedPlayers[i].players[1], newlyMatchedPlayers[i].matchMode);
 
             var player1Room = "queRoom" + match.players[0].id.toString();
@@ -103,7 +103,7 @@ export async function MatchMakingTick(){
             SendSocketMessage(player1Room, "matchReady", match.id);
             SendSocketMessage(player2Room, "matchReady", match.id);
         } else{
-            RemovePlayersFromQue(ques[1].queArr, newlyMatchedPlayers[i].players[0], newlyMatchedPlayers[i].players[1]);
+            RemovePlayersFromQue(que.players, newlyMatchedPlayers[i].players[0], newlyMatchedPlayers[i].players[1]);
             matchingPlayersList.push(new MatchedPlayers(newlyMatchedPlayers[i].players[0], newlyMatchedPlayers[i].players[1], newlyMatchedPlayers[i].matchMode));
 
             var player1Room = "queRoom" + newlyMatchedPlayers[i].players[0].toString();
@@ -118,29 +118,29 @@ export async function MatchMakingTick(){
 //Finds only one match per tick per que rn
 async function QueTick(que){
     //set all players search range
-    for (let i = 0; i < que.queArr.length; i++){
-        var secondsPlayerWaited = (Date.now() - que.queArr[i].startedQue) / 1000;
-        que.queArr[i].eloSearchRange = Math.min(queDatas[que.matchMode].baseEloRange + (secondsPlayerWaited * queDatas[que.matchMode].eloGrowthPerSecond), queDatas[que.matchMode].maxEloRange);
+    for (let i = 0; i < que.players.length; i++){
+        var secondsPlayerWaited = (Date.now() - que.players[i].startedQue) / 1000;
+        que.players[i].eloSearchRange = Math.min(queDatas[que.matchMode].baseEloRange + (secondsPlayerWaited * queDatas[que.matchMode].eloGrowthPerSecond), queDatas[que.matchMode].maxEloRange);
     }
 
     return FindPlayersToMatch(que);
 }
 
 function FindPlayersToMatch(que){
-    for (let i = 0; i < que.queArr.length - 1; i++){
-        for (let j = i + 1; j < que.queArr.length; j++){
+    for (let i = 0; i < que.players.length - 1; i++){
+        for (let j = i + 1; j < que.players.length; j++){
 
             //check if elo search ranges overlap
-            if (que.queArr[i].baseSearchElo - que.queArr[i].eloSearchRange > que.queArr[j].baseSearchElo + que.queArr[j].eloSearchRange) continue;
-            if (que.queArr[j].baseSearchElo - que.queArr[j].eloSearchRange > que.queArr[i].baseSearchElo + que.queArr[i].eloSearchRange) continue;
+            if (que.players[i].baseSearchElo - que.players[i].eloSearchRange > que.players[j].baseSearchElo + que.players[j].eloSearchRange) continue;
+            if (que.players[j].baseSearchElo - que.players[j].eloSearchRange > que.players[i].baseSearchElo + que.players[i].eloSearchRange) continue;
 
             //check if players didn't match recently
-            var index = SearchMatchedPlayersList(recentlyMatchedPlayersList, que.queArr[i].id);
+            var index = SearchMatchedPlayersList(recentlyMatchedPlayersList, que.players[i].id);
             if (index != -1){
-                if (recentlyMatchedPlayersList[index].players[0].id == que.queArr[j].id || recentlyMatchedPlayersList[index].players[1].id == que.queArr[j].id) continue;
+                if (recentlyMatchedPlayersList[index].players[0].id == que.players[j].id || recentlyMatchedPlayersList[index].players[1].id == que.players[j].id) continue;
             }
             var data = {
-                players: [que.queArr[i].id, que.queArr[j].id],
+                players: [que.players[i].id, que.players[j].id],
                 matchMode: que.matchMode,
                 matchId: 0
             }
@@ -153,7 +153,7 @@ function FindPlayersToMatch(que){
 //checks if timer has run out for any matchmade players
 export function CheckMatchmadePlayers(){
     for (let i = matchingPlayersList.length - 1; i >= 0; i--){
-        if (Date.now - matchingPlayersList[i].createdAt > queDatas[matchingPlayersList[i].matchMode].readyTimer + readyTimerGracePeriod){
+        if (Date.now() - matchingPlayersList[i].createdAt > (queDatas[matchingPlayersList[i].matchMode].readyTimer * 1000) + readyTimerGracePeriod){
             matchingPlayersList.splice(i, 1);
         }
     }
@@ -162,7 +162,7 @@ export function CheckMatchmadePlayers(){
 //Checks if timer has run out for recently matched players
 function CheckRecentlyMatchedPlayers(){
     for (let i = alreadyMatchedPlayersTime.length - 1; i >= 0; i--){
-        if (Date.now - alreadyMatchedPlayersTime[i].createdAt >  alreadyMatchedPlayersTime){
+        if (Date.now() - alreadyMatchedPlayersTime[i].createdAt >  alreadyMatchedPlayersTime){
             alreadyMatchedPlayersTime.splice(i, 1);
         }
     }
@@ -170,11 +170,11 @@ function CheckRecentlyMatchedPlayers(){
 
 export function FindIfPlayerInQue(playerId){
     for (let i = 0; i < ques.length; i++){
-        for (let j = 0; j < ques[i].queArr.length; j++){
-            if (ques[i].queArr[j].id == playerId){
+        for (let j = 0; j < ques[i].players.length; j++){
+            if (ques[i].players[j].id == playerId){
                 var data = {
                     matchMode: ques[i].matchMode, 
-                    timeQueStarted: ques[i].queArr[j].startedQue
+                    timeQueStarted: ques[i].players[j].startedQue
                 };
                 return data;
             }
@@ -209,15 +209,11 @@ export function FindIfPlayerWaitingForReady(playerId){
 
 //doesnt remove from ready list
 export function RemovePlayerFromQue(playerId, matchMode){
-    for (let i = 0; i < ques.length; i++){
-        // Stringify both objects to check for equality
-        if (ques[i].matchMode != matchMode) continue;
-
-        for (let j = 0; j < ques[i].queArr.length; j++){
-            if (ques[i].queArr[j].id == playerId){
-                ques[i].queArr.splice(j, 1);
-                return true;
-            }
+    var que = GetQueFromMatchmode(matchMode);
+    for (let i = 0; i < que.players.length; j++){
+        if (que.players[i].id == playerId){
+            que.players.splice(i, 1);
+            return true;
         }
     }
     return false;
@@ -226,9 +222,9 @@ export function RemovePlayerFromQue(playerId, matchMode){
 //does remove from ready list
 export function RemovePlayerFromAnyQue(playerId){
     for (let i = 0; i < ques.length; i++){
-        for (let j = 0; j < ques[i].queArr.length; i++){
-            if (ques[i].queArr[j].id == playerId){
-                ques[i].queArr.splice(j, 1);
+        for (let j = 0; j < ques[i].players.length; i++){
+            if (ques[i].players[j].id == playerId){
+                ques[i].players.splice(j, 1);
                 return true;
             }
         }
@@ -248,9 +244,9 @@ export function AddRecentlyMatchedPlayers(player1Id, player2Id, matchMode){
     recentlyMatchedPlayersList.push(new MatchedPlayers(player1Id, player2Id, matchMode));
 }
 
-function RemovePlayersFromQue(queArr, player1Id, player2Id){
-    for (let i = queArr.length - 1; i >= 0; i--){
-        if (queArr[i].id == player1Id || queArr[i].id == player2Id) queArr.splice(i, 1);
+function RemovePlayersFromQue(playersArr, player1Id, player2Id){
+    for (let i = playersArr.length - 1; i >= 0; i--){
+        if (playersArr[i].id == player1Id || playersArr[i].id == player2Id) playersArr.splice(i, 1);
     }
 }
 
@@ -283,4 +279,15 @@ function SearchMatchedPlayersList(arr, playerId){
         if (arr[i].players[0].id == playerId || arr[i].players[1].id == playerId) return i;
     }
     return -1;
+}
+
+function GetQueFromMatchmode(matchMode){
+    switch (matchMode){
+        case matchModes.casual:
+        return ques[0];
+        case matchModes.ranked:
+        return ques[1];
+        default:
+        return null;
+    }
 }

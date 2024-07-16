@@ -1,9 +1,8 @@
 import { SlashCommandBuilder } from "discord.js";
-import { GetUserByDiscordId, GetUserMatchCount, GetUserMatchHistory } from "../../database.js";
+import { GetUserByDiscordId, GetUserLeaderboardPosition, GetUserMatchCount, GetUserMatchHistory } from "../../database.js";
 import { GetRank, unranked } from "../../public/constants/rankData.js";
 import { embedColor } from '../utils/constants.js';
 import { BuildSimpleEmbed } from "../utils/embed.js";
-import { GetPlayerLeaderboardPosition } from "../../userListManager.js";
 import { SanitizeDiscordLog } from "../../utils/string.js";
 
 import dotenv from 'dotenv';
@@ -31,19 +30,14 @@ export async function execute(interaction) {
 		return;        
     }
 
-	var matchCount = await GetUserMatchCount(user.id);
-	var leaderboardPosition = GetPlayerLeaderboardPosition(user.id);
-	if (leaderboardPosition == 0) leaderboardPosition = 'N/A';
+	const matchCount = await GetUserMatchCount(user.id);
     const matches = await GetUserMatchHistory(user.id, 1, 1);
 
     //buildembed
-	var lastPlayedValue = (matches[0]) ? `<t:${matches[0].unix_created_at}:R>` : 'Never';
-	var rank = unranked;
-	var ratingValue = 'N/A';
-	if (!user.hide_rank) {
-		rank = GetRank(user.g2_rating);
-		ratingValue = Math.floor(user.g2_rating);
-	}
+	const lastPlayedValue = (matches[0]) ? `<t:${matches[0].unix_created_at}:R>` : (matchCount > 0) ? 'Over 3 months ago' : 'Never';
+	const rank = (user.g2_rating) ? GetRank(user.g2_rating) : unranked;
+	const ratingValue = (user.g2_rating) ? Math.floor(user.g2_rating) : 'N/A';
+	const leaderboardPosition = (user.g2_rating) ? await GetUserLeaderboardPosition(user.id) : 'N/A';
 
     var profileFields = [ 
 	{

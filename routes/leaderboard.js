@@ -2,7 +2,9 @@ import { Router } from 'express';
 
 import { SetResponse } from '../Responses/ResponseData.js';
 import { definitionErrors } from '../Responses/requestErrors.js';
-import { GetLeaderboardAtPos, SearchLeaderboard } from '../userListManager.js';
+import { leaderboardLimit } from '../public/constants/searchData.js';
+import { GetLeaderboard, GetUserLeaderboardPosition } from '../database.js';
+import { GetLeaderboardSize } from '../TempDatabaseManagers/leaderboardSize.js';
 
 const router = Router();
 
@@ -14,15 +16,21 @@ router.post('/GetLeaderboard', async (req, res) => {
         var startPos = req.body.startPos;
         var hitCount = req.body.hitCount;
 
+        if (typeof(startPos) !== 'number' && typeof(hitCount) !== 'undefined') return SetResponse(res, definitionErrors.leaderboardStartPosWrongFormat);
+        if (typeof(hitCount) !== 'number' && typeof(hitCount) !== 'undefined') return SetResponse(res, definitionErrors.leaderboardHitCountWrongFormat);
+
         // Had to check against NaN because startPos = 0 was returning false but we can't start with startPos 1 or we get player ranked #2
         // Try different conditional check maybe? Or check startPos === false?
         
-        if (!hitCount || ( !startPos && isNaN(startPos) ) ){
-            res.sendStatus(400);
-            return;
-        }
+        if (!hitCount) hitCount = leaderboardLimit;
+        if (!startPos) startPos = 0;
 
-        var data = GetLeaderboardAtPos(startPos, hitCount);
+        const leaderboard = await GetLeaderboard(startPos, hitCount);
+        const leaderboardSize = GetLeaderboardSize();
+        const data ={
+            result: leaderboard,
+            totalPlayers: leaderboardSize
+        }
 
         res.status(200).send(data);
     } catch (err){
@@ -31,21 +39,23 @@ router.post('/GetLeaderboard', async (req, res) => {
     }
 });
 
-//req: input
-//res: leaderboardUsers
-//leaderboardUsers: user, position
-router.post('/SearchLeaderboard', async (req, res) => {
+//req: userId (default to current user)
+//res: position int
+router.post('/GetUserLeaderboardPosition', async (req, res) => {
     try{
-        const input = req.body.input;
+        const userId = req.body.userId;
 
-        if (typeof(input) !== 'string') return SetResponse(res, definitionErrors.usernameUndefined);
+        if (typeof(userId) !== 'string'){
+            userId = req.session.user;
+            if (!CheckUserDefined(req)) return SetResponse(res, definitionErrors.userNotDefined);
+        }
 
-        const leaderboardUsers = SearchLeaderboard(input);
+        const position = GetUserLeaderboardPosition(userId);
 
-        res.status(200).send(leaderboardUsers);
+        res.status(200).send(position);
     } catch(error){
         console.log(error);
-        res.sendStatus(400);
+        res.sendStatus(500);
     }
 });
 

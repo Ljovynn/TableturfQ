@@ -17,7 +17,7 @@ import { SendSocketMessage, SendEmptySocketMessage } from '../socketManager.js';
 import { definitionErrors, nullErrors, userErrors } from '../Responses/requestErrors.js';
 import { ResponseSucceeded, SetResponse } from '../Responses/ResponseData.js';
 import { chatLoadLimit, ChatMessage, disputeResolveOptions, matchModes, systemId } from '../public/constants/matchData.js';
-import { ApplyHideRank, CheckUserBanned } from '../utils/userUtils.js';
+import { CheckUserBanned } from '../utils/userUtils.js';
 
 const router = Router();
 
@@ -85,18 +85,17 @@ router.post("/WinGame", async (req, res) => {
         var responseData = await PlayerSentGameWin(userId, winnerId);
         if (!ResponseSucceeded(responseData.code)) return SetResponse(res, responseData);
 
-        res.sendStatus(responseData.code);
         var matchData = responseData.data;
+        SendSocketMessage('match' + matchData.matchId, "playerConfirmedWin", {playerId: userId, winnerId: winnerId});
         if (matchData.dispute){
             SendEmptySocketMessage('match' + matchData.matchId, "dispute");
         } else if (matchData.matchWin){
-            var data = [winnerId, matchData.newPlayerRatings]
+            var data = {winnerId: winnerId, newPlayerRatings: matchData.newPlayerRatings}
             SendSocketMessage('match' + matchData.matchId, "matchWin", data);
         } else if (matchData.confirmed){
             SendSocketMessage('match' + matchData.matchId, "gameWin", winnerId);
-        } else{
-            SendSocketMessage('match' + matchData.matchId, "playerConfirmedWin", winnerId);
         }
+        res.sendStatus(responseData.code);
     } catch (err){
         console.error(err);
         res.sendStatus(500);
@@ -305,12 +304,10 @@ router.post("/GetMatchInfo", async (req, res) => {
         var players = [null, null]
         if (match.players[0].id !== null){
             players[0] = await GetUserData(match.players[0].id);
-            players[0].g2_rating = ApplyHideRank(players[0]);
         }
 
         if (match.players[1].id !== null){
             players[1] = await GetUserData(match.players[1].id);
-            players[1].g2_rating = ApplyHideRank(players[1]);
         }
 
         //check if user has access
@@ -326,7 +323,9 @@ router.post("/GetMatchInfo", async (req, res) => {
             match.chat.splice(0, match.chat.length - chatLoadLimit);
         }
 
-        var othersInChatIds = [null, players[0].id, players[1].id];
+        var othersInChatIds = [null, 
+        (players[0]) ? players[0].id : null,
+        (players[1]) ? players[1].id : null];
 
         for (let i = 0; i < match.chat.length; i++){
             if (!othersInChatIds.includes(match.chat[i].ownerId)) othersInChatIds.push(match.chat[i].ownerId);

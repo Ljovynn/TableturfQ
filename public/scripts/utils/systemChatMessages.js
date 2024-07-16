@@ -23,6 +23,11 @@ export function ChooseStageChatMessage(userId, stage){
     return result;
 }
 
+export function GamePlayerConfirmMessage(userId, winnerId){
+    var result = `<${userId}> marked <${winnerId}> as the winner.`;
+    return result;
+}
+
 export function GameWinChatMessage(winUserId, gameNumber){
     var result = `<${winUserId}> won game ${gameNumber}.`;
     return result;
