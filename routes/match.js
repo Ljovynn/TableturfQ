@@ -85,7 +85,6 @@ router.post("/WinGame", async (req, res) => {
         var responseData = await PlayerSentGameWin(userId, winnerId);
         if (!ResponseSucceeded(responseData.code)) return SetResponse(res, responseData);
 
-        res.sendStatus(responseData.code);
         var matchData = responseData.data;
         SendSocketMessage('match' + matchData.matchId, "playerConfirmedWin", {playerId: userId, winnerId: winnerId});
         if (matchData.dispute){
@@ -96,6 +95,7 @@ router.post("/WinGame", async (req, res) => {
         } else if (matchData.confirmed){
             SendSocketMessage('match' + matchData.matchId, "gameWin", winnerId);
         }
+        res.sendStatus(responseData.code);
     } catch (err){
         console.error(err);
         res.sendStatus(500);
