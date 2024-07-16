@@ -24,7 +24,7 @@ export function ChooseStageChatMessage(userId, stage){
 }
 
 export function GamePlayerConfirmMessage(userId, winnerId){
-    var result = `<${userId}> marked ${winnerId} as the winner.`;
+    var result = `<${userId}> marked <${winnerId}> as the winner.`;
     return result;
 }
 
