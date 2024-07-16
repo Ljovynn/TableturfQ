@@ -602,7 +602,7 @@ async function prependMessage(chatString) {
 }
 
 async function getMessageString(chatData) {
-    console.log('Addming message');
+    console.log('Adding message');
     console.log(chatData);
     var userId = chatData.ownerId;
     var chatMessage = chatData.content;
@@ -629,8 +629,8 @@ async function getMessageString(chatData) {
     } else if ( players[1].id == userId ) {
         senderName = players[1].username;
     } else if ( 'System' == userId || userId === null ) {
-        chatMessage = chatMessage.replace('<' + players[0].id + '>', players[0].username);
-        chatMessage = chatMessage.replace('<' + players[1].id + '>', players[1].username);
+        chatMessage = chatMessage.replaceAll('<' + players[0].id + '>', players[0].username);
+        chatMessage = chatMessage.replaceAll('<' + players[1].id + '>', players[1].username);
         senderName = 'System';
         senderClass = 'match-chat-system';
     } else {
@@ -1052,6 +1052,16 @@ async function setPickSystemMessage(currentStriker, selectedStage) {
     return;
 }
 
+async function setConfirmPlayerMessage(playerId, winnerId) {
+    console.log(playerId);
+    console.log(winnerId);
+    var confirmString = '';
+    var systemMessage = { ownerId: 'System', content: '<' + playerId + '> marked <' + winnerId + '> as the winner.', date: Date.now() }
+    var messageString = await getMessageString(systemMessage);
+    await addMessage(messageString);
+    return;
+}
+
 
 // Strike validation
 function validateStrikes(strikes, strikeAmount) {
@@ -1106,9 +1116,8 @@ socket.on('stagePick', (selectedStage) => {
     startGame();
 });
 
-socket.on('playerConfirmedWin', (winnerId) => {
-    console.log('Player ' + winnerId + ' has won the game!!!');
-    console.log('Waiting for confirmation');
+socket.on('playerConfirmedWin', (data) => {
+    setConfirmPlayerMessage(data.playerId, data.winnerId);
     //setWinner(winnerId);
     // Get the match info again to update the local match object
     //getMatchInfo(matchId);
