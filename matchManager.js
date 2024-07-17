@@ -285,8 +285,8 @@ async function HandleRankedMatchWin(match){
     if (!await FinishMatch(match)) return true;
     if (match.privateBattle) return;
 
-    CheckPlacements(match.players[0].id);
-    CheckPlacements(match.players[1].id);
+    await CheckPlacements(match.players[0].id);
+    await CheckPlacements(match.players[1].id);
 
     return await ApplyMatchEloResults(match);
 }
@@ -319,6 +319,7 @@ export async function PlayerSentForfeit(playerId){
 
 async function CheckPlacements(playerId){
     const rankedMatchCount = await GetUserRankedMatchCount(playerId);
+    console.log("ranked match count: " + rankedMatchCount);
 
     if (rankedMatchCount == placementMatchCount){
         await SetUserHideRank(playerId, false);

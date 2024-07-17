@@ -124,7 +124,7 @@ export async function GetUserMatchCount(userId)
 
 export async function GetUserRankedMatchCount(userId)
 {
-    const [count] = await pool.execute(`SELECT SUM(total) FROM (SELECT COUNT(*) AS total FROM matches WHERE player1_id = ? AND ranked = TRUE
+    const [count] = await pool.execute(`SELECT SUM(total) AS total FROM (SELECT COUNT(*) AS total FROM matches WHERE player1_id = ? AND ranked = TRUE
         UNION SELECT COUNT(*) AS total FROM matches WHERE player2_id = ? AND ranked = TRUE) x`, [userId, userId]);
     if (count[0]) return count[0].total;
 }
@@ -155,7 +155,7 @@ export async function GetUserLeaderboardPosition(userId)
 }
 
 export async function GetMatchGames(matchId){
-    const [rows] = await pool.execute(`SELECT match_id, stage, result FROM games WHERE match_id = ? ORDER BY id`, [matchId]);
+    const [rows] = await pool.execute(`SELECT id, stage, result FROM games WHERE match_id = ? ORDER BY id`, [matchId]);
     return rows;
 }
 
