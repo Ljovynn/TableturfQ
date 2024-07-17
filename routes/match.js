@@ -170,7 +170,7 @@ router.post("/ResolveDispute", async (req, res) => {
 
         if (responseData.data === matchModes.casual){
             res.sendStatus(responseData.code);
-            SendSocketMessage('match' + matchId, "resolveDispute", disputeResolveOptions.noChanges);
+            SendSocketMessage('match' + responseData.data.matchId, "resolveDispute", disputeResolveOptions.noChanges);
             return;
         }
         
