@@ -8,6 +8,9 @@ const matchLink = document.getElementById('index-match-link');
 const guestName = document.getElementById('guest-login-name');
 const guestSubmit = document.getElementById('guest-login-button');
 
+const nextAnnouncement = document.getElementById('next-announcement');
+const upcomingAnnouncements = document.getElementById('upcoming-announcements');
+
 var userInfo;
 var matchInfo;
 var isGuest;
@@ -68,20 +71,76 @@ function setMatchLink(matchId) {
 
 async function setAnnouncements() {
     try {
-        await getNextAnnouncement();
-        getUpcomingAnnouncements();
+        var announcement = await getNextAnnouncement();
+        console.log(announcement);
+        if ( announcement ) {
+            console.log('adding');
+            addNextAnnouncement(announcement);
+            nextAnnouncement.style.display = 'block';
+
+            // If there's no next announcement, there can't be any upcoming ones right?
+            var announcements = await getUpcomingAnnouncements();
+            console.log(announcements);
+            if ( announcements ) {
+                upcomingAnnouncements.style.display = 'block';
+                addUpcomingAnnouncements(announcements);
+            }
+        }
     } catch (error) {
         //
+        console.log(error);
     }
 }
 
 async function getNextAnnouncement() {
     var result = await fetchData('/announcementInfo/GetNextAnnouncement');
-    console.log(result);
     return result;
 }
 
+function addNextAnnouncement(announcement) {
+    let announcementDiv = document.createElement('div');
+    let announcementTitle = document.createElement('h4');
+    announcementTitle.innerHTML = announcement.title;
 
+    let announcementDate = document.createElement('div');
+    announcementDate.classList.add('announcement-date');
+    announcementDate.innerHTML = new Date(announcement.date*1000).toLocaleString();
+
+    let announcementDescription = document.createElement('p');
+    announcementDescription.innerHTML = announcement.description;
+
+    announcementDiv.append(announcementTitle);
+    announcementDiv.append(announcementDate);
+    announcementDiv.append(announcementDescription);
+
+    nextAnnouncement.append(announcementDiv);
+}
+
+async function getUpcomingAnnouncements() {
+    var result = await fetchData('/announcementInfo/GetUpcomingAnnouncements');
+    return result;
+}
+
+function addUpcomingAnnouncements(announcements) {
+    // Get rid of the first one since we already displayed it as the next announcement
+    announcements.shift();
+    for( let announcement of announcements ) {
+        let upcomingAnnouncement = document.createElement('div');
+        upcomingAnnouncement.classList.add('upcoming-announcement');
+
+        let upcomingTitle = document.createElement('h4');
+        upcomingTitle.innerHTML = announcement.title;
+
+        var upcomingDate = document.createElement('div');
+        upcomingDate.classList.add('announcement-date');
+        upcomingDate.innerHTML = new Date(announcement.date*1000).toLocaleString();
+
+        upcomingAnnouncement.append(upcomingTitle);
+        upcomingAnnouncement.append(upcomingDate);
+
+        upcomingAnnouncements.append(upcomingAnnouncement);
+    }
+}
 
 function validateDisplayname(displayName) {
     if ( displayName === '' ) {

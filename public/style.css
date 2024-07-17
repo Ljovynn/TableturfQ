@@ -60,6 +60,33 @@ h3 {
     margin: auto;
 }
 
+#next-announcement {
+    display: none;
+    width: 75%;
+    margin: auto;
+    outline: 2px solid black;
+    padding: 10px;
+}
+
+#upcoming-announcements {
+    display: none;
+    width: 75%;
+    margin: auto;
+}
+
+.announcement-date {
+    color: lightgray;
+    font-size: 14px;
+}
+
+.upcoming-announcement {
+    outline: 2px solid black;
+    padding: 10px;
+    margin: 10px;
+    display: inline-block;
+    width: 30%;
+}
+
 /**** QUEUE PAGE STYLES ****/
 
 #competetive-queue, #casual-queue {
