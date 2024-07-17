@@ -33,6 +33,7 @@ const matchHistory = document.getElementById('user-match-history');
 
 const graphTimeframe = document.getElementById('user-rating-graph-timeframe');
 const graphSubmit = document.getElementById('user-rating-graph-submit');
+var chosenTimeframe;
 
 // Logout
 const logoutButton = document.getElementById('logout-button');
@@ -347,12 +348,80 @@ async function getELOGraph(timeframe) {
 }
 
 async function setELOGraph(timeframe = 'month') {
+    chosenTimeframe = timeframe;
     graphData = await getELOGraph(timeframe);
 
     google.charts.load('current', {'packages':['corechart']});
     google.charts.setOnLoadCallback(drawELOChart);
 
     // Other stuff
+}
+
+function GetChartOptions(timeframe){
+    var result = {
+        legend: { position: 'bottom' },
+        lineWidth: 4
+    }
+    switch (timeframe){
+        case 'day':
+        result.title = 'Rating History (1 day)',
+        result.hAxis = {
+            viewWindow: {
+                min: new Date(Date.now() - (24 * 60 * 60 * 1000)),
+                max: new Date(Date.now())
+            },
+            gridlines: {
+                count: 8,
+                units: {
+                    hours: {format: ['HH:mm']},
+                }
+            },
+            minorGridlines: {
+                count: 0
+            }
+        }
+        break;
+        case 'week':
+        result.title = 'Rating History (1 week)',
+        result.hAxis = {
+            viewWindow: {
+                min: new Date(Date.now() - (7 * 24 * 60 * 60 * 1000)),
+                max: new Date(Date.now())
+            },
+            gridlines: {
+                count: 7,
+                units: {
+                    days: {format: ['MMM dd']},
+                }
+            },
+            minorGridlines: {
+                count: 0
+            }
+        }
+        break;
+        case 'month':
+        default:
+        result.title = 'Rating History (1 month)',
+        result.hAxis = { 
+            viewWindow: {
+                min: new Date(Date.now() - (31 * 24 * 60 * 60 * 1000)),
+                max: new Date(Date.now())
+            },
+            gridlines: {
+                count: 15,
+                units: {
+                    days: {format: ['MMM dd']},
+                }
+            },
+            minorGridlines: {
+                count: 0
+            }
+        }
+        break;
+        case 'season':
+        break;
+    }
+    return result;
 }
 
 function drawELOChart() {
@@ -398,14 +467,10 @@ function drawELOChart() {
     var data = new google.visualization.DataTable();
     data.addColumn('date', 'Date');
     data.addColumn('number', 'Match Rating');
-    data.addColumn('number', 'Rating Decay/Manual/Adjustments');
+    data.addColumn('number', 'Rating Decay/Manual adjustments');
     data.addRows(dataArray);
 
-    var options = {
-      title: 'User Rating History',
-      legend: { position: 'bottom' },
-
-    };
+    var options = GetChartOptions(chosenTimeframe);
 
     var chart = new google.visualization.LineChart(document.getElementById('user-graph'));
 
