@@ -34,6 +34,7 @@ const matchHistory = document.getElementById('user-match-history');
 const graphTimeframe = document.getElementById('user-rating-graph-timeframe');
 const graphSubmit = document.getElementById('user-rating-graph-submit');
 var chosenTimeframe;
+const chartEndpointsOffset = 1300;
 
 // Logout
 const logoutButton = document.getElementById('logout-button');
@@ -343,6 +344,20 @@ async function getMatchUsers(users) {
 async function getELOGraph(timeframe) {
     var data = { userId: userId, ratingHistoryOption: ratingHistoryOptions[timeframe] };
     var result = await getData('/user/GetUserRatingHistory', data);
+    /*if (result.length > 0){
+        result.unshift({
+            match_id: null,
+            old_rating: result[0].old_rating,
+            new_rating: result[0].old_rating,
+            unix_date: Math.round(((Date.now() - ratingHistoryOptions[timeframe]) / 1000))
+        });
+        result.push({
+            match_id: null,
+            old_rating: result[result.length - 1].new_rating,
+            new_rating: result[result.length - 1].new_rating,
+            unix_date: Math.round((Date.now() / 1000))
+        });
+    }*/
     console.log(result);
     return result;
 }
@@ -360,14 +375,31 @@ async function setELOGraph(timeframe = 'month') {
 function GetChartOptions(timeframe){
     var result = {
         legend: { position: 'bottom' },
-        lineWidth: 4
+        lineWidth: 4,
+        dataOpacity: 0.6,
+        pointSize: 5,
+        colors: ['#739FEE', '#E68888'],
+        chartArea: {
+            backgroundColor: {
+                stroke: 'A79100',
+                strokeWidth: 2
+            }
+        },
+        backgroundColor:{
+            stroke: 'A79100',
+            strokeWidth: 3
+        },
+        series: {
+            0: {},
+            1: {}
+        }
     }
     switch (timeframe){
         case 'day':
         result.title = 'Rating History (1 day)',
         result.hAxis = {
             viewWindow: {
-                min: new Date(Date.now() - (24 * 60 * 60 * 1000)),
+                min: new Date(Date.now() - ratingHistoryOptions[timeframe]),
                 max: new Date(Date.now())
             },
             gridlines: {
@@ -385,7 +417,7 @@ function GetChartOptions(timeframe){
         result.title = 'Rating History (1 week)',
         result.hAxis = {
             viewWindow: {
-                min: new Date(Date.now() - (7 * 24 * 60 * 60 * 1000)),
+                min: new Date(Date.now() - ratingHistoryOptions[timeframe]),
                 max: new Date(Date.now())
             },
             gridlines: {
@@ -404,7 +436,7 @@ function GetChartOptions(timeframe){
         result.title = 'Rating History (1 month)',
         result.hAxis = { 
             viewWindow: {
-                min: new Date(Date.now() - (31 * 24 * 60 * 60 * 1000)),
+                min: new Date(Date.now() - ratingHistoryOptions[timeframe]),
                 max: new Date(Date.now())
             },
             gridlines: {
@@ -444,33 +476,42 @@ function drawELOChart() {
     var previousMatch;
     for ( let match of graphData ) {
         currentMatch = match;
-        var dateString = '';
         if ( !previousMatch || currentMatch.old_rating == previousMatch.new_rating ) {
             var matchDate = new Date(match.unix_date*1000);
             //dateString = getMatchDateString(matchDate);
-            dataArray.push([matchDate, match.new_rating, null]);
+            dataArray.push([matchDate, match.new_rating, null, null, null]);
         } else {
             // Set up the rating decay graph
             var startDate = new Date(previousMatch.unix_date*1000);
             //dateString = getMatchDateString(startDate);
-            dataArray.push([startDate, null, previousMatch.new_rating]);
+            dataArray.push([startDate, null, null, null, previousMatch.new_rating]);
 
             var endDate = new Date(currentMatch.unix_date*1000);
             //dateString = getMatchDateString(endDate);
-            dataArray.push([endDate, null, currentMatch.old_rating]);
-            dataArray.push([endDate, currentMatch.old_rating, null]);
-            dataArray.push([endDate, currentMatch.new_rating, null]);
+            dataArray.push([endDate, null, null, null, currentMatch.old_rating]);
+            dataArray.push([endDate, currentMatch.old_rating, null, null, null]);
+            dataArray.push([endDate, currentMatch.new_rating, null, null, null]);
         }
         previousMatch = match;
+    }
+    if (graphData.length > 0){
+        dataArray.unshift([new Date(Date.now() - ratingHistoryOptions[chosenTimeframe]), graphData[0].old_rating,
+        'point { size: 0; visible: false; }', `Start rating: ${graphData[0].old_rating}`, null]);
+        //dataArray.push([new Date(Date.now()), graphData[graphData.length - 1].new_rating, null, 'point {visible: false; }']);
     }
 
     var data = new google.visualization.DataTable();
     data.addColumn('date', 'Date');
     data.addColumn('number', 'Match Rating');
+    data.addColumn({'type': 'string', 'role': 'style'});
+    data.addColumn({'type': 'string', 'role': 'tooltip'});
     data.addColumn('number', 'Rating Decay/Manual adjustments');
     data.addRows(dataArray);
 
     var options = GetChartOptions(chosenTimeframe);
+
+    //series[0] = {visibleInLegend: false, pointsVisible: false};
+    //series[graphData.length - 1] = {visibleInLegend: false, pointsVisible: false, color: 'd3d3d3'};
 
     var chart = new google.visualization.LineChart(document.getElementById('user-graph'));
 
