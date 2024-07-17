@@ -365,6 +365,8 @@ async function setUserInfo() {
         user = userInfo.user;
         username = user.username;
         userID = user.id;
+        userELO = user.g2_rating;
+
     } catch (error) {
         await getMatchInfo(matchId);
         match = matchInfo.match;
@@ -1062,6 +1064,19 @@ async function setConfirmPlayerMessage(playerId, winnerId) {
     return;
 }
 
+async function checkPlayerRanked(newPlayerRatings) {
+    var newPlayerRating;
+    if ( players[0].id == userID ) {
+        newPlayerRating = newPlayerRatings.newPlayer1Rating;
+    } else {
+        newPlayerRating = newPlayerRatings.newPlayer2Rating;
+    }
+
+    if ( userELO == null && newPlayerRating != null ) {
+        var userRank = await GetRank(newPlayerRating);
+        alert('Congratulations, you have qualified as: ' + userRank.name + '!');
+    }
+}
 
 // Strike validation
 function validateStrikes(strikes, strikeAmount) {
@@ -1141,6 +1156,7 @@ socket.on('matchWin', async (data) => {
     //await getMatchInfo(matchId);
     await gameFinish(data.winnerId);
     confirmationMessage.style.display = 'none';
+    checkPlayerRanked(data.newPlayerRatings);
     // Unhide return to queue button
     // Do any final things
 });
@@ -1155,11 +1171,13 @@ socket.on('matchEnd', async (data) => {
 });
 
 socket.on('forfeit', async (data) => {
+    console.log(data);
     if ( !userLeft ) {
         alert('Your opponent has forfeited the match.');
         confirmationMessage.innerHTML = 'Your opponent has forfeited the match.';
         requeueButton.style.display = 'block';
         leaveMatch.style.display = 'none';
+        checkPlayerRanked(data.newPlayerRatings);
     }
 });
 
