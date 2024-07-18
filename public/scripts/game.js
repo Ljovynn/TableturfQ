@@ -1205,3 +1205,13 @@ socket.on('resolveDispute', async (resolveOption) => {
         resetGame();
     }
 });
+
+socket.on("connect_error", (err) => {
+  alert(`Socket connection error. Please report this to the devs! (And reload the page to reconnect).
+  
+  Message: ${err.message}
+  
+  Decription: ${err.description}
+  
+  Context: ${err.context}`);
+});

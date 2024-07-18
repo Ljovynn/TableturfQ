@@ -378,3 +378,13 @@ socket.on('matchReady', (matchID) => {
     console.log('/game?matchID=' + matchID);
     window.location.href = '/game?matchID=' + matchID;
 });
+
+socket.on("connect_error", (err) => {
+  alert(`Socket connection error. Please report this to the devs! (And reload the page to reconnect).
+  
+  Message: ${err.message}
+  
+  Decription: ${err.description}
+  
+  Context: ${err.context}`);
+});
