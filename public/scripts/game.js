@@ -503,7 +503,7 @@ async function setMatchInfo() {
         player2InGameName.innerHTML = 'Deleted User';
     }
 
-    setLength.innerHTML = 'Best of ' + ( privateMatch ? match.setLength : bestOfSets[rulesets[ matchModes[match.mode] ].setLength] ) + ' games';
+    setLength.innerHTML = 'Best of ' + bestOfSets[match.setLength] + ' games';
     turnTimer.innerHTML = ( rulesets[ matchModes[match.mode] ].turnTimer * 10 ) + ' seconds';
 
     addChatMessages(chat);
