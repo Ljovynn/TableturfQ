@@ -13,6 +13,7 @@ var matchInfo;
 var isGuest;
 
 setUserInfo();
+setAnnouncements();
 
 guestSubmit.addEventListener('click', async (e) => {
     if ( validateDisplayname(guestName.value) ) {
@@ -64,6 +65,23 @@ function setMatchLink(matchId) {
     matchLink.setAttribute('href', '/game?matchId=' + matchId);
     matchDiv.style.display = 'block';
 }
+
+async function setAnnouncements() {
+    try {
+        await getNextAnnouncement();
+        getUpcomingAnnouncements();
+    } catch (error) {
+        //
+    }
+}
+
+async function getNextAnnouncement() {
+    var result = await fetchData('/announcementInfo/GetNextAnnouncement');
+    console.log(result);
+    return result;
+}
+
+
 
 function validateDisplayname(displayName) {
     if ( displayName === '' ) {

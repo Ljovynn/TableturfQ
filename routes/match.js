@@ -132,7 +132,7 @@ router.post("/ForfeitMatch", async (req, res) => {
 
         var data = {
             forfeitId: userId,
-            newPlayerRatings: responseData.newPlayerRatings,
+            newPlayerRatings: responseData.data.newPlayerRatings,
         }
 
         res.sendStatus(responseData.code);
@@ -170,7 +170,7 @@ router.post("/ResolveDispute", async (req, res) => {
 
         if (responseData.data === matchModes.casual){
             res.sendStatus(responseData.code);
-            SendSocketMessage('match' + matchId, "resolveDispute", disputeResolveOptions.noChanges);
+            SendSocketMessage('match' + responseData.data.matchId, "resolveDispute", disputeResolveOptions.noChanges);
             return;
         }
         
