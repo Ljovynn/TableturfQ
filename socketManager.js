@@ -54,7 +54,7 @@ export function CreateSocketConnection (server){
         });
     }
 
-    if (process.env.ENVIRONMENT.LOG_SOCKET_ERRORS === 'true'){
+    if (process.env.LOG_SOCKET_ERRORS === 'true'){
         io.engine.on("connection_error", (err) => {
             console.log("socket connection error");
             console.log(err.req);      // the request object
