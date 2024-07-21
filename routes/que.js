@@ -65,8 +65,8 @@ router.post("/PlayerReady", async (req, res) => {
 
         var match = responseData.data;
         
-        var player1Room = "queRoom" + match.players[0].id.toString();
-        var player2Room = "queRoom" + match.players[1].id.toString();
+        var player1Room = "userRoom" + match.players[0].id.toString();
+        var player2Room = "userRoom" + match.players[1].id.toString();
         SendSocketMessage(player1Room, "matchReady", match.id.toString());
         SendSocketMessage(player2Room, "matchReady", match.id.toString());
     } catch (err){

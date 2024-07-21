@@ -101,16 +101,16 @@ export async function MatchMakingTick(){
             RemovePlayersFromQue(que.players, newlyMatchedPlayers[i].players[0], newlyMatchedPlayers[i].players[1]);
             var match = MakeNewMatch(newlyMatchedPlayers[i].players[0], newlyMatchedPlayers[i].players[1], newlyMatchedPlayers[i].matchMode);
 
-            var player1Room = "queRoom" + match.players[0].id.toString();
-            var player2Room = "queRoom" + match.players[1].id.toString();
+            var player1Room = "userRoom" + match.players[0].id.toString();
+            var player2Room = "userRoom" + match.players[1].id.toString();
             SendSocketMessage(player1Room, "matchReady", match.id);
             SendSocketMessage(player2Room, "matchReady", match.id);
         } else{
             RemovePlayersFromQue(que.players, newlyMatchedPlayers[i].players[0], newlyMatchedPlayers[i].players[1]);
             matchingPlayersList.push(new MatchedPlayers(newlyMatchedPlayers[i].players[0], newlyMatchedPlayers[i].players[1], newlyMatchedPlayers[i].matchMode));
 
-            var player1Room = "queRoom" + newlyMatchedPlayers[i].players[0].toString();
-            var player2Room = "queRoom" + newlyMatchedPlayers[i].players[1].toString();
+            var player1Room = "userRoom" + newlyMatchedPlayers[i].players[0].toString();
+            var player2Room = "userRoom" + newlyMatchedPlayers[i].players[1].toString();
             SendEmptySocketMessage(player1Room, "matchFound");
             SendEmptySocketMessage(player2Room, "matchFound");
         }
