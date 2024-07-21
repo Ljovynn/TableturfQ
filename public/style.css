@@ -531,6 +531,28 @@ h3 {
     margin: 20px;
 }
 
+/**** ABOUT/INFO STYLES ****/
+#info-container {
+    width: 65%;
+    margin: auto;
+}
+
+#section-match-rules, #section-site-rules {
+    display: none;
+}
+
+#section-about, #section-match-rules, #section-site-rules {
+    text-align: left;
+}
+
+#section-tabs {
+    margin: 10px;
+}
+
+.about-link, .match-rules-link, .site-rules-link {
+    cursor: pointer;
+}
+
 /**** MOBILE STLYES ****/
 @media only screen and (max-width: 600px) {
     #leaderboard {
