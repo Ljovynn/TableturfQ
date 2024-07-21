@@ -7,6 +7,15 @@ const counterPickList = document.getElementById('ranked-counters');
 const counterPickAmount = document.getElementById('counterpick-amount');
 const dsrEnabled = document.getElementById('dsr-enabled');
 
+const aboutSection = document.getElementById('section-about');
+const matchRulesSection = document.getElementById('section-match-rules');
+const siteRulesSection = document.getElementById('section-site-rules');
+
+// Set these by class so we can add any arbitrary number of them to the page
+const aboutLinks = document.getElementsByClassName('about-link');
+const matchRulesLinks = document.getElementsByClassName('match-rules-link');
+const siteRulesLinks = document.getElementsByClassName('site-rules-link');
+
 // Just the map for set length -> best of N
 var bestOfSets = {
     1: 1,
@@ -27,6 +36,30 @@ counterPickAmount.innerHTML = rankedRules.counterPickBans;
 
 if ( !rankedRules.dsr ) {
 	dsrEnabled.style.display = 'none';
+}
+
+for ( let link of aboutLinks ) {
+	link.addEventListener('click', (e) => {
+		matchRulesSection.style.display = 'none';
+		siteRulesSection.style.display = 'none';
+		aboutSection.style.display = 'block';
+	});
+}
+
+for ( let link of matchRulesLinks ) {
+	link.addEventListener('click', (e) => {
+		siteRulesSection.style.display = 'none';
+		aboutSection.style.display = 'none';
+		matchRulesSection.style.display = 'block';
+	});
+}
+
+for ( let link of siteRulesLinks ) {
+	link.addEventListener('click', (e) => {
+		matchRulesSection.style.display = 'none';
+		aboutSection.style.display = 'none';
+		siteRulesSection.style.display = 'block';
+	});
 }
 
 async function getStageList(stageElement, stageList) {
