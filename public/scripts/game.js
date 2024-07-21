@@ -503,7 +503,7 @@ async function setMatchInfo() {
         player2InGameName.innerHTML = 'Deleted User';
     }
 
-    setLength.innerHTML = 'Best of ' + ( privateMatch ? match.setLength : bestOfSets[rulesets[ matchModes[match.mode] ].setLength] ) + ' games';
+    setLength.innerHTML = 'Best of ' + bestOfSets[match.setLength] + ' games';
     turnTimer.innerHTML = ( rulesets[ matchModes[match.mode] ].turnTimer * 10 ) + ' seconds';
 
     addChatMessages(chat);
@@ -1204,4 +1204,14 @@ socket.on('resolveDispute', async (resolveOption) => {
     if ( match.gamesArr.at(-1).strikes.length == 0 ) {
         resetGame();
     }
+});
+
+socket.on("connect_error", (err) => {
+  alert(`Socket connection error. Please report this to the devs! (And reload the page to reconnect).
+  
+  Message: ${err.message}
+  
+  Decription: ${err.description}
+  
+  Context: ${err.context}`);
 });

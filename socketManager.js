@@ -53,6 +53,17 @@ export function CreateSocketConnection (server){
             mode: (process.env.ADMIN_IO_ADVANCED === 'true') ? "development" : "production",
         });
     }
+
+    if (process.env.LOG_SOCKET_ERRORS === 'true'){
+        io.engine.on("connection_error", (err) => {
+            console.log("socket connection error");
+            console.log(err.req);      // the request object
+            console.log(err.code);     // the error code, for example 1
+            console.log(err.message);  // the error message, for example "Session ID unknown"
+            console.log(err.context);  // some additional error context
+        });
+    }
+    
     connected = true;
 };
 

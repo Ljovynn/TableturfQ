@@ -282,8 +282,8 @@ function CheckMatchWin(match, winnerId){
 async function HandleRankedMatchWin(match){
     match.status = (match.players[0].id == match.winnerId) ? matchStatuses.player1Win : matchStatuses.player2Win;
 
-    if (!await FinishMatch(match)) return true;
-    if (match.privateBattle) return;
+    if (!await FinishMatch(match)) return false;
+    if (match.privateBattle) return true;
 
     await CheckPlacements(match.players[0].id);
     await CheckPlacements(match.players[1].id);
@@ -319,7 +319,6 @@ export async function PlayerSentForfeit(playerId){
 
 async function CheckPlacements(playerId){
     const rankedMatchCount = await GetUserRankedMatchCount(playerId);
-    console.log("ranked match count: " + rankedMatchCount);
 
     if (rankedMatchCount == placementMatchCount){
         await SetUserHideRank(playerId, false);
@@ -615,7 +614,7 @@ export function FindMatchWithPlayer(playerId){
 async function FinishMatch(match, cancelled = false){
     if (!cancelled) {
         if (!await SetMatchResult(match)) return false;
-        UpdateRecentMatches(match);
+        if (!match.privateBattle) UpdateRecentMatches(match);
     }
 
     const matchIndex = matches.indexOf(match);

@@ -41,7 +41,7 @@ export async function GetMatch(matchId){
 //only do this at server startup
 export async function GetRecentMatches(cutoff){
     const [rows] = await pool.query(`SELECT id, player1_id, player2_id, ranked, set_length, result, UNIX_TIMESTAMP(created_at) AS unix_created_at FROM matches
-        WHERE created_at > SUBDATE(CURRENT_TIMESTAMP, INTERVAL 1 MONTH)
+        WHERE created_at > SUBDATE(CURRENT_TIMESTAMP, INTERVAL 1 MONTH) AND private_battle = FALSE
 	    ORDER BY created_at DESC LIMIT ?`, [cutoff]);
     return rows;
 }
