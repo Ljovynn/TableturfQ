@@ -2,7 +2,7 @@ import { PublicQueDatas } from "../constants/queData.js";
 
 const readyCountdown = document.getElementById('ranked-match-ready-countdown');
 const readyButton = document.getElementById('ranked-match-ready-button');
-const modal = document.querySelector(".modal");
+const modal = document.getElementById("ready-modal");
 const overlay = document.querySelector(".overlay");
 const openModalBtn = document.querySelector(".btn-open");
 const closeModalBtn = document.querySelector(".btn-close");
