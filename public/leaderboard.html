@@ -9,6 +9,19 @@
         <link rel="stylesheet" href="./style.css">
     </head>
     <body class="body">
+        <div class="modal-container">
+            <section class="modal hidden">
+                <div class="flex">
+                    <button class="btn-close">⨉</button>
+                </div>
+                <div id="global-match-ready">
+                    <p id="ranked-match-found-message">Match found! Please ready up.</p>
+                    <p id="ranked-match-ready-countdown">00:20</p>
+                    <button id="ranked-match-ready-button" value="ready">Ready!</button>
+                </div>
+            </section>
+        </div>
+        <div class="overlay hidden"></div>
         <header>
             <h1><a href="/">TableturfQ</a></h1>
             <h3>Leaderboard</h3>
@@ -49,6 +62,8 @@
             </div>
         </main>
     </body>
+    <script src="/socket.io/socket.io.js"></script>
     <script type="text/javascript" src="./scripts/dataPOST.js"></script>
     <script type="text/javascript" src="./scripts/leaderboard.js"></script>
+    <script type="module" src="./scripts/global-queue.js"></script>
 </html>

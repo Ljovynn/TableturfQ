@@ -359,7 +359,7 @@ function getMatchPlayer( matchUsers, playerId ) {
 }
 
 // SOCKET JS
-socket.emit('join', 'queRoom');
+socket.emit('join', 'userRoom');
 
 socket.on('matchFound', () => {
     console.log('Socket event match ready');
