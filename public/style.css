@@ -326,6 +326,10 @@ h3 {
     margin: 20px;
 }
 
+#qualifier-image {
+    width: 30px;
+}
+
 /**** USER PROFILE ****/
 
 #profile-content {

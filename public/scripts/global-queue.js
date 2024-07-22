@@ -33,9 +33,9 @@ closeModalBtn.addEventListener('click', closeModal);
 
 async function setUserInfo() {
     var userInfo = await getUserInfo();
-    console.log(userInfo);
-    queuedMatchMode = userInfo.queData.matchMode;
-    console.log(queuedMatchMode);
+    if ( userInfo.queData ) {
+        queuedMatchMode = userInfo.queData.matchMode;
+    }
 }
 
 async function getUserInfo() {

@@ -86,6 +86,12 @@ const chatForm = document.getElementById('match-chat-form');
 const chatInput = document.getElementById('match-chat-input');
 const chatSend = document.getElementById('match-chat-button');
 
+// Modal Elements
+const overlay = document.querySelector(".overlay");
+const qualifierModal = document.getElementById('qualifier-modal');
+const qualifierImage = document.getElementById('qualifier-image');
+const qualifierName = document.getElementById('qualifier-name');
+const closeModalBtn = document.getElementById('qualifier-close');
 
 var match;
 var user = {};
@@ -308,6 +314,11 @@ leaveMatch.addEventListener('click', async (e) => {
             window.location.href = '/';
         }
     }
+});
+
+closeModalBtn.addEventListener('click', (e) => {
+    qualifierModal.classList.add('hidden');
+    overlay.classList.add('hidden');
 });
 
 // Admin actions
@@ -1066,6 +1077,7 @@ async function setConfirmPlayerMessage(playerId, winnerId) {
 
 async function checkPlayerRanked(newPlayerRatings) {
     var newPlayerRating;
+    var ratingstring;
     if ( players[0].id == userID ) {
         newPlayerRating = newPlayerRatings.newPlayer1Rating;
     } else {
@@ -1074,8 +1086,12 @@ async function checkPlayerRanked(newPlayerRatings) {
 
     if ( userELO == null && newPlayerRating != null ) {
         var userRank = await GetRank(newPlayerRating);
-        alert('Congratulations, you have qualified as: ' + userRank.name + '!');
+        qualifierImage.src = userRank.imageURL;
+        qualifierName.innerHTML = userRank.name;
+        overlay.classList.remove('hidden');
+        qualifierModal.classList.remove('hidden');
     }
+
 }
 
 // Strike validation
