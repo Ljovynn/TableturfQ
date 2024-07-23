@@ -1,5 +1,5 @@
 import { SlashCommandBuilder, PermissionFlagsBits } from "discord.js";
-import { CheckIfAnnouncementExistsById, DeleteAnnouncementById, SetNewAnnouncement } from "../../TempDatabaseManagers/announcementManager.js";
+import { CheckIfAnnouncementExistsById, DeleteAnnouncementById, SetNewAnnouncement } from "../../cache/announcementManager.js";
 import { BuildSimpleEmbed } from "../utils/embed.js";
 import { embedColor } from "../utils/constants.js";
 

@@ -10,10 +10,10 @@ import path from 'path';
 import { GetUserByDiscordId, CreateUserWithDiscord, SetUserDiscord, CreateUser, GetUserData, VerifyAccount } from '../database.js';
 import { GenerateNanoId } from '../nanoIdManager.js';
 import { CheckUserDefined } from '../utils/checkDefined.js';
-import { authErrors, databaseErrors } from '../Responses/authErrors.js';
-import { SetResponse } from '../Responses/ResponseData.js';
+import { authErrors, databaseErrors } from '../responses/authErrors.js';
+import { SetResponse } from '../responses/ResponseData.js';
 import { userRoles, usernameMaxLength, usernameMinLength } from '../public/constants/userData.js';
-import { definitionErrors } from '../Responses/requestErrors.js';
+import { definitionErrors } from '../responses/requestErrors.js';
 import { HasBadWords } from '../utils/string.js';
 
 const apiRouteOauth2Token = "https://discord.com/api/v10/oauth2/token";
@@ -144,6 +144,7 @@ async function StoreUserData(accessToken, refreshToken, userId){
 }
 
 function HandleAvatarGif(avatar){
+    console.log(avatar);
     if (avatar.slice(0, 2) === 'a_') return avatar.slice(2);
     return avatar;
 }

@@ -31,7 +31,12 @@ async function addSearchUser(users) {
 
             let avatarImage = document.createElement('img');
             avatarImage.classList.add('user-search-avatar')
-            let avatarString = 'https://cdn.discordapp.com/avatars/' + user.discord_id + '/' + user.discord_avatar_hash + '.jpg' + '?size=512';
+            let avatarString = '';
+            if ( user.discord_avatar_hash ) {
+                avatarString = 'https://cdn.discordapp.com/avatars/' + user.discord_id + '/' + user.discord_avatar_hash + '.jpg' + '?size=512';
+            } else {
+                avatarString = '/assets/images/chumper.png';
+            }
             avatarImage.src = avatarString;
             avatarCell.append(avatarImage);
 

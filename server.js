@@ -11,9 +11,9 @@ import { MatchMakingTick, CheckMatchmadePlayers } from "./queManager.js";
 import { StartDiscordBot } from "./discordBot/discordBotManager.js";
 import { DeleteOldSuspensions, DeleteOldUnverifiedAccounts, DeleteUnfinishedMatches, UpdateRankDecay } from "./database.js";
 import { CancelOldMatches } from "./matchManager.js";
-import { AnnouncementManagerSetup, DeletePastAnnouncements } from "./TempDatabaseManagers/announcementManager.js";
-import { LeaderboardSizeSetup, UpdateLeaderboardSize } from "./TempDatabaseManagers/leaderboardSize.js";
-import { MatchHistoryManagerSetup } from "./TempDatabaseManagers/matchHistoryManager.js";
+import { AnnouncementManagerSetup, DeletePastAnnouncements } from "./cache/announcementManager.js";
+import { LeaderboardSizeSetup, UpdateLeaderboardSize } from "./cache/leaderboardSize.js";
+import { MatchHistoryManagerSetup } from "./cache/matchHistoryManager.js";
 import { CleanupChatRateLimitList } from "./chatRateLimitManager.js";
 
 dotenv.config();
