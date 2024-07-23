@@ -17,7 +17,7 @@ var readyUp;
 setUserInfo();
 
 readyButton.addEventListener('click', async (e) => {
-    console.log('User is ready for competetive match.');
+    console.log('User is ready for competitive match.');
     readyButton.style.display = 'none';
     ready = true;
 
