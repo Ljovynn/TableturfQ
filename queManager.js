@@ -1,6 +1,6 @@
 import { queDatas } from "./constants/queData.js";
 import { FindIfPlayerInMatch, MakeNewMatch } from "./matchManager.js";
-import { GetUserData, GetUserRankData } from "./database.js";
+import { GetUserRankData } from "./database.js";
 import { userRoles } from "./public/constants/userData.js";
 import { SendEmptySocketMessage, SendSocketMessage } from "./socketManager.js";
 import { ResponseData } from "./responses/ResponseData.js";
