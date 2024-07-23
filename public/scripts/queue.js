@@ -2,7 +2,7 @@ import { PublicQueDatas } from "../constants/queData.js";
 
 // Elements
 const loading = document.getElementById('loading');
-const competetiveQueue = document.getElementById('competetive-queue');
+const competitiveQueue = document.getElementById('competitive-queue');
 const casualQueue = document.getElementById('casual-queue');
 const casualUsername = document.getElementById('casual-username');
 const queueMatchmaking = document.getElementById('queue-matchmaking');
@@ -14,7 +14,7 @@ const recentMatches = document.getElementById('recent-matches');
 const recentMatchesList = document.getElementById('recent-matches-list');
 
 // Interactable Elements
-const joinCompetetive = document.getElementById('join-competetive-queue');
+const joinCompetitive = document.getElementById('join-competitive-queue');
 const joinCasual = document.getElementById('join-casual-queue');
 const queueButtons = document.getElementsByClassName('queue-button');
 const readyButton = document.getElementById('ranked-match-ready-button');
@@ -37,8 +37,8 @@ var countdown;
 await setUserInfo();
 await getRecentMatches();
 
-joinCompetetive.addEventListener('click', async (e) => {
-    console.log('User has joined the competetive queue');
+joinCompetitive.addEventListener('click', async (e) => {
+    console.log('User has joined the competitive queue');
     var data = { matchMode: 'ranked' }
     queuedMatchMode = 'ranked';
 
@@ -87,7 +87,7 @@ joinCasual.addEventListener('click', async (e) => {
 });
 
 readyButton.addEventListener('click', async (e) => {
-    console.log('User is ready for competetive match.');
+    console.log('User is ready for competitive match.');
     readyButton.style.display = 'none';
     ready = true;
 
@@ -134,7 +134,7 @@ async function setUserInfo() {
                 isCasual = true;
                 casualQueue.style.display = 'block';
             } else {
-                competetiveQueue.style.display = 'inline-block';
+                competitiveQueue.style.display = 'inline-block';
                 casualQueue.style.display = 'inline-block';
             }
 
