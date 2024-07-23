@@ -281,7 +281,6 @@ function countdownTimer() {
             queueButton.style.display = 'inline-block';
         }
     }
-
 }
 
 function clearTimer(intervalId) {

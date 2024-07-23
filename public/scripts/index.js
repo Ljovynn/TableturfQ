@@ -102,6 +102,10 @@ function addNextAnnouncement(announcement) {
     let announcementTitle = document.createElement('h4');
     announcementTitle.innerHTML = announcement.title;
 
+    let announcementIcon = document.createElement('img');
+    announcementIcon.classList.add('announcement-icon');
+    announcementIcon.src = announcement.iconSrc;
+
     let announcementDate = document.createElement('div');
     announcementDate.classList.add('announcement-date');
     announcementDate.innerHTML = new Date(announcement.date*1000).toLocaleString();
@@ -110,6 +114,7 @@ function addNextAnnouncement(announcement) {
     announcementDescription.innerHTML = announcement.description;
 
     announcementDiv.append(announcementTitle);
+    announcementDiv.append(announcementIcon);
     announcementDiv.append(announcementDate);
     announcementDiv.append(announcementDescription);
 
@@ -131,12 +136,21 @@ function addUpcomingAnnouncements(announcements) {
         let upcomingTitle = document.createElement('h4');
         upcomingTitle.innerHTML = announcement.title;
 
+        let upcomingIcon = document.createElement('img');
+        upcomingIcon.classList.add('announcement-icon');
+        upcomingIcon.src = announcement.iconSrc;
+
         var upcomingDate = document.createElement('div');
         upcomingDate.classList.add('announcement-date');
         upcomingDate.innerHTML = new Date(announcement.date*1000).toLocaleString();
 
+        let upcomingDescription = document.createElement('p');
+        upcomingDescription.innerHTML = announcement.description;
+
         upcomingAnnouncement.append(upcomingTitle);
+        upcomingAnnouncement.append(upcomingIcon);
         upcomingAnnouncement.append(upcomingDate);
+        upcomingAnnouncement.append(upcomingDescription);
 
         upcomingAnnouncements.append(upcomingAnnouncement);
     }
