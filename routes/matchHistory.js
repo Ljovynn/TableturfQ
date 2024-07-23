@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { GetGlobalMatchHistory } from '../TempDatabaseManagers/matchHistoryManager.js';
+import { GetGlobalMatchHistory } from '../cache/matchHistoryManager.js';
 import { CheckUserDefined } from '../utils/checkDefined.js';
-import { SetResponse } from '../Responses/ResponseData.js';
+import { SetResponse } from '../responses/ResponseData.js';
 import { GetMultipleUserDatas, GetUserMatchHistory } from '../database.js';
-import { definitionErrors } from '../Responses/requestErrors.js';
+import { definitionErrors } from '../responses/requestErrors.js';
 
 const router = Router();
 

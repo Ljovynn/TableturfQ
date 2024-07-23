@@ -80,7 +80,7 @@ export async function GetMultipleUserDatas(userIdlist){
 }
 
 export async function GetUserRankData(userId){
-    const [rows] = await pool.execute(`SELECT id, g2_rating, hide_rank, g2_rd, g2_vol FROM users WHERE id = ?`, [userId]);
+    const [rows] = await pool.execute(`SELECT id, role, g2_rating, hide_rank, g2_rd, g2_vol FROM users WHERE id = ?`, [userId]);
     return rows[0];
 }
 

@@ -9,8 +9,8 @@ import { FindIfPlayerInQue, FindIfPlayerWaitingForReady } from '../queManager.js
 import { FindMatchWithPlayer } from '../matchManager.js';
 import { GetMultipleUserDatas, GetUserBanState, GetUserRankData, GetUserRankedMatchCount, GetUserRatingHistory, SearchUser,
     SetUserCountry, SetUserDiscordTokens, SetUsername } from '../database.js';
-import { definitionErrors, userErrors } from '../Responses/requestErrors.js';
-import { SetResponse } from '../Responses/ResponseData.js';
+import { definitionErrors, userErrors } from '../responses/requestErrors.js';
+import { SetResponse } from '../responses/ResponseData.js';
 import { usernameMaxLength, usernameMinLength } from '../public/constants/userData.js';
 import { HasBadWords, SanitizeFulltextSearch } from '../utils/string.js';
 import { ratingHistoryOptions } from '../public/constants/ratingData.js';

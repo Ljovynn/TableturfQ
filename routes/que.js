@@ -2,8 +2,8 @@ import { Router } from 'express';
 import { AddPlayerToQue, RemovePlayerFromQue, PlayerSentReady } from "../queManager.js";
 import { CheckUserDefined } from "../utils/checkDefined.js";
 import { SendSocketMessage } from "../socketManager.js";
-import { definitionErrors, userErrors } from '../Responses/requestErrors.js';
-import { ResponseSucceeded, SetResponse } from '../Responses/ResponseData.js';
+import { definitionErrors, userErrors } from '../responses/requestErrors.js';
+import { ResponseSucceeded, SetResponse } from '../responses/ResponseData.js';
 import { CheckUserBanned } from '../utils/userUtils.js';
 
 const router = Router();

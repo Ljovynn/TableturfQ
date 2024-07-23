@@ -7,8 +7,8 @@ import { userRoles } from '../public/constants/userData.js';
 import { SendSocketMessage } from '../socketManager.js';
 import { GetDisputedMatchesList, ModSentChatMessage, ResolveMatchDispute } from '../matchManager.js';
 import { disputeResolveOptions, matchModes } from '../public/constants/matchData.js';
-import { ResponseSucceeded, SetResponse } from '../Responses/ResponseData.js';
-import { definitionErrors, userErrors } from '../Responses/requestErrors.js';
+import { ResponseSucceeded, SetResponse } from '../responses/ResponseData.js';
+import { definitionErrors, userErrors } from '../responses/requestErrors.js';
 import { HandleBanUser } from '../utils/userUtils.js';
 
 const router = Router();
