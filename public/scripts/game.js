@@ -426,7 +426,7 @@ async function setMatchInfo() {
         var player1DiscordId = players[0].discord_id;
         var player1DiscordAvatar = players[0].discord_avatar_hash;
         var player1ELO = players[0].g2_rating;
-        var player1Rank = await GetRank(player1ELO);
+        var player1Rank = GetRank(player1ELO);
         console.log(player1Rank);
     } catch (error) {
         // Set Deleted player 1 stuff
@@ -436,7 +436,7 @@ async function setMatchInfo() {
         var player2DiscordId = players[1].discord_id;
         var player2DiscordAvatar  = players[1].discord_avatar_hash;
         var player2ELO = players[1].g2_rating;
-        var player2Rank = await GetRank(player2ELO);
+        var player2Rank = GetRank(player2ELO);
         console.log(player2Rank);
     } catch (error) {
         // Set Deleted player 2 stuff
@@ -477,10 +477,8 @@ async function setMatchInfo() {
         }
         player1VictoryButton.value = players[0].id;
         player1Score.setAttribute('player-id', players[0].id);
-        if ( !players[0].hide_rank ) {
-            player1RankIcon.src = player1Rank.imageURL;
-            player1RankLabel.innerHTML = player1Rank.name;
-        }
+        player1RankIcon.src = player1Rank.imageURL;
+        player1RankLabel.innerHTML = player1Rank.name;
     } catch (error) {
         console.log(error);
         // deleted player 1 country
@@ -504,10 +502,8 @@ async function setMatchInfo() {
         }
         player2VictoryButton.value = players[1].id;
         player2Score.setAttribute('player-id', players[1].id);
-        if ( !players[1].hide_rank ) {
-            player2RankIcon.src = player2Rank.imageURL;
-            player2RankLabel.innerHTML = player2Rank.name;
-        }
+        player2RankIcon.src = player2Rank.imageURL;
+        player2RankLabel.innerHTML = player2Rank.name;
     } catch (error) {
         console.log(error);
         // deleted player 2 country
@@ -1085,7 +1081,7 @@ async function checkPlayerRanked(newPlayerRatings) {
     }
 
     if ( userELO == null && newPlayerRating != null ) {
-        var userRank = await GetRank(newPlayerRating);
+        var userRank = GetRank(newPlayerRating);
         qualifierImage.src = userRank.imageURL;
         qualifierName.innerHTML = userRank.name;
         overlay.classList.remove('hidden');
