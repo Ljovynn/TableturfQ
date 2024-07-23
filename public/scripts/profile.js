@@ -233,7 +233,12 @@ async function setUserInfo() {
 
         userDisplayName.innerHTML = username;
         userDiscordName.innerHTML = discordUsername;
-        var avatarString = 'https://cdn.discordapp.com/avatars/' + discordId + '/' + discordAvatarHash + '.jpg' + '?size=512';
+        var avatarString = '';
+        if ( discordAvatarHash ) {
+            avatarString = 'https://cdn.discordapp.com/avatars/' + discordId + '/' + discordAvatarHash + '.jpg' + '?size=512';
+        } else {
+            avatarString = '/assets/images/chumper.png';
+        }
         userProfilePicture.src = avatarString;
 
         if ( user.country ) {
