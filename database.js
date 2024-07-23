@@ -199,7 +199,7 @@ export async function GetLeaderboardCount(){
 
 //todo optimize
 export async function GetFutureAnnouncements(){
-    const [rows] = await pool.execute(`SELECT title, description, icon_src, UNIX_TIMESTAMP(date) AS unix_date, is_event FROM announcements WHERE date > current_timestamp ORDER BY date ASC`);
+    const [rows] = await pool.execute(`SELECT id, title, description, icon_src, UNIX_TIMESTAMP(date) AS unix_date, is_event FROM announcements WHERE date > current_timestamp ORDER BY date ASC`);
     return rows;
 }
 

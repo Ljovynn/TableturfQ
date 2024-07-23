@@ -46,24 +46,23 @@ async function addSearchUser(users) {
 
             row.append(avatarCell);
             row.append(nameCell);
+            
+            let eloCell = document.createElement('div');
+            eloCell.classList.add('user-search-ELO');
+            let ratingString = ( user.g2_rating ) ? Math.floor(user.g2_rating) : 'Unranked';
+            eloCell.append(ratingString);
 
-            if ( !user.hide_rank ) {
-                let eloCell = document.createElement('div');
-                eloCell.classList.add('user-search-ELO');
-                eloCell.append( (Math.round(user.g2_rating * 100) / 100).toFixed(2) );
+            let rankCell = document.createElement('div');
+            rankCell.classList.add('user-search-rank');
+            let userRank = GetRank(user.g2_rating);
+            let rankImage = document.createElement('img');
+            rankImage.classList.add('user-search-rank-icon')
+            console.log(userRank);
+            rankImage.src = userRank.imageURL;
+            rankCell.append(rankImage);
 
-                let rankCell = document.createElement('div');
-                rankCell.classList.add('user-search-rank');
-                let userRank = await GetRank(user.g2_rating);
-                let rankImage = document.createElement('img');
-                rankImage.classList.add('user-search-rank-icon')
-                console.log(userRank);
-                rankImage.src = userRank.imageURL;
-                rankCell.append(rankImage);
-
-                row.append(eloCell);
-                row.append(rankCell);
-            }
+            row.append(eloCell);
+            row.append(rankCell);
 
             searchResults.append(row);
         }
