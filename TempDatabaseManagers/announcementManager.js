@@ -70,12 +70,15 @@ export function CheckIfAnnouncementExistsById(announcementId){
 }
 
 export async function DeleteAnnouncementById(announcementId){
-    for (let i = 0; i < announcements.length; i++){
-        if (announcements[i].id != announcementId) continue;
-
-        await DeleteAnnouncement(announcementId);
-        announcements.splice(i, 1);
-        return true;
+    try{
+        for (let i = 0; i < announcements.length; i++){
+            if (announcements[i].id != announcementId) continue;
+            await DeleteAnnouncement(announcementId);
+            announcements.splice(i, 1);
+            return true;
+        }
+        return false;
+    }catch(error){
+        return error.message;
     }
-    return false;
 }
