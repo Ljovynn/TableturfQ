@@ -70,7 +70,7 @@ export function CheckIfAnnouncementExistsById(announcementId){
 }
 
 export async function DeleteAnnouncementById(announcementId){
-    for (let i = 0; i < announcement.length; i++){
+    for (let i = 0; i < announcements.length; i++){
         if (announcements[i].id != announcementId) continue;
 
         await DeleteAnnouncement(announcementId);
