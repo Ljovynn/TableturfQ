@@ -28,10 +28,10 @@ export function CreateSocketConnection (server){
         socket.on('join', function(room){
             if (typeof(room) !== 'string') return;
             const userId = socket.request.session.user;
-            if (room == 'queRoom'){
+            if (room == 'userRoom'){
                 if (!userId) return; 
 
-                var userQueRoom = 'queRoom' + userId;
+                var userQueRoom = 'userRoom' + userId;
                 socket.join(userQueRoom);
                 return;
             }

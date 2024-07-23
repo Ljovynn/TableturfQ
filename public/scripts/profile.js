@@ -245,15 +245,12 @@ async function setUserInfo() {
         }
 
         userCountryValue.append(countryFlag);
+        rank = GetRank(user.g2_rating);
+        userELO.innerHTML = (user.g2_rating) ? Math.floor(user.g2_rating) : 'N/A';
+        userRank.src = rank.imageURL;
+        userRankInfo.style.display = 'block';
+        userRank.parentElement.innerHTML += rank.name;
 
-        if ( !user.hide_rank ) {
-            eloRating = (Math.round(user.g2_rating * 100) / 100).toFixed(2);
-            rank = await GetRank(eloRating);
-            userELO.innerHTML = eloRating;
-            userRank.src = rank.imageURL;
-            userRankInfo.style.display = 'block';
-            userRank.parentElement.innerHTML += rank.name;
-        }
         hideNonUserElements();
     } catch (error) {
         console.log(error);

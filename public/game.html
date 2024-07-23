@@ -7,6 +7,27 @@
     <link rel="stylesheet" href="./assets/fontawesome-free-6.5.2-web/css/all.min.css">
   </head>
   <body class="body">
+    <div class="modal-container">
+            <section id="ready-modal" class="modal hidden">
+                <div class="flex">
+                    <button class="btn-close">⨉</button>
+                </div>
+                <div id="global-match-ready">
+                    <p id="ranked-match-found-message">Match found! Please ready up.</p>
+                    <p id="ranked-match-ready-countdown">00:20</p>
+                    <button id="ranked-match-ready-button" value="ready">Ready!</button>
+                </div>
+            </section>
+            <section id="qualifier-modal" class="modal hidden">
+                <div class="flex">
+                    <button id="qualifier-close" class="btn-close">⨉</button>
+                </div>
+                <div id="qualifier-content">
+                    <p id="qualifier-message">Congratulations you have qualified as: <img id="qualifier-image" /><span id="qualifier-name"></span>!</p>
+                </div>
+            </section>
+        </div>
+        <div class="overlay hidden"></div>
     <main class="main">
         <header>
             <h1><a href="/">TableturfQ</a></h1>
@@ -190,4 +211,5 @@
   <!--<script src="https://tableturfq.up.railway.app/socket.io/socket.io.js"></script>-->
   <script src="/socket.io/socket.io.js"></script>
   <script type="module" src="./scripts/game.js"></script>
+  <script type="module" src="./scripts/global-queue.js"></script>
 </html>

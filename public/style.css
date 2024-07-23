@@ -326,6 +326,10 @@ h3 {
     margin: 20px;
 }
 
+#qualifier-image {
+    width: 30px;
+}
+
 /**** USER PROFILE ****/
 
 #profile-content {
@@ -551,6 +555,80 @@ h3 {
 
 .about-link, .match-rules-link, .site-rules-link {
     cursor: pointer;
+}
+
+/**** MODAL STYLES ****/
+.modal-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.4rem;
+    width: 450px;
+    padding: 1.3rem;
+    min-height: 250px;
+    position: fixed;
+    top: 20%;
+    border: 1px solid #ddd;
+    border-radius: 15px;
+    z-index: 2;
+
+    background-image: linear-gradient(45deg, rgba(52.9,48.6,76.1,1), rgba(85.1,77.3,27.8,1));
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+
+.modal .flex {
+    display: flex;
+    align-self: end;
+    justify-content: space-between;
+}
+
+.btn {
+    display: inline-block;
+    padding: 0.8rem 1.4rem;
+    font-weight: 700;
+    background-color: black;
+    color: white;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 1em;
+}
+
+.btn-open {
+    position: absolute;
+    bottom: 150px;
+}
+
+.btn-close {
+    transform: translate(10px, -20px);
+    padding: 0.5rem 0.7rem;
+    background: #eee;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(3px);
+    z-index: 1;
+}
+
+.hidden {
+    display: none;
 }
 
 /**** MOBILE STLYES ****/

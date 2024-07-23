@@ -21,6 +21,7 @@ export const ranks = Object.freeze([
 ]);
 
 export function GetRank(rating){
+    if (!rating) return unranked;
     for (let i = ranks.length - 1; i >= 0; i--){
         if (rating >= ranks[i].ratingThreshold) return ranks[i];  
     }
