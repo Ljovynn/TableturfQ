@@ -1,10 +1,10 @@
 import { Router } from 'express';
 
-import { SetResponse } from '../Responses/ResponseData.js';
-import { definitionErrors } from '../Responses/requestErrors.js';
+import { SetResponse } from '../responses/ResponseData.js';
+import { definitionErrors } from '../responses/requestErrors.js';
 import { leaderboardLimit } from '../public/constants/searchData.js';
 import { GetLeaderboard, GetUserLeaderboardPosition } from '../database.js';
-import { GetLeaderboardSize } from '../TempDatabaseManagers/leaderboardSize.js';
+import { GetLeaderboardSize } from '../cache/leaderboardSize.js';
 
 const router = Router();
 

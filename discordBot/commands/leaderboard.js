@@ -3,7 +3,7 @@ import { embedColor } from '../utils/constants.js';
 import { GetRank } from "../../public/constants/rankData.js";
 import { SanitizeDiscordLog } from "../../utils/string.js";
 import { GetLeaderboard } from "../../database.js";
-import { GetLeaderboardSize } from "../../TempDatabaseManagers/leaderboardSize.js";
+import { GetLeaderboardSize } from "../../cache/leaderboardSize.js";
 
 const limit = 15;
 

@@ -1,10 +1,10 @@
 import { queDatas } from "./constants/queData.js";
 import { FindIfPlayerInMatch, MakeNewMatch } from "./matchManager.js";
-import { GetUserData } from "./database.js";
+import { GetUserRankData } from "./database.js";
 import { userRoles } from "./public/constants/userData.js";
 import { SendEmptySocketMessage, SendSocketMessage } from "./socketManager.js";
-import { ResponseData } from "./Responses/ResponseData.js";
-import { enterQueErrors, readyUpErrors } from "./Responses/queErrors.js";
+import { ResponseData } from "./responses/ResponseData.js";
+import { enterQueErrors, readyUpErrors } from "./responses/queErrors.js";
 import { matchModes } from "./public/constants/matchData.js";
 
 const readyTimerGracePeriod = 1000 * 3;
@@ -63,7 +63,7 @@ export async function AddPlayerToQue(playerId, matchMode){
     if (FindIfPlayerInQue(playerId)) return enterQueErrors.inQue;
     if (FindIfPlayerInMatch(playerId)) return enterQueErrors.inMatch; 
 
-    var user = await GetUserData(playerId);
+    var user = await GetUserRankData(playerId);
     if (!user) return enterQueErrors.noUser;
     if (que.matchMode == matchModes.ranked){
         if (user.role == userRoles.unverified) return enterQueErrors.unverified;

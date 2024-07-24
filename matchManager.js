@@ -6,12 +6,12 @@ import { AddChatMessage, GetMatch, GetUserRankedMatchCount, SetMatchResult, SetU
 import { FindPlayerPosInMatch } from "./utils/matchUtils.js";
 import { AddRecentlyMatchedPlayers } from "./queManager.js";
 import { SendDisputeMessage, SendNewSuspiciousAction, SuspiciousAction } from "./discordBot/discordBotManager.js";
-import { ResponseData } from "./Responses/ResponseData.js";
-import { casualMatchEndErrors, chatMessageErrors, disputeErrors, gameWinErrors, databaseErrors, resolveErrors, stagePickErrors, stageStrikeErrors, nullErrors, forfeitErrors } from "./Responses/matchErrors.js";
+import { ResponseData } from "./responses/ResponseData.js";
+import { casualMatchEndErrors, chatMessageErrors, disputeErrors, gameWinErrors, databaseErrors, resolveErrors, stagePickErrors, stageStrikeErrors, nullErrors, forfeitErrors } from "./responses/matchErrors.js";
 import { HasBadWords, SanitizeDiscordLog } from "./utils/string.js";
 import { ChooseStageChatMessage, DisputeChatMessage, GamePlayerConfirmMessage, GameWinChatMessage, MatchStartChatMessage, MatchWinChatMessage, ResolveDisputeChatMessage, StrikeStagesChatMessage } from "./public/scripts/utils/systemChatMessages.js";
 import { CheckChatLimitReached, NewMessage } from "./chatRateLimitManager.js";
-import { UpdateRecentMatches } from "./TempDatabaseManagers/matchHistoryManager.js";
+import { UpdateRecentMatches } from "./cache/matchHistoryManager.js";
 
 var matches = [];
 

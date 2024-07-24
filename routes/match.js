@@ -14,8 +14,8 @@ import { CheckIfArray, CheckUserDefined } from '../utils/checkDefined.js';
 
 import { SendSocketMessage, SendEmptySocketMessage } from '../socketManager.js';
 
-import { definitionErrors, nullErrors, userErrors } from '../Responses/requestErrors.js';
-import { ResponseSucceeded, SetResponse } from '../Responses/ResponseData.js';
+import { definitionErrors, nullErrors, userErrors } from '../responses/requestErrors.js';
+import { ResponseSucceeded, SetResponse } from '../responses/ResponseData.js';
 import { chatLoadLimit, ChatMessage, disputeResolveOptions, matchModes, systemId } from '../public/constants/matchData.js';
 import { CheckUserBanned } from '../utils/userUtils.js';
 
