@@ -40,7 +40,7 @@ var ques = [
 
 var matchingPlayersList = [];
 
-var queAvailible = false;
+var queAvailible = (process.env.NODE_ENV === 'production') ? false : true;
 
 export function GetQueAvailible(){return queAvailible}
 export function SetQueAvailible(availible){
