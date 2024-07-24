@@ -30,4 +30,5 @@ export async function UpdateRecentMatches(match){
         unix_created_at: Math.round(match.createdAt / 1000)
     }
     matchHistory.unshift(newMatch);
+    announcements.sort((a, b) => b.unix_created_at - a.unix_created_at);
 }
