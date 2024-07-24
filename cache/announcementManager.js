@@ -22,7 +22,7 @@ export async function AnnouncementManagerSetup(){
         console.log(error);
     }
     for (let i = 0; i < data.length; i++){
-        announcements.push(new Announcement(data[i].id, data[i].title, data[i].description, data[i].icon_src, (data[i].unix_date * 1000), data[i].is_event));
+        announcements.push(new Announcement(data[i].id, data[i].title, data[i].description, data[i].icon_src, data[i].unix_date, data[i].is_event));
     }
 }
 

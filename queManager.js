@@ -213,7 +213,7 @@ export function FindIfPlayerWaitingForReady(playerId){
 //doesnt remove from ready list
 export function RemovePlayerFromQue(playerId, matchMode){
     var que = GetQueFromMatchmode(matchMode);
-    for (let i = 0; i < que.players.length; j++){
+    for (let i = 0; i < que.players.length; i++){
         if (que.players[i].id == playerId){
             que.players.splice(i, 1);
             return true;
