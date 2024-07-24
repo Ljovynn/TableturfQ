@@ -196,7 +196,7 @@ function displayRecentMatches(recentMatchData) {
                 var player1 = getMatchPlayer(players, match.player1_id);
                 var player2 = getMatchPlayer(players, match.player2_id);
                 matchupCell.classList.add('matchup');
-                matchupCell.append(player1[0].username + ' vs ' + player2[0].username);
+                matchupCell.append( sanitizeDisplayName( player1[0].username ) + ' vs ' + sanitizeDisplayName( player2[0].username ) );
 
                 let outcomeCell = document.createElement('div');
                 outcomeCell.classList.add('match-outcome');
@@ -209,11 +209,11 @@ function displayRecentMatches(recentMatchData) {
                         break;
                     case 3:
                         // player 1 win
-                        outcome = player1[0].username + ' Victory';
+                        outcome = sanitizeDisplayName( player1[0].username ) + ' Victory';
                         break;
                     case 4:
                         // player 2 win
-                        outcome = player2[0].username + ' Victory';
+                        outcome = saintizeDisplayName( player2[0].username ) + ' Victory';
                         break;
                     default:
                         outcome = 'No Winner';
@@ -387,3 +387,10 @@ socket.on("connect_error", (err) => {
   
   Context: ${err.context}`);
 });
+
+function sanitizeDisplayName(s) {
+    if ( null == s )
+        return;
+    
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+}

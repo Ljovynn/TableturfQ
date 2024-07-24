@@ -231,8 +231,8 @@ async function setUserInfo() {
         discordId = user.discord_id;
         discordAvatarHash = user.discord_avatar_hash;
 
-        userDisplayName.innerHTML = username;
-        userDiscordName.innerHTML = discordUsername;
+        userDisplayName.innerHTML = sanitizeDisplayName(username);
+        userDiscordName.innerHTML = sanitizeDisplayName(discordUsername);
         var avatarString = '';
         if ( discordAvatarHash ) {
             avatarString = 'https://cdn.discordapp.com/avatars/' + discordId + '/' + discordAvatarHash + '.jpg' + '?size=512';
@@ -618,6 +618,13 @@ function getReadableTime(time) {
     var mDisplay = m > 0 ? m + (m == 1 ? " minute, " : " minutes, ") : "";
     var sDisplay = s > 0 ? s + (s == 1 ? " second" : " seconds") : "";
     return dDisplay + hDisplay + mDisplay + sDisplay;
+}
+
+function sanitizeDisplayName(s) {
+    if ( null == s )
+        return;
+    
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
 }
 
 function validateDisplayName(newDisplayName) {
