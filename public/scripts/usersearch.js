@@ -46,7 +46,7 @@ async function addSearchUser(users) {
             let userLink = document.createElement('a');
             userLink.href = '/profile?playerId=' + user.id;
             userLink.setAttribute('target', '_blank');
-            userLink.append(user.username);
+            userLink.append(sanitizeDisplayName(user.username) );
             nameCell.append(userLink);
 
             row.append(avatarCell);
@@ -89,4 +89,11 @@ function validateSeach(searchValue) {
     }
 
     return true;
+}
+
+function sanitizeDisplayName(s) {
+    if ( null == s )
+        return;
+    
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
 }

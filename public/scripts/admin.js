@@ -80,7 +80,7 @@ async function addDisputedMatch(match, players) {
 
     let playersCell = document.createElement('div');
     playersCell.classList.add('admin-disputed-match-players');
-    let playersString = players[0].username + ' ' + scores[players[0].id] + ' vs ' + players[1].username + ' ' + scores[players[1].id]
+    let playersString = sanitizeDisplayName( players[0].username ) + ' ' + scores[players[0].id] + ' vs ' + sanitizeDisplayName( players[1].username ) + ' ' + scores[players[1].id]
     playersCell.append(playersString);
 
     let actionCell = document.createElement('div');
@@ -137,4 +137,11 @@ async function setListeners() {
 		        }
 	    });
 	}
+}
+
+function sanitizeDisplayName(s) {
+    if ( null == s )
+        return;
+    
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
 }
