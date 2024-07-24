@@ -40,7 +40,7 @@ var ques = [
 
 var matchingPlayersList = [];
 
-var queAvailible = true;
+var queAvailible = false;
 
 export function GetQueAvailible(){return queAvailible}
 export function SetQueAvailible(availible){
