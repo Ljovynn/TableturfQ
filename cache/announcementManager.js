@@ -27,7 +27,7 @@ export async function AnnouncementManagerSetup(){
 }
 
 export function DeletePastAnnouncements(){
-    var cutoffDate = Date.now() + announcementLifeAfterDate;
+    var cutoffDate = Date.now() - announcementLifeAfterDate;
     for (let i = announcements.length - 1; i >= 0; i--){
         if (announcements[i].date >= cutoffDate) continue;
 
