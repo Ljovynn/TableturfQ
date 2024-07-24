@@ -983,7 +983,7 @@ async function gameFinish(winnerId) {
     console.log(players);
 
     if ( players[0].id == winnerId ) {
-        name = sanitizeDisaplyName( players[0].username );
+        name = sanitizeDisplayName( players[0].username );
     } else {
         name = sanitizeDisplayName( players[1].username );
     }
