@@ -31,8 +31,13 @@ closeModalBtn.addEventListener('click', closeModal);
 
 async function setUserInfo() {
     var userInfo = await getUserInfo();
+    console.log(userInfo);
     if ( userInfo.queData ) {
         queuedMatchMode = userInfo.queData.matchMode;
+    } else if ( userInfo.readyData ) {
+        queuedMatchMode = userInfo.readyData.matchMode;
+    } else {
+        // idk error I guess
     }
 }
 
@@ -89,8 +94,8 @@ function secondsToMS(d) {
 
 socket.emit('join', 'userRoom');
 
-socket.on('matchFound', () => {
-    setUserInfo();
+socket.on('matchFound', async () => {
+    await setUserInfo();
     // show modal
     openModal();
 

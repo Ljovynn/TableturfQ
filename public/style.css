@@ -305,6 +305,7 @@ select {
     padding: 5px;
     overflow-y: scroll;
     margin: 10px 0px 15px 0px;
+    scrollbar-color: #363636;
 }
 
 #match-chat-input {
