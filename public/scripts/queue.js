@@ -6,10 +6,10 @@ const competitiveQueue = document.getElementById('competitive-queue');
 const casualQueue = document.getElementById('casual-queue');
 const casualUsername = document.getElementById('casual-username');
 const queueMatchmaking = document.getElementById('queue-matchmaking');
-const matchMakingReady = document.getElementById('ranked-match-ready');
+const matchMakingReady = document.getElementById('ranked-match-ready-non-modal');
 const queueTimer = document.getElementById('queue-timer');
 const queueInfo = document.getElementById('queue-info');
-const readyCountdown = document.getElementById('ranked-match-ready-countdown');
+const readyCountdown = document.getElementById('ranked-match-ready-countdown-non-modal');
 const recentMatches = document.getElementById('recent-matches');
 const recentMatchesList = document.getElementById('recent-matches-list');
 
@@ -17,7 +17,7 @@ const recentMatchesList = document.getElementById('recent-matches-list');
 const joinCompetitive = document.getElementById('join-competitive-queue');
 const joinCasual = document.getElementById('join-casual-queue');
 const queueButtons = document.getElementsByClassName('queue-button');
-const readyButton = document.getElementById('ranked-match-ready-button');
+const readyButton = document.getElementById('ranked-match-ready-button-non-modal');
 const leaveButton = document.getElementById('leave-queue-button');
 
 const socket = io();

@@ -15,7 +15,7 @@
             <div id="global-match-ready">
                 <p id="ranked-match-found-message">Match found! Please ready up.</p>
                 <p id="ranked-match-ready-countdown">00:20</p>
-                <button id="ranked-match-ready-button" value="ready">Ready!</button>
+                <div id="ranked-match-ready-button" class="button" value="ready">Ready!</div>
             </div>
         </section>
         <section id="qualifier-modal" class="modal hidden">
@@ -78,7 +78,7 @@
                     <p id="player1-rank-label"></p>
                   </div>
                   <p class="score-container">Score: <span id="player1-score" class="player-score" player-id="0">0</span></p>
-                  <button id="player1-victory-button" class="player-victory-button" value="player1">Mark as winner</button>
+                  <div id="player1-victory-button" class="button player-victory-button" value="player1">Mark as winner</div>
                   <div id="admin-player1">
                     <p id="admin-user-player1-details"></p>
                     <div id="admin-ban-player1-content">
@@ -89,10 +89,10 @@
                             <option value="604800000">1 Week</option>
                             <option value="2592000000">1 Month</option>
                         </select>
-                        <button id="admin-ban-player1-button">Ban User</button>
+                        <div id="admin-ban-player1-button" class="button">Ban User</div>
                     </div>
                     <div id="admin-unban-player1-content">
-                        <button id="admin-unban-player1-button">Unban User</button>
+                        <div id="admin-unban-player1-button" class="button">Unban User</div>
                     </div>
                 </div>
                 </div>
@@ -105,7 +105,7 @@
                     <p id="player2-rank-label"></p>
                   </div>
                   <p class="score-container">Score: <span id="player2-score" class="player-score" player-id="0">0</span></p>
-                  <button id="player2-victory-button" class="player-victory-button" value="player2">Mark as winner</button>
+                  <div id="player2-victory-button" class="button player-victory-button" value="player2">Mark as winner</div>
                   <div id="admin-player2">
                     <p id="admin-user-ban-details"></p>
                     <div id="admin-ban-player2-content">
@@ -116,10 +116,10 @@
                             <option value="604800000">1 Week</option>
                             <option value="2592000000">1 Month</option>
                         </select>
-                        <button id="admin-ban-player2-button">Ban User</button>
+                        <div id="admin-ban-player2-button" class="button">Ban User</div>
                     </div>
                     <div id="admin-unban-player2-content">
-                        <button id="admin-unban-player2-button">Unban User</button>
+                        <div id="admin-unban-player2-button" class="button">Unban User</div>
                     </div>
                 </div>
                 </div>
@@ -128,7 +128,9 @@
             <div id="match-chat-content">
                 <div id="match-chat-log"></div>
                 <form id="match-chat-form">
-                    <input type="text" id="match-chat-input" maxlength="256" /><input type="submit" id="match-chat-button" value="Send" />
+                    <input type="text" id="match-chat-input" name="match-chat-input" maxlength="256" />
+                    <label class="button" for="match-chat-input">Send</label>
+                    <input type="submit" id="match-chat-button" class="input-button" value="Send" />
                 </form>
             </div>
             <div id="admin-content">
@@ -143,17 +145,18 @@
                     <option value="6">Player 1 Wins Match</option>
                     <option value="7">Player 2 Wins Match</option>
                 </select>
-                <button id="admin-resolve-dispute">Resolve Dispute</button>
+                <div id="admin-resolve-dispute" class="button">Resolve Dispute</div>
             </div>
             <div id="player-raise-dispute">
                 <a id="player-need-help">Need Help?</a>
-                <button id="player-raise-dispute-button">Dispute Match</button>
+                <div id="player-raise-dispute-button" class="button">Dispute Match</div>
             </div>
             <div id="player-resolve-content">
-                <button id="player-resolve-dispute">Resolve Dispute</button>
+                <div id="player-resolve-dispute" class="button">Resolve Dispute</div>
             </div>
             <p id="playing-stage"></p>
-            <div id="stages-list" class="stages-list">
+            <div id="striking content">
+                <div id="stages-list" class="stages-list">
                     <div id="mainStreet" stage-value="1" class="stage stage-stricken stage-unselectable">
                         <h3>Main Street</h3>
                         <img  src="./assets/images/Main-Street-Icon.png" />
@@ -223,14 +226,15 @@
                 <div id="strike-content">
                     <p id="strike-info">1 stage strike remaining.</p>
                     <p id="select-map-message">Please select the stage to play on.</p>
-                    <button id="confirm-map-selection">Confirm Strikes</button>
+                    <div id="confirm-map-selection" class="button">Confirm Strikes</div>
                 </div>
+            </div>
             <div id="play-game">
                 <p id="game-info"></p>
                 <p></p>
             </div>
-            <a id="requeue-button" href="/queue"><button>Queue Again</button></a>
-            <button id="leave-match-button">Leave Match</button>
+            <a id="requeue-button" href="/queue"><div class="button">Queue Again</div></a>
+            <div id="leave-match-button" class="button">Leave Match</div>
         </div>
         
     </main>

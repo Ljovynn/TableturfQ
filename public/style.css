@@ -25,21 +25,53 @@ p, a, div, span, h1, h3, h4 {
 
 a {
     text-decoration: none;
-    /*color: #ff7800;*/
+    color: #dbc639;
 }
 
 a:hover {
-    color: black;
-    text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
+    color: #6858c2;
 }
 
 h3 {
+}
+
+.button {
+    width: 100px;
+    padding: 10px;
+    border-radius: 3px;
+    background: #dbc639;
+    margin: auto;
+}
+
+.button:hover {
+    background: #6858c2;
+    cursor: pointer;
+}
+
+.input-button {
+    display: none;
+}
+
+label {
+    display: inline-block;
 }
 
 .main-content {
     width: 50%;
     margin: auto;
 }
+
+select {
+    margin-bottom: 10px;
+    border-radius: 3px;
+    background: #363636;
+    height: 25px;
+    width: 100px;
+    color: white;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+}
+
+/**** HEADER MENU ****/
 
 #site-header-container {
     width: 100%;
@@ -87,6 +119,10 @@ h3 {
     cursor: pointer;
 }
 
+.header-button a {
+    color: white;
+}
+
 .header-button a:hover {
     color: white;
     text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
@@ -126,7 +162,7 @@ h3 {
     display: none;
     width: 75%;
     margin: auto;
-    outline: 2px solid black;
+    outline: 2px solid #6858c2;
     padding: 10px;
 }
 
@@ -147,7 +183,7 @@ h3 {
 }
 
 .upcoming-announcement {
-    outline: 2px solid black;
+    outline: 2px solid #6858c2;
     padding: 10px;
     margin: 10px;
     display: inline-block;
@@ -178,10 +214,10 @@ h3 {
 }
 
 #recent-matches-list {
-    outline: 2px solid black;
+    outline: 2px solid #6858c2;
 }
 
-#ranked-match-ready {
+#ranked-match-ready-non-modal {
     display: none;
 }
 
@@ -198,7 +234,7 @@ h3 {
 .player-info {
     display: inline-block;
     padding: 20px;
-    border: 2px solid black;
+    border: 2px solid #6858c2;
     margin: 10px 10px 20px 10px;
     width: 200px;
 }
@@ -217,7 +253,7 @@ h3 {
 
 /* Hover effect when link attribute is set */
 #player1-in-game-name[href]:hover, #player2-in-game-name[href]:hover {
-    color: black;
+    color: #6858c2;
     text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
 }
 
@@ -246,7 +282,7 @@ h3 {
 
 #match-chat-log {
     height: 100px;
-    background: white;
+    background: #363636;
     padding: 5px;
     overflow-y: scroll;
     margin: 10px 0px 15px 0px;
@@ -254,27 +290,32 @@ h3 {
 
 #match-chat-input {
     width: 90%;
+    height: 25px;
+    border-radius: 3px;
+    margin-bottom: 10px;
+    background: #363636;
+    color: white;
 }
 
 .match-chat-message {
     text-align: left;
-    text-shadow: none;
-    color: black;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    color: white;
     margin: 0;
     word-wrap: break-word;
 }
 
 .match-chat-player {
     text-align: left;
-    text-shadow: none;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
 }
 
 .match-chat-current-player {
-    color: orange;
+    color: #dbc639;
 }
 
 .match-chat-opponent-player {
-    color: black;
+    color: #6858c2;
 }
 
 .match-chat-system {
@@ -325,14 +366,14 @@ h3 {
 .stage {
     width: 160px;
     height: 225px;
-    border: 2px solid black;
+    border: 2px solid #6858c2;
     margin: 10px;
     display: inline-block;
 }
 
 .stage-selectable:hover {
     cursor: pointer;
-    border: 2px solid white;
+    border: 2px solid #dbc639;
 }
 
 .stage-unselectable {
@@ -395,6 +436,14 @@ h3 {
 
 #qualifier-image {
     width: 30px;
+}
+
+#confirm-map-selection {
+    width: 150px;
+}
+
+#leave-match-button {
+    width: 150px;
 }
 
 /**** USER PROFILE ****/
@@ -478,12 +527,12 @@ h3 {
     display: block;
     width: 80%;
     margin: auto;
-    outline: 2px solid black;
+    outline: 2px solid #6858c2;
 }
 
 .match-row {
     display: flex;
-    outline: 1px solid black;
+    outline: 1px solid #6858c2;
 }
 
 .match-row div {
@@ -538,7 +587,7 @@ h3 {
     display: block;
     width: 50%;
     margin: auto;
-    outline: 2px solid black;
+    outline: 2px solid #6858c2;
 }
 
 
@@ -548,12 +597,12 @@ h3 {
     margin: auto;
     margin-top: 15px;
     margin-bottom: 20px;
-    outline: 2px solid black;
+    outline: 2px solid #6858c2;
 }
 
 .leaderboard-row {
     display: flex;
-    outline: 1px solid black;
+    outline: 1px solid #6858c2;
 }
 
 .leaderboard-row div {
@@ -588,7 +637,7 @@ h3 {
 .user-search-row {
     display: inline-block;
     padding: 20px;
-    border: 2px solid black;
+    border: 2px solid #6858c2;
     margin: 10px 10px 20px 10px;
     width: 200px;
 }
@@ -606,6 +655,26 @@ h3 {
 #info-container {
     width: 65%;
     margin: auto;
+}
+
+#language-section .button, #section-tabs .button {
+    display: inline-block;
+    margin: 0;
+}
+
+/* temp */
+#info-japanese {
+    cursor: auto;
+    background: grey;
+}
+
+#section-tabs .button {
+    width: 150px;
+}
+
+#section-tabs .active {
+    cursor: auto;
+    background: grey;
 }
 
 .content-section {
@@ -719,12 +788,12 @@ h3 {
     display: block;
     width: 50%;
     margin: auto;
-    outline: 2px solid black;
+    outline: 2px solid #6858c2;
 }
 
 .disputed-match-row {
     display: flex;
-    outline: 1px solid black;
+    outline: 1px solid #6858c2;
 }
 
 .admin-disputed-match-players {

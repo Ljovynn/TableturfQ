@@ -14,8 +14,6 @@ var queuedMatchMode;
 var ready = false;
 var readyUp;
 
-setUserInfo();
-
 readyButton.addEventListener('click', async (e) => {
     console.log('User is ready for competitive match.');
     readyButton.style.display = 'none';
@@ -92,6 +90,7 @@ function secondsToMS(d) {
 socket.emit('join', 'userRoom');
 
 socket.on('matchFound', () => {
+    setUserInfo();
     // show modal
     openModal();
 
