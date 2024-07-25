@@ -6,6 +6,36 @@
     <link rel="stylesheet" href="./style.css">
   </head>
   <body class="body">
+    <header id="site-header">
+        <div id="site-header-container">
+            <div id="site-header-home-button">
+                <a id="site-header-logo" href="/"><img src="./assets/images/chumper.png" /></a>
+            </div>
+            <div id="site-header-page-links">
+                <div class="header-button">
+                    <a href="/info">Rules and Info</a>
+                </div>
+                <div id="index-profile-div" class="header-button index-logged-in-link">
+                    <a id="profile-link" href="/profile">My Profile</a>
+                </div>
+                <div class="header-button">
+                    <a href="/leaderboard">Leaderboard</a>
+                </div>
+                <div class="header-button">
+                    <a href="/usersearch">User Search</a>
+                </div>
+                <div class="header-button index-logged-in-link">
+                    <a href="/queue">Queue</a>
+                </div>
+                <div id="index-match-div" class="header-button">
+                    <a id="index-match-link" href="">Rejoin Game</a>
+                </div>
+                <div id="header-logout-div" class="header-button index-logged-in-link">
+                    <a id="header-logout-button" href="">Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
     <main class="main">
       <p id="admin-loading">Loading...</p>
       <div id="admin-disputed-matches">
@@ -24,4 +54,5 @@
   <!--<script src="https://tableturfq.up.railway.app/socket.io/socket.io.js"></script>-->
   <script src="/socket.io/socket.io.js"></script>
   <script type="module" src="./scripts/admin.js"></script>
+  <script type="module" src="./scripts/global-header.js"></script>
 </html>

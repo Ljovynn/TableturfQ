@@ -8,36 +8,64 @@
   </head>
   <body class="body">
     <div class="modal-container">
-            <section id="ready-modal" class="modal hidden">
-                <div class="flex">
-                    <button class="btn-close">⨉</button>
+        <section id="ready-modal" class="modal hidden">
+            <div class="flex">
+                <button class="btn-close">⨉</button>
+            </div>
+            <div id="global-match-ready">
+                <p id="ranked-match-found-message">Match found! Please ready up.</p>
+                <p id="ranked-match-ready-countdown">00:20</p>
+                <button id="ranked-match-ready-button" value="ready">Ready!</button>
+            </div>
+        </section>
+        <section id="qualifier-modal" class="modal hidden">
+            <div class="flex">
+                <button id="qualifier-close" class="btn-close">⨉</button>
+            </div>
+            <div id="qualifier-content">
+                <p id="qualifier-message">Congratulations you have qualified as: <img id="qualifier-image" /><span id="qualifier-name"></span>!</p>
+            </div>
+        </section>
+    </div>
+    <div class="overlay hidden"></div>
+    <header id="site-header">
+        <div id="site-header-container">
+            <div id="site-header-home-button">
+                <a id="site-header-logo" href="/"><img src="./assets/images/chumper.png" /></a>
+            </div>
+            <div id="site-header-page-links">
+                <div class="header-button">
+                    <a href="/info">Rules and Info</a>
                 </div>
-                <div id="global-match-ready">
-                    <p id="ranked-match-found-message">Match found! Please ready up.</p>
-                    <p id="ranked-match-ready-countdown">00:20</p>
-                    <button id="ranked-match-ready-button" value="ready">Ready!</button>
+                <div id="index-profile-div" class="header-button index-logged-in-link">
+                    <a id="profile-link" href="/profile">My Profile</a>
                 </div>
-            </section>
-            <section id="qualifier-modal" class="modal hidden">
-                <div class="flex">
-                    <button id="qualifier-close" class="btn-close">⨉</button>
+                <div class="header-button">
+                    <a href="/leaderboard">Leaderboard</a>
                 </div>
-                <div id="qualifier-content">
-                    <p id="qualifier-message">Congratulations you have qualified as: <img id="qualifier-image" /><span id="qualifier-name"></span>!</p>
+                <div class="header-button">
+                    <a href="/usersearch">User Search</a>
                 </div>
-            </section>
+                <div class="header-button index-logged-in-link">
+                    <a href="/queue">Queue</a>
+                </div>
+                <div id="index-match-div" class="header-button">
+                    <a id="index-match-link" href="">Rejoin Game</a>
+                </div>
+                <div id="header-logout-div" class="header-button index-logged-in-link">
+                    <a id="header-logout-button" href="">Logout</a>
+                </div>
+            </div>
         </div>
-        <div class="overlay hidden"></div>
+    </header>
     <main class="main">
-        <header>
-            <h1><a href="/">TableturfQ</a></h1>
-        </header>
         <p id="loading-message">Loading...</p>
         <div id="match-container">
             <div id="match-info">
                 <div id="ruleset">
                     <p><i class="fa-solid fa-gamepad"></i>&nbsp;: <span id="set-length"></span></p>
                     <p><i class="fa-solid fa-stopwatch"></i>&nbsp;: <span id="timer-duration"></span></p>
+                    <p><i class="fa-solid fa-water-ladder"></i>&nbsp;: <span id="pool-code">TTBQ</span></p>
                 </div>
             </div>
             <div id="player-content">
@@ -204,6 +232,7 @@
             <a id="requeue-button" href="/queue"><button>Queue Again</button></a>
             <button id="leave-match-button">Leave Match</button>
         </div>
+        
     </main>
   </body>
   <script type="text/javascript" src="./scripts/dataPOST.js"></script>
@@ -211,5 +240,6 @@
   <!--<script src="https://tableturfq.up.railway.app/socket.io/socket.io.js"></script>-->
   <script src="/socket.io/socket.io.js"></script>
   <script type="module" src="./scripts/game.js"></script>
+  <script type="module" src="./scripts/global-header.js"></script>
   <script type="module" src="./scripts/global-queue.js"></script>
 </html>
