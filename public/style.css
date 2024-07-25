@@ -61,6 +61,14 @@ label {
     margin: auto;
 }
 
+input[type="text"] {
+    height: 25px;
+    border-radius: 3px;
+    margin-bottom: 10px;
+    background: #363636;
+    color: white;
+}
+
 select {
     margin-bottom: 10px;
     border-radius: 3px;
@@ -290,11 +298,6 @@ select {
 
 #match-chat-input {
     width: 90%;
-    height: 25px;
-    border-radius: 3px;
-    margin-bottom: 10px;
-    background: #363636;
-    color: white;
 }
 
 .match-chat-message {
@@ -468,6 +471,7 @@ select {
     display: none;
 }
 
+
 #user-profile-edit-name:hover {
     cursor: pointer;
 }
@@ -478,6 +482,11 @@ select {
 
 #user-profile-edit-name-form.editing {
     display: block;
+}
+
+#user-profile-name-submit {
+    width: 150px;
+    margin: 10px auto;
 }
 
 #user-profile-edit-close {
@@ -546,6 +555,10 @@ select {
 
 .rating-negative {
     color: red;
+}
+
+#user-rating-graph-options {
+    margin-bottom: 10px;
 }
 
 #user-graph text {
