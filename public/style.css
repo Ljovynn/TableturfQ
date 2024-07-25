@@ -40,7 +40,7 @@ h3 {
     padding: 10px;
     border-radius: 3px;
     background: #dbc639;
-    margin: auto;
+    margin: 5px auto;
 }
 
 .button:hover {
@@ -92,7 +92,7 @@ select {
 
 #site-header-home-button {
     width: 50px;
-    padding-top: 5px;
+    padding-top: 3px;
     padding-bottom: 5px;
     float: left;
 }
