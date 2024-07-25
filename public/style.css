@@ -402,6 +402,10 @@ select {
 
 }
 
+.stage-stricken {
+    border: 2px solid grey;
+}
+
 .stage-stricken h3, .stage-stricken img {
     opacity: 0.5;
 }
