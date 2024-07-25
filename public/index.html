@@ -17,7 +17,7 @@
                 <div id="global-match-ready">
                     <p id="ranked-match-found-message">Match found! Please ready up.</p>
                     <p id="ranked-match-ready-countdown">00:20</p>
-                    <button id="ranked-match-ready-button" value="ready">Ready!</button>
+                    <div id="ranked-match-ready-button" class="button" value="ready">Ready!</div>
                 </div>
             </section>
         </div>
@@ -28,39 +28,41 @@
                     <a id="site-header-logo" href="/"><img src="./assets/images/chumper.png" /></a>
                 </div>
                 <div id="site-header-page-links">
-                    <div class="header-button">
-                        <a href="/info">Rules and Info</a>
-                    </div>
-                    <div id="index-profile-div" class="header-button index-logged-in-link">
-                        <a id="profile-link" href="/profile">My Profile</a>
-                    </div>
-                    <div class="header-button">
-                        <a href="/leaderboard">Leaderboard</a>
-                    </div>
-                    <div class="header-button">
-                        <a href="/usersearch">User Search</a>
-                    </div>
-                    <div class="header-button index-logged-in-link">
-                        <a href="/queue">Queue</a>
-                    </div>
-                    <div id="index-match-div" class="header-button">
-                        <a id="index-match-link" href="">Rejoin Game</a>
-                    </div>
-                    <div id="header-logout-div" class="header-button index-logged-in-link">
-                        <a id="header-logout-button" href="">Logout</a>
-                    </div>
+                    <a href="/info">
+                        <div class="header-button">Rules and Info</div>
+                    </a>
+                    <a id="profile-link" href="/profile">
+                    <div id="index-profile-div" class="header-button index-logged-in-link">My Profile</div>
+                    </a>
+                    <a href="/leaderboard">
+                        <div class="header-button">Leaderboard</div>
+                    </a>
+                    <a href="/usersearch">
+                    <div class="header-button">User Search</div>
+                    </a>
+                    <a href="/queue">
+                        <div class="header-button index-logged-in-link">Queue</div>
+                    </a>
+                    <a id="index-match-link" href="">
+                        <div id="index-match-div" class="header-button">Rejoin Game</div>
+                    </a>
+                    <a id="header-logout-button" href="">
+                        <div id="header-logout-div" class="header-button index-logged-in-link">Logout</div>
+                    </a>
                 </div>
             </div>
         </header>
         <main class="main">
+            <h3>TableturfQ</h3>
             <div id="login-content">
-                <div id="user-login" class = "logInButtonDiv">
-                    <p><a href="https://discord.com/oauth2/authorize?client_id=1226952880569847960&response_type=code&redirect_uri=https%3A%2F%2Fwww.tableturfq.com%2Fapi%2Fauth%2Fdiscord%2Fredirect&scope=identify"><button id="logIn" style="font-weight: bold;">Log in</button></a></p>
-                </div>
+                <a id="login-button" href="https://discord.com/oauth2/authorize?client_id=1226952880569847960&response_type=code&redirect_uri=https%3A%2F%2Fwww.tableturfq.com%2Fapi%2Fauth%2Fdiscord%2Fredirect&scope=identify">
+                    <div id="user-login" class = "logInButtonDiv button">Log In</div>
+                </a>
                 <div id="guest-login">
                     <p>If you'd like to play as a guest, please enter your username. You will only be able to play casual matches.</p>
                     <input type="text" id="guest-login-name" placeholder="Enter username" />
-                    <input type="submit" id="guest-login-button" />
+                    <label id="guest-login-button" class="button" for="guest-login-button">Submit</label>
+                    <input type="submit" id="guest-login-button" class="input-button" name="guest-login-button"/>
                 </div>
             </div>
             <div id="announcements-content">

@@ -62,7 +62,7 @@ label {
 }
 
 input[type="text"] {
-    height: 25px;
+    height: 35px;
     border-radius: 3px;
     margin-bottom: 10px;
     background: #363636;
@@ -73,7 +73,7 @@ select {
     margin-bottom: 10px;
     border-radius: 3px;
     background: #363636;
-    height: 25px;
+    height: 40px;
     width: 100px;
     color: white;
     text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
@@ -99,6 +99,12 @@ select {
 
 #site-header-logo img {
     width: 40px;
+    border: 2px solid #6858c2;
+    border-radius: 50%;
+}
+
+#site-header-logo img:hover {
+    opacity: 0.5;
 }
 
 #site-header-page-links {
@@ -155,11 +161,16 @@ select {
     margin: auto;
 }
 
-#user-login, #guest-login {
+#user-login {
     display: block;
-    width: 50%;
-    margin: auto;
+    width: 100px;
+    margin: 10px auto;
 }
+
+#guest-login {
+    width: auto;
+}
+
 
 #announcements-content {
     width: 50%;
