@@ -438,6 +438,7 @@ select {
 
 .player-victory-button {
     display: none;
+    width: 150px;
 }
 
 #requeue-button {
