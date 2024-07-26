@@ -5,6 +5,10 @@ const matchDiv = document.getElementById('index-match-div');
 const matchLink = document.getElementById('index-match-link');
 const logOut = document.getElementById('header-logout-div');
 
+// Mobile
+const hamburger = document.getElementById('site-header-hamburger');
+const pageLinks = document.getElementById('site-header-page-links');
+
 var userInfo;
 
 setUserInfo();
@@ -16,6 +20,11 @@ logOut.addEventListener('click', async (e) => {
     }
 });
 
+hamburger.addEventListener('click', async(e) => {
+    hamburger.classList.toggle('active');
+    pageLinks.classList.toggle('header-expanded')
+});
+
 async function setUserInfo() {
     userInfo = await getUserInfo();
     console.log(userInfo)
@@ -23,7 +32,7 @@ async function setUserInfo() {
         setLoggedInLinks();
     }
 
-    if ( userInfo.matchId ) {
+    if ( userInfo.matchId != null ) {
         setMatchLink(userInfo.matchId.id);
     }
 }
@@ -48,5 +57,5 @@ function setLoggedInLinks() {
 
 function setMatchLink(matchId) {
     matchLink.setAttribute('href', '/game?matchId=' + matchId);
-    matchDiv.style.display = 'inline-block';
+    matchLink.classList.remove('not-in-game');
 }
