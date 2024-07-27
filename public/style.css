@@ -113,6 +113,7 @@ select {
 
 #site-header-page-links {
     margin: auto;
+    height: 50px;
 }
 
 #site-header-profile-links {
@@ -129,7 +130,7 @@ select {
     width: 120px;
     display: inline-block;
     padding-top: 15px;
-    padding-bottom: 15px;
+    padding-bottom: 17px;
 }
 
 .header-button:hover {
@@ -605,6 +606,7 @@ select {
 
     #site-header-page-links {
         display: none;
+        height: auto;
     }
 
     #site-header-logo {
@@ -629,6 +631,7 @@ select {
 
     #site-header-home-button {
         float: none;
+        height: auto;
     }
 
     .mobile-home {
