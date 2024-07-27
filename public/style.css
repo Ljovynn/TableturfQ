@@ -654,6 +654,14 @@ select {
     #match-chat-content {
         width: 90%;
     }
+
+    #user-match-info {
+        width: 90%;
+    }
+
+    #user-rating-graph {
+        width: 90%;
+    }
 }
 
 /**** LEADERBOARD STYLES ****/
