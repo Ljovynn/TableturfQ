@@ -643,6 +643,10 @@ select {
         width: 100%;
     }
 
+    .header-button.not-in-game {
+        display: none;
+    }
+
     #user-match-history {
         width: 100%;
     }
