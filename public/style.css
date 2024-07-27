@@ -597,77 +597,6 @@ select {
     margin-top: 20px;
 }
 
-/**** MOBILE STLYES ****/
-@media only screen and (max-width: 600px) {
-    .header-expanded {
-        height: 100%;
-        display: block;
-    }
-
-    #site-header-page-links {
-        display: none;
-        height: auto;
-    }
-
-    #site-header-logo {
-        display: none;
-    }
-
-    #site-header-hamburger {
-        width: 50px;
-        padding-top: 10px;
-        padding-bottom: 5px;
-        color: white;
-        display: block;
-    }
-
-    #site-header-hamburger.active {
-        color: #6858c2;
-    }
-
-    #site-header-page-links.header-expanded {
-        display: block;
-    }
-
-    #site-header-home-button {
-        float: none;
-        height: auto;
-    }
-
-    .mobile-home {
-        display: block;
-    }
-
-    .header-button {
-        display: block;
-        width: 100%;
-    }
-
-    .header-button.not-in-game {
-        display: none;
-    }
-
-    #user-match-history {
-        width: 100%;
-    }
-
-    .match-row {
-        display: block;
-    }
-
-    #match-chat-content {
-        width: 90%;
-    }
-
-    #user-match-info {
-        width: 90%;
-    }
-
-    #user-rating-graph {
-        width: 90%;
-    }
-}
-
 /**** LEADERBOARD STYLES ****/
 
 #leaderboard-header {
@@ -866,18 +795,6 @@ select {
     display: none;
 }
 
-/**** MOBILE STLYES ****/
-@media only screen and (max-width: 600px) {
-    #leaderboard {
-        width: 100%;
-    }
-
-    .leaderboard-row {
-        display: block;
-    }
-
-}
-
 /**** ADMIN STYLES ****/
 #admin-disputed-matches {
     display: none;
@@ -934,4 +851,91 @@ select {
 
 #admin-unban-player1-content, #admin-unban-player2-content {
     display: none;
+}
+
+/**** MOBILE STLYES ****/
+@media only screen and (max-width: 600px) {
+    .header-expanded {
+        height: 100%;
+        display: block;
+    }
+
+    #site-header-page-links {
+        display: none;
+        height: auto;
+    }
+
+    #site-header-logo {
+        display: none;
+    }
+
+    #site-header-hamburger {
+        width: 50px;
+        padding-top: 10px;
+        padding-bottom: 5px;
+        color: white;
+        display: block;
+    }
+
+    #site-header-hamburger.active {
+        color: #6858c2;
+    }
+
+    #site-header-page-links.header-expanded {
+        display: block;
+    }
+
+    #site-header-home-button {
+        float: none;
+        height: auto;
+    }
+
+    .mobile-home {
+        display: block;
+    }
+
+    .header-button {
+        display: block;
+        width: 100%;
+    }
+
+    .index-logged-in-link {
+        display: none;
+    }
+
+    .header-button.not-in-game {
+        display: none;
+    }
+
+    #section-tabs .button {
+        margin: 10px 0;
+    }
+
+    #user-match-history {
+        width: 100%;
+    }
+
+    .match-row {
+        display: block;
+    }
+
+    #match-chat-content {
+        width: 90%;
+    }
+
+    #user-match-info {
+        width: 90%;
+    }
+
+    #user-rating-graph {
+        width: 90%;
+    }
+
+    #leaderboard {
+        width: 100%;
+    }
+
+    .leaderboard-row {
+        display: block;
+    }
 }

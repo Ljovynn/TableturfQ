@@ -3,7 +3,7 @@ const profileDiv = document.getElementById('index-profile-div');
 const profileLink = document.getElementById('profile-link');
 const matchDiv = document.getElementById('index-match-div');
 const matchLink = document.getElementById('index-match-link');
-const logOut = document.getElementById('header-logout-div');
+const logOut = document.getElementById('header-logout-button');
 
 // Mobile
 const hamburger = document.getElementById('site-header-hamburger');
@@ -49,7 +49,7 @@ function setLoggedInLinks() {
     }
 
     if ( !userInfo.user.discord_id ) {
-        profileDiv.style.display = 'none';
+        profileLink.style.display = 'none';
     } else {
         profileLink.href = '/profile?playerId=' + userInfo.user.id;
     }
