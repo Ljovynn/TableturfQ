@@ -12,6 +12,7 @@ const queueInfo = document.getElementById('queue-info');
 const readyCountdown = document.getElementById('ranked-match-ready-countdown-non-modal');
 const recentMatches = document.getElementById('recent-matches');
 const recentMatchesList = document.getElementById('recent-matches-list');
+const modal = document.getElementById("ready-modal");
 
 // Interactable Elements
 const joinCompetitive = document.getElementById('join-competitive-queue');
@@ -50,7 +51,6 @@ joinCompetitive.addEventListener('click', async (e) => {
             queueButton.style.display = 'none';
         }
         // Do queue frontend stuff
-        alert('Successfully joined the queue!');
         timer = 0;
         queueInfo.style.display = 'block';
         mainTimer = window.setInterval(updateTimer, 1000);
@@ -75,7 +75,6 @@ joinCasual.addEventListener('click', async (e) => {
             queueButton.style.display = 'none';
         }
         // Do queue frontend stuff
-        alert('Successfully joined the queue!');
         timer = 0;
         queueInfo.style.display = 'block';
         mainTimer = window.setInterval(updateTimer, 1000);
@@ -110,7 +109,6 @@ leaveButton.addEventListener('click', async (e) => {
         }
         clearTimer(mainTimer);
         queueInfo.style.display = 'none';
-        alert('You have successfully left the queue');
         timer = 0;
         queueTimer.innerHTML = 'Finding Match... 00:00:00'; 
     }
@@ -271,10 +269,20 @@ function countdownTimer() {
     readyCountdown.innerHTML = time;
     if ( countdown == 0 ) {
         clearTimer(readyUp);
-        if ( !ready ) {
-            alert('You have been removed from the queue due to inactivity.');
-        } else {
-            alert('Your opponent did not ready up for the match and it has been canceled.');
+        if ( modal.offsetTop == 0 ) {
+            console.log('hidden modal');
+            // Make the logic work if they clicked ready from the modal
+            if ( readyButton.classList.contains('modal-readied') ) {
+                console.log('readied on modal');
+                ready = true;
+                readyButton.classList.remove('modal-readied');
+            }
+
+            if ( !ready ) {
+                alert('You have been removed from the queue due to inactivity.');
+            } else {
+                alert('Your opponent did not ready up for the match and it has been canceled.');
+            }
         }
         matchMakingReady.style.display = 'none';
         for ( let queueButton of queueButtons ) {
