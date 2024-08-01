@@ -1258,3 +1258,15 @@ socket.on("connect_error", (err) => {
   
   Context: ${err.context}`);
 });
+
+socket.on("disconnect", (reason, details) => {
+  alert(`Socket disconnect. This shouldnt be pushed to prod!
+
+  Reason: ${reason}
+  
+  Message: ${details.message}
+  
+  Decription: ${details.description}
+  
+  Context: ${details.context}`);
+});
