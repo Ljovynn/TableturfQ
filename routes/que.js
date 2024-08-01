@@ -75,7 +75,7 @@ router.post("/PlayerReady", async (req, res) => {
     }
 });
 
-router.get('/GetMatchmakingState', async (req, res) => {
+router.get('/GetMatchmakingStatus', async (req, res) => {
     try {
         var data = GetQueAvailible();
 
