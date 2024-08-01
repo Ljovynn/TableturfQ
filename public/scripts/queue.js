@@ -280,7 +280,12 @@ function displayRecentMatches(recentMatchData) {
                 matchPlayer2.append( player2Name );
 
                 matchupCell.append( matchPlayer1 );
-                matchupCell.append('vs');
+
+                let vsImg = document.createElement('img');
+                vsImg.classList.add('recent-matchup-vs');
+                vsImg.src = 'https://comicvine.gamespot.com/a/uploads/original/11136/111361078/6676820-vs.png';
+                //matchupCell.append('vs');
+                matchupCell.append(vsImg);
                 matchupCell.append( matchPlayer2 );
 
                 /*let outcomeCell = document.createElement('div');

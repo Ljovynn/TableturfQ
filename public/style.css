@@ -633,6 +633,10 @@ div.recent-matchup-name {
     color: green;
 }
 
+.recent-matchup-vs {
+    width: 25px;
+}
+
 #ranked-match-ready-non-modal {
     display: none;
 }

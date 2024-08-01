@@ -283,56 +283,116 @@ async function setMatchHistory() {
 
     if ( matches ) {
         for ( let match of matches ) {
-            console.log(match);
-            let row = document.createElement('div');
-            row.classList.add('match-row');
+            try {
+                let row = document.createElement('div');
+                row.classList.add('match-row');
 
-            let dateCell = document.createElement('div');
-            dateCell.classList.add('match-date');
-            var matchDate = new Date( match.unix_created_at * 1000 ).toLocaleDateString('en-us', { year:"numeric", month:"short", day:"numeric"}) ;
-            dateCell.append(matchDate);
+                let dateCell = document.createElement('div');
+                dateCell.classList.add('match-date');
+                var matchDate = match.unix_created_at;
+                matchDate = new Date(matchDate);
+                matchDate = matchDate.getTime();
+                var timeNow = Math.floor(Date.now() / 1000);
+                var timeElapsed = timeNow - matchDate;
+                var readableTime = getReadableMatchTime(timeElapsed);
 
-            let matchupCell = document.createElement('div');
-           // var players = await getMatchUsers( [match.player1_id, match.player2_id] );
-            var player1 = getMatchPlayer(matchUsers, match.player1_id);
-            var player2 = getMatchPlayer(matchUsers, match.player2_id);
-            matchupCell.classList.add('matchup');
-            matchupCell.append(player1[0].username + ' vs ' + player2[0].username);
+                dateCell.append(readableTime);
 
-            let outcomeCell = document.createElement('div');
-            outcomeCell.classList.add('match-outcome');
-            let outcome = '';
-            switch ( match.result ) {
-                case 0:
-                case 1:
-                case 2:
-                    outcome = 'In Game';
-                    break;
-                case 3:
-                    // player 1 win
-                    if ( player1[0].id == userId )
-                        outcome = 'Victory';
-                    else
-                        outcome = 'Defeat';
-                    break;
-                case 4:
-                    // player 2 win
-                    if ( player2[0].id == userId )
-                        outcome = 'Victory';
-                    else
-                        outcome = 'Defeat';
-                    break;
-                default:
-                    outcome = 'No Winner';
-                    break;
+                let matchupCell = document.createElement('div');
+               // var players = await getMatchUsers( [match.player1_id, match.player2_id] );
+                var player1 = getMatchPlayer(matchUsers, match.player1_id);
+                var player2 = getMatchPlayer(matchUsers, match.player2_id);
+                matchupCell.classList.add('matchup');
+
+                let matchPlayer1 = document.createElement('div');
+                matchPlayer1.classList.add('recent-matchup-player');
+                matchPlayer1.classList.add('recent-matchup-player1');
+                let matchPlayer2 = document.createElement('div');
+                matchPlayer2.classList.add('recent-matchup-player');
+                matchPlayer2.classList.add('recent-matchup-player2');
+
+                let avatarPlayer1 = document.createElement('img')
+                avatarPlayer1.classList.add('recent-matchup-avatar');
+                let avatarPlayer2 = document.createElement('img');
+                avatarPlayer2.classList.add('recent-matchup-avatar');
+
+                if ( player1[0].discord_avatar_hash ) {
+                    avatarPlayer1.src = 'https://cdn.discordapp.com/avatars/' + player1[0].discord_id + '/' + player1[0].discord_avatar_hash + '.jpg' + '?size=512';
+                } else {
+                    avatarPlayer1.src = '/assets/images/chumper.png';
+                }
+
+                if ( player2[0].discord_avatar_hash ) {
+                    avatarPlayer2.src = 'https://cdn.discordapp.com/avatars/' + player2[0].discord_id + '/' + player2[0].discord_avatar_hash + '.jpg' + '?size=512';
+                } else {
+                    avatarPlayer2.src = '/assets/images/chumper.png';
+                }
+
+                let player1Name = document.createElement('div');
+                player1Name.classList.add('recent-matchup-name');
+                let player2Name = document.createElement('div');
+                player2Name.classList.add('recent-matchup-name');
+
+                switch ( match.result ) {
+                    case 0:
+                    case 1:
+                    case 2:
+                        //
+                        break;
+                    case 3:
+                        // player 1 win
+                        player1Name.classList.add('recent-matchup-victor');
+                        break;
+                    case 4:
+                        // player 2 win
+                        player2Name.classList.add('recent-matchup-victor');
+                        break;
+                    default:
+                        //
+                        break;
+                }
+
+                player1Name.append( sanitizeDisplayName( player1[0].username ) );
+                player2Name.append( sanitizeDisplayName( player2[0].username ) );
+
+                matchPlayer1.append(avatarPlayer1);
+                matchPlayer1.append( player1Name );
+
+                matchPlayer2.append(avatarPlayer2);
+                matchPlayer2.append( player2Name );
+
+                matchupCell.append( matchPlayer1 );
+
+                let vsImg = document.createElement('img');
+                vsImg.classList.add('recent-matchup-vs');
+                vsImg.src = 'https://comicvine.gamespot.com/a/uploads/original/11136/111361078/6676820-vs.png';
+                //matchupCell.append('vs');
+                matchupCell.append(vsImg);
+                matchupCell.append( matchPlayer2 );
+
+                /*let outcomeCell = document.createElement('div');
+                outcomeCell.classList.add('match-outcome');
+                let outcome = '';
+                outcomeCell.append(outcome);*/
+
+                let typeCell = document.createElement('div');
+                typeCell.classList.add('match-type');
+
+                if ( match.ranked ) {
+                    typeCell.append('Ranked');
+                } else {
+                    typeCell.append('Casual');
+                }
+
+                row.append(matchupCell);
+                row.append(typeCell);
+                row.append(dateCell);
+                //row.append(outcomeCell);
+
+                matchHistory.append(row);
+            } catch (error) {
+                console.log(error);
             }
-            outcomeCell.append(outcome);
-
-            row.append(dateCell);
-            row.append(matchupCell);
-            row.append(outcomeCell);
-
-            matchHistory.append(row);
         }
     }
 }
@@ -618,6 +678,42 @@ function getReadableTime(time) {
     var mDisplay = m > 0 ? m + (m == 1 ? " minute, " : " minutes, ") : "";
     var sDisplay = s > 0 ? s + (s == 1 ? " second" : " seconds") : "";
     return dDisplay + hDisplay + mDisplay + sDisplay;
+}
+
+function getReadableMatchTime(time) {
+    var returnTime;
+    var timeUnit;
+    if ( time / 3600 > 24 ) {
+        returnTime = Math.floor( time / 3600 / 24);
+        if ( returnTime != 1 ) {
+            timeUnit = 'days';
+        } else {
+            timeUnit = 'day'
+        }
+    } else if ( time > 3600 ) {
+        returnTime = Math.round( time / 3600);
+        if ( returnTime != 1 ) {
+            timeUnit = 'hours';
+        } else {
+            timeUnit = 'hour'
+        }
+    } else if ( time < 60 ) {
+        returnTime = time;
+        if ( returnTime != 1 ) {
+            timeUnit = 'seconds';
+        } else {
+            timeUnit = 'second';
+        }
+    } else {
+        returnTime = Math.round( time / 60 );
+        if ( returnTime != 1 ) {
+            timeUnit = 'minutes';
+        } else {
+            timeUnit = 'minute';
+        }
+    }
+
+    return returnTime + ' ' + timeUnit + ' ago';
 }
 
 function sanitizeDisplayName(s) {
