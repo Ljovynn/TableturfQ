@@ -10,7 +10,7 @@ import { FindMatchWithPlayer } from '../matchManager.js';
 import { GetMultipleUserDatas, GetUserBanState, GetUserRankData, GetUserRankedMatchCount, GetUserRatingHistory, SearchUser,
     SetUserCountry, SetUserDiscordTokens, SetUsername } from '../database.js';
 import { definitionErrors, userErrors } from '../responses/requestErrors.js';
-import { SetJSONResponse } from '../responses/ResponseData.js';
+import { SetErrorResponse } from '../responses/ResponseData.js';
 import { usernameMaxLength, usernameMinLength } from '../public/constants/userData.js';
 import { HasBadWords, SanitizeFulltextSearch } from '../utils/string.js';
 import { ratingHistoryOptions } from '../public/constants/ratingData.js';
@@ -26,11 +26,11 @@ router.post("/SetUsername", async (req, res) => {
         const userId = req.session.user;
         const username = req.body.username;
 
-        if (!CheckUserDefined(req)) return SetJSONResponse(res, userErrors.notLoggedIn);
+        if (!CheckUserDefined(req)) return SetErrorResponse(res, userErrors.notLoggedIn);
         
-        if (typeof(username) !== 'string') return SetJSONResponse(res, definitionErrors.usernameUndefined);
-        if (username.length < usernameMinLength || username.length > usernameMaxLength) return SetJSONResponse(res, definitionErrors.usernameWrongFormat);
-        if (HasBadWords(username)) return SetJSONResponse(res, definitionErrors.usernameContainsBadWord);
+        if (typeof(username) !== 'string') return SetErrorResponse(res, definitionErrors.usernameUndefined);
+        if (username.length < usernameMinLength || username.length > usernameMaxLength) return SetErrorResponse(res, definitionErrors.usernameWrongFormat);
+        if (HasBadWords(username)) return SetErrorResponse(res, definitionErrors.usernameContainsBadWord);
 
         await SetUsername(userId, username);
         res.sendStatus(201);
@@ -46,8 +46,8 @@ router.post("/SetUserCountry", async (req, res) => {
         const userId = req.session.user;
         var country = req.body.country;
 
-        if (!CheckUserDefined(req)) return SetJSONResponse(res, userErrors.notLoggedIn);
-        if (typeof(country) !== 'string') return SetJSONResponse(res, definitionErrors.countryUndefined);
+        if (!CheckUserDefined(req)) return SetErrorResponse(res, userErrors.notLoggedIn);
+        if (typeof(country) !== 'string') return SetErrorResponse(res, definitionErrors.countryUndefined);
 
         country = country.toLowerCase();
         if (country == 'none'){
@@ -55,7 +55,7 @@ router.post("/SetUserCountry", async (req, res) => {
             res.sendStatus(201);
             return;
         }
-        if (country.length != 2) return SetJSONResponse(res, definitionErrors.countryWrongFormat);
+        if (country.length != 2) return SetErrorResponse(res, definitionErrors.countryWrongFormat);
 
         await SetUserCountry(userId, country);
         res.sendStatus(201);
@@ -68,7 +68,7 @@ router.post("/SetUserCountry", async (req, res) => {
 router.post("/DeleteUserLoginData", async (req, res) => {
     try{
         const userId = req.session.user;
-        if (!CheckUserDefined(req)) return SetJSONResponse(res, userErrors.notLoggedIn);
+        if (!CheckUserDefined(req)) return SetErrorResponse(res, userErrors.notLoggedIn);
 
         //await DeleteAllUserSessions(userId);
         req.session.destroy();
@@ -87,7 +87,7 @@ router.post("/DeleteUserLoginData", async (req, res) => {
 router.post("/GetUsers", async (req, res) => {
     try{
         const userIdList = req.body.userIdList;
-        if (!CheckIfArray(userIdList) || userIdList.length == 0) return SetJSONResponse(res, definitionErrors.userNotDefined);
+        if (!CheckIfArray(userIdList) || userIdList.length == 0) return SetErrorResponse(res, definitionErrors.userNotDefined);
 
         const users = await GetMultipleUserDatas(userIdList);
 
@@ -105,8 +105,8 @@ router.post("/SearchUser", async (req, res) => {
     try{
         const input = req.body.input;
 
-        if (typeof(input) !== 'string') return SetJSONResponse(res, definitionErrors.usernameUndefined);
-        if (input.length < 1) return SetJSONResponse(res, definitionErrors.usernameUndefined);
+        if (typeof(input) !== 'string') return SetErrorResponse(res, definitionErrors.usernameUndefined);
+        if (input.length < 1) return SetErrorResponse(res, definitionErrors.usernameUndefined);
 
         const sanitizedInput = SanitizeFulltextSearch(input);
 
@@ -128,12 +128,12 @@ router.post("/GetUserRatingHistory", async (req, res) => {
         const ratingHistoryOption = req.body.ratingHistoryOption;
 
         if (!userId){
-            if (!CheckUserDefined(req)) return SetJSONResponse(res, userErrors.notLoggedIn);
+            if (!CheckUserDefined(req)) return SetErrorResponse(res, userErrors.notLoggedIn);
             userId = req.session.user;
         }
 
-        if (typeof(ratingHistoryOption) !== 'number') return SetJSONResponse(res, definitionErrors.ratingHistoryOptionUndefined);
-        if (!Object.values(ratingHistoryOptions).includes(ratingHistoryOption)) return SetJSONResponse(res, definitionErrors.ratingHistoryOptionWrongFormat);
+        if (typeof(ratingHistoryOption) !== 'number') return SetErrorResponse(res, definitionErrors.ratingHistoryOptionUndefined);
+        if (!Object.values(ratingHistoryOptions).includes(ratingHistoryOption)) return SetErrorResponse(res, definitionErrors.ratingHistoryOptionWrongFormat);
 
         var ignoreHideRank = false;
         //todo implement season
@@ -143,7 +143,7 @@ router.post("/GetUserRatingHistory", async (req, res) => {
 
         if (!ignoreHideRank){
             var userRankData = await GetUserRankData(userId);
-            if (!userRankData) return SetJSONResponse(res, definitionErrors.userNotDefined);
+            if (!userRankData) return SetErrorResponse(res, definitionErrors.userNotDefined);
             if (userRankData.hide_rank) return res.status(200).send([]);
         }
         const cutoffDate = (ratingHistoryOption == 0) ? Date.now() : Date.now() - ratingHistoryOption;
@@ -181,7 +181,7 @@ router.post("/GetUserRatingHistory", async (req, res) => {
 router.get("/GetUserInfo", async (req, res) => {
     try{
         var user = await GetCurrentUser(req);
-        if (!user) return SetJSONResponse(res, userErrors.notLoggedIn);
+        if (!user) return SetErrorResponse(res, userErrors.notLoggedIn);
 
         var queData = FindIfPlayerInQue(user.id);
         var readyData = FindIfPlayerWaitingForReady(user.id);
@@ -199,7 +199,7 @@ router.get("/GetUserInfo", async (req, res) => {
 router.get("/GetUserBanInfo", async (req, res) => {
     try{
         const userId = req.session.user;
-        if (!CheckUserDefined(req)) return SetJSONResponse(res, userErrors.notLoggedIn);
+        if (!CheckUserDefined(req)) return SetErrorResponse(res, userErrors.notLoggedIn);
 
         var banInfo = await GetUserBanState(userId);
         var data = {
@@ -221,7 +221,7 @@ router.get("/GetUserBanInfo", async (req, res) => {
 router.get("/GetUserPlacementInfo", async (req, res) => {
     try{
         const userId = req.session.user;
-        if (!CheckUserDefined(req)) return SetJSONResponse(res, userErrors.notLoggedIn);
+        if (!CheckUserDefined(req)) return SetErrorResponse(res, userErrors.notLoggedIn);
 
         var matchCount = await GetUserRankedMatchCount(userId);
 
