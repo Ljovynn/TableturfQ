@@ -998,12 +998,8 @@ async function gameFinish(winnerId) {
 
     console.log('winner name: ' + name);
 
-    leaveMatch.style.display = 'none';
-
-    confirmationMessage.style.display = 'none';
-    gameMessage.style.display = 'block';
-
-    gameMessage.innerHTML = name + ' has won the match!';
+    setMatchWinnerMessage(winnerId);
+    
     requeueButton.style.display = 'block';
 }
 
@@ -1074,6 +1070,13 @@ async function setConfirmPlayerMessage(playerId, winnerId) {
     console.log(winnerId);
     var confirmString = '';
     var systemMessage = { ownerId: 'System', content: '<' + playerId + '> marked <' + winnerId + '> as the winner.', date: Date.now() }
+    var messageString = await getMessageString(systemMessage);
+    await addMessage(messageString);
+    return;
+}
+
+async function setMatchWinnerMessage(playerId) {
+    var systemMessage = { ownerId: 'System', content: '<' + playerId + '> won the match.', date: Date.now() }
     var messageString = await getMessageString(systemMessage);
     await addMessage(messageString);
     return;
@@ -1194,7 +1197,7 @@ socket.on('matchWin', async (data) => {
     console.log(data.winnerId);
     //await getMatchInfo(matchId);
     await gameFinish(data.winnerId);
-    confirmationMessage.style.display = 'none';
+    //confirmationMessage.style.display = 'none';
     checkPlayerRanked(data.newPlayerRatings);
     // Unhide return to queue button
     // Do any final things
