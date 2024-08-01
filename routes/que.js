@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { AddPlayerToQue, RemovePlayerFromQue, PlayerSentReady } from "../queManager.js";
+import { AddPlayerToQue, RemovePlayerFromQue, PlayerSentReady, GetQueAvailible } from "../queManager.js";
 import { CheckUserDefined } from "../utils/checkDefined.js";
 import { SendSocketMessage } from "../socketManager.js";
 import { definitionErrors, userErrors } from '../responses/requestErrors.js';
@@ -71,6 +71,16 @@ router.post("/PlayerReady", async (req, res) => {
         SendSocketMessage(player2Room, "matchReady", match.id.toString());
     } catch (err){
         console.error(err);
+        res.sendStatus(500);
+    }
+});
+
+router.get('/GetMatchmakingState', async (req, res) => {
+    try {
+        var data = GetQueAvailible();
+
+        res.status(200).send(data);
+    } catch (err){
         res.sendStatus(500);
     }
 });
