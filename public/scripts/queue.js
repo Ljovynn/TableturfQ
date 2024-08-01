@@ -132,8 +132,8 @@ async function setUserInfo() {
                 isCasual = true;
                 casualQueue.style.display = 'block';
             } else {
-                competitiveQueue.style.display = 'inline-block';
-                casualQueue.style.display = 'inline-block';
+                competitiveQueue.style.display = 'block';
+                casualQueue.style.display = 'block';
             }
 
             if ( userInfo.queData ) {
