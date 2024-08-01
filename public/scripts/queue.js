@@ -2,6 +2,8 @@ import { PublicQueDatas } from "../constants/queData.js";
 
 // Elements
 const loading = document.getElementById('loading');
+const matchMakingUnavailable = document.getElementById('matchmaking-unavailable');
+const matchMakingQueues = document.getElementById('matchmaking-queues');
 const competitiveQueue = document.getElementById('competitive-queue');
 const casualQueue = document.getElementById('casual-queue');
 const casualUsername = document.getElementById('casual-username');
@@ -23,6 +25,7 @@ const leaveButton = document.getElementById('leave-queue-button');
 
 const socket = io();
 
+var matchMakingStatus = false;
 var queuedMatchMode;
 var mainTimer;
 var readyUp;
@@ -35,6 +38,7 @@ var userID = 0;
 var timer = 0;
 var countdown;
 
+await setMatchMakingStatus();
 await setUserInfo();
 await getRecentMatches();
 
@@ -114,6 +118,26 @@ leaveButton.addEventListener('click', async (e) => {
     }
 });
 
+async function getMatchMakingStatus() {
+    var data = {};
+    var result = await fetchData('/que/GetMatchmakingStatus');
+    return result;
+}
+
+async function setMatchMakingStatus() {
+    try {
+        var status = await getMatchMakingStatus();
+        console.log(status);
+        if ( !status ) {
+            loading.style.display = 'none';
+            matchMakingUnavailable.style.display = 'block';
+        }
+        matchMakingStatus = status;
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 async function getUserInfo() {
     var data = {};
     var result = await fetchData('/user/GetUserInfo');
@@ -128,20 +152,23 @@ async function setUserInfo() {
         if ( !user.banned ) {
             userID = user.id;
             loading.style.display = 'none';
-            if ( !user.discord_id ) {
-                isCasual = true;
-                casualQueue.style.display = 'block';
-            } else {
-                competitiveQueue.style.display = 'block';
-                casualQueue.style.display = 'block';
-            }
+            if ( matchMakingStatus ) {
+                matchMakingQueues.style.display = 'block';
+                if ( !user.discord_id ) {
+                    isCasual = true;
+                    casualQueue.style.display = 'block';
+                } else {
+                    competitiveQueue.style.display = 'block';
+                    casualQueue.style.display = 'block';
+                }
 
-            if ( userInfo.queData ) {
-                setQueueInfo(userInfo.queData);
-            }
+                if ( userInfo.queData ) {
+                    setQueueInfo(userInfo.queData);
+                }
 
-            if ( userInfo.readyData ) {
-                setReadyUp(userInfo.readyData);
+                if ( userInfo.readyData ) {
+                    setReadyUp(userInfo.readyData);
+                }
             }
         } else {
             window.location.href = '/profile?playerId=' + user.id;

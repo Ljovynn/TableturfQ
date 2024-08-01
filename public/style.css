@@ -572,13 +572,21 @@ div.match-type, div.match-date {
 
 /**** QUEUE PAGE STYLES ****/
 
+#matchmaking-unavailable {
+    display: none;
+}
+
+#matchmaking-queues {
+    display: none;
+}
+
 #competetive-queue, #casual-queue {
     display: none;
 }
 
 .queue-section {
     display: inline-block;
-    padding: 20px;
+    padding: 10px;
 }
 
 #queue-info {
