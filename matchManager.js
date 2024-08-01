@@ -9,7 +9,7 @@ import { SendDisputeMessage, SendNewSuspiciousAction, SuspiciousAction } from ".
 import { ResponseData } from "./responses/ResponseData.js";
 import { casualMatchEndErrors, chatMessageErrors, disputeErrors, gameWinErrors, databaseErrors, resolveErrors, stagePickErrors, stageStrikeErrors, nullErrors, forfeitErrors } from "./responses/matchErrors.js";
 import { HasBadWords, SanitizeDiscordLog } from "./utils/string.js";
-import { CasualMatchEndChatMessage, ChooseStageChatMessage, DisputeChatMessage, GamePlayerConfirmMessage, GameWinChatMessage, MatchStartChatMessage, MatchWinChatMessage, ResolveDisputeChatMessage, StrikeStagesChatMessage } from "./public/scripts/utils/systemChatMessages.js";
+import { CasualMatchEndChatMessage, ChooseStageChatMessage, DisputeChatMessage, ForfeitChatMessage, GamePlayerConfirmMessage, GameWinChatMessage, MatchStartChatMessage, MatchWinChatMessage, ResolveDisputeChatMessage, StrikeStagesChatMessage } from "./public/scripts/utils/systemChatMessages.js";
 import { CheckChatLimitReached, NewMessage } from "./chatRateLimitManager.js";
 import { UpdateRecentMatches } from "./cache/matchHistoryManager.js";
 
@@ -306,6 +306,7 @@ export async function PlayerSentForfeit(playerId){
         newPlayerRatings: undefined,
     }
     
+    match.chat.push(new ChatMessage(ForfeitChatMessage(playerId), systemId));
     result.newPlayerRatings = await HandleRankedMatchWin(match);
     if (!result.newPlayerRatings) return databaseErrors.matchFinishError;
 
