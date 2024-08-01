@@ -34,10 +34,11 @@ export async function execute(interaction) {
     const matches = await GetUserMatchHistory(user.id, 1, 1);
 
     //buildembed
-	const lastPlayedValue = (matches[0]) ? `<t:${matches[0].unix_created_at}:R>` : (matchCount > 0) ? 'Over 3 months ago' : 'Never';
-	const rank = (user.g2_rating) ? GetRank(user.g2_rating) : unranked;
+	const rank = GetRank(user.g2_rating);
 	const ratingValue = (user.g2_rating) ? Math.floor(user.g2_rating) : 'N/A';
 	const leaderboardPosition = (user.g2_rating) ? await GetUserLeaderboardPosition(user.id) : 'N/A';
+	const lastPlayedValue = (matches[0]) ? `<t:${matches[0].unix_created_at}:R>` : (matchCount > 0) ? 'Over 3 months ago' : 'Never';
+	const joinedValue = `<t:${user.unix_created_at}:D>`;
 
     var profileFields = [ 
 	{
@@ -65,10 +66,20 @@ export async function execute(interaction) {
         value: `${matchCount}`,
 		inline: true
 		},
+	{
+        name: ' ',
+        value: ' ',
+		inline: false
+		},
 	{ 
 		name: 'Last played',
 		value: lastPlayedValue,
-		inline: false
+		inline: true
+		},
+	{
+        name: 'Join date',
+        value: joinedValue,
+		inline: true
 		},
     ];
 
