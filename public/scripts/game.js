@@ -1079,6 +1079,13 @@ async function setConfirmPlayerMessage(playerId, winnerId) {
     return;
 }
 
+async function setPlayerLeftMessage(playerId) {
+    var systemMessage = { ownerId: 'System', content: '<' + playerId + '> has chosen to end the session.', date: Date.now() }
+    var messageString = await getMessageString(systemMessage);
+    await addMessage(messageString);
+    return;
+}
+
 async function checkPlayerRanked(newPlayerRatings) {
     var newPlayerRating;
     var ratingstring;
@@ -1189,11 +1196,20 @@ socket.on('matchWin', async (data) => {
 });
 
 socket.on('matchEnd', async (data) => {
+    console.log(data);
     if ( !userLeft ) {
-        alert('Your opponent has left the match.');
-        confirmationMessage.innerHTML = 'Your opponent has left the match.';
+        var leftPlayer;
+        if ( players[0].id == userID ) {
+            leftPlayer = players[1].id;
+        } else {
+            leftPlayer = players[0].id;
+        }
+        //alert('Your opponent has left the match.');
+        //confirmationMessage.innerHTML = 'Your opponent has left the match.';
+        setPlayerLeftMessage( leftPlayer );
         requeueButton.style.display = 'block';
         leaveMatch.style.display = 'none';
+
     }
 });
 
@@ -1201,7 +1217,7 @@ socket.on('forfeit', async (data) => {
     console.log(data);
     if ( !userLeft ) {
         alert('Your opponent has forfeited the match.');
-        confirmationMessage.innerHTML = 'Your opponent has forfeited the match.';
+        //confirmationMessage.innerHTML = 'Your opponent has forfeited the match.';
         requeueButton.style.display = 'block';
         leaveMatch.style.display = 'none';
         checkPlayerRanked(data.newPlayerRatings);
