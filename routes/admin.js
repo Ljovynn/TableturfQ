@@ -7,7 +7,7 @@ import { userRoles } from '../public/constants/userData.js';
 import { SendSocketMessage } from '../socketManager.js';
 import { GetDisputedMatchesList, ModSentChatMessage, ResolveMatchDispute } from '../matchManager.js';
 import { disputeResolveOptions, matchModes } from '../public/constants/matchData.js';
-import { ResponseSucceeded, SetResponse } from '../responses/ResponseData.js';
+import { ResponseSucceeded, SetJSONResponse } from '../responses/ResponseData.js';
 import { definitionErrors, userErrors } from '../responses/requestErrors.js';
 import { HandleBanUser } from '../utils/userUtils.js';
 
@@ -21,14 +21,14 @@ router.post("/ResolveDispute", async (req, res) => {
         const matchId = req.body.matchId;
         const resolveOption = req.body.resolveOption;
 
-        if (typeof(matchId) !== 'string') return SetResponse(res, definitionErrors.matchUndefined);
-        if (typeof(resolveOption) !== 'number') return SetResponse(res, definitionErrors.resolveOptionUndefined);
+        if (typeof(matchId) !== 'string') return SetJSONResponse(res, definitionErrors.matchUndefined);
+        if (typeof(resolveOption) !== 'number') return SetJSONResponse(res, definitionErrors.resolveOptionUndefined);
 
         var userError = await CheckIfNotAdmin(req);
-        if (userError) return SetResponse(res, userError);
+        if (userError) return SetJSONResponse(res, userError);
 
         var responseData = await ResolveMatchDispute(matchId, resolveOption);
-        if (!ResponseSucceeded(responseData.code)) return SetResponse(res, responseData);
+        if (!ResponseSucceeded(responseData.code)) return SetJSONResponse(res, responseData);
         var matchData = responseData.data;
 
         if (responseData.data === matchModes.casual){
@@ -79,17 +79,17 @@ router.post("/BanUser", async (req, res) => {
         const banLength = req.body.banLength;
         const reason = req.body.reason;
 
-        if (typeof(bannedUserId) !== 'string') return SetResponse(res, definitionErrors.bannedUserUndefined);
-        if (typeof(banLength) !== 'number' && typeof(banLength) !== 'undefined') return SetResponse(res, definitionErrors.banLengthWrongFormat);
-        if (typeof(banLength) !== 'string' && typeof(banLength) !== 'undefined') return SetResponse(res, definitionErrors.banReasonWrongFormat);
-        if (reason.length > 128) return SetResponse(res, definitionErrors.banReasonTooLong);
+        if (typeof(bannedUserId) !== 'string') return SetJSONResponse(res, definitionErrors.bannedUserUndefined);
+        if (typeof(banLength) !== 'number' && typeof(banLength) !== 'undefined') return SetJSONResponse(res, definitionErrors.banLengthWrongFormat);
+        if (typeof(banLength) !== 'string' && typeof(banLength) !== 'undefined') return SetJSONResponse(res, definitionErrors.banReasonWrongFormat);
+        if (reason.length > 128) return SetJSONResponse(res, definitionErrors.banReasonTooLong);
 
         var userError = await CheckIfNotAdmin(req);
-        if (userError) return SetResponse(res, userError);
+        if (userError) return SetJSONResponse(res, userError);
 
         var bannedUser = await GetUserBanAndRole(bannedUserId);
 
-        if (!bannedUser) return SetResponse(res, definitionErrors.userNotDefined);
+        if (!bannedUser) return SetJSONResponse(res, definitionErrors.userNotDefined);
 
         if (!reason) reason = null;
 
@@ -116,10 +116,10 @@ router.post("/UnbanUser", async (req, res) => {
     try {
         const unbannedUserId = req.body.unbannedUserId;
 
-        if (typeof(unbannedUserId) !== 'string') return SetResponse(res, definitionErrors.unbannedUserUndefined);
+        if (typeof(unbannedUserId) !== 'string') return SetJSONResponse(res, definitionErrors.unbannedUserUndefined);
 
         var userError = await CheckIfNotAdmin(req);
-        if (userError) return SetResponse(res, userError);
+        if (userError) return SetJSONResponse(res, userError);
 
         await UnbanUser(unbannedUserId);
 
@@ -137,10 +137,10 @@ router.post("/GetUserBanInfo", async (req, res) => {
     try{
         const bannedUserId = req.body.userId;
 
-        if (typeof(bannedUserId) !== 'string') return SetResponse(res, definitionErrors.unbannedUserUndefined);
+        if (typeof(bannedUserId) !== 'string') return SetJSONResponse(res, definitionErrors.unbannedUserUndefined);
 
         var userError = await CheckIfNotAdmin(req);
-        if (userError) return SetResponse(res, userError);
+        if (userError) return SetJSONResponse(res, userError);
 
         var banInfo = await GetUserBanState(bannedUserId);
 
@@ -167,14 +167,14 @@ router.post("/ModChatMessage", async (req, res) => {
         const matchId = req.body.matchId;
         const message = req.body.message;
 
-        if (typeof(matchId) !== 'string') return SetResponse(res, definitionErrors.matchUndefined);
-        if (typeof(message) !== 'string') return SetResponse(res, definitionErrors.chatMessageUndefined);
+        if (typeof(matchId) !== 'string') return SetJSONResponse(res, definitionErrors.matchUndefined);
+        if (typeof(message) !== 'string') return SetJSONResponse(res, definitionErrors.chatMessageUndefined);
 
         var userError = await CheckIfNotAdmin(req);
-        if (userError) return res.status(userError.code).send(userError.data);
+        if (userError) return SetJSONResponse(res, userError);
 
         var responseData = await ModSentChatMessage(matchId, userId, message)
-        if (!ResponseSucceeded(responseData.code)) return SetResponse(res, responseData);
+        if (!ResponseSucceeded(responseData.code)) return SetJSONResponse(res, responseData);
 
         res.sendStatus(responseData.code);
         var socketMessage = {ownerId: userId, content: message, date: Date.now()};
@@ -191,7 +191,7 @@ router.get('/GetDisputedMatchesList', async (req, res) => {
     try {
         var userId = req.session.user;
         var userError = await CheckIfNotAdmin(req);
-        if (userError) return SetResponse(res, userError);
+        if (userError) return SetJSONResponse(res, userError);
 
         var data = GetDisputedMatchesList(userId);
 

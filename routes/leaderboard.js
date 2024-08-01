@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-import { SetResponse } from '../responses/ResponseData.js';
+import { SetJSONResponse } from '../responses/ResponseData.js';
 import { definitionErrors } from '../responses/requestErrors.js';
 import { leaderboardLimit } from '../public/constants/searchData.js';
 import { GetLeaderboard, GetUserLeaderboardPosition } from '../database.js';
@@ -16,8 +16,8 @@ router.post('/GetLeaderboard', async (req, res) => {
         var startPos = req.body.startPos;
         var hitCount = req.body.hitCount;
 
-        if (typeof(startPos) !== 'number' && typeof(hitCount) !== 'undefined') return SetResponse(res, definitionErrors.leaderboardStartPosWrongFormat);
-        if (typeof(hitCount) !== 'number' && typeof(hitCount) !== 'undefined') return SetResponse(res, definitionErrors.leaderboardHitCountWrongFormat);
+        if (typeof(startPos) !== 'number' && typeof(hitCount) !== 'undefined') return SetJSONResponse(res, definitionErrors.leaderboardStartPosWrongFormat);
+        if (typeof(hitCount) !== 'number' && typeof(hitCount) !== 'undefined') return SetJSONResponse(res, definitionErrors.leaderboardHitCountWrongFormat);
 
         // Had to check against NaN because startPos = 0 was returning false but we can't start with startPos 1 or we get player ranked #2
         // Try different conditional check maybe? Or check startPos === false?
@@ -47,7 +47,7 @@ router.post('/GetUserLeaderboardPosition', async (req, res) => {
 
         if (typeof(userId) !== 'string'){
             userId = req.session.user;
-            if (!CheckUserDefined(req)) return SetResponse(res, definitionErrors.userNotDefined);
+            if (!CheckUserDefined(req)) return SetJSONResponse(res, definitionErrors.userNotDefined);
         }
 
         const position = GetUserLeaderboardPosition(userId);

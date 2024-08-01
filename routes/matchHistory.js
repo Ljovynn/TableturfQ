@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { GetGlobalMatchHistory } from '../cache/matchHistoryManager.js';
 import { CheckUserDefined } from '../utils/checkDefined.js';
-import { SetResponse } from '../responses/ResponseData.js';
+import { SetJSONResponse } from '../responses/ResponseData.js';
 import { GetMultipleUserDatas, GetUserMatchHistory } from '../database.js';
 import { definitionErrors } from '../responses/requestErrors.js';
 
@@ -20,7 +20,7 @@ router.post("/GetUserMatchHistory", async (req, res) => {
 
         if (typeof(userId) !== 'string'){
             userId = req.session.user;
-            if (!CheckUserDefined(req)) return SetResponse(res, definitionErrors.userNotDefined);
+            if (!CheckUserDefined(req)) return SetJSONResponse(res, definitionErrors.userNotDefined);
         } 
 
         if (typeof(pageNumber) !== 'number' || pageNumber < 0){

@@ -13,3 +13,7 @@ export function ResponseSucceeded(responseCode){
 export function SetResponse(res, responseData){
     return res.status(responseData.code).send(responseData.data);
 }
+
+export function SetJSONResponse(res, responseData){
+    return res.status(responseData.code).json(responseData.data);
+}

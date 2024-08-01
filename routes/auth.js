@@ -11,7 +11,7 @@ import { GetUserByDiscordId, CreateUserWithDiscord, SetUserDiscord, CreateUser, 
 import { GenerateNanoId } from '../nanoIdManager.js';
 import { CheckUserDefined } from '../utils/checkDefined.js';
 import { authErrors, databaseErrors } from '../responses/authErrors.js';
-import { SetResponse } from '../responses/ResponseData.js';
+import { SetJSONResponse } from '../responses/ResponseData.js';
 import { userRoles, usernameMaxLength, usernameMinLength } from '../public/constants/userData.js';
 import { definitionErrors } from '../responses/requestErrors.js';
 import { HasBadWords } from '../utils/string.js';
@@ -32,12 +32,12 @@ const router = Router();
 
 //req: username
 router.post("/unverified/login", async (req, res) => {
-    if (CheckUserDefined(req)) return SetResponse(res, authErrors.userLoggedIn);
+    if (CheckUserDefined(req)) return SetJSONResponse(res, authErrors.userLoggedIn);
 
     const username = req.body.username;
-    if (typeof(username) !== 'string') return SetResponse(res, definitionErrors.usernameUndefined);
-    if (username.length < usernameMinLength || username.length > usernameMaxLength) return SetResponse(res, definitionErrors.usernameWrongFormat);
-    if (HasBadWords(username)) return SetResponse(res, definitionErrors.usernameContainsBadWord);
+    if (typeof(username) !== 'string') return SetJSONResponse(res, definitionErrors.usernameUndefined);
+    if (username.length < usernameMinLength || username.length > usernameMaxLength) return SetJSONResponse(res, definitionErrors.usernameWrongFormat);
+    if (HasBadWords(username)) return SetJSONResponse(res, definitionErrors.usernameContainsBadWord);
 
     const userId = GenerateNanoId();
     await CreateUser(userId, username);
@@ -82,7 +82,7 @@ router.get("/discord/redirect", async (req, res) => {
 
             const newUserId = await StoreUserData(access_token, refresh_token, userId);
 
-            if (!newUserId) return SetResponse(res, databaseErrors.verifiedCreateError);
+            if (!newUserId) return SetJSONResponse(res, databaseErrors.verifiedCreateError);
             await SerializeSession(req, newUserId);
     
             //refresh token
