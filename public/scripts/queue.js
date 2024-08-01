@@ -194,34 +194,86 @@ function displayRecentMatches(recentMatchData) {
                 var player1 = getMatchPlayer(players, match.player1_id);
                 var player2 = getMatchPlayer(players, match.player2_id);
                 matchupCell.classList.add('matchup');
-                matchupCell.append( sanitizeDisplayName( player1[0].username ) + ' vs ' + sanitizeDisplayName( player2[0].username ) );
 
-                let outcomeCell = document.createElement('div');
-                outcomeCell.classList.add('match-outcome');
-                let outcome = '';
+                let matchPlayer1 = document.createElement('div');
+                matchPlayer1.classList.add('recent-matchup-player');
+                matchPlayer1.classList.add('recent-matchup-player1');
+                let matchPlayer2 = document.createElement('div');
+                matchPlayer2.classList.add('recent-matchup-player');
+                matchPlayer2.classList.add('recent-matchup-player2');
+
+                let avatarPlayer1 = document.createElement('img')
+                avatarPlayer1.classList.add('recent-matchup-avatar');
+                let avatarPlayer2 = document.createElement('img');
+                avatarPlayer2.classList.add('recent-matchup-avatar');
+
+                if ( player1[0].discord_avatar_hash ) {
+                    avatarPlayer1.src = 'https://cdn.discordapp.com/avatars/' + player1[0].discord_id + '/' + player1[0].discord_avatar_hash + '.jpg' + '?size=512';
+                } else {
+                    avatarPlayer1.src = '/assets/images/chumper.png';
+                }
+
+                if ( player2[0].discord_avatar_hash ) {
+                    avatarPlayer2.src = 'https://cdn.discordapp.com/avatars/' + player2[0].discord_id + '/' + player2[0].discord_avatar_hash + '.jpg' + '?size=512';
+                } else {
+                    avatarPlayer2.src = '/assets/images/chumper.png';
+                }
+
+                let player1Name = document.createElement('div');
+                player1Name.classList.add('recent-matchup-name');
+                let player2Name = document.createElement('div');
+                player2Name.classList.add('recent-matchup-name');
+
                 switch ( match.result ) {
                     case 0:
                     case 1:
                     case 2:
-                        outcome = 'In Game';
+                        //
                         break;
                     case 3:
                         // player 1 win
-                        outcome = sanitizeDisplayName( player1[0].username ) + ' Victory';
+                        player1Name.classList.add('recent-matchup-victor');
                         break;
                     case 4:
                         // player 2 win
-                        outcome = saintizeDisplayName( player2[0].username ) + ' Victory';
+                        player2Name.classList.add('recent-matchup-victor');
                         break;
                     default:
-                        outcome = 'No Winner';
+                        //
                         break;
                 }
-                outcomeCell.append(outcome);
 
-                row.append(dateCell);
+                player1Name.append( sanitizeDisplayName( player1[0].username ) );
+                player2Name.append( sanitizeDisplayName( player2[0].username ) );
+
+                matchPlayer1.append(avatarPlayer1);
+                matchPlayer1.append( player1Name );
+
+                matchPlayer2.append(avatarPlayer2);
+                matchPlayer2.append( player2Name );
+
+                matchupCell.append( matchPlayer1 );
+                matchupCell.append('vs');
+                matchupCell.append( matchPlayer2 );
+
+                /*let outcomeCell = document.createElement('div');
+                outcomeCell.classList.add('match-outcome');
+                let outcome = '';
+                outcomeCell.append(outcome);*/
+
+                let typeCell = document.createElement('div');
+                typeCell.classList.add('match-type');
+
+                if ( match.ranked ) {
+                    typeCell.append('Ranked');
+                } else {
+                    typeCell.append('Casual');
+                }
+
                 row.append(matchupCell);
-                row.append(outcomeCell);
+                row.append(typeCell);
+                row.append(dateCell);
+                //row.append(outcomeCell);
 
                 recentMatchesList.append(row);
             } catch (error) {

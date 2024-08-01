@@ -159,14 +159,10 @@ await showAdminBanInfo();
 // Stage selection event listener
 for (let stage of stages ) {
     stage.addEventListener('click', (e) => {
-        console.log('click fire');
         if ( currentStriker == userID ) {
-            console.log('click striker');
             if ( stage.classList.contains('stage-selectable') ) {
-                console.log('valid stage');
                 // Prevent toggle for new stages when you have no strikes remaining for that round of striking
                 if ( strikesRemaining != 0 || stage.classList.contains('stage-selected') ) {
-                    console.log('selected toggle');
                     stage.classList.toggle('stage-selected');
                 }
                 var stageValue = parseInt(stage.getAttribute('stage-value'));

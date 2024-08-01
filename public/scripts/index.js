@@ -63,9 +63,17 @@ async function setAnnouncements() {
                 upcomingAnnouncements.style.display = 'block';
                 addUpcomingAnnouncements(announcements);
             }
+        } else {
+            let noAnnouncements = document.createElement('p');
+            noAnnouncements.innerHTML = 'There are currently no announcements.';
+            nextAnnouncement.append(noAnnouncements);
+            nextAnnouncement.style.display = 'block';
         }
     } catch (error) {
-        //
+        let noAnnouncements = document.createElement('p');
+        noAnnouncements.innerHTML = 'There are currently no announcements.';
+        nextAnnouncement.append(noAnnouncements);
+        nextAnnouncement.style.display = 'block';
         console.log(error);
     }
 }

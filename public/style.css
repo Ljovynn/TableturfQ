@@ -218,37 +218,6 @@ select {
     width: 30%;
 }
 
-/**** QUEUE PAGE STYLES ****/
-
-#competetive-queue, #casual-queue {
-    display: none;
-}
-
-.queue-section {
-    display: inline-block;
-    padding: 20px;
-}
-
-#queue-info {
-    display: none;
-    margin: auto;
-    width: 50%;
-}
-
-#recent-matches {
-    display: none;
-    width: 50%;
-    margin: auto;
-}
-
-#recent-matches-list {
-    outline: 2px solid #6858c2;
-}
-
-#ranked-match-ready-non-modal {
-    display: none;
-}
-
 /**** GAME PAGE STYLES ****/
 
 #match-container {
@@ -575,6 +544,10 @@ select {
     padding: 10px 5px;
 }
 
+div.match-type, div.match-date {
+    width: 30%;
+}
+
 .rating-positive {
     color: green;
 }
@@ -595,6 +568,65 @@ select {
     width: 50%;
     margin: auto;
     margin-top: 20px;
+}
+
+/**** QUEUE PAGE STYLES ****/
+
+#competetive-queue, #casual-queue {
+    display: none;
+}
+
+.queue-section {
+    display: inline-block;
+    padding: 20px;
+}
+
+#queue-info {
+    display: none;
+    margin: auto;
+    width: 50%;
+}
+
+#recent-matches {
+    display: none;
+    width: 50%;
+    margin: auto;
+}
+
+#recent-matches-list {
+    outline: 2px solid #6858c2;
+}
+
+div.recent-matchup-player {
+    display: inline-block;
+    width: 150px;
+}
+
+.recent-matchup-player1 {
+    margin-right: 50px;
+}
+
+.recent-matchup-player2 {
+    margin-left: 50px;
+}
+
+.recent-matchup-avatar {
+    display: inline;
+    width: 50px;
+    border-radius: 50%;
+}
+
+div.recent-matchup-name {
+    display: block;
+    width: auto !important;
+}
+
+.recent-matchup-victor {
+    color: green;
+}
+
+#ranked-match-ready-non-modal {
+    display: none;
 }
 
 /**** LEADERBOARD STYLES ****/
@@ -936,6 +968,20 @@ select {
         width: 90%;
     }
 
+    /**** QUEUE ****/
+    div.match-type, div.match-date {
+        width: 100%;
+    }
+
+    .recent-matchup-player {
+        display: inline-block;
+        width: 100%;
+    }
+
+    .recent-matchup-player1, .recent-matchup-player2 {
+        margin: 0;
+    }
+
     /**** LEADERBOARD ****/
 
     #leaderboard {
@@ -944,12 +990,7 @@ select {
 
     .leaderboard-row {
         display: block;
-    }
-
-    /**** QUEUE ****/
-    #recent-matches {
-        width: 90%;
-    }
+    }    
 
     /**** MATCH ****/
 
