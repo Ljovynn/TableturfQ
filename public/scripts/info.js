@@ -7,6 +7,10 @@ const counterPickList = document.getElementById('ranked-counters');
 const counterPickAmount = document.getElementById('counterpick-amount');
 const dsrEnabled = document.getElementById('dsr-enabled');
 
+const aboutButton = document.getElementById('about-tab-button');
+const matchButton = document.getElementById('match-tab-button');
+const siteButton = document.getElementById('site-tab-button');
+
 const aboutSection = document.getElementById('section-about');
 const matchRulesSection = document.getElementById('section-match-rules');
 const siteRulesSection = document.getElementById('section-site-rules');
@@ -41,24 +45,39 @@ if ( !rankedRules.dsr ) {
 for ( let link of aboutLinks ) {
 	link.addEventListener('click', (e) => {
 		matchRulesSection.style.display = 'none';
+		aboutButton.classList.remove('active');
+
 		siteRulesSection.style.display = 'none';
+		siteButton.classList.remove('active');
+
 		aboutSection.style.display = 'block';
+		aboutButton.classList.add('active');
 	});
 }
 
 for ( let link of matchRulesLinks ) {
 	link.addEventListener('click', (e) => {
 		siteRulesSection.style.display = 'none';
+		siteButton.classList.remove('active');
+
 		aboutSection.style.display = 'none';
+		aboutButton.classList.remove('active');
+
 		matchRulesSection.style.display = 'block';
+		matchButton.classList.add('active');
 	});
 }
 
 for ( let link of siteRulesLinks ) {
 	link.addEventListener('click', (e) => {
 		matchRulesSection.style.display = 'none';
+		matchButton.classList.remove('active');
+
 		aboutSection.style.display = 'none';
+		aboutButton.classList.remove('active');
+
 		siteRulesSection.style.display = 'block';
+		siteButton.classList.add('active');
 	});
 }
 

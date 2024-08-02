@@ -14,12 +14,14 @@ var queuedMatchMode;
 var ready = false;
 var readyUp;
 
-setUserInfo();
-
 readyButton.addEventListener('click', async (e) => {
     console.log('User is ready for competitive match.');
     readyButton.style.display = 'none';
     ready = true;
+
+    var readyNonModal = document.getElementById('ranked-match-ready-button-non-modal');
+    readyNonModal.style.display = 'none';
+    readyNonModal.classList.add('modal-readied');
 
     // Not sure if we need to send any data but we can leave it blank for now
 
@@ -33,8 +35,13 @@ closeModalBtn.addEventListener('click', closeModal);
 
 async function setUserInfo() {
     var userInfo = await getUserInfo();
+    console.log(userInfo);
     if ( userInfo.queData ) {
         queuedMatchMode = userInfo.queData.matchMode;
+    } else if ( userInfo.readyData ) {
+        queuedMatchMode = userInfo.readyData.matchMode;
+    } else {
+        // idk error I guess
     }
 }
 
@@ -61,12 +68,14 @@ function countdownTimer() {
     readyCountdown.innerHTML = time;
     if ( countdown == 0 ) {
         clearTimer(readyUp);
-        if ( !ready ) {
-            alert('You have been removed from the queue due to inactivity.');
-            closeModal();
-        } else {
-            alert('Your opponent did not ready up for the match and it has been canceled.');
-            closeModal();
+        if ( modal.offsetTop != 0 ) {
+            if ( !ready ) {
+                alert('You have been removed from the queue due to inactivity.');
+                closeModal();
+            } else {
+                alert('Your opponent did not ready up for the match and it has been canceled.');
+                closeModal();
+            }
         }
     }
 }
@@ -91,7 +100,8 @@ function secondsToMS(d) {
 
 socket.emit('join', 'userRoom');
 
-socket.on('matchFound', () => {
+socket.on('matchFound', async () => {
+    await setUserInfo();
     // show modal
     openModal();
 

@@ -7,6 +7,7 @@
 		<meta name="description" property="og:description" content="Tableturf Matchmaking!"/>
         <title>TableturfQ</title>
         <link rel="stylesheet" href="./style.css">
+        <link rel="stylesheet" href="./assets/fontawesome-free-6.5.2-web/css/all.min.css">
     </head>
     <body class="body">
         <div class="modal-container">
@@ -17,31 +18,65 @@
                 <div id="global-match-ready">
                     <p id="ranked-match-found-message">Match found! Please ready up.</p>
                     <p id="ranked-match-ready-countdown">00:20</p>
-                    <button id="ranked-match-ready-button" value="ready">Ready!</button>
+                    <div id="ranked-match-ready-button" class="button" value="ready">Ready!</div>
                 </div>
             </section>
         </div>
         <div class="overlay hidden"></div>
-        <header>
-            <h1><a href="/">TableturfQ</a></h1>
-            <h3>Info</h3>
+        <header id="site-header">
+            <div id="site-header-container">
+                <div id="site-header-home-button">
+                    <a id="site-header-logo" href="/"><img src="./assets/images/chumper.png" /></a>
+                    <a id="site-header-hamburger"><i class="fa-solid fa-bars"></i></a>
+                </div>
+                <div id="site-header-page-links">
+                    <a class="mobile-home header-button" href="/">
+                        <div>Home</div>
+                    </a>
+                    <a class="header-button" href="/info">
+                        <div>Rules and Info</div>
+                    </a>
+                    <a class="header-button index-logged-in-link" id="profile-link" href="/profile">
+                    <div id="index-profile-div">My Profile</div>
+                    </a>
+                    <a class="header-button" href="/leaderboard">
+                        <div >Leaderboard</div>
+                    </a>
+                    <a class="header-button" href="/usersearch">
+                    <div >User Search</div>
+                    </a>
+                    <a class="header-button"href="/queue">
+                        <div >Queue</div>
+                    </a>
+                    <a id="index-match-link" class="header-button not-in-game" href="">
+                        <div id="index-match-div">Rejoin Game</div>
+                    </a>
+                    <a id="header-logout-button" class="header-button index-logged-in-link" href="">
+                        <div id="header-logout-div" >Logout</div>
+                    </a>
+                </div>
+            </div>
         </header>
         <main class="main">
+            <h3>Info</h3>
             <div id="info-container">
                 <div class="content-section">
                     <h4>TableturfQ</h4>
                     <p>TableturfQ is an unofficial matchmaking service for the Tableturf Battle card game within Splatoon 3. Unlike every other multiplayer mode in Splatoon 3, Nintendo doesn’t offer any ingame matchmaking for Tableturf Battle. This has made it difficult for players to find others to battle against. The TableturfQ team’s goal is to offer Tableturf players a way to solve this problem by bringing together the Tableturf Battle community into one place where they can easily find others to play against.</p>
-                    <p>TableturfQ does not include a simulation of Tableturf Battle, and you are expected to play the actual official game with your opponent after getting matched together, using the pool code</p>
+                    <p>TableturfQ does not include a simulation of Tableturf Battle, and you are expected to play the actual official game with your opponent after getting matched together, using the pool code: TTBQ.</p>
+                    <h4>Developers</h4>
+                    <p>Backend/Lead Dev - Ljovynn</p>
+                    <p>Frontend - zeb</p>
                 </div>
                 <div id="language-section">
                     <h3>Language</h3>
-                    <button id="info-english">English</button>
-                    <button id="info-japanese" disabled>Japanese</button>
+                    <div id="info-english" class="button">English</div>
+                    <div id="info-japanese" class="button" disabled>Japanese</div>
                 </div>
                 <div id="section-tabs">
-                    <button class="about-link">About</button>
-                    <button class=match-rules-link>Match Rulesets</button>
-                    <button class="site-rules-link">Site Rules</button>
+                    <div id="about-tab-button" class="about-link button active">About</div>
+                    <div id="match-tab-button" class="match-rules-link button">Match Rulesets</div>
+                    <div id="site-tab-button" class="site-rules-link button">Site Rules</div>
                 </div>
                 <div id="section-about">
                     <h3>About</h3>
@@ -93,6 +128,10 @@
                 <div id="section-match-rules">
                     <h3 id="rules">Match Rulesets</h3>
 
+                    <div class="content-section">
+                        <h4>Pool Code</h4>
+                        <p>The pool code used for all TableturfQ matches is: TTBQ. It is not case sensitive, so ttbq will work as well.</p>
+                    </div>
                     <div class="content-section">
                         <h4>Casual Ruleset</h4>
                         <p>There is no rulset for casual matches</p>
@@ -170,5 +209,6 @@
     <script src="/socket.io/socket.io.js"></script>
     <script type="text/javascript" src="./scripts/dataPOST.js"></script>
     <script type="module" src="./scripts/info.js"></script>
+    <script type="module" src="./scripts/global-header.js"></script>
     <script type="module" src="./scripts/global-queue.js"></script>
 </html>

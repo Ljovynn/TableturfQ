@@ -34,11 +34,6 @@ async function setUserInfo() {
     console.log(userInfo);
     if ( userInfo.user.id ) {
         hideLogInOptions();
-        setLoggedInLinks();
-    }
-
-    if ( userInfo.matchId ) {
-        setMatchLink(userInfo.matchId.id);
     }
 }
 
@@ -50,23 +45,6 @@ async function getUserInfo() {
 
 function hideLogInOptions() {
     loginContent.style.display = 'none';
-}
-
-function setLoggedInLinks() {
-    for ( let link of loggedInLinks ) {
-        link.style.display = 'block';
-    }
-
-    if ( !userInfo.user.discord_id ) {
-        profileDiv.style.display = 'none';
-    } else {
-        profileLink.href = '/profile?playerId=' + userInfo.user.id;
-    }
-}
-
-function setMatchLink(matchId) {
-    matchLink.setAttribute('href', '/game?matchId=' + matchId);
-    matchDiv.style.display = 'block';
 }
 
 async function setAnnouncements() {
@@ -85,9 +63,17 @@ async function setAnnouncements() {
                 upcomingAnnouncements.style.display = 'block';
                 addUpcomingAnnouncements(announcements);
             }
+        } else {
+            let noAnnouncements = document.createElement('p');
+            noAnnouncements.innerHTML = 'There are currently no announcements.';
+            nextAnnouncement.append(noAnnouncements);
+            nextAnnouncement.style.display = 'block';
         }
     } catch (error) {
-        //
+        let noAnnouncements = document.createElement('p');
+        noAnnouncements.innerHTML = 'There are currently no announcements.';
+        nextAnnouncement.append(noAnnouncements);
+        nextAnnouncement.style.display = 'block';
         console.log(error);
     }
 }

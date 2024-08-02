@@ -38,6 +38,16 @@ export function MatchWinChatMessage(winUserId){
     return result;
 }
 
+export function CasualMatchEndChatMessage(userId){
+    var result = `<${userId}> has chosen to end the session.`;
+    return result;
+}
+
+export function ForfeitChatMessage(forfeitUserId){
+    var result = `<${forfeitUserId}> forfeited the match.`;
+    return result;
+}
+
 export function DisputeChatMessage(){
     var result = 'The match is in dispute.';
     return result;

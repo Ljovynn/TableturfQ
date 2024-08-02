@@ -47,8 +47,8 @@ export async function GetRecentMatches(cutoff){
 }
 
 export async function GetUserByDiscordId(discordId){
-    const [rows] = await pool.execute(`SELECT id, username, role, g2_rating, hide_rank, CAST(discord_id AS CHAR) discord_id, discord_username, discord_avatar_hash, country,
-        UNIX_TIMESTAMP(created_at) AS unix_created_at FROM users u WHERE discord_id = ?`, [discordId]);
+    const [rows] = await pool.execute(`SELECT id, username, role, IF(hide_rank, NULL, g2_rating) g2_rating, CAST(discord_id AS CHAR) discord_id,
+        discord_username, discord_avatar_hash, country, UNIX_TIMESTAMP(created_at) AS unix_created_at FROM users u WHERE discord_id = ?`, [discordId]);
     if (rows[0]){
         //console.log("insert id: " + rows[0].insertId); 
         //console.log("id: " + rows[0].id);
@@ -72,7 +72,7 @@ export async function GetUserData(userId){
 }
 
 export async function GetMultipleUserDatas(userIdlist){
-    const [rows] = await pool.query(`SELECT id, username, role, g2_rating, IF(hide_rank, NULL, g2_rating) g2_rating, CAST(discord_id AS CHAR) discord_id,
+    const [rows] = await pool.query(`SELECT id, username, role, IF(hide_rank, NULL, g2_rating) g2_rating, CAST(discord_id AS CHAR) discord_id,
         discord_username, discord_avatar_hash, country, UNIX_TIMESTAMP(created_at) AS unix_created_at,
         (SELECT COUNT(*) FROM ban_list WHERE user_id = u.id) AS banned FROM users u WHERE id IN (?)`,
     [userIdlist]);

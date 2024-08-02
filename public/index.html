@@ -7,6 +7,7 @@
 		<meta name="description" property="og:description" content="Tableturf Matchmaking!"/>
         <title>TableturfQ</title>
         <link rel="stylesheet" href="./style.css">
+        <link rel="stylesheet" href="./assets/fontawesome-free-6.5.2-web/css/all.min.css">
     </head>
     <body class="body">
         <div class="modal-container">
@@ -17,42 +18,58 @@
                 <div id="global-match-ready">
                     <p id="ranked-match-found-message">Match found! Please ready up.</p>
                     <p id="ranked-match-ready-countdown">00:20</p>
-                    <button id="ranked-match-ready-button" value="ready">Ready!</button>
+                    <div id="ranked-match-ready-button" class="button" value="ready">Ready!</div>
                 </div>
             </section>
         </div>
         <div class="overlay hidden"></div>
-        <header>
-            <h1>TableturfQ</h1>
+        <header id="site-header">
+            <div id="site-header-container">
+                <div id="site-header-home-button">
+                    <a id="site-header-logo" href="/"><img src="./assets/images/chumper.png" /></a>
+                    <a id="site-header-hamburger"><i class="fa-solid fa-bars"></i></a>
+                </div>
+                <div id="site-header-page-links">
+                    <a class="mobile-home header-button" href="/">
+                        <div>Home</div>
+                    </a>
+                    <a class="header-button" href="/info">
+                        <div>Rules and Info</div>
+                    </a>
+                    <a class="header-button index-logged-in-link" id="profile-link" href="/profile">
+                    <div id="index-profile-div">My Profile</div>
+                    </a>
+                    <a class="header-button" href="/leaderboard">
+                        <div >Leaderboard</div>
+                    </a>
+                    <a class="header-button" href="/usersearch">
+                    <div >User Search</div>
+                    </a>
+                    <a class="header-button"href="/queue">
+                        <div >Queue</div>
+                    </a>
+                    <a id="index-match-link" class="header-button not-in-game" href="">
+                        <div id="index-match-div">Rejoin Game</div>
+                    </a>
+                    <a id="header-logout-button" class="header-button index-logged-in-link" href="">
+                        <div id="header-logout-div" >Logout</div>
+                    </a>
+                </div>
+            </div>
         </header>
         <main class="main">
+            <h3>TableturfQ</h3>
             <div id="login-content">
-                <div id="user-login" class = "logInButtonDiv">
-                    <p><a href="https://discord.com/oauth2/authorize?client_id=1226952880569847960&response_type=code&redirect_uri=https%3A%2F%2Fwww.tableturfq.com%2Fapi%2Fauth%2Fdiscord%2Fredirect&scope=identify"><button id="logIn" style="font-weight: bold;">Log in</button></a></p>
-                </div>
+
+                <a id="login-button" href="https://discord.com/oauth2/authorize?client_id=1226952880569847960&response_type=code&redirect_uri=https%3A%2F%2Fwww.tableturfq.com%2Fapi%2Fauth%2Fdiscord%2Fredirect&scope=identify">
+                    <div id="user-login" class = "logInButtonDiv button">Log In</div>
+                </a>
                 <div id="guest-login">
                     <p>If you'd like to play as a guest, please enter your username. You will only be able to play casual matches.</p>
                     <input type="text" id="guest-login-name" placeholder="Enter username" />
-                    <input type="submit" id="guest-login-button" />
+                    <label id="guest-login-label" class="button" for="guest-login-button">Submit</label>
+                    <input type="submit" id="guest-login-button" class="input-button" name="guest-login-button"/>
                 </div>
-            </div>
-            <div class="index-link">
-                <a href="/info">Rules and Info</a>
-            </div>
-            <div id="index-profile-div" class="index-link index-logged-in-link">
-                <a id="profile-link" href="/profile">My Profile</a>
-            </div>
-            <div class="index-link">
-                <a href="/leaderboard">Leaderboard</a>
-            </div>
-            <div class="index-link">
-                <a href="/usersearch">Search for a user</a>
-            </div>
-            <div class="index-link index-logged-in-link">
-                <a href="/queue">Queue</a>
-            </div>
-            <div id="index-match-div" class="index-link">
-                <a id="index-match-link" href="">Rejoin Game</a>
             </div>
             <div id="announcements-content">
                 <h3>Announcements</h3>
@@ -66,5 +83,6 @@
     <script src="/socket.io/socket.io.js"></script>
     <script type="text/javascript" src="./scripts/dataPOST.js"></script>
     <script type="module" src="./scripts/index.js"></script>
+    <script type="module" src="./scripts/global-header.js"></script>
     <script type="module" src="./scripts/global-queue.js"></script>
 </html>

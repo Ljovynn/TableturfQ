@@ -1,8 +1,7 @@
 /**** GENERAL STYLES ****/
 
 header {
-    text-align: center;
-    padding: 20px 0px -5px 0px;
+    width: 100%;
 }
 
 html {
@@ -16,6 +15,7 @@ html {
 body {
     font-family:Arial, Helvetica, sans-serif;
     text-align: center;
+    margin: 0;
 }
 
 p, a, div, span, h1, h3, h4 {
@@ -25,14 +25,130 @@ p, a, div, span, h1, h3, h4 {
 
 a {
     text-decoration: none;
+    color: #dbc639;
 }
 
 a:hover {
-    color: black;
-    text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
+    color: #6858c2;
 }
 
 h3 {
+}
+
+.button {
+    width: 100px;
+    padding: 10px;
+    border-radius: 3px;
+    background: #dbc639;
+    margin: 5px auto;
+}
+
+.button:hover {
+    background: #6858c2;
+    cursor: pointer;
+}
+
+.input-button {
+    display: none;
+}
+
+label {
+    display: inline-block;
+}
+
+.main-content {
+    width: 50%;
+    margin: auto;
+}
+
+input[type="text"] {
+    height: 35px;
+    border-radius: 3px;
+    margin-bottom: 10px;
+    background: #363636;
+    color: white;
+}
+
+select {
+    margin-bottom: 10px;
+    border-radius: 3px;
+    background: #363636;
+    height: 40px;
+    width: 100px;
+    color: white;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+}
+
+/**** HEADER MENU ****/
+
+#site-header-container {
+    width: 100%;
+    min-height: 50px;
+    /*background: url('./assets/images/header-background.png');
+    background-repeat: reapeat;
+    background-size: contain;*/
+    background: #dbc639;
+}
+
+#site-header-home-button {
+    width: 50px;
+    padding-top: 3px;
+    padding-bottom: 5px;
+    float: left;
+}
+
+#site-header-hamburger {
+    display: none;
+}
+
+#site-header-logo img {
+    width: 40px;
+    border: 2px solid #6858c2;
+    border-radius: 50%;
+}
+
+#site-header-logo img:hover {
+    opacity: 0.5;
+}
+
+#site-header-page-links {
+    margin: auto;
+    height: 50px;
+}
+
+#site-header-profile-links {
+    width: 33%;
+    margin: auto;
+}
+
+#header-profile-icon {
+    height: 45px;
+}
+
+.header-button {
+    background: #dbc639;
+    width: 120px;
+    display: inline-block;
+    padding-top: 15px;
+    padding-bottom: 17px;
+}
+
+.header-button:hover {
+    background: #6858c2;
+    cursor: pointer;
+}
+
+.header-button a {
+    color: white;
+}
+
+.header-button a:hover {
+    color: white;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+}
+
+.mobile-home {
+    display: none;
 }
 
 /**** INDEX PAGE STYLES ****/
@@ -45,7 +161,7 @@ h3 {
     display: none;
 }
 
-#index-match-div {
+.not-in-game {
     display: none;
 }
 
@@ -54,8 +170,18 @@ h3 {
     margin: auto;
 }
 
-#user-login, #guest-login {
+#user-login {
     display: block;
+    width: 100px;
+    margin: 10px auto;
+}
+
+#guest-login {
+    width: auto;
+}
+
+
+#announcements-content {
     width: 50%;
     margin: auto;
 }
@@ -64,7 +190,7 @@ h3 {
     display: none;
     width: 75%;
     margin: auto;
-    outline: 2px solid black;
+    outline: 2px solid #6858c2;
     padding: 10px;
 }
 
@@ -85,42 +211,11 @@ h3 {
 }
 
 .upcoming-announcement {
-    outline: 2px solid black;
+    outline: 2px solid #6858c2;
     padding: 10px;
     margin: 10px;
     display: inline-block;
     width: 30%;
-}
-
-/**** QUEUE PAGE STYLES ****/
-
-#competetive-queue, #casual-queue {
-    display: none;
-}
-
-.queue-section {
-    display: inline-block;
-    padding: 20px;
-}
-
-#queue-info {
-    display: none;
-    margin: auto;
-    width: 50%;
-}
-
-#recent-matches {
-    display: none;
-    width: 50%;
-    margin: auto;
-}
-
-#recent-matches-list {
-    outline: 2px solid black;
-}
-
-#ranked-match-ready {
-    display: none;
 }
 
 /**** GAME PAGE STYLES ****/
@@ -136,7 +231,7 @@ h3 {
 .player-info {
     display: inline-block;
     padding: 20px;
-    border: 2px solid black;
+    border: 2px solid #6858c2;
     margin: 10px 10px 20px 10px;
     width: 200px;
 }
@@ -155,7 +250,7 @@ h3 {
 
 /* Hover effect when link attribute is set */
 #player1-in-game-name[href]:hover, #player2-in-game-name[href]:hover {
-    color: black;
+    color: #6858c2;
     text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
 }
 
@@ -184,10 +279,11 @@ h3 {
 
 #match-chat-log {
     height: 100px;
-    background: white;
+    background: #363636;
     padding: 5px;
     overflow-y: scroll;
     margin: 10px 0px 15px 0px;
+    scrollbar-color: #363636;
 }
 
 #match-chat-input {
@@ -196,23 +292,23 @@ h3 {
 
 .match-chat-message {
     text-align: left;
-    text-shadow: none;
-    color: black;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    color: white;
     margin: 0;
     word-wrap: break-word;
 }
 
 .match-chat-player {
     text-align: left;
-    text-shadow: none;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
 }
 
 .match-chat-current-player {
-    color: orange;
+    color: #dbc639;
 }
 
 .match-chat-opponent-player {
-    color: black;
+    color: #6858c2;
 }
 
 .match-chat-system {
@@ -263,14 +359,14 @@ h3 {
 .stage {
     width: 160px;
     height: 225px;
-    border: 2px solid black;
+    border: 2px solid #6858c2;
     margin: 10px;
     display: inline-block;
 }
 
 .stage-selectable:hover {
     cursor: pointer;
-    border: 2px solid white;
+    border: 2px solid #dbc639;
 }
 
 .stage-unselectable {
@@ -283,6 +379,10 @@ h3 {
 
 .selected-strike {
 
+}
+
+.stage-stricken {
+    border: 2px solid grey;
 }
 
 .stage-stricken h3, .stage-stricken img {
@@ -316,6 +416,7 @@ h3 {
 
 .player-victory-button {
     display: none;
+    width: 150px;
 }
 
 #requeue-button {
@@ -333,6 +434,14 @@ h3 {
 
 #qualifier-image {
     width: 30px;
+}
+
+#confirm-map-selection {
+    width: 150px;
+}
+
+#leave-match-button {
+    width: 150px;
 }
 
 /**** USER PROFILE ****/
@@ -357,6 +466,7 @@ h3 {
     display: none;
 }
 
+
 #user-profile-edit-name:hover {
     cursor: pointer;
 }
@@ -367,6 +477,11 @@ h3 {
 
 #user-profile-edit-name-form.editing {
     display: block;
+}
+
+#user-profile-name-submit {
+    width: 150px;
+    margin: 10px auto;
 }
 
 #user-profile-edit-close {
@@ -416,17 +531,21 @@ h3 {
     display: block;
     width: 80%;
     margin: auto;
-    outline: 2px solid black;
+    outline: 2px solid #6858c2;
 }
 
 .match-row {
     display: flex;
-    outline: 1px solid black;
+    outline: 1px solid #6858c2;
 }
 
 .match-row div {
     width: 100%;
     padding: 10px 5px;
+}
+
+div.match-type, div.match-date {
+    width: 30%;
 }
 
 .rating-positive {
@@ -435,6 +554,10 @@ h3 {
 
 .rating-negative {
     color: red;
+}
+
+#user-rating-graph-options {
+    margin-bottom: 10px;
 }
 
 #user-graph text {
@@ -447,15 +570,75 @@ h3 {
     margin-top: 20px;
 }
 
-/**** MOBILE STLYES ****/
-@media only screen and (max-width: 600px) {
-    #user-match-history {
-        width: 100%;
-    }
+/**** QUEUE PAGE STYLES ****/
 
-    .match-row {
-        display: block;
-    }
+#matchmaking-unavailable {
+    display: none;
+}
+
+#matchmaking-queues {
+    display: none;
+}
+
+#competetive-queue, #casual-queue {
+    display: none;
+}
+
+.queue-section {
+    display: inline-block;
+    padding: 10px;
+}
+
+#queue-info {
+    display: none;
+    margin: auto;
+    width: 50%;
+}
+
+#recent-matches {
+    display: none;
+    width: 50%;
+    margin: auto;
+}
+
+#recent-matches-list {
+    outline: 2px solid #6858c2;
+}
+
+div.recent-matchup-player {
+    display: inline-block;
+    width: 150px;
+}
+
+.recent-matchup-player1 {
+    margin-right: 50px;
+}
+
+.recent-matchup-player2 {
+    margin-left: 50px;
+}
+
+.recent-matchup-avatar {
+    display: inline;
+    width: 50px;
+    border-radius: 50%;
+}
+
+div.recent-matchup-name {
+    display: block;
+    width: auto !important;
+}
+
+.recent-matchup-victor {
+    color: green;
+}
+
+.recent-matchup-vs {
+    width: 25px;
+}
+
+#ranked-match-ready-non-modal {
+    display: none;
 }
 
 /**** LEADERBOARD STYLES ****/
@@ -476,7 +659,7 @@ h3 {
     display: block;
     width: 50%;
     margin: auto;
-    outline: 2px solid black;
+    outline: 2px solid #6858c2;
 }
 
 
@@ -486,12 +669,12 @@ h3 {
     margin: auto;
     margin-top: 15px;
     margin-bottom: 20px;
-    outline: 2px solid black;
+    outline: 2px solid #6858c2;
 }
 
 .leaderboard-row {
     display: flex;
-    outline: 1px solid black;
+    outline: 1px solid #6858c2;
 }
 
 .leaderboard-row div {
@@ -526,7 +709,7 @@ h3 {
 .user-search-row {
     display: inline-block;
     padding: 20px;
-    border: 2px solid black;
+    border: 2px solid #6858c2;
     margin: 10px 10px 20px 10px;
     width: 200px;
 }
@@ -546,12 +729,32 @@ h3 {
     margin: auto;
 }
 
-#section-match-rules, #section-site-rules {
-    display: none;
+#language-section .button, #section-tabs .button {
+    display: inline-block;
+    margin: 0;
 }
 
-#section-about, #section-match-rules, #section-site-rules {
+/* temp */
+#info-japanese {
+    cursor: auto;
+    background: grey;
+}
+
+#section-tabs .button {
+    width: 150px;
+}
+
+#section-tabs .active {
+    cursor: auto;
+    background: grey;
+}
+
+.content-section {
     text-align: left;
+}
+
+#section-match-rules, #section-site-rules {
+    display: none;
 }
 
 #section-tabs {
@@ -636,18 +839,6 @@ h3 {
     display: none;
 }
 
-/**** MOBILE STLYES ****/
-@media only screen and (max-width: 600px) {
-    #leaderboard {
-        width: 100%;
-    }
-
-    .leaderboard-row {
-        display: block;
-    }
-
-}
-
 /**** ADMIN STYLES ****/
 #admin-disputed-matches {
     display: none;
@@ -657,12 +848,12 @@ h3 {
     display: block;
     width: 50%;
     margin: auto;
-    outline: 2px solid black;
+    outline: 2px solid #6858c2;
 }
 
 .disputed-match-row {
     display: flex;
-    outline: 1px solid black;
+    outline: 1px solid #6858c2;
 }
 
 .admin-disputed-match-players {
@@ -704,4 +895,130 @@ h3 {
 
 #admin-unban-player1-content, #admin-unban-player2-content {
     display: none;
+}
+
+/**** MOBILE STLYES ****/
+@media only screen and (max-width: 810px) {
+    /**** HEADER ****/
+    .header-expanded {
+        height: 100%;
+        display: block;
+    }
+
+    #site-header-page-links {
+        display: none;
+        height: auto;
+    }
+
+    #site-header-logo {
+        display: none;
+    }
+
+    #site-header-hamburger {
+        width: 50px;
+        padding-top: 10px;
+        padding-bottom: 5px;
+        color: white;
+        display: block;
+    }
+
+    #site-header-hamburger.active {
+        color: #6858c2;
+    }
+
+    #site-header-page-links.header-expanded {
+        display: block;
+    }
+
+    #site-header-home-button {
+        float: none;
+        height: auto;
+    }
+
+    .mobile-home {
+        display: block;
+    }
+
+    .header-button {
+        display: block;
+        width: 100%;
+    }
+
+    .index-logged-in-link {
+        display: none;
+    }
+
+    .header-button.not-in-game {
+        display: none;
+    }
+
+    /**** INFO ****/
+
+    #section-tabs .button {
+        margin: 10px 0;
+    }
+
+    /**** PROFILE ****/
+
+    #user-match-history {
+        width: 100%;
+    }
+
+    .match-row {
+        display: block;
+    }
+
+    #match-chat-content {
+        width: 90%;
+    }
+
+    #user-match-info {
+        width: 90%;
+    }
+
+    #user-rating-graph {
+        width: 90%;
+    }
+
+    /**** QUEUE ****/
+    div.match-type, div.match-date {
+        width: 100%;
+    }
+
+    .recent-matchup-player {
+        display: inline-block;
+        width: 100%;
+    }
+
+    .recent-matchup-player1, .recent-matchup-player2 {
+        margin: 0;
+    }
+
+    /**** LEADERBOARD ****/
+
+    #leaderboard {
+        width: 100%;
+    }
+
+    .leaderboard-row {
+        display: block;
+    }    
+
+    /**** MATCH ****/
+
+    .stage:hover {
+        border: 2px solid #6858c2;
+    }
+
+    .touch-hover {
+        border: 2px solid #dbc639;
+    }
+
+    .stage.mobile-selected {
+        border: 2px solid red;
+    }
+
+    .stage.mobile-select:hover {
+        border: 2px solid red !important;
+    }
 }

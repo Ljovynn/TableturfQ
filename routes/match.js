@@ -15,8 +15,8 @@ import { CheckIfArray, CheckUserDefined } from '../utils/checkDefined.js';
 import { SendSocketMessage, SendEmptySocketMessage } from '../socketManager.js';
 
 import { definitionErrors, nullErrors, userErrors } from '../responses/requestErrors.js';
-import { ResponseSucceeded, SetResponse } from '../responses/ResponseData.js';
-import { chatLoadLimit, ChatMessage, disputeResolveOptions, matchModes, systemId } from '../public/constants/matchData.js';
+import { ResponseSucceeded, SetErrorResponse } from '../responses/ResponseData.js';
+import { chatLoadLimit, ChatMessage, disputeResolveOptions, matchModes } from '../public/constants/matchData.js';
 import { CheckUserBanned } from '../utils/userUtils.js';
 
 const router = Router();
@@ -40,11 +40,11 @@ router.post("/StrikeStages", async (req, res) => {
         const userId = req.session.user;
         const stages = req.body.stages;
 
-        if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
-        if (!CheckIfArray(stages, res) || stages.length == 0) return SetResponse(res, definitionErrors.stagesUndefined);
+        if (!CheckUserDefined(req)) return SetErrorResponse(res, userErrors.notLoggedIn);
+        if (!CheckIfArray(stages, res) || stages.length == 0) return SetErrorResponse(res, definitionErrors.stagesUndefined);
 
         var responseData = PlayerSentStageStrikes(userId, stages);
-        if (!ResponseSucceeded(responseData.code)) return SetResponse(res, responseData);
+        if (!ResponseSucceeded(responseData.code)) return SetErrorResponse(res, responseData);
 
         res. sendStatus(responseData.code);
         SendSocketMessage('match' + responseData.data, "stageStrikes", stages);
@@ -60,11 +60,11 @@ router.post("/PickStage", async (req, res) => {
         const userId = req.session.user;
         const stage = req.body.stage;
 
-        if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
-        if (typeof(stage) !== 'number') return SetResponse(res, definitionErrors.stageUndefined);
+        if (!CheckUserDefined(req)) return SetErrorResponse(res, userErrors.notLoggedIn);
+        if (typeof(stage) !== 'number') return SetErrorResponse(res, definitionErrors.stageUndefined);
 
         var responseData = PlayerSentStagePick(userId, stage);
-        if (!ResponseSucceeded(responseData.code)) return SetResponse(res, responseData);
+        if (!ResponseSucceeded(responseData.code)) return SetErrorResponse(res, responseData);
 
         res.sendStatus(responseData.code);
         SendSocketMessage('match' + responseData.data, "stagePick", stage);
@@ -79,11 +79,11 @@ router.post("/WinGame", async (req, res) => {
         const userId = req.session.user;
         const winnerId = req.body.winnerId;
 
-        if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
-        if (typeof(winnerId) !== 'string') return SetResponse(res, definitionErrors.winnerUndefined);
+        if (!CheckUserDefined(req)) return SetErrorResponse(res, userErrors.notLoggedIn);
+        if (typeof(winnerId) !== 'string') return SetErrorResponse(res, definitionErrors.winnerUndefined);
 
         var responseData = await PlayerSentGameWin(userId, winnerId);
-        if (!ResponseSucceeded(responseData.code)) return SetResponse(res, responseData);
+        if (!ResponseSucceeded(responseData.code)) return SetErrorResponse(res, responseData);
 
         var matchData = responseData.data;
         SendSocketMessage('match' + matchData.matchId, "playerConfirmedWin", {playerId: userId, winnerId: winnerId});
@@ -106,10 +106,10 @@ router.post("/CasualMatchEnd", async (req, res) => {
     try {
         var userId = req.body.userId;
 
-        if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
+        if (!CheckUserDefined(req)) return SetErrorResponse(res, userErrors.notLoggedIn);
 
         var responseData = await PlayerSentCasualMatchEnd(userId);
-        if (!ResponseSucceeded(responseData.code)) return SetResponse(res, responseData);
+        if (!ResponseSucceeded(responseData.code)) return SetErrorResponse(res, responseData);
 
         res.sendStatus(responseData.code);
         SendEmptySocketMessage('match' + responseData.data, "matchEnd");
@@ -123,10 +123,10 @@ router.post("/ForfeitMatch", async (req, res) => {
     try {
         var userId = req.body.userId;
 
-        if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
+        if (!CheckUserDefined(req)) return SetErrorResponse(res, userErrors.notLoggedIn);
 
         var responseData = await PlayerSentForfeit(userId);
-        if (!ResponseSucceeded(responseData.code)) return SetResponse(res, responseData);
+        if (!ResponseSucceeded(responseData.code)) return SetErrorResponse(res, responseData);
 
         var matchId = responseData.data.matchId;
 
@@ -147,10 +147,10 @@ router.post("/Dispute", async (req, res) => {
     try {
         var userId = req.body.userId;
 
-        if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
+        if (!CheckUserDefined(req)) return SetErrorResponse(res, userErrors.notLoggedIn);
 
         var responseData = PlayerSentMatchDispute(userId);
-        if (!ResponseSucceeded(responseData.code)) return SetResponse(res, responseData);
+        if (!ResponseSucceeded(responseData.code)) return SetErrorResponse(res, responseData);
 
         res.sendStatus(responseData.code);
         SendEmptySocketMessage('match' + responseData.data, "dispute");
@@ -163,10 +163,10 @@ router.post("/Dispute", async (req, res) => {
 router.post("/ResolveDispute", async (req, res) => {
     try {
         const userId = req.session.user;
-        if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
+        if (!CheckUserDefined(req)) return SetErrorResponse(res, userErrors.notLoggedIn);
 
         var responseData = await PlayerSentResolveDispute(userId);
-        if (!ResponseSucceeded(responseData.code)) return SetResponse(res, responseData);
+        if (!ResponseSucceeded(responseData.code)) return SetErrorResponse(res, responseData);
 
         if (responseData.data === matchModes.casual){
             res.sendStatus(responseData.code);
@@ -193,13 +193,13 @@ router.post("/SendChatMessage", async (req, res) => {
         const matchId = req.body.matchId;
         const message = req.body.message;
 
-        if (!CheckUserDefined(req)) return SetResponse(res, userErrors.notLoggedIn);
-        if (await CheckUserBanned(userId)) return SetResponse(res, userErrors.banned);
-        if (typeof(matchId) !== 'string') return SetResponse(res, definitionErrors.matchUndefined);
-        if (typeof(message) !== 'string') return SetResponse(res, definitionErrors.chatMessageUndefined);
+        if (!CheckUserDefined(req)) return SetErrorResponse(res, userErrors.notLoggedIn);
+        if (await CheckUserBanned(userId)) return SetErrorResponse(res, userErrors.banned);
+        if (typeof(matchId) !== 'string') return SetErrorResponse(res, definitionErrors.matchUndefined);
+        if (typeof(message) !== 'string') return SetErrorResponse(res, definitionErrors.chatMessageUndefined);
 
         var responseData = await UserSentChatMessage(matchId, userId, message);
-        if (!ResponseSucceeded(responseData.code)) return SetResponse(res, responseData);
+        if (!ResponseSucceeded(responseData.code)) return SetErrorResponse(res, responseData);
 
         res.sendStatus(responseData.code);
         var socketMessage = {ownerId: userId, content: message, date: Date.now()};
@@ -216,9 +216,9 @@ router.post("/LoadChatMessages", async (req, res) => {
         const loadedMessagesAmount = req.body.loadedMessagesAmount;
         const userId = req.session.user;
 
-        if (typeof(matchId) !== 'string') return SetResponse(res, definitionErrors.matchUndefined);
-        if (typeof(loadedMessagesAmount) !== 'number') return SetResponse(res, definitionErrors.chatMessageUndefined);
-        if (loadedMessagesAmount < 0) return SetResponse(res, definitionErrors.chatMessageUndefined);
+        if (typeof(matchId) !== 'string') return SetErrorResponse(res, definitionErrors.matchUndefined);
+        if (typeof(loadedMessagesAmount) !== 'number') return SetErrorResponse(res, definitionErrors.chatMessageUndefined);
+        if (loadedMessagesAmount < 0) return SetErrorResponse(res, definitionErrors.chatMessageUndefined);
 
         var userRole = userRoles.unverified;
         if (userId) userRole = await GetUserRole(userId);
@@ -229,7 +229,7 @@ router.post("/LoadChatMessages", async (req, res) => {
         var data = [];
         if (!match){
             let matchData = await GetMatch(matchId);
-            if (!matchData) return SetResponse(res, nullErrors.noMatch);
+            if (!matchData) return SetErrorResponse(res, nullErrors.noMatch);
 
             var chatMessages = await GetChatMessages(matchId, loadedMessagesAmount);
 
@@ -254,7 +254,7 @@ router.post("/LoadChatMessages", async (req, res) => {
         if (!players[0] == userId && !players[1] == userId){
             //mods cant see PBs
             if (userRole != userRoles.mod || match.privateBattle){
-                return SetResponse(res, userErrors.noAccess);
+                return SetErrorResponse(res, userErrors.noAccess);
             }
         }
 
@@ -276,7 +276,7 @@ router.post("/GetMatchInfo", async (req, res) => {
         const matchId = req.body.matchId;
         const userId = req.session.user;
 
-        if (typeof(matchId) !== 'string') return SetResponse(res, definitionErrors.matchUndefined);
+        if (typeof(matchId) !== 'string') return SetErrorResponse(res, definitionErrors.matchUndefined);
 
         var userRole = userRoles.unverified;
         if (userId) userRole = await GetUserRole(userId);
@@ -288,7 +288,7 @@ router.post("/GetMatchInfo", async (req, res) => {
             matchHidden = false;
 
             let matchData = await GetMatch(matchId);
-            if (!matchData) return SetResponse(res, nullErrors.noMatch);
+            if (!matchData) return SetErrorResponse(res, nullErrors.noMatch);
 
             let gameData = await GetMatchGames(matchId);
             let strikeData = [];
@@ -314,7 +314,7 @@ router.post("/GetMatchInfo", async (req, res) => {
         if (!CheckIfPlayerIsId(players[0], userId) && !CheckIfPlayerIsId(players[1], userId)){
             //mods cant see PBs
             if (userRole != userRoles.mod || match.privateBattle){
-                if (matchHidden) return SetResponse(res, userErrors.noAccess);
+                if (matchHidden) return SetErrorResponse(res, userErrors.noAccess);
                 match.chat = [];
             }
         }

@@ -7,40 +7,88 @@
 		<meta name="description" property="og:description" content="Tableturf Matchmaking!"/>
         <title>TableturfQ</title>
         <link rel="stylesheet" href="./style.css">
+        <link rel="stylesheet" href="./assets/fontawesome-free-6.5.2-web/css/all.min.css">
     </head>
     <body class="body">
-        <header>
-            <h1><a href="/">TableturfQ</a></h1>
+        <div class="modal-container">
+            <section id="ready-modal" class="modal hidden">
+                <div class="flex">
+                    <button class="btn-close">⨉</button>
+                </div>
+                <div id="global-match-ready">
+                    <p id="ranked-match-found-message">Match found! Please ready up.</p>
+                    <p id="ranked-match-ready-countdown">00:20</p>
+                    <div id="ranked-match-ready-button" class="button" value="ready">Ready!</div>
+                </div>
+            </section>
+        </div>
+        <div class="overlay hidden"></div>
+        <header id="site-header">
+            <div id="site-header-container">
+                <div id="site-header-home-button">
+                    <a id="site-header-logo" href="/"><img src="./assets/images/chumper.png" /></a>
+                    <a id="site-header-hamburger"><i class="fa-solid fa-bars"></i></a>
+                </div>
+                <div id="site-header-page-links">
+                    <a class="mobile-home header-button" href="/">
+                        <div>Home</div>
+                    </a>
+                    <a class="header-button" href="/info">
+                        <div>Rules and Info</div>
+                    </a>
+                    <a class="header-button index-logged-in-link" id="profile-link" href="/profile">
+                    <div id="index-profile-div">My Profile</div>
+                    </a>
+                    <a class="header-button" href="/leaderboard">
+                        <div >Leaderboard</div>
+                    </a>
+                    <a class="header-button" href="/usersearch">
+                    <div >User Search</div>
+                    </a>
+                    <a class="header-button"href="/queue">
+                        <div >Queue</div>
+                    </a>
+                    <a id="index-match-link" class="header-button not-in-game" href="">
+                        <div id="index-match-div">Rejoin Game</div>
+                    </a>
+                    <a id="header-logout-button" class="header-button index-logged-in-link" href="">
+                        <div id="header-logout-div" >Logout</div>
+                    </a>
+                </div>
+            </div>
         </header>
         <main class="main">
             <h3 data-key="howToUse">Matchmaking Queue</h3>
             <div id="loading">Loading...</div>
-            <div id="competitive-queue" class="queue-section">
-                <h4>Competitive Queue</h4>
-                <button id="join-competitive-queue" class="queue-button">Join Queue</button>
-            </div>
-            <div id="casual-queue" class="queue-section">
-                <h4>Casual Queue</h4>
-                <button id="join-casual-queue" class="queue-button">Join Queue</button>
+            <div id="matchmaking-unavailable">Matchmaking is not available at this time.</div>
+            <div id="matchmaking-queues">
+                <div id="competitive-queue" class="queue-section">
+                    <h4>Competitive Queue</h4>
+                    <div id="join-competitive-queue" class="button" class="queue-button">Join Queue</div>
+                </div>
+                <div id="casual-queue" class="queue-section">
+                    <h4>Casual Queue</h4>
+                    <div id="join-casual-queue" class="button" class="queue-button">Join Queue</div>
+                </div>
             </div>
             <div id="queue-matchmaking">
                 <div id="queue-info">
                     <p id="queue-timer">Finding Match... 00:00:00</p>
-                    <button id="leave-queue-button">Leave Queue</button>
+                    <div id="leave-queue-button" class="button">Leave Queue</div>
                 </div>
-                <div id="ranked-match-ready">
+                <div id="ranked-match-ready-non-modal">
                     <p id="ranked-match-found-message">Match found! Please ready up.</p>
-                    <p id="ranked-match-ready-countdown">00:20</p>
-                    <button id="ranked-match-ready-button" value="ready">Ready!</button>
+                    <p id="ranked-match-ready-countdown-non-modal">00:20</p>
+                    <div id="ranked-match-ready-button-non-modal" class="button" value="ready">Ready!</div>
                 </div>
             </div>
             <div id="recent-matches">
                 <p>Recent Matches</p>
                 <div id="recent-matches-list">
                     <div class="match-row">
-                        <div id="match-date">Match Started</div>
-                        <div class="matchup">Matchup</div>
-                        <div class="match-outcome">Match Status</div>
+                        <div id="matchup">Matchup</div>
+                        <div class="match-type">Match Type</div>
+                        <div class="match-date">Match Date</div>
                     </div>
                 </div>
             </div>
@@ -51,4 +99,6 @@
     <!--<script src="https://tableturfq.up.railway.app/socket.io/socket.io.js"></script>-->
     <script src="/socket.io/socket.io.js"></script>
     <script type="module" src="./scripts/queue.js"></script>
+    <script type="module" src="./scripts/global-header.js"></script>
+    <script type="module" src="./scripts/global-queue.js"></script>
 </html>

@@ -187,6 +187,14 @@ for (let stage of stages ) {
             }
         }
     });
+
+    stage.addEventListener('touchstart', (e) => {
+        stage.classList.toggle('mobile-selected');
+        stage.classList.add('touch-hover');
+    });
+    stage.addEventListener('touchend', (e) => {
+        stage.classList.remove('touch-hover');
+    })
 }
 
 // Victory button click listener
@@ -983,19 +991,15 @@ async function gameFinish(winnerId) {
     console.log(players);
 
     if ( players[0].id == winnerId ) {
-        name = sanitizeDisaplyName( players[0].username );
+        name = sanitizeDisplayName( players[0].username );
     } else {
         name = sanitizeDisplayName( players[1].username );
     }
 
     console.log('winner name: ' + name);
 
-    leaveMatch.style.display = 'none';
-
-    confirmationMessage.style.display = 'none';
-    gameMessage.style.display = 'block';
-
-    gameMessage.innerHTML = name + ' has won the match!';
+    setMatchWinnerMessage(winnerId);
+    
     requeueButton.style.display = 'block';
 }
 
@@ -1066,6 +1070,25 @@ async function setConfirmPlayerMessage(playerId, winnerId) {
     console.log(winnerId);
     var confirmString = '';
     var systemMessage = { ownerId: 'System', content: '<' + playerId + '> marked <' + winnerId + '> as the winner.', date: Date.now() }
+    var messageString = await getMessageString(systemMessage);
+    await addMessage(messageString);
+    return;
+}
+
+async function setMatchWinnerMessage(playerId) {
+    var systemMessage = { ownerId: 'System', content: '<' + playerId + '> won the match.', date: Date.now() }
+    var messageString = await getMessageString(systemMessage);
+    await addMessage(messageString);
+    return;
+}
+
+async function setPlayerLeftMessage(playerId, ranked) {
+    var systemMessage;
+    if ( ranked ) {
+        systemMessage = { ownerId: 'System', content: '<' + playerId + '> forfeited the match.', date: Date.now() }
+    } else {
+        systemMessage = { ownerId: 'System', content: '<' + playerId + '> has chosen to end the session.', date: Date.now() }
+    }
     var messageString = await getMessageString(systemMessage);
     await addMessage(messageString);
     return;
@@ -1174,26 +1197,42 @@ socket.on('matchWin', async (data) => {
     console.log(data.winnerId);
     //await getMatchInfo(matchId);
     await gameFinish(data.winnerId);
-    confirmationMessage.style.display = 'none';
+    //confirmationMessage.style.display = 'none';
     checkPlayerRanked(data.newPlayerRatings);
     // Unhide return to queue button
     // Do any final things
 });
 
 socket.on('matchEnd', async (data) => {
+    console.log(data);
     if ( !userLeft ) {
-        alert('Your opponent has left the match.');
-        confirmationMessage.innerHTML = 'Your opponent has left the match.';
+        var leftPlayer;
+        if ( players[0].id == userID ) {
+            leftPlayer = players[1].id;
+        } else {
+            leftPlayer = players[0].id;
+        }
+        //alert('Your opponent has left the match.');
+        //confirmationMessage.innerHTML = 'Your opponent has left the match.';
+        setPlayerLeftMessage( leftPlayer, false );
         requeueButton.style.display = 'block';
         leaveMatch.style.display = 'none';
+
     }
 });
 
 socket.on('forfeit', async (data) => {
     console.log(data);
     if ( !userLeft ) {
+        var leftPlayer;
+        if ( players[0].id == userID ) {
+            leftPlayer = players[1].id;
+        } else {
+            leftPlayer = players[0].id;
+        }
         alert('Your opponent has forfeited the match.');
-        confirmationMessage.innerHTML = 'Your opponent has forfeited the match.';
+        setPlayerLeftMessage( leftPlayer, true );
+        //confirmationMessage.innerHTML = 'Your opponent has forfeited the match.';
         requeueButton.style.display = 'block';
         leaveMatch.style.display = 'none';
         checkPlayerRanked(data.newPlayerRatings);
@@ -1233,4 +1272,16 @@ socket.on("connect_error", (err) => {
   Decription: ${err.description}
   
   Context: ${err.context}`);
+});
+
+socket.on("disconnect", (reason, details) => {
+  alert(`Socket disconnect. This shouldnt be pushed to prod!
+
+  Reason: ${reason}
+  
+  Message: ${details.message}
+  
+  Decription: ${details.description}
+  
+  Context: ${details.context}`);
 });

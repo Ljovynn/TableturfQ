@@ -2,26 +2,30 @@ import { PublicQueDatas } from "../constants/queData.js";
 
 // Elements
 const loading = document.getElementById('loading');
+const matchMakingUnavailable = document.getElementById('matchmaking-unavailable');
+const matchMakingQueues = document.getElementById('matchmaking-queues');
 const competitiveQueue = document.getElementById('competitive-queue');
 const casualQueue = document.getElementById('casual-queue');
 const casualUsername = document.getElementById('casual-username');
 const queueMatchmaking = document.getElementById('queue-matchmaking');
-const matchMakingReady = document.getElementById('ranked-match-ready');
+const matchMakingReady = document.getElementById('ranked-match-ready-non-modal');
 const queueTimer = document.getElementById('queue-timer');
 const queueInfo = document.getElementById('queue-info');
-const readyCountdown = document.getElementById('ranked-match-ready-countdown');
+const readyCountdown = document.getElementById('ranked-match-ready-countdown-non-modal');
 const recentMatches = document.getElementById('recent-matches');
 const recentMatchesList = document.getElementById('recent-matches-list');
+const modal = document.getElementById("ready-modal");
 
 // Interactable Elements
 const joinCompetitive = document.getElementById('join-competitive-queue');
 const joinCasual = document.getElementById('join-casual-queue');
 const queueButtons = document.getElementsByClassName('queue-button');
-const readyButton = document.getElementById('ranked-match-ready-button');
+const readyButton = document.getElementById('ranked-match-ready-button-non-modal');
 const leaveButton = document.getElementById('leave-queue-button');
 
 const socket = io();
 
+var matchMakingStatus = false;
 var queuedMatchMode;
 var mainTimer;
 var readyUp;
@@ -34,6 +38,7 @@ var userID = 0;
 var timer = 0;
 var countdown;
 
+await setMatchMakingStatus();
 await setUserInfo();
 await getRecentMatches();
 
@@ -50,7 +55,6 @@ joinCompetitive.addEventListener('click', async (e) => {
             queueButton.style.display = 'none';
         }
         // Do queue frontend stuff
-        alert('Successfully joined the queue!');
         timer = 0;
         queueInfo.style.display = 'block';
         mainTimer = window.setInterval(updateTimer, 1000);
@@ -75,7 +79,6 @@ joinCasual.addEventListener('click', async (e) => {
             queueButton.style.display = 'none';
         }
         // Do queue frontend stuff
-        alert('Successfully joined the queue!');
         timer = 0;
         queueInfo.style.display = 'block';
         mainTimer = window.setInterval(updateTimer, 1000);
@@ -110,11 +113,30 @@ leaveButton.addEventListener('click', async (e) => {
         }
         clearTimer(mainTimer);
         queueInfo.style.display = 'none';
-        alert('You have successfully left the queue');
         timer = 0;
         queueTimer.innerHTML = 'Finding Match... 00:00:00'; 
     }
 });
+
+async function getMatchMakingStatus() {
+    var data = {};
+    var result = await fetchData('/que/GetMatchmakingStatus');
+    return result;
+}
+
+async function setMatchMakingStatus() {
+    try {
+        var status = await getMatchMakingStatus();
+        console.log(status);
+        if ( !status ) {
+            loading.style.display = 'none';
+            matchMakingUnavailable.style.display = 'block';
+        }
+        matchMakingStatus = status;
+    } catch (error) {
+        console.log(error);
+    }
+}
 
 async function getUserInfo() {
     var data = {};
@@ -130,20 +152,23 @@ async function setUserInfo() {
         if ( !user.banned ) {
             userID = user.id;
             loading.style.display = 'none';
-            if ( !user.discord_id ) {
-                isCasual = true;
-                casualQueue.style.display = 'block';
-            } else {
-                competitiveQueue.style.display = 'inline-block';
-                casualQueue.style.display = 'inline-block';
-            }
+            if ( matchMakingStatus ) {
+                matchMakingQueues.style.display = 'block';
+                if ( !user.discord_id ) {
+                    isCasual = true;
+                    casualQueue.style.display = 'block';
+                } else {
+                    competitiveQueue.style.display = 'block';
+                    casualQueue.style.display = 'block';
+                }
 
-            if ( userInfo.queData ) {
-                setQueueInfo(userInfo.queData);
-            }
+                if ( userInfo.queData ) {
+                    setQueueInfo(userInfo.queData);
+                }
 
-            if ( userInfo.readyData ) {
-                setReadyUp(userInfo.readyData);
+                if ( userInfo.readyData ) {
+                    setReadyUp(userInfo.readyData);
+                }
             }
         } else {
             window.location.href = '/profile?playerId=' + user.id;
@@ -196,34 +221,91 @@ function displayRecentMatches(recentMatchData) {
                 var player1 = getMatchPlayer(players, match.player1_id);
                 var player2 = getMatchPlayer(players, match.player2_id);
                 matchupCell.classList.add('matchup');
-                matchupCell.append( sanitizeDisplayName( player1[0].username ) + ' vs ' + sanitizeDisplayName( player2[0].username ) );
 
-                let outcomeCell = document.createElement('div');
-                outcomeCell.classList.add('match-outcome');
-                let outcome = '';
+                let matchPlayer1 = document.createElement('div');
+                matchPlayer1.classList.add('recent-matchup-player');
+                matchPlayer1.classList.add('recent-matchup-player1');
+                let matchPlayer2 = document.createElement('div');
+                matchPlayer2.classList.add('recent-matchup-player');
+                matchPlayer2.classList.add('recent-matchup-player2');
+
+                let avatarPlayer1 = document.createElement('img')
+                avatarPlayer1.classList.add('recent-matchup-avatar');
+                let avatarPlayer2 = document.createElement('img');
+                avatarPlayer2.classList.add('recent-matchup-avatar');
+
+                if ( player1[0].discord_avatar_hash ) {
+                    avatarPlayer1.src = 'https://cdn.discordapp.com/avatars/' + player1[0].discord_id + '/' + player1[0].discord_avatar_hash + '.jpg' + '?size=512';
+                } else {
+                    avatarPlayer1.src = '/assets/images/chumper.png';
+                }
+
+                if ( player2[0].discord_avatar_hash ) {
+                    avatarPlayer2.src = 'https://cdn.discordapp.com/avatars/' + player2[0].discord_id + '/' + player2[0].discord_avatar_hash + '.jpg' + '?size=512';
+                } else {
+                    avatarPlayer2.src = '/assets/images/chumper.png';
+                }
+
+                let player1Name = document.createElement('div');
+                player1Name.classList.add('recent-matchup-name');
+                let player2Name = document.createElement('div');
+                player2Name.classList.add('recent-matchup-name');
+
                 switch ( match.result ) {
                     case 0:
                     case 1:
                     case 2:
-                        outcome = 'In Game';
+                        //
                         break;
                     case 3:
                         // player 1 win
-                        outcome = sanitizeDisplayName( player1[0].username ) + ' Victory';
+                        player1Name.classList.add('recent-matchup-victor');
                         break;
                     case 4:
                         // player 2 win
-                        outcome = saintizeDisplayName( player2[0].username ) + ' Victory';
+                        player2Name.classList.add('recent-matchup-victor');
                         break;
                     default:
-                        outcome = 'No Winner';
+                        //
                         break;
                 }
-                outcomeCell.append(outcome);
 
-                row.append(dateCell);
+                player1Name.append( sanitizeDisplayName( player1[0].username ) );
+                player2Name.append( sanitizeDisplayName( player2[0].username ) );
+
+                matchPlayer1.append(avatarPlayer1);
+                matchPlayer1.append( player1Name );
+
+                matchPlayer2.append(avatarPlayer2);
+                matchPlayer2.append( player2Name );
+
+                matchupCell.append( matchPlayer1 );
+
+                let vsImg = document.createElement('img');
+                vsImg.classList.add('recent-matchup-vs');
+                vsImg.src = 'https://comicvine.gamespot.com/a/uploads/original/11136/111361078/6676820-vs.png';
+                //matchupCell.append('vs');
+                matchupCell.append(vsImg);
+                matchupCell.append( matchPlayer2 );
+
+                /*let outcomeCell = document.createElement('div');
+                outcomeCell.classList.add('match-outcome');
+                let outcome = '';
+                outcomeCell.append(outcome);*/
+
+                let typeCell = document.createElement('div');
+                typeCell.classList.add('match-type');
+
+                if ( match.ranked ) {
+                    typeCell.append('Ranked');
+                } else {
+                    typeCell.append('Casual');
+                }
+
                 row.append(matchupCell);
-                row.append(outcomeCell);
+                row.append(typeCell);
+                row.append(dateCell);
+                //row.append(outcomeCell);
 
                 recentMatchesList.append(row);
             } catch (error) {
@@ -271,10 +353,20 @@ function countdownTimer() {
     readyCountdown.innerHTML = time;
     if ( countdown == 0 ) {
         clearTimer(readyUp);
-        if ( !ready ) {
-            alert('You have been removed from the queue due to inactivity.');
-        } else {
-            alert('Your opponent did not ready up for the match and it has been canceled.');
+        if ( modal.offsetTop == 0 ) {
+            console.log('hidden modal');
+            // Make the logic work if they clicked ready from the modal
+            if ( readyButton.classList.contains('modal-readied') ) {
+                console.log('readied on modal');
+                ready = true;
+                readyButton.classList.remove('modal-readied');
+            }
+
+            if ( !ready ) {
+                alert('You have been removed from the queue due to inactivity.');
+            } else {
+                alert('Your opponent did not ready up for the match and it has been canceled.');
+            }
         }
         matchMakingReady.style.display = 'none';
         for ( let queueButton of queueButtons ) {
@@ -386,6 +478,18 @@ socket.on("connect_error", (err) => {
   Decription: ${err.description}
   
   Context: ${err.context}`);
+});
+
+socket.on("disconnect", (reason, details) => {
+  alert(`Socket disconnect. This shouldnt be pushed to prod!
+
+  Reason: ${reason}
+  
+  Message: ${details.message}
+  
+  Decription: ${details.description}
+  
+  Context: ${details.context}`);
 });
 
 function sanitizeDisplayName(s) {

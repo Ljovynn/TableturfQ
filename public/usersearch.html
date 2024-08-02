@@ -7,6 +7,7 @@
 		<meta name="description" property="og:description" content="Tableturf Matchmaking!"/>
         <title>TableturfQ</title>
         <link rel="stylesheet" href="./style.css">
+        <link rel="stylesheet" href="./assets/fontawesome-free-6.5.2-web/css/all.min.css">
     </head>
     <body class="body">
         <div class="modal-container">
@@ -22,14 +23,45 @@
             </section>
         </div>
         <div class="overlay hidden"></div>
-        <header>
-            <h1><a href="/">TableturfQ</a></h1>
-            <h3>User Search</h3>
+        <header id="site-header">
+            <div id="site-header-container">
+                <div id="site-header-home-button">
+                    <a id="site-header-logo" href="/"><img src="./assets/images/chumper.png" /></a>
+                    <a id="site-header-hamburger"><i class="fa-solid fa-bars"></i></a>
+                </div>
+                <div id="site-header-page-links">
+                    <a class="mobile-home header-button" href="/">
+                        <div>Home</div>
+                    </a>
+                    <a class="header-button" href="/info">
+                        <div>Rules and Info</div>
+                    </a>
+                    <a class="header-button index-logged-in-link" id="profile-link" href="/profile">
+                    <div id="index-profile-div">My Profile</div>
+                    </a>
+                    <a class="header-button" href="/leaderboard">
+                        <div >Leaderboard</div>
+                    </a>
+                    <a class="header-button" href="/usersearch">
+                    <div >User Search</div>
+                    </a>
+                    <a class="header-button"href="/queue">
+                        <div >Queue</div>
+                    </a>
+                    <a id="index-match-link" class="header-button not-in-game" href="">
+                        <div id="index-match-div">Rejoin Game</div>
+                    </a>
+                    <a id="header-logout-button" class="header-button index-logged-in-link" href="">
+                        <div id="header-logout-div" >Logout</div>
+                    </a>
+                </div>
+            </div>
         </header>
         <main class="main">
+            <h3>User Search</h3>
             <form id="user-search-form">
                 <input id="user-search" type="text" placeholder="Search for a player" />
-                <input id="user-search-button" type="submit" value="Search" />
+                <div id="user-search-button" class="button">Search</div>
             </form>
             <div id="user-search-results">
                 <div></div>
@@ -39,5 +71,6 @@
     <script src="/socket.io/socket.io.js"></script>
     <script type="text/javascript" src="./scripts/dataPOST.js"></script>
     <script type="module" src="./scripts/usersearch.js"></script>
+    <script type="module" src="./scripts/global-header.js"></script>
     <script type="module" src="./scripts/global-queue.js"></script>
 </html>

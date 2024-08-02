@@ -40,7 +40,7 @@ searchInput.addEventListener('input', async (e) => {
 });*/
 
 pageFilter.addEventListener('change', (e) => {
-    hitCount = pageFilter.value;
+    hitCount = parseInt(pageFilter.value);
     // Reset startPos too?
     refreshLeaderBoard(0, hitCount);
 });
