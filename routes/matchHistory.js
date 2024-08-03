@@ -41,14 +41,12 @@ router.post("/GetUserMatchHistory", async (req, res) => {
 
 //requests
 
-//res: matchHistory (DB matches, not match objects), users (DB users)
+//res: matchHistory (DB matches, not match objects. Also included in the objects are username, discord_avatar_hash, g2_rating)
 router.get("/GetRecentMatches", async (req, res) => {
     try{
         const recentMatches = GetGlobalMatchHistory();
 
-        const users = await GetUsers(recentMatches);
-
-        res.status(200).send({recentMatches, users});
+        res.status(200).send(recentMatches);
     } catch(error){
         console.log(error)
         res.status(500).send(error);
