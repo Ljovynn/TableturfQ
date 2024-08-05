@@ -81,7 +81,7 @@ router.post("/BanUser", async (req, res) => {
 
         if (typeof(bannedUserId) !== 'string') return SetErrorResponse(res, definitionErrors.bannedUserUndefined);
         if (typeof(banLength) !== 'number' && typeof(banLength) !== 'undefined') return SetErrorResponse(res, definitionErrors.banLengthWrongFormat);
-        if (typeof(banLength) !== 'string' && typeof(banLength) !== 'undefined') return SetErrorResponse(res, definitionErrors.banReasonWrongFormat);
+        if (typeof(reason) !== 'string' && typeof(reason) !== 'undefined') return SetErrorResponse(res, definitionErrors.banReasonWrongFormat);
         if (reason.length > 128) return SetErrorResponse(res, definitionErrors.banReasonTooLong);
 
         var userError = await CheckIfNotAdmin(req);
