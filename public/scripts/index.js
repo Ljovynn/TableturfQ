@@ -1,4 +1,5 @@
 const loginContent = document.getElementById('login-content');
+const loggedInContent = document.getElementById('logged-in-content');
 const loggedInLinks = document.getElementsByClassName('index-logged-in-link');
 const profileDiv = document.getElementById('index-profile-div');
 const profileLink = document.getElementById('profile-link');
@@ -40,6 +41,7 @@ async function setUserInfo() {
         console.log(userInfo);
         if ( userInfo.user.id ) {
             hideLogInOptions();
+            showLoggedInButton();
         }
     } catch (error) {
         // error
@@ -55,6 +57,10 @@ async function getUserInfo() {
 
 function hideLogInOptions() {
     loginContent.style.display = 'none';
+}
+
+function showLoggedInButton() {
+    loggedInContent.style.display = 'block';
 }
 
 async function setAnnouncements() {

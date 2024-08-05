@@ -151,6 +151,18 @@ select {
     display: none;
 }
 
+/**** FOOTER STYLES ****/
+
+footer {
+    position: relative;
+    bottom: 0;
+    margin-top: 15px;
+    width: 100%;
+    background-color: #6858c2;
+    text: center;
+    padding: 10px 0;
+}
+
 /**** INDEX PAGE STYLES ****/
 .index-link {
     display: block;
@@ -170,6 +182,12 @@ select {
     margin: auto;
 }
 
+#logged-in-content {
+    display: none;
+    width: 50%;
+    margin: auto;
+}
+
 #user-login {
     display: block;
     width: 100px;
@@ -180,6 +198,20 @@ select {
     width: auto;
 }
 
+#homepage-play-now {
+    display: block;
+    width: 500px;
+    margin: auto;
+}
+
+#homepage-play-button {
+    width: auto;
+    margin: auto;
+}
+
+#rank-chart {
+    max-width: 750px;
+}
 
 #announcements-content {
     width: 50%;
@@ -950,6 +982,20 @@ div.recent-matchup-name {
 
     .header-button.not-in-game {
         display: none;
+    }
+
+    /**** INDEX ****/
+
+    #logged-in-content {
+        width: 90%;
+    }
+
+    #homepage-play-now {
+        width: auto;
+    }
+
+    #rank-chart {
+        max-width: 400px;
     }
 
     /**** INFO ****/
