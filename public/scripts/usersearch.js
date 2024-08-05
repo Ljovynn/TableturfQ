@@ -10,9 +10,9 @@ userSearchForm.addEventListener('submit', async (e) => {
 
     if ( validateSeach(searchValue) ) {
         var data = { input: searchValue };
-        var response = await getData('/user/SearchUser', data);
+        var response = await postData('/user/SearchUser', data);
 
-        addSearchUser(response);
+        addSearchUser(response.data);
         // If success, recreate the table with the retrieved results
     } else {
         alert('Please enter a valid username to search.');

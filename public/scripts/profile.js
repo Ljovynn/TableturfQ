@@ -200,8 +200,8 @@ if ( loggedInUserInfo.user.role== 2 ) {
 async function getUserInfo() {
     try {
         var data = {};
-        var result = await fetchData('/user/GetUserInfo');
-        return result;
+        var result = await getData('/user/GetUserInfo');
+        return result.data;
     } catch (error) {
         return null;
     }
@@ -272,8 +272,8 @@ async function getMatchHistory() {
     } else {
         data = { userId: userId, pageNumber: parseInt(page), hitsPerPage: parseInt(hits) };
     }
-    var result = await getData('/matchHistory/GetUserMatchHistory', data);
-    return result;
+    var result = await postData('/matchHistory/GetUserMatchHistory', data);
+    return result.data;
 }
 
 async function setMatchHistory() {
@@ -365,7 +365,7 @@ async function setMatchHistory() {
 
                 let vsImg = document.createElement('img');
                 vsImg.classList.add('recent-matchup-vs');
-                vsImg.src = 'https://comicvine.gamespot.com/a/uploads/original/11136/111361078/6676820-vs.png';
+                vsImg.src = '/assets/images/vs-icon.png';
                 //matchupCell.append('vs');
                 matchupCell.append(vsImg);
                 matchupCell.append( matchPlayer2 );
@@ -399,13 +399,13 @@ async function setMatchHistory() {
 
 async function getMatchUsers(users) {
     var data = { userIdList: users };
-    var result = await getData('/user/GetUsers', data);
-    return result;
+    var result = await postData('/user/GetUsers', data);
+    return result.data;
 }
 
 async function getELOGraph(timeframe) {
     var data = { userId: userId, ratingHistoryOption: ratingHistoryOptions[timeframe] };
-    var result = await getData('/user/GetUserRatingHistory', data);
+    var result = await postData('/user/GetUserRatingHistory', data);
     /*if (result.length > 0){
         result.unshift({
             match_id: null,
@@ -421,7 +421,7 @@ async function getELOGraph(timeframe) {
         });
     }*/
     console.log(result);
-    return result;
+    return result.data;
 }
 
 async function setELOGraph(timeframe = 'month') {
@@ -608,9 +608,9 @@ async function setUserBanLength() {
 
 async function getUserBanLength() {
     //var data = { user: userID };
-    var result = await fetchData('/user/GetUserBanInfo');
+    var result = await getData('/user/GetUserBanInfo');
     console.log(result);
-    return result;
+    return result.data;
 }
 
 async function setAdminBanLength(userID) {
@@ -637,7 +637,7 @@ async function getAdminBanLength(userID) {
     var data = { userId: userID };
     var result = await getData('/admin/GetUserBanInfo', data);
     console.log(result);
-    return result;
+    return result.data;
 }
 
 function getMatchPlayer( matchUsers, playerId ) {

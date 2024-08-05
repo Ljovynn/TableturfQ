@@ -372,7 +372,7 @@ if ( user.role== 2 ) {
 // Page functions
 async function getUserInfo() {
     var data = {};
-    var result = await fetchData('/user/GetUserInfo');
+    var result = await getData('/user/GetUserInfo');
     return result;
 }
 
@@ -403,7 +403,7 @@ async function setUserInfo() {
 async function getMatchInfo(matchId) {
     var data = {matchId: matchId};
     console.log(data);
-    var result = await getData('/match/GetMatchInfo', data);
+    var result = await postData('/match/GetMatchInfo', data);
     matchInfo = result;
     console.log(matchInfo);
 }
@@ -569,7 +569,7 @@ async function setMatchInfo() {
 
 async function getChatMessages(matchId, amountMessages) {
     var data = { matchId: matchId, loadedMessagesAmount: amountMessages };
-    var response = await getData('/match/LoadChatMessages', data);
+    var response = await postData('/match/LoadChatMessages', data);
     console.log(response);
     loadingMessages = false;
     return response;
@@ -1032,7 +1032,7 @@ function showPlayerResolve() {
 
 async function getModUser(users) {
     var data = { userIdList: users };
-    var result = await getData('/user/GetUsers', data);
+    var result = await postData('/user/GetUsers', data);
     return result;
 }
 
