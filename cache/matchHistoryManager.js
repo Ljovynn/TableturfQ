@@ -22,7 +22,6 @@ export async function MatchHistoryManagerSetup(){
             matchHistory[i].player2_rating = player2Data.g2_rating;
             matchHistory[i].player2_discord_avatar_hash = player2Data.discord_avatar_hash;
         }
-        matchHistory = await GetRecentMatches(matchHistoryLength);
     } catch (error){
         console.log(error);
     }
