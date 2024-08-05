@@ -118,14 +118,14 @@ export async function GetUserMatchHistory(userId, hitsPerPage, pageNumber)
 export async function GetUserMatchCount(userId)
 {
     const [count] = await pool.execute(`SELECT SUM(total) AS total FROM (SELECT COUNT(*) AS total FROM matches WHERE player1_id = ? AND private_battle = FALSE
-        UNION SELECT COUNT(*) AS total FROM matches WHERE player2_id = ? AND private_battle = FALSE) x`, [userId, userId]);
+        UNION ALL SELECT COUNT(*) AS total FROM matches WHERE player2_id = ? AND private_battle = FALSE) x`, [userId, userId]);
     if (count[0]) return count[0].total;
 }
 
 export async function GetUserRankedMatchCount(userId)
 {
     const [count] = await pool.execute(`SELECT SUM(total) AS total FROM (SELECT COUNT(*) AS total FROM matches WHERE player1_id = ? AND ranked = TRUE
-        UNION SELECT COUNT(*) AS total FROM matches WHERE player2_id = ? AND ranked = TRUE) x`, [userId, userId]);
+        UNION ALL SELECT COUNT(*) AS total FROM matches WHERE player2_id = ? AND ranked = TRUE) x`, [userId, userId]);
     if (count[0]) return count[0].total;
 }
 
