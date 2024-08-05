@@ -605,7 +605,7 @@ div.match-type, div.match-date {
     outline: 2px solid #6858c2;
 }
 
-div.recent-matchup-player {
+.recent-matchup-player {
     display: inline-block;
     width: 150px;
 }
