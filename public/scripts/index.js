@@ -30,17 +30,27 @@ guestSubmit.addEventListener('click', async (e) => {
 });
 
 async function setUserInfo() {
-    userInfo = await getUserInfo();
-    console.log(userInfo);
-    if ( userInfo.user.id ) {
-        hideLogInOptions();
+    try {
+        userInfo = await getUserInfo();
+        
+        if ( 'error' in userInfo ) {
+            throw new Error(userInfo.error);
+        }
+
+        console.log(userInfo);
+        if ( userInfo.user.id ) {
+            hideLogInOptions();
+        }
+    } catch (error) {
+        // error
+        console.log(error);
     }
 }
 
 async function getUserInfo() {
     var data = {};
-    var result = await fetchData('/user/GetUserInfo');
-    return result;
+    var result = await getData('/user/GetUserInfo');
+    return result.data;
 }
 
 function hideLogInOptions() {
@@ -79,8 +89,8 @@ async function setAnnouncements() {
 }
 
 async function getNextAnnouncement() {
-    var result = await fetchData('/announcementInfo/GetNextAnnouncement');
-    return result;
+    var result = await getData('/announcementInfo/GetNextAnnouncement');
+    return result.data;
 }
 
 function addNextAnnouncement(announcement) {
@@ -108,7 +118,7 @@ function addNextAnnouncement(announcement) {
 }
 
 async function getUpcomingAnnouncements() {
-    var result = await fetchData('/announcementInfo/GetUpcomingAnnouncements');
+    var result = await getData('/announcementInfo/GetUpcomingAnnouncements');
     return result;
 }
 

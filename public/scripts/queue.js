@@ -120,8 +120,8 @@ leaveButton.addEventListener('click', async (e) => {
 
 async function getMatchMakingStatus() {
     var data = {};
-    var result = await fetchData('/que/GetMatchmakingStatus');
-    return result;
+    var result = await getData('/que/GetMatchmakingStatus');
+    return result.data;
 }
 
 async function setMatchMakingStatus() {
@@ -140,8 +140,8 @@ async function setMatchMakingStatus() {
 
 async function getUserInfo() {
     var data = {};
-    var result = await fetchData('/user/GetUserInfo');
-    return result;
+    var result = await getData('/user/GetUserInfo');
+    return result.data;
 }
 
 async function setUserInfo() {
@@ -191,9 +191,9 @@ function setQueueInfo(queueData) {
 
 async function getRecentMatches() {
     var data = {};
-    var result = await fetchData('/matchHistory/GetRecentMatches');
+    var result = await getData('/matchHistory/GetRecentMatches');
     console.log(result);
-    displayRecentMatches(result);
+    displayRecentMatches(result.data);
 }
 
 function displayRecentMatches(recentMatchData) {
@@ -283,7 +283,8 @@ function displayRecentMatches(recentMatchData) {
 
                 let vsImg = document.createElement('img');
                 vsImg.classList.add('recent-matchup-vs');
-                vsImg.src = 'https://comicvine.gamespot.com/a/uploads/original/11136/111361078/6676820-vs.png';
+                vsImg.src = '/assets/images/vs-icon.png';
+
                 //matchupCell.append('vs');
                 matchupCell.append(vsImg);
                 matchupCell.append( matchPlayer2 );

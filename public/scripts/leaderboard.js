@@ -185,8 +185,8 @@ async function refreshLeaderBoard(startPos, hitCount) {
 
 async function getLeaderBoard(startPos, hitCount) {
     var data = { startPos: startPos, hitCount: hitCount }
-    var result = await getData('/leaderboard/GetLeaderboard', data);
-    return result;
+    var result = await postData('/leaderboard/GetLeaderboard', data);
+    return result.data;
 }
 
 function validateSeach(searchValue) {
