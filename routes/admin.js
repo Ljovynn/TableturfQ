@@ -32,7 +32,7 @@ router.post("/ResolveDispute", async (req, res) => {
         var matchData = responseData.data;
 
         if (responseData.data === matchModes.casual){
-            res.sendStatus(responseData.code);
+            res.status(responseData.code).send({});
             SendSocketMessage('match' + matchId, "resolveDispute", disputeResolveOptions.noChanges);
             return;
         }
@@ -41,17 +41,17 @@ router.post("/ResolveDispute", async (req, res) => {
             case disputeResolveOptions.gameWinPlayer1:
             case disputeResolveOptions.gameWinPlayer2:
                 if (responseData.data.matchFinished){
-                    res.sendStatus(responseData.code);
+                    res.status(responseData.code).send({});
                     var data = {winnerId: winnerId, newPlayerRatings: matchData.newPlayerRatings};
                     SendSocketMessage('match' + matchId, "matchWin", data);
                 } else{
-                    res.sendStatus(responseData.code);
+                    res.status(responseData.code).send({});
                     SendSocketMessage('match' + matchId, "gameWin", matchData.winnerId);
                 }
                 break;
             case disputeResolveOptions.matchWinPlayer1:
             case disputeResolveOptions.matchWinPlayer2:
-                res.sendStatus(responseData.code);
+                res.status(responseData.code).send({});
                 var data = {winnerId: winnerId, newPlayerRatings: matchData.newPlayerRatings};
                 SendSocketMessage('match' + matchId, "matchWin", data);
                 break;
@@ -59,7 +59,7 @@ router.post("/ResolveDispute", async (req, res) => {
             case disputeResolveOptions.resetCurrentGame:
             case disputeResolveOptions.restartMatch:
             case disputeResolveOptions.cancelMatch:
-                res.sendStatus(responseData.code);
+                res.status(responseData.code).send({});
                 SendSocketMessage('match' + matchId, "resolveDispute", resolveOption);
                 break;
             default:
@@ -102,7 +102,7 @@ router.post("/BanUser", async (req, res) => {
 
         await HandleBanUser(bannedUserId);
 
-        res.sendStatus(201);
+        res.status(201).send({});
         return;
         
     } catch (err){
@@ -123,7 +123,7 @@ router.post("/UnbanUser", async (req, res) => {
 
         await UnbanUser(unbannedUserId);
 
-        res.sendStatus(201);
+        res.status(201).send({});
         return;
         
     } catch (err){
@@ -176,7 +176,7 @@ router.post("/ModChatMessage", async (req, res) => {
         var responseData = await ModSentChatMessage(matchId, userId, message)
         if (!ResponseSucceeded(responseData.code)) return SetErrorResponse(res, responseData);
 
-        res.sendStatus(responseData.code);
+        res.status(responseData.code).send({});
         var socketMessage = {ownerId: userId, content: message, date: Date.now()};
         SendSocketMessage('match' + matchId, "chatMessage", socketMessage);
     } catch (err){

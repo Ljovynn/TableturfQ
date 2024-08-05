@@ -66,7 +66,7 @@ router.post("/PickStage", async (req, res) => {
         var responseData = PlayerSentStagePick(userId, stage);
         if (!ResponseSucceeded(responseData.code)) return SetErrorResponse(res, responseData);
 
-        res.sendStatus(responseData.code);
+        res.status(responseData.code).send({});
         SendSocketMessage('match' + responseData.data, "stagePick", stage);
     } catch (err){
         res.sendStatus(500);
@@ -95,7 +95,7 @@ router.post("/WinGame", async (req, res) => {
         } else if (matchData.confirmed){
             SendSocketMessage('match' + matchData.matchId, "gameWin", winnerId);
         }
-        res.sendStatus(responseData.code);
+        res.status(responseData.code).send({});
     } catch (err){
         console.error(err);
         res.sendStatus(500);
@@ -111,7 +111,7 @@ router.post("/CasualMatchEnd", async (req, res) => {
         var responseData = await PlayerSentCasualMatchEnd(userId);
         if (!ResponseSucceeded(responseData.code)) return SetErrorResponse(res, responseData);
 
-        res.sendStatus(responseData.code);
+        res.status(responseData.code).send({});
         SendEmptySocketMessage('match' + responseData.data, "matchEnd");
     } catch (err){
         console.error(err);
@@ -135,7 +135,7 @@ router.post("/ForfeitMatch", async (req, res) => {
             newPlayerRatings: responseData.data.newPlayerRatings,
         }
 
-        res.sendStatus(responseData.code);
+        res.status(responseData.code).send({});
         SendSocketMessage('match' + matchId, "forfeit", data);
     } catch (err){
         console.error(err);
@@ -152,7 +152,7 @@ router.post("/Dispute", async (req, res) => {
         var responseData = PlayerSentMatchDispute(userId);
         if (!ResponseSucceeded(responseData.code)) return SetErrorResponse(res, responseData);
 
-        res.sendStatus(responseData.code);
+        res.status(responseData.code).send({});
         SendEmptySocketMessage('match' + responseData.data, "dispute");
     } catch (err){
         console.error(err);
@@ -169,17 +169,17 @@ router.post("/ResolveDispute", async (req, res) => {
         if (!ResponseSucceeded(responseData.code)) return SetErrorResponse(res, responseData);
 
         if (responseData.data === matchModes.casual){
-            res.sendStatus(responseData.code);
+            res.status(responseData.code).send({});
             SendSocketMessage('match' + responseData.data.matchId, "resolveDispute", disputeResolveOptions.noChanges);
             return;
         }
         
         if (!responseData.data){
-            return res.sendStatus(responseData.code);
+            return res.status(responseData.code).send({});
         }
         
         SendSocketMessage('match' + responseData.data, "resolveDispute", disputeResolveOptions.noChanges);
-        res.sendStatus(responseData.code);
+        res.status(responseData.code).send({});
     } catch (err){
         console.error(err);
         res.sendStatus(500);
@@ -201,7 +201,7 @@ router.post("/SendChatMessage", async (req, res) => {
         var responseData = await UserSentChatMessage(matchId, userId, message);
         if (!ResponseSucceeded(responseData.code)) return SetErrorResponse(res, responseData);
 
-        res.sendStatus(responseData.code);
+        res.status(responseData.code).send({});
         var socketMessage = {ownerId: userId, content: message, date: Date.now()};
         SendSocketMessage('match' + matchId, "chatMessage", socketMessage);
     } catch (err){

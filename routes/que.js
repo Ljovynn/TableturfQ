@@ -23,7 +23,7 @@ router.post("/PlayerEnterQue", async (req, res) => {
         var responseData = await AddPlayerToQue(userId, matchMode);
         if (!ResponseSucceeded(responseData.code)) return SetErrorResponse(res, responseData);
 
-        res.sendStatus(responseData.code);
+        res.status(responseData.code).send({});
     } catch (err){
         console.log(err);
         res.sendStatus(500);
@@ -59,7 +59,7 @@ router.post("/PlayerReady", async (req, res) => {
 
         var responseData = await PlayerSentReady(userId);
         if (!ResponseSucceeded(responseData.code)) return SetErrorResponse(res, responseData);
-        res.sendStatus(responseData.code);
+        res.status(responseData.code).send({});
 
         if (!responseData.data) return;
 
