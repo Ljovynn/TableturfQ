@@ -96,6 +96,7 @@ async function setAnnouncements() {
 
 async function getNextAnnouncement() {
     var result = await getData('/announcementInfo/GetNextAnnouncement');
+    console.log(result);
     return result.data;
 }
 
@@ -125,7 +126,7 @@ function addNextAnnouncement(announcement) {
 
 async function getUpcomingAnnouncements() {
     var result = await getData('/announcementInfo/GetUpcomingAnnouncements');
-    return result;
+    return result.data;
 }
 
 function addUpcomingAnnouncements(announcements) {

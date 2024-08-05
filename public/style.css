@@ -12,6 +12,11 @@ html {
     height: auto;
 }
 
+main {
+    width: 75%;
+    margin: auto;
+}
+
 body {
     font-family:Arial, Helvetica, sans-serif;
     text-align: center;
@@ -209,18 +214,30 @@ footer {
     margin: auto;
 }
 
+#home-content {
+    display: inline-block;
+    width: 60%;
+}
+
+.home-content-section {
+    width: 75%;
+    margin: auto;
+    text-align: left;
+}
+
 #rank-chart {
     max-width: 750px;
 }
 
 #announcements-content {
-    width: 50%;
+    display: inline-block;
+    width: 33%;
     margin: auto;
+    float: right;
 }
 
 #next-announcement {
     display: none;
-    width: 75%;
     margin: auto;
     outline: 2px solid #6858c2;
     padding: 10px;
@@ -228,7 +245,6 @@ footer {
 
 #upcoming-announcements {
     display: none;
-    width: 75%;
     margin: auto;
 }
 
@@ -246,8 +262,6 @@ footer {
     outline: 2px solid #6858c2;
     padding: 10px;
     margin: 10px;
-    display: inline-block;
-    width: 30%;
 }
 
 /**** GAME PAGE STYLES ****/
@@ -931,6 +945,11 @@ div.recent-matchup-name {
 
 /**** MOBILE STLYES ****/
 @media only screen and (max-width: 810px) {
+    main {
+        width: 100%;
+    }
+
+
     /**** HEADER ****/
     .header-expanded {
         height: 100%;
@@ -992,6 +1011,15 @@ div.recent-matchup-name {
 
     #homepage-play-now {
         width: auto;
+    }
+
+    #home-content {
+        width: 90%;
+    }
+
+    #announcement-content {
+        clear: both;
+        width: 90%;
     }
 
     #rank-chart {
