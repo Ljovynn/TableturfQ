@@ -47,6 +47,7 @@ const adminBanUserButton = document.getElementById('admin-ban-user-button');
 const adminUnbanUserContent = document.getElementById('admin-unban-user-content');
 const adminUnbanUserButton = document.getElementById('admin-unban-user-button');
 const adminBanLength = document.getElementById('admin-ban-user-length');
+const adminBanReason = document.getElementById('admin-ban-user-reason');
 
 var loggedInUserInfo;
 var loggedInUserID = '';
@@ -148,7 +149,7 @@ countrySubmit.addEventListener('click', async (e) => {
 
 logoutButton.addEventListener('click', async (e) => {
     var response = await postData('/user/DeleteUserLoginData');
-    if ( response == 201 ) {
+    if ( response.code == 201 ) {
         window.location.href = '/';
     }
 });
@@ -172,11 +173,11 @@ if ( loggedInUserInfo.user.role== 2 ) {
     });
 
     adminBanUserButton.addEventListener('click', async (e) => {
-        var data = { bannedUserId: userId, banLength: parseInt(adminBanLength.value) };
+        var data = { bannedUserId: userId, banLength: parseInt(adminBanLength.value), reason: adminBanReason.value };
         var response = await postData('/admin/BanUser', data);
 
         console.log(response);
-        if ( response == 201 ) {
+        if ( response.code == 201 ) {
             adminUnbanUserContent.style.display = 'block';
             adminBanUser.style.display = 'none';
             adminBanUserContent.style.display = 'none';
@@ -189,7 +190,7 @@ if ( loggedInUserInfo.user.role== 2 ) {
         var response = await postData('/admin/UnbanUser', data);
 
         console.log(response);
-        if ( response == 201 ) {
+        if ( response.code == 201 ) {
             adminUnbanUserContent.style.display = 'none';
             banDetails.style.display = 'none';
             adminBanUser.style.display = 'block';
@@ -305,10 +306,12 @@ async function setMatchHistory() {
                 var player2 = getMatchPlayer(matchUsers, match.player2_id);
                 matchupCell.classList.add('matchup');
 
-                let matchPlayer1 = document.createElement('div');
+                let matchPlayer1 = document.createElement('a');
+                matchPlayer1.href = '/profile?playerId=' + match.player1_id;
                 matchPlayer1.classList.add('recent-matchup-player');
                 matchPlayer1.classList.add('recent-matchup-player1');
-                let matchPlayer2 = document.createElement('div');
+                let matchPlayer2 = document.createElement('a');
+                matchPlayer2.href = '/profile?playerId=' + match.player2_id;
                 matchPlayer2.classList.add('recent-matchup-player');
                 matchPlayer2.classList.add('recent-matchup-player2');
 
@@ -597,10 +600,10 @@ async function setUserBanLength() {
                 var remainingTime = banLength - currentTime;
                 var readableLength = getReadableTime(remainingTime);
 
-                banDetails.innerHTML = 'You are suspened from using TableturfQ until ' + new Date(banLength*1000) + `<br />` + 'Which is ' + readableLength + ' from now';
+                banDetails.innerHTML = 'You are suspened from using TableturfQ until ' + new Date(banLength*1000) + `<br />` + 'Which is ' + readableLength + ' from now.' + `<br />` + 'Reason: ' + banInfo.reason;
                 banDetails.style.display = 'block';
             } else {
-                banDetails.innerHTML = 'You are banned from using TableturfQ';
+                banDetails.innerHTML = 'You are banned from using TableturfQ.' + `<br />` + 'Reason: ' + banInfo.reason;
                 banDetails.style.display = 'block';
             }
         }
@@ -624,10 +627,10 @@ async function setAdminBanLength(userID) {
             var remainingTime = banLength - currentTime;
             var readableLength = getReadableTime(remainingTime);
 
-            banDetails.innerHTML = 'User is suspended from using TableturfQ until ' + new Date(banLength*1000) + `<br />` + 'Which is ' + readableLength + ' from now';
+            banDetails.innerHTML = 'User is suspended from using TableturfQ until ' + new Date(banLength*1000) + `<br />` + 'Which is ' + readableLength + ' from now.' + `<br />` + 'Reason: ' + banInfo.reason;
             banDetails.style.display = 'block';
         } else {
-            banDetails.innerHTML = 'User is banned from using TableturfQ';
+            banDetails.innerHTML = 'User is banned from using TableturfQ.' + `<br />` + 'Reason: ' + banInfo.reason;
             banDetails.style.display = 'block';
         }
     }
@@ -636,7 +639,7 @@ async function setAdminBanLength(userID) {
 async function getAdminBanLength(userID) {
     console.log(userID);
     var data = { userId: userID };
-    var result = await getData('/admin/GetUserBanInfo', data);
+    var result = await postData('/admin/GetUserBanInfo', data);
     console.log(result);
     return result.data;
 }

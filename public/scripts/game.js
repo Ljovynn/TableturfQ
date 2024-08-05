@@ -51,6 +51,7 @@ const adminUnbanPlayer1Content = document.getElementById('admin-unban-player1-co
 const adminUnbanPlayer1Button = document.getElementById('admin-unban-player1-button');
 const adminBanPlayer1Details = document.getElementById('admin-ban-player1-details');
 const adminBanPlayer1Length = document.getElementById('admin-ban-player1-length');
+const adminBanPlayer1Reason = document.getElementById('admin-ban-player1-reason');
 
 const adminBanPlayer2Content = document.getElementById('admin-ban-player2-content');
 const adminBanPlayer2Button = document.getElementById('admin-ban-player2-button');
@@ -58,6 +59,7 @@ const adminUnbanPlayer2Content = document.getElementById('admin-unban-player2-co
 const adminUnbanPlayer2Button = document.getElementById('admin-unban-player2-button');
 const adminBanPlayer2Details = document.getElementById('admin-ban-player2-details');
 const adminBanPlayer2Length = document.getElementById('admin-ban-player2-length');
+const adminBanPlayer2Reason = document.getElementById('admin-ban-player2-reason');
 
 // Match options
 const setLength = document.getElementById('set-length');
@@ -205,7 +207,7 @@ for (let victoryButton of victoryButtons ) {
         var data = { winnerId: victoryButton.value };
         var response = await postData('/match/WinGame', data);
         console.log(response);
-        if ( response == 201 ) {
+        if ( response.code == 201 ) {
             console.log('Winner was marked at least');
             confirmationMessage.style.display = 'block';
             player1VictoryButton.style.display = 'none';
@@ -274,7 +276,7 @@ strikeButton.addEventListener('click', async (e) => {
         }
         console.log(response);
 
-        if ( response == 201 ) {
+        if ( response.code == 201 ) {
             stageStrikes = [];
         }
 
@@ -301,7 +303,7 @@ playerResolveDispute.addEventListener('click', async (e) => {
     playerResolve.style.display = 'none';
     var response = await postData('/match/ResolveDispute');
     console.log(response);
-    if ( response == 201 ) {
+    if ( response.code == 201 ) {
         // idk
     }
 });
@@ -335,13 +337,13 @@ if ( user.role== 2 ) {
         var data = { matchId: matchId, resolveOption: parseInt(adminDisputeOptions.value) };
         var response = await postData('/admin/ResolveDispute', data);
         console.log(response);
-        if ( response == 201 ) {
+        if ( response.code == 201 ) {
             adminContent.style.display = 'none';
         }
     });
 
     adminBanPlayer1Button.addEventListener('click', async (e) => {
-        var data = { bannedUserId: players[0].id, banLength: parseInt(adminBanPlayer1Length.value) };
+        var data = { bannedUserId: players[0].id, banLength: parseInt(adminBanPlayer1Length.value), reason: adminBanPlayer1Reason.value };
         var response = await postData('/admin/BanUser', data);
 
         console.log(response);
@@ -355,7 +357,7 @@ if ( user.role== 2 ) {
     });
 
     adminBanPlayer2Button.addEventListener('click', async (e) => {
-        var data = { bannedUserId: players[1].id, banLength: parseInt(adminBanPlayer2Length.value) };
+        var data = { bannedUserId: players[1].id, banLength: parseInt(adminBanPlayer2Length.value), reason: adminBanPlayer2Reason.value };
         var response = await postData('/admin/BanUser', data);
 
         console.log(response);
