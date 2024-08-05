@@ -212,7 +212,7 @@ for (let victoryButton of victoryButtons ) {
             confirmationMessage.style.display = 'block';
             player1VictoryButton.style.display = 'none';
             player2VictoryButton.style.display = 'none';
-            confirmationMessage.innerHTML = 'Waiting for opponent to confirm the winner.';
+            //confirmationMessage.innerHTML = 'Waiting for opponent to confirm the winner.';
         }
     });
 }
@@ -544,6 +544,7 @@ async function setMatchInfo() {
                 // player 1 win
                 stageList.style.display = 'none';
                 currentStrikerName.style.display = 'none';
+                strikeContent.style.display = 'none';
                 gameMessage.innerHTML = sanitizeDisplayName( players[0].username ) + ' has won the match!';
                 requeueButton.style.display = 'block';
                 confirmationMessage.style.display = 'none';
@@ -553,6 +554,7 @@ async function setMatchInfo() {
                 // player 2 win
                 stageList.style.display = 'none';
                 currentStrikerName.style.display = 'none';
+                strikeContent.style.display = 'none';
                 gameMessage.innerHTML = sanitizeDisplayName( players[1].username ) + ' has won the match!';
                 requeueButton.style.display = 'block';
                 confirmationMessage.style.display = 'none';
@@ -989,6 +991,7 @@ async function gameFinish(winnerId) {
     stageList.style.display = 'none';
     strikerSection.style.display = 'block';
     currentStrikerName.style.display = 'none';
+    leaveMatch.style.display = 'none';
 
     console.log(players);
 
@@ -1219,7 +1222,6 @@ socket.on('matchEnd', async (data) => {
         setPlayerLeftMessage( leftPlayer, false );
         requeueButton.style.display = 'block';
         leaveMatch.style.display = 'none';
-
     }
 });
 
