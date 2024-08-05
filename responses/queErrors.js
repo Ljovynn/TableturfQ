@@ -13,3 +13,7 @@ export const enterQueErrors = Object.freeze({
 export const readyUpErrors = Object.freeze({ 
     notMatched: new ResponseData(403, 'Player isn\'t put in a match'),
 });
+
+export const leaveQueErrors = Object.freeze({ 
+    notInQue: new ResponseData(403, 'Player already not in que'),
+});
