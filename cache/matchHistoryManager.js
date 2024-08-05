@@ -16,10 +16,12 @@ export async function MatchHistoryManagerSetup(){
 
             matchHistory[i].player1_username = player1Data.username;
             matchHistory[i].player1_rating = player1Data.g2_rating;
+            matchHistory[i].player1_discord_id = player1Data.discord_id;
             matchHistory[i].player1_discord_avatar_hash = player1Data.discord_avatar_hash;
 
             matchHistory[i].player2_username = player2Data.username;
             matchHistory[i].player2_rating = player2Data.g2_rating;
+            matchHistory[i].player2_discord_id = player2Data.discord_id;
             matchHistory[i].player2_discord_avatar_hash = player2Data.discord_avatar_hash;
         }
     } catch (error){
@@ -40,10 +42,12 @@ export async function UpdateRecentMatches(match){
         player1_id: match.players[0].id,
         player1_username: player1Data.username,
         player1_rating: player1Data.g2_rating,
+        player1_discord_id: player1Data.discord_id,
         player1_discord_avatar_hash: player1Data.discord_avatar_hash,
         player2_id: match.players[1].id,
         player2_username: player2Data.username,
         player2_rating: player2Data.g2_rating,
+        player2_discord_id: player2Data.discord_id,
         player2_discord_avatar_hash: player2Data.discord_avatar_hash,
         ranked: (match.mode == matchModes.ranked) ? true : false,
         set_length: match.setLength,
