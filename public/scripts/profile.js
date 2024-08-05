@@ -278,6 +278,7 @@ async function getMatchHistory() {
 
 async function setMatchHistory() {
     matchList = await getMatchHistory();
+    console.log(matchList);
     matches = matchList.matchHistory;
     matchUsers = matchList.users;
 

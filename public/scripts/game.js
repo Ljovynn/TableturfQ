@@ -233,7 +233,7 @@ chatForm.addEventListener('submit', async (e) => {
         }
         console.log('chat message send response: ' + response);
 
-        if ( response == 201 ) {
+        if ( response.code == 201 ) {
             // If the message is accepted by the server
             chatInput.value = '';
         }
@@ -381,7 +381,7 @@ async function setUserInfo() {
     try {
         var userInfo = await getUserInfo(userID);
 
-        user = userInfo.user;
+        user = userInfo.data.user;
         username = sanitizeDisplayName( user.username );
         userID = user.id;
         userELO = user.g2_rating;
@@ -404,7 +404,7 @@ async function getMatchInfo(matchId) {
     var data = {matchId: matchId};
     console.log(data);
     var result = await postData('/match/GetMatchInfo', data);
-    matchInfo = result;
+    matchInfo = result.data;
     console.log(matchInfo);
 }
 
