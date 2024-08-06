@@ -159,7 +159,7 @@ graphSubmit.addEventListener('click', async (e) => {
 });
 
 // Admin actions
-if ( loggedInUserInfo.user.role== 2 ) {
+if ( !loggedInUserInfo.error && loggedInUserInfo.user.role== 2 ) {
     adminBanUser.addEventListener('click', async (e) => {
         adminBanUserContent.style.display = 'block';
     });
@@ -211,12 +211,13 @@ async function getUserInfo() {
 async function setUserInfo() {
     try {
         loggedInUserInfo = await getUserInfo();
-        if ( loggedInUserInfo ) {
+        if ( loggedInUserInfo && !loggedInUserInfo.error ) {
             loggedInUserID = loggedInUserInfo.user.id;
         }
         // If no playerID is set, try the default get current user info
         if ( playerID != '' ) {
             userInfo = await getMatchUsers([playerID]);
+            console.log(userInfo);
             user = userInfo[0];
         } else {
             userInfo = loggedInUserInfo;
@@ -260,7 +261,7 @@ async function setUserInfo() {
         hideNonUserElements();
     } catch (error) {
         console.log(error);
-        window.location.href = '/';
+        //window.location.href = '/';
     }
 }
 
@@ -658,7 +659,7 @@ function hideNonUserElements() {
 }
 
 async function showAdminBanInfo() {
-    if ( loggedInUserInfo.user.role == 2 ) {
+    if ( !loggedInUserInfo.error && loggedInUserInfo.user.role == 2 ) {
         adminContent.style.display = 'block';
         if ( user.banned ) {
             adminBanUserContent.style.display = 'none';
