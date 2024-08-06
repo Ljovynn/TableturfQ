@@ -6,7 +6,7 @@ header {
 
 html {
     /*background-image: linear-gradient(45deg, rgba(52.9,48.6,76.1,1), rgba(85.1,77.3,27.8,1));*/
-    background-image: linear-gradient(11deg, rgba(85.1,77.3,27.8,1), rgba(52.9,48.6,76.1,1));
+    background-image: linear-gradient(-11deg, rgba(85.1,77.3,27.8,1), rgba(52.9,48.6,76.1,1));
     background-repeat: no-repeat;
     background-size: 100% 100%;
     min-height: 100%;
@@ -843,7 +843,7 @@ div.recent-matchup-name {
     z-index: 2;
 
     /*background-image: linear-gradient(45deg, rgba(52.9,48.6,76.1,1), rgba(85.1,77.3,27.8,1));*/
-    background-image: linear-gradient(45deg, rgba(85.1,77.3,27.8,1), rgba(52.9,48.6,76.1,1));
+    background-image: linear-gradient(-11deg, rgba(85.1,77.3,27.8,1), rgba(52.9,48.6,76.1,1));
     background-repeat: no-repeat;
     background-size: 100% 100%;
 }

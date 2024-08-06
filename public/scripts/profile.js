@@ -120,10 +120,12 @@ displayNameSubmit.addEventListener('click', (e) => {
         var response = postData('/user/SetUsername', data);
 
         // On successful response
-        editDisplayNameForm.classList.toggle('editing');
-        userDisplayNameContent.classList.toggle('editing');
-        displayNameInput.value = '';
-        userDisplayName.textContent = newDisplayName;
+        if ( response.code == 200 ) {
+            editDisplayNameForm.classList.toggle('editing');
+            userDisplayNameContent.classList.toggle('editing');
+            displayNameInput.value = '';
+            userDisplayName.textContent = newDisplayName;
+        }
     } else {
         alert('The submitted display name is invalid. Please try again.');
     }
@@ -137,14 +139,15 @@ countrySubmit.addEventListener('click', async (e) => {
 
     // On Success
     console.log(response);
-
-    editCountryForm.classList.toggle('editing');
-    userCountry.classList.toggle('editing');
-    var countryElement = document.createElement('img');
-    countryElement.src = 'https://flagcdn.com/w20/' + newCountry.toLowerCase() + '.png';
-    countryFlag = countryElement;
-    userCountryValue.innerHTML = '';
-    userCountryValue.append(countryFlag);
+    if ( response.code == 200 ) {
+        editCountryForm.classList.toggle('editing');
+        userCountry.classList.toggle('editing');
+        var countryElement = document.createElement('img');
+        countryElement.src = 'https://flagcdn.com/w20/' + newCountry.toLowerCase() + '.png';
+        countryFlag = countryElement;
+        userCountryValue.innerHTML = '';
+        userCountryValue.append(countryFlag);
+    }
 });
 
 logoutButton.addEventListener('click', async (e) => {
