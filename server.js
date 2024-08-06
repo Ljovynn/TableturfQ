@@ -110,6 +110,7 @@ import adminRouter from './routes/admin.js';
 import userRouter from './routes/user.js';
 import announcementRouter from './routes/announcementInfo.js';
 import matchHistoryRouter from './routes/matchHistory.js';
+import deckSharingRouter from './routes/deckSharing.js';
 
 app.use('/api/auth', authRouter);
 app.use('/match', matchRouter);
@@ -119,6 +120,7 @@ app.use('/admin', adminRouter);
 app.use('/user', userRouter);
 app.use('/announcementInfo', announcementRouter);
 app.use('/matchHistory', matchHistoryRouter);
+app.use('/deckSharing', deckSharingRouter);
 
 //todo: mod stuff
 //resolve dispute

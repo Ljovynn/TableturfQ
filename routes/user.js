@@ -33,7 +33,7 @@ router.post("/SetUsername", async (req, res) => {
         if (HasBadWords(username)) return SetErrorResponse(res, definitionErrors.usernameContainsBadWord);
 
         await SetUsername(userId, username);
-        res.sendStatus(201);
+        res.status(201).send({});
     } catch(error){
         console.error(error);
         res.sendStatus(400);
@@ -52,13 +52,13 @@ router.post("/SetUserCountry", async (req, res) => {
         country = country.toLowerCase();
         if (country == 'none'){
             await SetUserCountry(userId, null);
-            res.sendStatus(201);
+            res.status(201).send({});
             return;
         }
         if (country.length != 2) return SetErrorResponse(res, definitionErrors.countryWrongFormat);
 
         await SetUserCountry(userId, country);
-        res.sendStatus(201);
+        res.status(201).send({});
     } catch(error){
         console.error(error);
         res.sendStatus(400);
