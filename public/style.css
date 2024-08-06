@@ -5,7 +5,8 @@ header {
 }
 
 html {
-    background-image: linear-gradient(45deg, rgba(52.9,48.6,76.1,1), rgba(85.1,77.3,27.8,1));
+    /*background-image: linear-gradient(45deg, rgba(52.9,48.6,76.1,1), rgba(85.1,77.3,27.8,1));*/
+    background-image: linear-gradient(11deg, rgba(85.1,77.3,27.8,1), rgba(52.9,48.6,76.1,1));
     background-repeat: no-repeat;
     background-size: 100% 100%;
     min-height: 100%;
@@ -15,6 +16,7 @@ html {
 main {
     width: 75%;
     margin: auto;
+    min-height: 850px;
 }
 
 body {
@@ -273,12 +275,16 @@ footer {
     margin: auto;
 }
 
+.score-container {
+    font-size: 1.4rem;
+}
+
 .player-info {
     display: inline-block;
     padding: 20px;
     border: 2px solid #6858c2;
     margin: 10px 10px 20px 10px;
-    width: 200px;
+    width: 33%
 }
 
 #player1-in-game-name, #player2-in-game-name {
@@ -306,6 +312,10 @@ footer {
 #player1-avatar, #player2-avatar {
     width: 150px;
     border-radius: 50%;
+}
+
+#player1-rank, #player2-rank {
+    display: inline-block;
 }
 
 .player-rank {
@@ -568,7 +578,7 @@ footer {
 
 #user-match-info {
     display: inline-block;
-    width: 50%;
+    width: 100%;
     margin: auto;
 }
 
@@ -642,7 +652,7 @@ div.match-type, div.match-date {
 
 #recent-matches {
     display: none;
-    width: 50%;
+    width: 100%;
     margin: auto;
 }
 
@@ -832,7 +842,8 @@ div.recent-matchup-name {
     border-radius: 15px;
     z-index: 2;
 
-    background-image: linear-gradient(45deg, rgba(52.9,48.6,76.1,1), rgba(85.1,77.3,27.8,1));
+    /*background-image: linear-gradient(45deg, rgba(52.9,48.6,76.1,1), rgba(85.1,77.3,27.8,1));*/
+    background-image: linear-gradient(45deg, rgba(85.1,77.3,27.8,1), rgba(52.9,48.6,76.1,1));
     background-repeat: no-repeat;
     background-size: 100% 100%;
 }
@@ -1082,6 +1093,11 @@ div.recent-matchup-name {
     }    
 
     /**** MATCH ****/
+
+    .player-info {
+        width: auto;
+        display: block;
+    }
 
     .stage:hover {
         border: 2px solid #6858c2;
