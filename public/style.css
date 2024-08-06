@@ -5,11 +5,18 @@ header {
 }
 
 html {
-    background-image: linear-gradient(45deg, rgba(52.9,48.6,76.1,1), rgba(85.1,77.3,27.8,1));
+    /*background-image: linear-gradient(45deg, rgba(52.9,48.6,76.1,1), rgba(85.1,77.3,27.8,1));*/
+    background-image: linear-gradient(-11deg, rgba(85.1,77.3,27.8,1), rgba(52.9,48.6,76.1,1));
     background-repeat: no-repeat;
     background-size: 100% 100%;
     min-height: 100%;
     height: auto;
+}
+
+main {
+    width: 75%;
+    margin: auto;
+    min-height: 850px;
 }
 
 body {
@@ -209,18 +216,29 @@ footer {
     margin: auto;
 }
 
+#home-content {
+    display: inline-block;
+    width: 60%;
+}
+
+.home-content-section {
+    margin: auto;
+    text-align: left;
+}
+
 #rank-chart {
     max-width: 750px;
 }
 
 #announcements-content {
-    width: 50%;
+    display: inline-block;
+    width: 33%;
     margin: auto;
+    float: right;
 }
 
 #next-announcement {
     display: none;
-    width: 75%;
     margin: auto;
     outline: 2px solid #6858c2;
     padding: 10px;
@@ -228,7 +246,6 @@ footer {
 
 #upcoming-announcements {
     display: none;
-    width: 75%;
     margin: auto;
 }
 
@@ -246,8 +263,6 @@ footer {
     outline: 2px solid #6858c2;
     padding: 10px;
     margin: 10px;
-    display: inline-block;
-    width: 30%;
 }
 
 /**** GAME PAGE STYLES ****/
@@ -260,12 +275,16 @@ footer {
     margin: auto;
 }
 
+.score-container {
+    font-size: 1.4rem;
+}
+
 .player-info {
     display: inline-block;
     padding: 20px;
     border: 2px solid #6858c2;
     margin: 10px 10px 20px 10px;
-    width: 200px;
+    width: 33%
 }
 
 #player1-in-game-name, #player2-in-game-name {
@@ -293,6 +312,10 @@ footer {
 #player1-avatar, #player2-avatar {
     width: 150px;
     border-radius: 50%;
+}
+
+#player1-rank, #player2-rank {
+    display: inline-block;
 }
 
 .player-rank {
@@ -555,7 +578,7 @@ footer {
 
 #user-match-info {
     display: inline-block;
-    width: 50%;
+    width: 100%;
     margin: auto;
 }
 
@@ -629,7 +652,7 @@ div.match-type, div.match-date {
 
 #recent-matches {
     display: none;
-    width: 50%;
+    width: 100%;
     margin: auto;
 }
 
@@ -757,7 +780,7 @@ div.recent-matchup-name {
 
 /**** ABOUT/INFO STYLES ****/
 #info-container {
-    width: 65%;
+    width: 90%;
     margin: auto;
 }
 
@@ -819,7 +842,8 @@ div.recent-matchup-name {
     border-radius: 15px;
     z-index: 2;
 
-    background-image: linear-gradient(45deg, rgba(52.9,48.6,76.1,1), rgba(85.1,77.3,27.8,1));
+    /*background-image: linear-gradient(45deg, rgba(52.9,48.6,76.1,1), rgba(85.1,77.3,27.8,1));*/
+    background-image: linear-gradient(-11deg, rgba(85.1,77.3,27.8,1), rgba(52.9,48.6,76.1,1));
     background-repeat: no-repeat;
     background-size: 100% 100%;
 }
@@ -931,6 +955,11 @@ div.recent-matchup-name {
 
 /**** MOBILE STLYES ****/
 @media only screen and (max-width: 810px) {
+    main {
+        width: 100%;
+    }
+
+
     /**** HEADER ****/
     .header-expanded {
         height: 100%;
@@ -994,6 +1023,15 @@ div.recent-matchup-name {
         width: auto;
     }
 
+    #home-content {
+        width: 90%;
+    }
+
+    #announcements-content {
+        float: none;
+        width: 90%;
+    }
+
     #rank-chart {
         max-width: 400px;
     }
@@ -1031,6 +1069,10 @@ div.recent-matchup-name {
         width: 100%;
     }
 
+    #recent-matches {
+        width: 90%;
+    }
+
     .recent-matchup-player {
         display: inline-block;
         width: 100%;
@@ -1051,6 +1093,11 @@ div.recent-matchup-name {
     }    
 
     /**** MATCH ****/
+
+    .player-info {
+        width: auto;
+        display: block;
+    }
 
     .stage:hover {
         border: 2px solid #6858c2;

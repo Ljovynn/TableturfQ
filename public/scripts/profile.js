@@ -120,10 +120,12 @@ displayNameSubmit.addEventListener('click', (e) => {
         var response = postData('/user/SetUsername', data);
 
         // On successful response
-        editDisplayNameForm.classList.toggle('editing');
-        userDisplayNameContent.classList.toggle('editing');
-        displayNameInput.value = '';
-        userDisplayName.textContent = newDisplayName;
+        if ( response.code == 200 ) {
+            editDisplayNameForm.classList.toggle('editing');
+            userDisplayNameContent.classList.toggle('editing');
+            displayNameInput.value = '';
+            userDisplayName.textContent = newDisplayName;
+        }
     } else {
         alert('The submitted display name is invalid. Please try again.');
     }
@@ -137,14 +139,15 @@ countrySubmit.addEventListener('click', async (e) => {
 
     // On Success
     console.log(response);
-
-    editCountryForm.classList.toggle('editing');
-    userCountry.classList.toggle('editing');
-    var countryElement = document.createElement('img');
-    countryElement.src = 'https://flagcdn.com/w20/' + newCountry.toLowerCase() + '.png';
-    countryFlag = countryElement;
-    userCountryValue.innerHTML = '';
-    userCountryValue.append(countryFlag);
+    if ( response.code == 200 ) {
+        editCountryForm.classList.toggle('editing');
+        userCountry.classList.toggle('editing');
+        var countryElement = document.createElement('img');
+        countryElement.src = 'https://flagcdn.com/w20/' + newCountry.toLowerCase() + '.png';
+        countryFlag = countryElement;
+        userCountryValue.innerHTML = '';
+        userCountryValue.append(countryFlag);
+    }
 });
 
 logoutButton.addEventListener('click', async (e) => {
@@ -159,7 +162,7 @@ graphSubmit.addEventListener('click', async (e) => {
 });
 
 // Admin actions
-if ( loggedInUserInfo.user.role== 2 ) {
+if ( !loggedInUserInfo.error && loggedInUserInfo.user.role== 2 ) {
     adminBanUser.addEventListener('click', async (e) => {
         adminBanUserContent.style.display = 'block';
     });
@@ -211,12 +214,13 @@ async function getUserInfo() {
 async function setUserInfo() {
     try {
         loggedInUserInfo = await getUserInfo();
-        if ( loggedInUserInfo ) {
+        if ( loggedInUserInfo && !loggedInUserInfo.error ) {
             loggedInUserID = loggedInUserInfo.user.id;
         }
         // If no playerID is set, try the default get current user info
         if ( playerID != '' ) {
             userInfo = await getMatchUsers([playerID]);
+            console.log(userInfo);
             user = userInfo[0];
         } else {
             userInfo = loggedInUserInfo;
@@ -260,7 +264,7 @@ async function setUserInfo() {
         hideNonUserElements();
     } catch (error) {
         console.log(error);
-        window.location.href = '/';
+        //window.location.href = '/';
     }
 }
 
@@ -658,7 +662,7 @@ function hideNonUserElements() {
 }
 
 async function showAdminBanInfo() {
-    if ( loggedInUserInfo.user.role == 2 ) {
+    if ( !loggedInUserInfo.error && loggedInUserInfo.user.role == 2 ) {
         adminContent.style.display = 'block';
         if ( user.banned ) {
             adminBanUserContent.style.display = 'none';
