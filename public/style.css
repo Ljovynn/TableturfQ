@@ -279,6 +279,10 @@ footer {
     font-size: 3rem;
 }
 
+.score-container-mobile {
+    display: none;
+}
+
 #score-info {
     display: inline-block;
     width: 15%;
@@ -1181,6 +1185,11 @@ div.recent-matchup-name {
     }
 
     .score-container {
+        display: none;
+    }
+
+    .score-container-mobile {
+        display: block;
         font-size: 2rem;
     }
 }

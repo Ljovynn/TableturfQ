@@ -26,7 +26,9 @@ const player2RankLabel = document.getElementById('player2-rank-label');
 const player1VictoryButton = document.getElementById('player1-victory-button');
 const player2VictoryButton = document.getElementById('player2-victory-button');
 const player1Score = document.getElementById('player1-score');
+const player1ScoreMobile = document.getElementById('player1-score-mobile');
 const player2Score = document.getElementById('player2-score');
+const player2ScoreMobile = document.getElementById('player2-score-mobile');
 const scoreContainers = document.getElementsByClassName('score-container');
 const playerScores = document.getElementsByClassName('player-score');
 const victoryButtons = document.getElementsByClassName('player-victory-button');
@@ -513,6 +515,7 @@ async function setMatchInfo() {
         }
         player1VictoryButton.value = players[0].id;
         player1Score.setAttribute('player-id', players[0].id);
+        player1ScoreMobile.setAttribute('player-id', players[0].id);
         player1RankIcon.src = player1Rank.imageURL;
         player1RankLabel.innerHTML = player1Rank.name;
     } catch (error) {
@@ -538,6 +541,7 @@ async function setMatchInfo() {
         }
         player2VictoryButton.value = players[1].id;
         player2Score.setAttribute('player-id', players[1].id);
+        player2ScoreMobile.setAttribute('player-id', players[1].id);
         player2RankIcon.src = player2Rank.imageURL;
         player2RankLabel.innerHTML = player2Rank.name;
     } catch (error) {
