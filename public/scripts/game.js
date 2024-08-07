@@ -38,6 +38,9 @@ const playerRaiseDispute = document.getElementById('player-raise-dispute-button'
 const playerResolve = document.getElementById('player-resolve-content');
 const playerResolveDispute = document.getElementById('player-resolve-dispute');
 
+const toggleMatchChat = document.getElementById('toggle-match-chat');
+const toggleMatchStrikes = document.getElementById('toggle-match-strikes');
+
 // Admin
 const adminContent = document.getElementById('admin-content');
 const adminDisputeOptions = document.getElementById('admin-dispute-options');
@@ -76,6 +79,7 @@ const confirmationMessage = document.getElementById('confirmation-message');
 const gameMessage = document.getElementById('game-messages');
 
 // Strike elements
+const matchStrikeContent = document.getElementById('match-strike-content');
 const currentStrikerName = document.getElementById('current-striker');
 const strikerSection = document.getElementById('striker-section');
 const strikeContent = document.getElementById('strike-content');
@@ -83,6 +87,7 @@ const strikeInfo = document.getElementById('strike-info');
 const strikeButton = document.getElementById('confirm-map-selection');
 
 // Chat elements
+const matchChatContent = document.getElementById('match-chat-content');
 const chatLog = document.getElementById('match-chat-log');
 const chatForm = document.getElementById('match-chat-form');
 const chatInput = document.getElementById('match-chat-input');
@@ -216,6 +221,26 @@ for (let victoryButton of victoryButtons ) {
         }
     });
 }
+
+toggleMatchChat.addEventListener('click', async (e) => {
+    if ( !toggleMatchChat.classList.contains('active') ) {
+        toggleMatchChat.classList.toggle('active');
+        toggleMatchStrikes.classList.toggle('active');
+        matchChatContent.classList.toggle('untoggled');
+        matchStrikeContent.classList.toggle('untoggled');
+        toggleMatchChat.classList.remove('toggle-alert');
+    }
+});
+
+toggleMatchStrikes.addEventListener('click', async (e) => {
+    if ( !toggleMatchStrikes.classList.contains('active') ) {
+        toggleMatchChat.classList.toggle('active');
+        toggleMatchStrikes.classList.toggle('active');
+        matchChatContent.classList.toggle('untoggled');
+        matchStrikeContent.classList.toggle('untoggled');
+        toggleMatchStrikes.classList.remove('toggle-alert');
+    }
+});
 
 // Chat send listener
 chatForm.addEventListener('submit', async (e) => {
@@ -850,6 +875,7 @@ function isPlayerStriker() {
     console.log(userID);
     console.log(currentStriker);
     if ( userID == currentStriker ) {
+        tabAlert(toggleMatchStrikes);
         gameMessage.style.display = 'none';
         strikeContent.style.display = 'block';
     } else {
@@ -1118,6 +1144,12 @@ async function checkPlayerRanked(newPlayerRatings) {
 
 }
 
+function tabAlert(button) {
+    if ( !button.classList.contains('active') ) {
+        button.classList.add('toggle-alert');
+    }
+}
+
 // Strike validation
 function validateStrikes(strikes, strikeAmount) {
     if ( strikes.length != strikeAmount ) {
@@ -1151,6 +1183,7 @@ socket.emit('join', 'match' + matchId);
 
 socket.on('chatMessage', async (chatData) => {
     console.log(chatData);
+    tabAlert(toggleMatchChat);
     var chatString = await getMessageString(chatData);
     await addMessage(chatString);
 });

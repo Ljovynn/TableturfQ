@@ -130,15 +130,7 @@
                 </div>
                 </div>
             </div>
-            <p id="confirmation-message"></p>
-            <div id="match-chat-content">
-                <div id="match-chat-log"></div>
-                <form id="match-chat-form">
-                    <input type="text" id="match-chat-input" name="match-chat-input" maxlength="256" />
-                    <label class="button" for="match-chat-button">Send</label>
-                    <input type="submit" id="match-chat-button" class="input-button" value="Send" />
-                </form>
-            </div>
+
             <div id="admin-content">
                 <p>Dispute Options</p>
                 <select id="admin-dispute-options">
@@ -153,6 +145,7 @@
                 </select>
                 <div id="admin-resolve-dispute" class="button">Resolve Dispute</div>
             </div>
+
             <div id="player-raise-dispute">
                 <a id="player-need-help">Need Help?</a>
                 <div id="player-raise-dispute-button" class="button">Dispute Match</div>
@@ -160,8 +153,24 @@
             <div id="player-resolve-content">
                 <div id="player-resolve-dispute" class="button">Resolve Dispute</div>
             </div>
+
+            <p id="confirmation-message"></p>
+
+            <div id="toggle-content">
+                <div id="toggle-match-chat" class="toggle-button button active">Chat</div>
+                <div id="toggle-match-strikes" class="toggle-button button">Strikes</div>
+            </div>
+
+            <div id="match-chat-content">
+                <div id="match-chat-log"></div>
+                <form id="match-chat-form">
+                    <input type="text" id="match-chat-input" name="match-chat-input" maxlength="256" />
+                    <label class="button" for="match-chat-button">Send</label>
+                    <input type="submit" id="match-chat-button" class="input-button" value="Send" />
+                </form>
+            </div>
             <p id="playing-stage"></p>
-            <div id="striking content">
+            <div id="match-strike-content" class="untoggled">
                 <div id="stages-list" class="stages-list">
                     <div id="mainStreet" stage-value="1" class="stage stage-stricken stage-unselectable">
                         <h3>Main Street</h3>

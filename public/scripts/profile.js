@@ -29,8 +29,13 @@ const countryInput = document.getElementById('country-select');
 const countrySubmit = document.getElementById('user-profile-country-submit');
 const editCountryClose = document.getElementById('user-country-edit-close');
 
+const toggleMatchHistory = document.getElementById('toggle-match-history');
+const toggleRatingGraph = document.getElementById('toggle-rating-graph');
+
+const matchInfo = document.getElementById('user-match-info');
 const matchHistory = document.getElementById('user-match-history');
 
+const ratingGraph = document.getElementById('user-rating-graph');
 const graphTimeframe = document.getElementById('user-rating-graph-timeframe');
 const graphSubmit = document.getElementById('user-rating-graph-submit');
 var chosenTimeframe;
@@ -155,6 +160,24 @@ logoutButton.addEventListener('click', async (e) => {
     if ( response.code == 201 ) {
         window.location.href = '/';
     }
+});
+
+toggleMatchHistory.addEventListener('click', async (e) => {
+    if ( !toggleMatchHistory.classList.contains('active') ) {
+        toggleMatchHistory.classList.toggle('active');
+        toggleRatingGraph.classList.toggle('active');
+        matchInfo.classList.toggle('untoggled');
+        ratingGraph.classList.toggle('untoggled');
+    }
+});
+
+toggleRatingGraph.addEventListener('click', async (e) => {
+    if ( !toggleRatingGraph.classList.contains('active') ) {
+        toggleMatchHistory.classList.toggle('active');
+        toggleRatingGraph.classList.toggle('active');
+        matchInfo.classList.toggle('untoggled');
+        ratingGraph.classList.toggle('untoggled'); 
+    } 
 });
 
 graphSubmit.addEventListener('click', async (e) => {
@@ -284,10 +307,9 @@ async function getMatchHistory() {
 async function setMatchHistory() {
     matchList = await getMatchHistory();
     console.log(matchList);
-    matches = matchList.matchHistory;
-    matchUsers = matchList.users;
-
-    if ( matches ) {
+    if ( matchList.matchHistory.length > 0 ) {
+        matches = matchList.matchHistory;
+        matchUsers = matchList.users;
         for ( let match of matches ) {
             try {
                 let row = document.createElement('div');
@@ -402,6 +424,11 @@ async function setMatchHistory() {
                 console.log(error);
             }
         }
+    } else {
+        let emptyCell = document.createElement('div');
+        emptyCell.classList.add('match-history-empty');
+        emptyCell.innerHTML = 'User has no recent matches';
+        matchHistory.append(emptyCell);
     }
 }
 
@@ -444,6 +471,7 @@ async function setELOGraph(timeframe = 'month') {
 
 function GetChartOptions(timeframe){
     var result = {
+        width: 750,
         legend: { position: 'bottom' },
         lineWidth: 4,
         dataOpacity: 0.6,

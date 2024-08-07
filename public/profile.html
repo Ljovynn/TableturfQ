@@ -85,6 +85,10 @@
                     </select>
                     <div id="user-profile-country-submit" class="button">Edit Country</div>
                 </div>
+                <div id="user-rank-info">
+                    <p>ELO Rating: <span id="user-rank-elo">1500</span></p>
+                    <p>User Rank: <img id="user-rank" src="https://leanny.github.io/splat3/images/badge/Badge_NawaBattlerRank_Lv00.png"/></p>
+                </div>
                 <div id="logout-button" class="button">Logout</div>
                 </div>
 
@@ -107,31 +111,27 @@
                     </div>
                 </div>
 
-                <div id="user-match-info">
-                    <div id="user-rank-info">
-                        <p>ELO Rating: <span id="user-rank-elo">1500</span></p>
-                        <p>User Rank: <img id="user-rank" src="https://leanny.github.io/splat3/images/badge/Badge_NawaBattlerRank_Lv00.png"/></p>
+                <div id="profile-user-info-toggles">
+                    <div id="toggle-content">
+                        <div id="toggle-match-history" class="toggle-button button active">Match History</div>
+                        <div id="toggle-rating-graph" class="toggle-button button">Rating Graph</div>
                     </div>
-                    <div id="user-match-history">
-                        <div class="match-row">
-                            <div class="matchup">Matchup</div>
-                            <div class="match-type">Match Type</div>
-                            <div class="match-date">Match Date</div>
-                        </div>
+                    <div id="user-match-info">
+                        <div id="user-match-history"></div>
                     </div>
-                </div>
 
-                <div id="user-rating-graph">
-                    <div id="user-rating-graph-options">
-                        <select id="user-rating-graph-timeframe">
-                            <option value="season" disabled>Season</option>
-                            <option value="day">Day</option>
-                            <option value="week">Week</option>
-                            <option value="month" selected>Month</option>
-                        </select>
-                        <div id="user-rating-graph-submit" class="button">Submit</div>
-                    </div>
-                    <div id="user-graph">
+                    <div id="user-rating-graph" class="untoggled">
+                        <div id="user-rating-graph-options">
+                            <select id="user-rating-graph-timeframe">
+                                <option value="season" disabled>Season</option>
+                                <option value="day">Day</option>
+                                <option value="week">Week</option>
+                                <option value="month" selected>Month</option>
+                            </select>
+                            <div id="user-rating-graph-submit" class="button">Submit</div>
+                        </div>
+                        <div id="user-graph">
+                        </div>
                     </div>
                 </div>
             </div>

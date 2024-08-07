@@ -327,9 +327,13 @@ footer {
     display: none;
 }
 
+.toggle-alert {
+    box-shadow: 5px 5px 5px orange;
+}
+
 #match-chat-content {
     margin: auto;
-    width: 30%;
+    width: 50%;
 }
 
 #match-chat-log {
@@ -564,6 +568,24 @@ footer {
     cursor: pointer;
 }
 
+#toggle-content {
+    width: 80%;
+    margin: auto;
+    margin-bottom: 20px;
+}
+
+.toggle-button {
+    display: inline-block;
+    padding: 20px;
+    width: 25%;
+    margin: auto;
+}
+
+.toggle-button.active {
+    cursor: auto;
+    background: grey;
+}
+
 #user-rank-info {
     display: none;
 }
@@ -577,7 +599,6 @@ footer {
 }
 
 #user-match-info {
-    display: inline-block;
     width: 100%;
     margin: auto;
 }
@@ -587,6 +608,10 @@ footer {
     width: 80%;
     margin: auto;
     outline: 2px solid #6858c2;
+}
+
+.match-history-empty {
+    padding: 20px;
 }
 
 .match-row {
@@ -623,6 +648,10 @@ div.match-type, div.match-date {
     width: 50%;
     margin: auto;
     margin-top: 20px;
+}
+
+.untoggled {
+    display: none;
 }
 
 /**** QUEUE PAGE STYLES ****/
