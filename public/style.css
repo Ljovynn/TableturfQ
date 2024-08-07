@@ -226,7 +226,7 @@ footer {
     text-align: left;
 }
 
-#rank-chart {
+.homepage-image {
     max-width: 750px;
 }
 
@@ -1101,7 +1101,7 @@ div.recent-matchup-name {
         width: 90%;
     }
 
-    #rank-chart {
+    .homepage-image {
         max-width: 400px;
     }
 
