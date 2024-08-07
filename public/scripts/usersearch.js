@@ -46,7 +46,7 @@ async function addSearchUser(users) {
             let userLink = document.createElement('a');
             userLink.href = '/profile?playerId=' + user.id;
             userLink.setAttribute('target', '_blank');
-            userLink.append(sanitizeDisplayName(user.username) );
+            userLink.innerHTML = sanitizeDisplayName(user.username);
             nameCell.append(userLink);
 
             row.append(avatarCell);

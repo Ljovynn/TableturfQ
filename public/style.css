@@ -282,6 +282,8 @@ footer {
 #score-info {
     display: inline-block;
     width: 15%;
+    vertical-align: top;
+    margin-top: 5%;
 }
 
 .player-info {
@@ -321,6 +323,9 @@ footer {
 
 #player1-rank, #player2-rank {
     display: inline-block;
+    vertical-align: top;
+    width: 150px;
+    margin-top: 15px;
 }
 
 .player-rank {
@@ -336,7 +341,7 @@ footer {
     position: absolute;
     top: 0;
     border-radius: 50%;
-    background: red;
+    background: #d30a0a;
     width: 20px;
     padding: 5px;
     margin-top: -10px;
@@ -654,6 +659,8 @@ footer {
 
 div.match-type, div.match-date {
     width: 30%;
+    vertical-align: top;
+    margin-top: 30px;
 }
 
 .rating-positive {
@@ -747,6 +754,7 @@ div.recent-matchup-name {
 
 .recent-matchup-vs {
     width: 25px;
+    margin: 10px;
 }
 
 #ranked-match-ready-non-modal {
