@@ -19,7 +19,7 @@ const modal = document.getElementById("ready-modal");
 // Interactable Elements
 const joinCompetitive = document.getElementById('join-competitive-queue');
 const joinCasual = document.getElementById('join-casual-queue');
-const queueButtons = document.getElementsByClassName('queue-button');
+const queueButtons = document.getElementsByClassName('queue-section');
 const readyButton = document.getElementById('ranked-match-ready-button-non-modal');
 const leaveButton = document.getElementById('leave-queue-button');
 
@@ -109,7 +109,7 @@ leaveButton.addEventListener('click', async (e) => {
     console.log(response);
     if ( response.code == 201 ) {
         for ( let queueButton of queueButtons ) {
-            queueButton.style.display = 'inline-block';
+            queueButton.style.display = 'block';
         }
         clearTimer(mainTimer);
         queueInfo.style.display = 'none';
@@ -374,7 +374,7 @@ function countdownTimer() {
         }
         matchMakingReady.style.display = 'none';
         for ( let queueButton of queueButtons ) {
-            queueButton.style.display = 'inline-block';
+            queueButton.style.display = 'block';
         }
     }
 }
