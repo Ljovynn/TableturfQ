@@ -382,8 +382,8 @@ async function setMatchHistory() {
                         break;
                 }
 
-                player1Name.append( sanitizeDisplayName( player1[0].username ) );
-                player2Name.append( sanitizeDisplayName( player2[0].username ) );
+                player1Name.innerHTML = sanitizeDisplayName( player1[0].username );
+                player2Name.innerHTML = sanitizeDisplayName( player2[0].username );
 
                 matchPlayer1.append(avatarPlayer1);
                 matchPlayer1.append( player1Name );
