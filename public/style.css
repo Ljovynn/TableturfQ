@@ -276,7 +276,12 @@ footer {
 }
 
 .score-container {
-    font-size: 1.4rem;
+    font-size: 3rem;
+}
+
+#score-info {
+    display: inline-block;
+    width: 15%;
 }
 
 .player-info {
@@ -327,8 +332,30 @@ footer {
     display: none;
 }
 
-.toggle-alert {
-    box-shadow: 5px 5px 5px orange;
+.notification-icon {
+    position: absolute;
+    top: 0;
+    border-radius: 50%;
+    background: red;
+    width: 20px;
+    padding: 5px;
+    margin-top: -10px;
+    border: 2px solid #6858c2;
+    display: none;
+}
+
+.notification-icon.alert {
+    display: block;
+}
+
+#chat-notification {
+    left: 0;
+    margin-left: -10px;
+}
+
+#strike-notification {
+    right: 0;
+    margin-right: -10px;
 }
 
 #match-chat-content {
@@ -575,6 +602,7 @@ footer {
 }
 
 .toggle-button {
+    position: relative;
     display: inline-block;
     padding: 20px;
     width: 25%;
@@ -1142,5 +1170,9 @@ div.recent-matchup-name {
 
     .stage.mobile-select:hover {
         border: 2px solid red !important;
+    }
+
+    .score-container {
+        font-size: 2rem;
     }
 }

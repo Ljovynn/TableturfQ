@@ -40,6 +40,7 @@ const playerResolveDispute = document.getElementById('player-resolve-dispute');
 
 const toggleMatchChat = document.getElementById('toggle-match-chat');
 const toggleMatchStrikes = document.getElementById('toggle-match-strikes');
+const notifications = document.getElementsByClassName('notification-icon');
 
 // Admin
 const adminContent = document.getElementById('admin-content');
@@ -228,7 +229,7 @@ toggleMatchChat.addEventListener('click', async (e) => {
         toggleMatchStrikes.classList.toggle('active');
         matchChatContent.classList.toggle('untoggled');
         matchStrikeContent.classList.toggle('untoggled');
-        toggleMatchChat.classList.remove('toggle-alert');
+        removeNotifications();
     }
 });
 
@@ -238,7 +239,7 @@ toggleMatchStrikes.addEventListener('click', async (e) => {
         toggleMatchStrikes.classList.toggle('active');
         matchChatContent.classList.toggle('untoggled');
         matchStrikeContent.classList.toggle('untoggled');
-        toggleMatchStrikes.classList.remove('toggle-alert');
+        removeNotifications();
     }
 });
 
@@ -934,6 +935,7 @@ function setCasualGame() {
 }
 
 function startGame() {
+    tabAlert(toggleMatchStrikes);
     playingStage.innerHTML = 'This game will be played on';
     playingStage.style.display = 'block';
     strikerSection.style.display = 'none';
@@ -1146,7 +1148,14 @@ async function checkPlayerRanked(newPlayerRatings) {
 
 function tabAlert(button) {
     if ( !button.classList.contains('active') ) {
-        button.classList.add('toggle-alert');
+        var notification = button.childNodes[0];
+        notification.classList.add('alert')
+    }
+}
+
+function removeNotifications() {
+    for (let notification of notifications ) {
+        notification.classList.remove('alert');
     }
 }
 

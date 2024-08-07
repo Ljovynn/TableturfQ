@@ -81,7 +81,6 @@
                     <img id="player1-rank-icon" class="player-rank" src="https://leanny.github.io/splat3/images/badge/Badge_NawaBattlerRank_Lv00.png" />
                     <p id="player1-rank-label"></p>
                   </div>
-                  <p class="score-container">Score: <span id="player1-score" class="player-score" player-id="0">0</span></p>
                   <div id="player1-victory-button" class="button player-victory-button" value="player1">Mark as winner</div>
                   <div id="admin-player1">
                     <p id="admin-user-player1-details"></p>
@@ -101,6 +100,16 @@
                     </div>
                 </div>
                 </div>
+                <div id="score-info">
+                    <div class="score-container">
+                        <p>Score</p>
+                        <p>
+                            <span id="player1-score" class="player-score" player-id="0">0</span>
+                             -
+                            <span id="player2-score" class="player-score" player-id="0">0</span>
+                        </p>
+                    </div>
+                </div>
                 <div id="player2-info" class="player-info">
                   <a id="player2-in-game-name"></a>
                   <p id="player2-discord-name"><i class="fa-brands fa-discord"></i>&nbsp;<span id="player2-name"></span></p>
@@ -109,7 +118,6 @@
                     <img id="player2-rank-icon" class="player-rank" src="https://leanny.github.io/splat3/images/badge/Badge_NawaBattlerRank_Lv00.png" />
                     <p id="player2-rank-label"></p>
                   </div>
-                  <p class="score-container">Score: <span id="player2-score" class="player-score" player-id="0">0</span></p>
                   <div id="player2-victory-button" class="button player-victory-button" value="player2">Mark as winner</div>
                   <div id="admin-player2">
                     <p id="admin-user-ban-details"></p>
@@ -157,8 +165,8 @@
             <p id="confirmation-message"></p>
 
             <div id="toggle-content">
-                <div id="toggle-match-chat" class="toggle-button button active">Chat</div>
-                <div id="toggle-match-strikes" class="toggle-button button">Strikes</div>
+                <div id="toggle-match-chat" class="toggle-button button active"><div id="chat-notification" class="notification-icon">!</div>Chat</div>
+                <div id="toggle-match-strikes" class="toggle-button button"><div id="strike-notification" class="notification-icon">!</div>Strikes</div>
             </div>
 
             <div id="match-chat-content">
@@ -169,8 +177,8 @@
                     <input type="submit" id="match-chat-button" class="input-button" value="Send" />
                 </form>
             </div>
-            <p id="playing-stage"></p>
             <div id="match-strike-content" class="untoggled">
+                <p id="playing-stage"></p>
                 <div id="stages-list" class="stages-list">
                     <div id="mainStreet" stage-value="1" class="stage stage-stricken stage-unselectable">
                         <h3>Main Street</h3>
