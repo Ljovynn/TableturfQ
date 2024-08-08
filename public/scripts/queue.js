@@ -1,4 +1,5 @@
 import { PublicQueDatas } from "../constants/queData.js";
+import { userError } from "./error.js";
 
 // Elements
 const loading = document.getElementById('loading');
@@ -14,7 +15,7 @@ const queueInfo = document.getElementById('queue-info');
 const readyCountdown = document.getElementById('ranked-match-ready-countdown-non-modal');
 const recentMatches = document.getElementById('recent-matches');
 const recentMatchesList = document.getElementById('recent-matches-list');
-const modal = document.getElementById("ready-modal");
+const modal = document.getElementById('ready-modal');
 
 // Interactable Elements
 const joinCompetitive = document.getElementById('join-competitive-queue');
@@ -61,7 +62,11 @@ joinCompetitive.addEventListener('click', async (e) => {
         // Socket matchfound code
         //matchMakingReady.style.display = 'block';
     } else {
-        alert('There was a problem joining the queue. Please refresh and try again');
+        //alert('There was a problem joining the queue. Please refresh and try again');
+        console.log('error');
+        var error = response.data.error;
+        console.log(error);
+        await userError(error);
     }
 });
 
@@ -85,7 +90,11 @@ joinCasual.addEventListener('click', async (e) => {
         // Socket matchfound code
         //matchMakingReady.style.display = 'block';
     } else {
-        alert('There was a problem joining the queue. Please refresh and try again');
+        //alert('There was a problem joining the queue. Please refresh and try again');
+        console.log('error');
+        var error = response.data.error;
+        console.log(error);
+        await userError(error);
     }
 });
 
