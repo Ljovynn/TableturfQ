@@ -493,7 +493,7 @@ export async function SearchDecks(searchOptions, offset = 0){
     conditionsStr = conditions.length ? conditions.join(' AND ') : '1';
 
     var sortString = '';
-    var sortOption = (searchOptions.sortOption) ? searchOptions.sortOption : deckSearchSortingOptions.mostLiked;
+    var sortOption = (searchOptions.sortOption) ? searchOptions.sortOption : deckSearchSortingOptions.newest;
     switch(sortOption){
         case deckSearchSortingOptions.mostLiked:
             sortString = 'likes DESC';
