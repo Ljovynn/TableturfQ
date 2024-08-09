@@ -8,6 +8,8 @@ import { settings } from './glicko2Manager.js';
 import { chatLoadLimit, matchModes, systemId } from './public/constants/matchData.js';
 import { HandleBanUser } from './utils/userUtils.js';
 import { leaderboardLimit, userSearchLimit } from './public/constants/searchData.js';
+import { Deck, deckSearchPageLimit, deckSearchSortingOptions } from './public/constants/deckData.js';
+import { ranks } from './public/constants/rankData.js';
 
 dotenv.config();
 
@@ -108,6 +110,7 @@ export async function GetUserRatingHistory(userId, cutoffDate, endCutoffDate = D
 }
 
 //case insensitive
+//input already sanitized and checked
 export async function SearchUser(sanitizedName){
     const [rows] = await pool.execute (`SELECT id, username, IF(hide_rank, NULL, g2_rating) g2_rating, CAST(discord_id AS CHAR) discord_id, discord_username, discord_avatar_hash, country FROM users
         WHERE MATCH (discord_username, username) AGAINST (? IN BOOLEAN MODE) LIMIT ?`, [sanitizedName, userSearchLimit.toString()]);
@@ -403,6 +406,177 @@ export async function DeleteOldSuspensions(){
     catch(error){
         console.log(error);
     }
+}
+
+
+//decks
+export async function GetDeck(deckId){
+    const [decks] = await pool.execute(`SELECT d.id, d.owner_id, d.title, d.description, d.stage, UNIX_TIMESTAMP(d.created_at) AS unix_created_at, count(l.deck_id) AS 'likes'
+    FROM decks d LEFT JOIN user_deck_likes l ON d.id = l.deck_id WHERE d.id = ? GROUP BY d.id`, [deckId]);
+    const [cards] = await pool.execute(`SELECT card_id FROM deck_cards WHERE deck_id = ?`, [deckId]);
+    return BuildDeckObject(decks[0], cards);
+}
+
+export async function GetUserDecks(userId, offset = 0){
+    const [decks] = await pool.execute(`SELECT d.id, d.owner_id, d.title, d.description, d.stage, UNIX_TIMESTAMP(d.created_at) AS unix_created_at, count(l.deck_id) AS 'likes'
+    FROM decks d LEFT JOIN user_deck_likes l ON d.id = l.deck_id WHERE d.owner_id = ? GROUP BY d.id ORDER BY d.created_at DESC LIMIT ? OFFSET ?`,
+    [userId, deckSearchPageLimit.toString(), offset.toString()]);
+
+    var result = [];
+    for (let i = 0; i < decks.length; i++){
+        const [cards] = await pool.execute(`SELECT card_id FROM deck_cards WHERE deck_id = ?`, [decks[i].id]);
+        result[i] = BuildDeckObject(decks[i], cards);
+    }
+    return result;
+}
+
+//searchOptions (all optional) = input (string), users (array), cards (array), stages (array), minRank, start date, end date, sortOption
+export async function SearchDecks(searchOptions, offset = 0){
+    var conditions = [];
+    var values = [];
+    var conditionsStr;
+    var joinUsers = false;
+
+    if (typeof searchOptions.input !== 'undefined') {
+        conditions.push("MATCH (title, description) AGAINST (? IN BOOLEAN MODE)");
+        values.push(searchOptions.input);
+    }
+
+    if (typeof searchOptions.users !== 'undefined') {
+        let str = "owner_id IN (";
+        for (let i = 0; i < searchOptions.users.length; i++){
+            str += "?, ";
+            values.push(searchOptions.users[i]);
+        }
+        str.slice(0, -2);
+        str += ")";
+        conditions.push(str);
+    }
+
+    if (typeof searchOptions.cards !== 'undefined') {
+        for (let i = 0; i < searchOptions.cards.length; i++){
+            conditions.push("(exists (SELECT deck_id FROM deck_cards WHERE deck_id = d.id AND card_id = ?))");
+            values.push(searchOptions.cards[i]);
+        }
+    }
+    
+    if (typeof searchOptions.stages !== 'undefined') {
+        let str = "stage IN (";
+        for (let i = 0; i < searchOptions.stages.length; i++){
+            str += "?, ";
+            values.push(searchOptions.stages[i]);
+        }
+        str.slice(0, -2);
+        str += ")";
+        conditions.push(str);
+    }
+
+    if (typeof searchOptions.minRank !== 'undefined') {
+        const rank = ranks.find((r) => r.name == searchOptions.minRank);
+        if (rank){
+            conditions.push("u.g2_rating > ?");
+            values.push(rank.ratingThreshold);
+            joinUsers = true;
+        }
+    }
+
+    if (typeof searchOptions.startDate !== 'undefined') {
+        conditions.push("created_at > ?");
+        values.push(searchOptions.startDate);
+    }
+
+    if (typeof searchOptions.endDate !== 'undefined') {
+        conditions.push("created_at < ?");
+        values.push(searchOptions.endDate);
+    }
+
+    conditionsStr = conditions.length ? conditions.join(' AND ') : '1';
+
+    var sortString = '';
+    var sortOption = (searchOptions.sortOption) ? searchOptions.sortOption : deckSearchSortingOptions.mostLiked;
+    switch(sortOption){
+        case deckSearchSortingOptions.mostLiked:
+            sortString = 'likes DESC';
+        case deckSearchSortingOptions.newest:
+            sortString = 'created_at DESC';
+        case deckSearchSortingOptions.oldest:
+            sortString = 'created_at ASC';
+        case deckSearchSortingOptions.updated:
+            sortString = 'last_updated DESC';
+    }
+
+    //offset, limit
+    values.push(deckSearchPageLimit.toString());
+    values.push(offset.toString());
+
+    var queryString = (joinUsers) ? `SELECT d.id, d.owner_id, d.title, d.description, d.stage, UNIX_TIMESTAMP(d.created_at) AS unix_created_at, count(l.deck_id) AS 'likes'
+    FROM decks d LEFT JOIN user_deck_likes l ON d.id = l.deck_id INNER JOIN users u ON d.owner_id = u.id WHERE ${conditionsStr} GROUP BY d.id ORDER BY ${sortString} LIMIT ? OFFSET ?`:
+    `SELECT d.id, d.owner_id, d.title, d.description, d.stage, UNIX_TIMESTAMP(d.created_at) AS unix_created_at, count(l.deck_id) AS 'likes'
+    FROM decks d LEFT JOIN user_deck_likes l ON d.id = l.deck_id WHERE ${conditionsStr} GROUP BY d.id ORDER BY ${sortString} LIMIT ? OFFSET ?`;
+
+    const [decks] = await pool.query (queryString, values);
+    var result = [];
+    for (let i = 0; i < decks.length; i++){
+        const [cards] = await pool.execute(`SELECT card_id FROM deck_cards WHERE deck_id = ?`, [decks[i].id]);
+        result[i] = BuildDeckObject(decks[i], cards);
+    }
+    return result;
+}
+
+export async function GetLikedDecks(userId, offset = 0){
+    const [decks] = await pool.execute(`SELECT d.id, d.owner_id, d.title, d.description, d.stage, UNIX_TIMESTAMP(d.created_at) AS unix_created_at, count(lfull.deck_id) AS 'likes'
+    FROM decks d INNER JOIN user_deck_likes l ON d.id = l.deck_id
+    INNER JOIN user_deck_likes lfull ON d.id = lfull.deck_id
+    WHERE l.user_id = ? GROUP BY d.id ORDER BY l.created_at DESC LIMIT ? OFFSET ?`, [userId, deckSearchPageLimit.toString(), offset.toString()]);
+
+    var result = [];
+    for (let i = 0; i < decks.length; i++){
+        const [cards] = await pool.execute(`SELECT card_id FROM deck_cards WHERE deck_id = ?`, [decks[i].id]);
+        result[i] = BuildDeckObject(decks[i], cards);
+    }
+    return result;
+}
+
+export async function UpdateDeck(deck){
+    await pool.execute(`UPDATE decks SET title = ?, description = ?, stage = ?, last_updated = current_timestamp WHERE id = ?`,
+    [deck.title, deck.description, deck.stage, deck.id]);
+
+    await pool.execute(`DELETE FROM deck_cards WHERE deck_id = ?`, [deck.id]);
+
+    await pool.execute(`INSERT INTO deck_cards (deck_id, card_id) VALUES ?`, [deck.cards.map(card => [deck.id, card])]);
+}
+
+export async function CreateDeck(deck){
+    await pool.execute(`INSERT INTO decks (id, owner_id, title, description, stage) VALUES (?, ?, ?, ?, ?)`, [deck.id, deck.ownerId, deck.title, deck.description, deck.stage]);
+
+    await pool.execute(`INSERT INTO deck_cards (deck_id, card_id) VALUES ?`, [deck.cards.map(card => [deck.id, card])]);
+}
+
+export async function LikeDeck(userId, deckId){
+    const [rows] = await pool.execute(`SELECT user_id FROM user_deck_likes WHERE deck_id = ? AND user_id = ?`, [deckId, userId]);
+    if (rows[0]) return;
+    await pool.execute(`INSERT INTO user_deck_likes (deck_id, user_id) VALUES (?, ?)`, [deckId, userId]);
+}
+
+export async function DeleteDeck(deckId){
+    await pool.execute(`DELETE FROM decks WHERE id = ?`, [deckId]);
+}
+
+export async function UnlikeDeck(userId, deckId){
+    await pool.execute(`DELETE FROM user_deck_likes WHERE deck_id = ? AND user_id = ?`, [deckId, userId]);
+}
+
+export async function GetDeckOwner(deckId){
+    const [rows] = await pool.execute(`SELECT d.owner_id FROM decks WHERE id = ?`, [deckId]);
+    if (rows[0]) return rows[0].owner_id;
+}
+
+function BuildDeckObject(dbDeck, dbCards){
+    var cards = [];
+    for (let i = 0; i < dbCards.length; i++){
+        cards.push(dbCards[i].card_id);
+    }
+    return new Deck(dbDeck.id, dbDeck.owner_id, dbDeck.title, dbDeck.description, cards, dbDeck.stage, dbDeck.unix_created_at, dbDeck.likes);
 }
 
 
