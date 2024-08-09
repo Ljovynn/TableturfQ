@@ -88,6 +88,7 @@ router.post("/GetUsers", async (req, res) => {
     try{
         const userIdList = req.body.userIdList;
         if (!CheckIfArray(userIdList) || userIdList.length == 0) return SetErrorResponse(res, definitionErrors.userNotDefined);
+        if (!userIdList.every((element) => typeof(element) === 'string')) return SetErrorResponse(res, definitionErrors.userNotDefined);
 
         const users = await GetMultipleUserDatas(userIdList);
 
