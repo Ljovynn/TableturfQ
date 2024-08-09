@@ -24,6 +24,7 @@ router.post('/GetLeaderboard', async (req, res) => {
         
         if (!hitCount) hitCount = leaderboardLimit;
         if (!startPos) startPos = 0;
+        if (startPos < 0) startPos = 0;
 
         const leaderboard = await GetLeaderboard(startPos, hitCount);
         const leaderboardSize = GetLeaderboardSize();
