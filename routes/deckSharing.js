@@ -58,7 +58,7 @@ router.post("/SearchDecks", async (req, res) => {
         if (typeof(offset) !== 'number') offset = 0;
         if (offset < 0) offset = 0;
 
-        if (!searchOptions) return SetErrorResponse(res, deckSharingErrors.noSearchOptions);
+        if (typeof (searchOptions) !== 'object' || Array.isArray(searchOptions) || searchOptions === null) return false;
 ;
         if (typeof(searchOptions.input) !== 'undefined' && typeof(searchOptions.input) !== 'string') return SetErrorResponse(res, deckSharingErrors.inputWrongFormat);
         if (searchOptions.input){
