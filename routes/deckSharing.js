@@ -245,11 +245,12 @@ function CheckDeckLegality(deck){
 
     if (!Array.isArray(deck.cards)) return false;
     if (deck.cards.length != 15) return false;
-    if (!deck.cards.every((element) => typeof(element) === 'number') && element > 0 && element < uniqueCards) return false;
+    if (!deck.cards.every((element) => typeof(element) === 'number' && element > 0 && element <= uniqueCards)) return false;
+    if (new Set(deck.cards).size !== deck.cards.length) return false;
 
     if (typeof (deck.stage) !== 'number' && typeof (deck.stage) !== 'undefined') return false;
     if (!deck.stage) deck.stage = stages.unpicked;
-    if (!Object.values(stages).indexOf(deck.stage) > -1) return false;
+    if (Object.values(stages).indexOf(deck.stage) < 0) return false;
 
     return true;
 }
