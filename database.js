@@ -268,15 +268,8 @@ async function CreateFirstGameStrikes(match){
     const result = await pool.execute(`INSERT INTO games (match_id, stage, result) VALUES (?, ?, ?)`, [match.id, game.stage, strikePos]);
 
     const gameId = result[0].insertId;
-
-    var data = [];
-    for (let i = 0; i < game.strikes.length; i++){
-        const strikePos = ((i + 1) % 4 < 2) ? 1 : 2;
-        data[i] = [gameId, game.strikes[i], strikePos];
-    }
-
     if (data.length == 0) return;
-    await pool.query(`INSERT INTO stage_strikes (game_id, stage, strike_owner) VALUES ?`, [data.map(strike => [strike[0], strike[1], strike[2]])]);
+    await pool.query(`INSERT INTO stage_strikes (game_id, stage, strike_owner) VALUES ?`, [game.strikes.map(strike => [gameId, strike, strikePos])]);
 }
 
 async function CreateCounterpickGameAndStrikes(match, gameNumber){
@@ -285,13 +278,8 @@ async function CreateCounterpickGameAndStrikes(match, gameNumber){
     const result = await pool.execute(`INSERT INTO games (match_id, stage, result) VALUES (?, ?, ?)`, [match.id, game.stage, winnerPos]);
 
     const gameId = result[0].insertId;
-    var data = [];
-    for (let i = 0; i < game.strikes.length; i++){
-        data[i] = [gameId, game.strikes[i], winnerPos];
-    }
-
-    if (data.length == 0) return;
-    await pool.query(`INSERT INTO stage_strikes (game_id, stage, strike_owner) VALUES ?`, [data.map(strike => [strike[0], strike[1], strike[2]])]);
+    if (game.strikes.length == 0) return;
+    await pool.query(`INSERT INTO stage_strikes (game_id, stage, strike_owner) VALUES ?`, [game.strikes.map(strike => [gameId, strike, winnerPos])]);
 }
 
 export async function AddMatchRatings(matchId, p1OldRating, p2OldRating, p1NewRating, p2NewRating)
@@ -543,13 +531,12 @@ export async function UpdateDeck(deck){
 
     await pool.execute(`DELETE FROM deck_cards WHERE deck_id = ?`, [deck.id]);
 
-    await pool.execute(`INSERT INTO deck_cards (deck_id, card_id) VALUES ?`, [deck.cards.map(card => [deck.id, card])]);
+    await pool.query(`INSERT INTO deck_cards (deck_id, card_id) VALUES ?`, [deck.cards.map(card => [deck.id, card])]);
 }
 
 export async function CreateDeck(deck){
     await pool.execute(`INSERT INTO decks (id, owner_id, title, description, stage) VALUES (?, ?, ?, ?, ?)`, [deck.id, deck.ownerId, deck.title, deck.description, deck.stage]);
-
-    await pool.execute(`INSERT INTO deck_cards (deck_id, card_id) VALUES ?`, [deck.cards.map(card => [deck.id, card])]);
+    await pool.query(`INSERT INTO deck_cards (deck_id, card_id) VALUES ?`, [deck.cards.map(card => [deck.id, card])]);
 }
 
 export async function LikeDeck(userId, deckId){
