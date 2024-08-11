@@ -1116,7 +1116,7 @@ div.recent-matchup-name {
     }
 
     .homepage-image {
-        max-width: 400px;
+        width: 100%;
     }
 
     /**** INFO ****/
@@ -1205,5 +1205,11 @@ div.recent-matchup-name {
     .score-container-mobile {
         display: block;
         font-size: 2rem;
+    }
+
+    /**** USER SEARCH ****/
+
+    #user-search-results {
+        width: 90%;
     }
 }
