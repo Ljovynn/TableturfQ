@@ -268,7 +268,7 @@ async function CreateFirstGameStrikes(match){
     const result = await pool.execute(`INSERT INTO games (match_id, stage, result) VALUES (?, ?, ?)`, [match.id, game.stage, strikePos]);
 
     const gameId = result[0].insertId;
-    if (data.length == 0) return;
+    if (game.strikes.length == 0) return;
     await pool.query(`INSERT INTO stage_strikes (game_id, stage, strike_owner) VALUES ?`, [game.strikes.map(strike => [gameId, strike, strikePos])]);
 }
 
