@@ -1,4 +1,5 @@
 import { PublicQueDatas } from "../constants/queData.js";
+import { userError } from "./error.js";
 
 // Elements
 const loading = document.getElementById('loading');
@@ -14,12 +15,12 @@ const queueInfo = document.getElementById('queue-info');
 const readyCountdown = document.getElementById('ranked-match-ready-countdown-non-modal');
 const recentMatches = document.getElementById('recent-matches');
 const recentMatchesList = document.getElementById('recent-matches-list');
-const modal = document.getElementById("ready-modal");
+const modal = document.getElementById('ready-modal');
 
 // Interactable Elements
 const joinCompetitive = document.getElementById('join-competitive-queue');
 const joinCasual = document.getElementById('join-casual-queue');
-const queueButtons = document.getElementsByClassName('queue-button');
+const queueButtons = document.getElementsByClassName('queue-section');
 const readyButton = document.getElementById('ranked-match-ready-button-non-modal');
 const leaveButton = document.getElementById('leave-queue-button');
 
@@ -50,7 +51,7 @@ joinCompetitive.addEventListener('click', async (e) => {
     // Join the queue
     var response = await postData('/que/PlayerEnterQue', data);
     console.log('Response data: ' + JSON.stringify(response));
-    if ( response == 201 ) {
+    if ( response.code == 201 ) {
         for ( let queueButton of queueButtons ) {
             queueButton.style.display = 'none';
         }
@@ -61,7 +62,11 @@ joinCompetitive.addEventListener('click', async (e) => {
         // Socket matchfound code
         //matchMakingReady.style.display = 'block';
     } else {
-        alert('There was a problem joining the queue. Please refresh and try again');
+        //alert('There was a problem joining the queue. Please refresh and try again');
+        console.log('error');
+        var error = response.data.error;
+        console.log(error);
+        await userError(error);
     }
 });
 
@@ -74,7 +79,7 @@ joinCasual.addEventListener('click', async (e) => {
     // Join the queue
     var response = await postData('/que/PlayerEnterQue', data);
     
-    if ( response == 201 ) {
+    if ( response.code == 201 ) {
         for ( let queueButton of queueButtons ) {
             queueButton.style.display = 'none';
         }
@@ -85,7 +90,11 @@ joinCasual.addEventListener('click', async (e) => {
         // Socket matchfound code
         //matchMakingReady.style.display = 'block';
     } else {
-        alert('There was a problem joining the queue. Please refresh and try again');
+        //alert('There was a problem joining the queue. Please refresh and try again');
+        console.log('error');
+        var error = response.data.error;
+        console.log(error);
+        await userError(error);
     }
 });
 
@@ -107,9 +116,9 @@ leaveButton.addEventListener('click', async (e) => {
     var data = { matchMode: queuedMatchMode };
     var response = await postData('/que/PlayerLeaveQue', data);
     console.log(response);
-    if ( response == 201 ) {
+    if ( response.code == 201 ) {
         for ( let queueButton of queueButtons ) {
-            queueButton.style.display = 'inline-block';
+            queueButton.style.display = 'block';
         }
         clearTimer(mainTimer);
         queueInfo.style.display = 'none';
@@ -120,8 +129,8 @@ leaveButton.addEventListener('click', async (e) => {
 
 async function getMatchMakingStatus() {
     var data = {};
-    var result = await fetchData('/que/GetMatchmakingStatus');
-    return result;
+    var result = await getData('/que/GetMatchmakingStatus');
+    return result.data;
 }
 
 async function setMatchMakingStatus() {
@@ -140,8 +149,8 @@ async function setMatchMakingStatus() {
 
 async function getUserInfo() {
     var data = {};
-    var result = await fetchData('/user/GetUserInfo');
-    return result;
+    var result = await getData('/user/GetUserInfo');
+    return result.data;
 }
 
 async function setUserInfo() {
@@ -191,14 +200,15 @@ function setQueueInfo(queueData) {
 
 async function getRecentMatches() {
     var data = {};
-    var result = await fetchData('/matchHistory/GetRecentMatches');
+    var result = await getData('/matchHistory/GetRecentMatches');
     console.log(result);
-    displayRecentMatches(result);
+    displayRecentMatches(result.data);
 }
 
 function displayRecentMatches(recentMatchData) {
-    var players = recentMatchData.users;
-    var matches = recentMatchData.recentMatches;
+    //var players = recentMatchData.users;
+    //var matches = recentMatchData.recentMatches;
+    var matches = recentMatchData;
     if ( matches.length > 0 ) {
         for ( let match of matches ) {
             try {
@@ -218,14 +228,16 @@ function displayRecentMatches(recentMatchData) {
 
                 let matchupCell = document.createElement('div');
                // var players = await getMatchUsers( [match.player1_id, match.player2_id] );
-                var player1 = getMatchPlayer(players, match.player1_id);
-                var player2 = getMatchPlayer(players, match.player2_id);
+                var player1 = match.player1_id;
+                var player2 = match.player2_id;
                 matchupCell.classList.add('matchup');
 
-                let matchPlayer1 = document.createElement('div');
+                let matchPlayer1 = document.createElement('a');
+                matchPlayer1.href = '/profile?playerId=' + match.player1_id;
                 matchPlayer1.classList.add('recent-matchup-player');
                 matchPlayer1.classList.add('recent-matchup-player1');
-                let matchPlayer2 = document.createElement('div');
+                let matchPlayer2 = document.createElement('a');
+                matchPlayer2.href = '/profile?playerId=' + match.player2_id;
                 matchPlayer2.classList.add('recent-matchup-player');
                 matchPlayer2.classList.add('recent-matchup-player2');
 
@@ -234,14 +246,14 @@ function displayRecentMatches(recentMatchData) {
                 let avatarPlayer2 = document.createElement('img');
                 avatarPlayer2.classList.add('recent-matchup-avatar');
 
-                if ( player1[0].discord_avatar_hash ) {
-                    avatarPlayer1.src = 'https://cdn.discordapp.com/avatars/' + player1[0].discord_id + '/' + player1[0].discord_avatar_hash + '.jpg' + '?size=512';
+                if ( match.player1_discord_avatar_hash ) {
+                    avatarPlayer1.src = 'https://cdn.discordapp.com/avatars/' + match.player1_discord_id + '/' + match.player1_discord_avatar_hash + '.jpg' + '?size=512';
                 } else {
                     avatarPlayer1.src = '/assets/images/chumper.png';
                 }
 
-                if ( player2[0].discord_avatar_hash ) {
-                    avatarPlayer2.src = 'https://cdn.discordapp.com/avatars/' + player2[0].discord_id + '/' + player2[0].discord_avatar_hash + '.jpg' + '?size=512';
+                if ( match.player2_discord_avatar_hash ) {
+                    avatarPlayer2.src = 'https://cdn.discordapp.com/avatars/' + match.player2_discord_id + '/' + match.player2_discord_avatar_hash + '.jpg' + '?size=512';
                 } else {
                     avatarPlayer2.src = '/assets/images/chumper.png';
                 }
@@ -270,8 +282,8 @@ function displayRecentMatches(recentMatchData) {
                         break;
                 }
 
-                player1Name.append( sanitizeDisplayName( player1[0].username ) );
-                player2Name.append( sanitizeDisplayName( player2[0].username ) );
+                player1Name.append( sanitizeDisplayName( match.player1_username ) );
+                player2Name.append( sanitizeDisplayName( match.player2_username ) );
 
                 matchPlayer1.append(avatarPlayer1);
                 matchPlayer1.append( player1Name );
@@ -283,7 +295,8 @@ function displayRecentMatches(recentMatchData) {
 
                 let vsImg = document.createElement('img');
                 vsImg.classList.add('recent-matchup-vs');
-                vsImg.src = 'https://comicvine.gamespot.com/a/uploads/original/11136/111361078/6676820-vs.png';
+                vsImg.src = '/assets/images/vs-icon.png';
+
                 //matchupCell.append('vs');
                 matchupCell.append(vsImg);
                 matchupCell.append( matchPlayer2 );
@@ -370,7 +383,7 @@ function countdownTimer() {
         }
         matchMakingReady.style.display = 'none';
         for ( let queueButton of queueButtons ) {
-            queueButton.style.display = 'inline-block';
+            queueButton.style.display = 'block';
         }
     }
 }

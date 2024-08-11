@@ -5,6 +5,7 @@ import { SendSocketMessage } from "../socketManager.js";
 import { definitionErrors, userErrors } from '../responses/requestErrors.js';
 import { ResponseSucceeded, SetErrorResponse } from '../responses/ResponseData.js';
 import { CheckUserBanned } from '../utils/userUtils.js';
+import { leaveQueErrors } from '../responses/queErrors.js';
 
 const router = Router();
 
@@ -23,7 +24,7 @@ router.post("/PlayerEnterQue", async (req, res) => {
         var responseData = await AddPlayerToQue(userId, matchMode);
         if (!ResponseSucceeded(responseData.code)) return SetErrorResponse(res, responseData);
 
-        res.sendStatus(responseData.code);
+        res.status(responseData.code).send({});
     } catch (err){
         console.log(err);
         res.sendStatus(500);
@@ -40,10 +41,10 @@ router.post("/PlayerLeaveQue", async (req, res) => {
         if (typeof(matchMode) !== 'string') return SetErrorResponse(res, definitionErrors.matchModeUndefined);
 
         if (RemovePlayerFromQue(userId, matchMode)){
-            res.sendStatus(201);
+            res.status(201).send({});
             return;
         }
-        res.status(403).send('Player already not in que');
+        return SetErrorResponse(res, leaveQueErrors.notInQue);
     } catch (err){
         console.error(err);
         res.sendStatus(500);
@@ -59,7 +60,7 @@ router.post("/PlayerReady", async (req, res) => {
 
         var responseData = await PlayerSentReady(userId);
         if (!ResponseSucceeded(responseData.code)) return SetErrorResponse(res, responseData);
-        res.sendStatus(responseData.code);
+        res.status(responseData.code).send({});
 
         if (!responseData.data) return;
 

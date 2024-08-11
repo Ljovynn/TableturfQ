@@ -118,7 +118,7 @@ async function setLeaderBoard(startPos, hitCount) {
             userLink.append(flagSpace);
         }
 
-        userLink.append( sanitizeDisplayName( user.username ) );
+        userLink.innerHTML = sanitizeDisplayName( user.username );
         nameCell.append(userLink);
 
         let eloCell = document.createElement('div');
@@ -161,7 +161,7 @@ function addSearchedUser(users) {
             userLink.append(flagSpace);
         }
 
-        userLink.append( sanitizeDisplayName( user.user.username ) );
+        userLink.innerHTML = sanitizeDisplayName( user.user.username );
         nameCell.append(userLink);
 
         let eloCell = document.createElement('div');
@@ -185,8 +185,8 @@ async function refreshLeaderBoard(startPos, hitCount) {
 
 async function getLeaderBoard(startPos, hitCount) {
     var data = { startPos: startPos, hitCount: hitCount }
-    var result = await getData('/leaderboard/GetLeaderboard', data);
-    return result;
+    var result = await postData('/leaderboard/GetLeaderboard', data);
+    return result.data;
 }
 
 function validateSeach(searchValue) {

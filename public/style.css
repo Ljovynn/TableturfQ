@@ -5,11 +5,18 @@ header {
 }
 
 html {
-    background-image: linear-gradient(45deg, rgba(52.9,48.6,76.1,1), rgba(85.1,77.3,27.8,1));
+    /*background-image: linear-gradient(45deg, rgba(52.9,48.6,76.1,1), rgba(85.1,77.3,27.8,1));*/
+    background-image: linear-gradient(-11deg, rgba(85.1,77.3,27.8,1), rgba(52.9,48.6,76.1,1));
     background-repeat: no-repeat;
     background-size: 100% 100%;
     min-height: 100%;
     height: auto;
+}
+
+main {
+    width: 75%;
+    margin: auto;
+    min-height: 850px;
 }
 
 body {
@@ -77,6 +84,20 @@ select {
     width: 100px;
     color: white;
     text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+}
+
+#notification-message {
+    width: 60%;
+    margin: 20px auto;
+    padding: 15px;
+    background: #363636;
+    border-radius: 5px;
+    border-left: 10px solid #d30a0a;
+    display: none;
+}
+
+#notification-message.notification-error {
+    display: block;
 }
 
 /**** HEADER MENU ****/
@@ -151,6 +172,18 @@ select {
     display: none;
 }
 
+/**** FOOTER STYLES ****/
+
+footer {
+    position: relative;
+    bottom: 0;
+    margin-top: 15px;
+    width: 100%;
+    background-color: #6858c2;
+    text: center;
+    padding: 10px 0;
+}
+
 /**** INDEX PAGE STYLES ****/
 .index-link {
     display: block;
@@ -170,6 +203,12 @@ select {
     margin: auto;
 }
 
+#logged-in-content {
+    display: none;
+    width: 50%;
+    margin: auto;
+}
+
 #user-login {
     display: block;
     width: 100px;
@@ -180,15 +219,40 @@ select {
     width: auto;
 }
 
+#homepage-play-now {
+    display: block;
+    width: 500px;
+    margin: auto;
+}
+
+#homepage-play-button {
+    width: auto;
+    margin: auto;
+}
+
+#home-content {
+    display: inline-block;
+    width: 60%;
+}
+
+.home-content-section {
+    margin: auto;
+    text-align: left;
+}
+
+.homepage-image {
+    max-width: 750px;
+}
 
 #announcements-content {
-    width: 50%;
+    display: inline-block;
+    width: 33%;
     margin: auto;
+    float: right;
 }
 
 #next-announcement {
     display: none;
-    width: 75%;
     margin: auto;
     outline: 2px solid #6858c2;
     padding: 10px;
@@ -196,7 +260,6 @@ select {
 
 #upcoming-announcements {
     display: none;
-    width: 75%;
     margin: auto;
 }
 
@@ -214,8 +277,6 @@ select {
     outline: 2px solid #6858c2;
     padding: 10px;
     margin: 10px;
-    display: inline-block;
-    width: 30%;
 }
 
 /**** GAME PAGE STYLES ****/
@@ -228,12 +289,27 @@ select {
     margin: auto;
 }
 
+.score-container {
+    font-size: 3rem;
+}
+
+.score-container-mobile {
+    display: none;
+}
+
+#score-info {
+    display: inline-block;
+    width: 15%;
+    vertical-align: top;
+    margin-top: 5%;
+}
+
 .player-info {
     display: inline-block;
     padding: 20px;
     border: 2px solid #6858c2;
     margin: 10px 10px 20px 10px;
-    width: 200px;
+    width: 33%
 }
 
 #player1-in-game-name, #player2-in-game-name {
@@ -263,6 +339,13 @@ select {
     border-radius: 50%;
 }
 
+#player1-rank, #player2-rank {
+    display: inline-block;
+    vertical-align: top;
+    width: 150px;
+    margin-top: 15px;
+}
+
 .player-rank {
     margin: 10px;
     width: 50px;
@@ -272,9 +355,35 @@ select {
     display: none;
 }
 
+.notification-icon {
+    position: absolute;
+    top: 0;
+    border-radius: 50%;
+    background: #d30a0a;
+    width: 20px;
+    padding: 5px;
+    margin-top: -10px;
+    border: 2px solid #6858c2;
+    display: none;
+}
+
+.notification-icon.alert {
+    display: block;
+}
+
+#chat-notification {
+    left: 0;
+    margin-left: -10px;
+}
+
+#strike-notification {
+    right: 0;
+    margin-right: -10px;
+}
+
 #match-chat-content {
     margin: auto;
-    width: 30%;
+    width: 50%;
 }
 
 #match-chat-log {
@@ -509,6 +618,25 @@ select {
     cursor: pointer;
 }
 
+#toggle-content {
+    width: 80%;
+    margin: auto;
+    margin-bottom: 20px;
+}
+
+.toggle-button {
+    position: relative;
+    display: inline-block;
+    padding: 20px;
+    width: 25%;
+    margin: auto;
+}
+
+.toggle-button.active {
+    cursor: auto;
+    background: grey;
+}
+
 #user-rank-info {
     display: none;
 }
@@ -522,8 +650,7 @@ select {
 }
 
 #user-match-info {
-    display: inline-block;
-    width: 50%;
+    width: 100%;
     margin: auto;
 }
 
@@ -532,6 +659,10 @@ select {
     width: 80%;
     margin: auto;
     outline: 2px solid #6858c2;
+}
+
+.match-history-empty {
+    padding: 20px;
 }
 
 .match-row {
@@ -546,6 +677,8 @@ select {
 
 div.match-type, div.match-date {
     width: 30%;
+    vertical-align: top;
+    margin-top: 30px;
 }
 
 .rating-positive {
@@ -568,6 +701,10 @@ div.match-type, div.match-date {
     width: 50%;
     margin: auto;
     margin-top: 20px;
+}
+
+.untoggled {
+    display: none;
 }
 
 /**** QUEUE PAGE STYLES ****/
@@ -597,7 +734,7 @@ div.match-type, div.match-date {
 
 #recent-matches {
     display: none;
-    width: 50%;
+    width: 100%;
     margin: auto;
 }
 
@@ -605,7 +742,7 @@ div.match-type, div.match-date {
     outline: 2px solid #6858c2;
 }
 
-div.recent-matchup-player {
+.recent-matchup-player {
     display: inline-block;
     width: 150px;
 }
@@ -635,6 +772,7 @@ div.recent-matchup-name {
 
 .recent-matchup-vs {
     width: 25px;
+    margin: 10px;
 }
 
 #ranked-match-ready-non-modal {
@@ -725,7 +863,7 @@ div.recent-matchup-name {
 
 /**** ABOUT/INFO STYLES ****/
 #info-container {
-    width: 65%;
+    width: 90%;
     margin: auto;
 }
 
@@ -787,7 +925,8 @@ div.recent-matchup-name {
     border-radius: 15px;
     z-index: 2;
 
-    background-image: linear-gradient(45deg, rgba(52.9,48.6,76.1,1), rgba(85.1,77.3,27.8,1));
+    /*background-image: linear-gradient(45deg, rgba(52.9,48.6,76.1,1), rgba(85.1,77.3,27.8,1));*/
+    background-image: linear-gradient(-11deg, rgba(85.1,77.3,27.8,1), rgba(52.9,48.6,76.1,1));
     background-repeat: no-repeat;
     background-size: 100% 100%;
 }
@@ -899,6 +1038,11 @@ div.recent-matchup-name {
 
 /**** MOBILE STLYES ****/
 @media only screen and (max-width: 810px) {
+    main {
+        width: 100%;
+    }
+
+
     /**** HEADER ****/
     .header-expanded {
         height: 100%;
@@ -952,6 +1096,29 @@ div.recent-matchup-name {
         display: none;
     }
 
+    /**** INDEX ****/
+
+    #logged-in-content {
+        width: 90%;
+    }
+
+    #homepage-play-now {
+        width: auto;
+    }
+
+    #home-content {
+        width: 90%;
+    }
+
+    #announcements-content {
+        float: none;
+        width: 90%;
+    }
+
+    .homepage-image {
+        max-width: 400px;
+    }
+
     /**** INFO ****/
 
     #section-tabs .button {
@@ -985,6 +1152,10 @@ div.recent-matchup-name {
         width: 100%;
     }
 
+    #recent-matches {
+        width: 90%;
+    }
+
     .recent-matchup-player {
         display: inline-block;
         width: 100%;
@@ -1006,6 +1177,11 @@ div.recent-matchup-name {
 
     /**** MATCH ****/
 
+    .player-info {
+        width: auto;
+        display: block;
+    }
+
     .stage:hover {
         border: 2px solid #6858c2;
     }
@@ -1020,5 +1196,14 @@ div.recent-matchup-name {
 
     .stage.mobile-select:hover {
         border: 2px solid red !important;
+    }
+
+    .score-container {
+        display: none;
+    }
+
+    .score-container-mobile {
+        display: block;
+        font-size: 2rem;
     }
 }

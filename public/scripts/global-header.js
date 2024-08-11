@@ -26,21 +26,25 @@ hamburger.addEventListener('click', async(e) => {
 });
 
 async function setUserInfo() {
-    userInfo = await getUserInfo();
-    console.log(userInfo)
-    if ( userInfo.user.id ) {
-        setLoggedInLinks();
-    }
+    try {
+        userInfo = await getUserInfo();
+        console.log(userInfo)
+        if ( userInfo.user.id ) {
+            setLoggedInLinks();
+        }
 
-    if ( userInfo.matchId != null ) {
-        setMatchLink(userInfo.matchId.id);
+        if ( userInfo.matchId != null ) {
+            setMatchLink(userInfo.matchId.id);
+        }
+    } catch (error) {
+        console.log(error);
     }
 }
 
 async function getUserInfo() {
     var data = {};
-    var result = await fetchData('/user/GetUserInfo');
-    return result;
+    var result = await getData('/user/GetUserInfo');
+    return result.data;
 }
 
 function setLoggedInLinks() {

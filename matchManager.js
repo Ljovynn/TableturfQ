@@ -39,16 +39,17 @@ export async function CancelOldMatches(cutoffTime){
     var result = [];
     var cutoffDate = Date.now() - cutoffTime;
     for (let i = matches.length - 1; i >= 0; i--){
-        if (matches[i].createdAt > cutoffDate) continue;
+        let match = matches[i];
+        if (match.createdAt > cutoffDate) continue;
 
-        matches[i].status = matchStatuses.noWinner;
+        match.status = matchStatuses.noWinner;
         try {
-            if (await FinishMatch(matches[i])) result.push(matches[i].id);
+            if (await FinishMatch(match)) result.push(match.id);
         }
         catch(error){
             console.log(error);
         }
-        if (matches[i].mode == matchModes.ranked){
+        if (match.mode == matchModes.ranked){
             const suspiciousAction = new SuspiciousAction(matches[i].players[0].id, `Ranked match cancelled for taking too long, against player ID ${SanitizeDiscordLog(matches[i].players[1].id)}`, Date.now());
             await SendNewSuspiciousAction(suspiciousAction);
         }

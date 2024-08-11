@@ -16,7 +16,7 @@ router.post('/GetLeaderboard', async (req, res) => {
         var startPos = req.body.startPos;
         var hitCount = req.body.hitCount;
 
-        if (typeof(startPos) !== 'number' && typeof(hitCount) !== 'undefined') return SetErrorResponse(res, definitionErrors.leaderboardStartPosWrongFormat);
+        if (typeof(startPos) !== 'number' && typeof(startPos) !== 'undefined') return SetErrorResponse(res, definitionErrors.leaderboardStartPosWrongFormat);
         if (typeof(hitCount) !== 'number' && typeof(hitCount) !== 'undefined') return SetErrorResponse(res, definitionErrors.leaderboardHitCountWrongFormat);
 
         // Had to check against NaN because startPos = 0 was returning false but we can't start with startPos 1 or we get player ranked #2
@@ -24,6 +24,7 @@ router.post('/GetLeaderboard', async (req, res) => {
         
         if (!hitCount) hitCount = leaderboardLimit;
         if (!startPos) startPos = 0;
+        if (startPos < 0) startPos = 0;
 
         const leaderboard = await GetLeaderboard(startPos, hitCount);
         const leaderboardSize = GetLeaderboardSize();

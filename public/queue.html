@@ -58,6 +58,7 @@
             </div>
         </header>
         <main class="main">
+            <div id="notification-message"></div>
             <h3 data-key="howToUse">Matchmaking Queue</h3>
             <div id="loading">Loading...</div>
             <div id="matchmaking-unavailable">Matchmaking is not available at this time.</div>
@@ -84,13 +85,7 @@
             </div>
             <div id="recent-matches">
                 <p>Recent Matches</p>
-                <div id="recent-matches-list">
-                    <div class="match-row">
-                        <div id="matchup">Matchup</div>
-                        <div class="match-type">Match Type</div>
-                        <div class="match-date">Match Date</div>
-                    </div>
-                </div>
+                <div id="recent-matches-list"></div>
             </div>
         </main>
     </body>
@@ -98,6 +93,7 @@
     <!--<script src="http://localhost:8080/socket.io/socket.io.js"></script>-->
     <!--<script src="https://tableturfq.up.railway.app/socket.io/socket.io.js"></script>-->
     <script src="/socket.io/socket.io.js"></script>
+    <script type="module" src="./scripts/error.js"></script>
     <script type="module" src="./scripts/queue.js"></script>
     <script type="module" src="./scripts/global-header.js"></script>
     <script type="module" src="./scripts/global-queue.js"></script>

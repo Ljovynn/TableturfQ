@@ -10,9 +10,9 @@ userSearchForm.addEventListener('submit', async (e) => {
 
     if ( validateSeach(searchValue) ) {
         var data = { input: searchValue };
-        var response = await getData('/user/SearchUser', data);
+        var response = await postData('/user/SearchUser', data);
 
-        addSearchUser(response);
+        addSearchUser(response.data);
         // If success, recreate the table with the retrieved results
     } else {
         alert('Please enter a valid username to search.');
@@ -46,7 +46,7 @@ async function addSearchUser(users) {
             let userLink = document.createElement('a');
             userLink.href = '/profile?playerId=' + user.id;
             userLink.setAttribute('target', '_blank');
-            userLink.append(sanitizeDisplayName(user.username) );
+            userLink.innerHTML = sanitizeDisplayName(user.username);
             nameCell.append(userLink);
 
             row.append(avatarCell);

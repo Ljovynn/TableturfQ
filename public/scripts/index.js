@@ -1,4 +1,5 @@
 const loginContent = document.getElementById('login-content');
+const loggedInContent = document.getElementById('logged-in-content');
 const loggedInLinks = document.getElementsByClassName('index-logged-in-link');
 const profileDiv = document.getElementById('index-profile-div');
 const profileLink = document.getElementById('profile-link');
@@ -30,21 +31,36 @@ guestSubmit.addEventListener('click', async (e) => {
 });
 
 async function setUserInfo() {
-    userInfo = await getUserInfo();
-    console.log(userInfo);
-    if ( userInfo.user.id ) {
-        hideLogInOptions();
+    try {
+        userInfo = await getUserInfo();
+        
+        if ( 'error' in userInfo ) {
+            throw new Error(userInfo.error);
+        }
+
+        console.log(userInfo);
+        if ( userInfo.user.id ) {
+            hideLogInOptions();
+            showLoggedInButton();
+        }
+    } catch (error) {
+        // error
+        console.log(error);
     }
 }
 
 async function getUserInfo() {
     var data = {};
-    var result = await fetchData('/user/GetUserInfo');
-    return result;
+    var result = await getData('/user/GetUserInfo');
+    return result.data;
 }
 
 function hideLogInOptions() {
     loginContent.style.display = 'none';
+}
+
+function showLoggedInButton() {
+    loggedInContent.style.display = 'block';
 }
 
 async function setAnnouncements() {
@@ -79,8 +95,9 @@ async function setAnnouncements() {
 }
 
 async function getNextAnnouncement() {
-    var result = await fetchData('/announcementInfo/GetNextAnnouncement');
-    return result;
+    var result = await getData('/announcementInfo/GetNextAnnouncement');
+    console.log(result);
+    return result.data;
 }
 
 function addNextAnnouncement(announcement) {
@@ -108,8 +125,8 @@ function addNextAnnouncement(announcement) {
 }
 
 async function getUpcomingAnnouncements() {
-    var result = await fetchData('/announcementInfo/GetUpcomingAnnouncements');
-    return result;
+    var result = await getData('/announcementInfo/GetUpcomingAnnouncements');
+    return result.data;
 }
 
 function addUpcomingAnnouncements(announcements) {

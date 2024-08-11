@@ -26,7 +26,9 @@ const player2RankLabel = document.getElementById('player2-rank-label');
 const player1VictoryButton = document.getElementById('player1-victory-button');
 const player2VictoryButton = document.getElementById('player2-victory-button');
 const player1Score = document.getElementById('player1-score');
+const player1ScoreMobile = document.getElementById('player1-score-mobile');
 const player2Score = document.getElementById('player2-score');
+const player2ScoreMobile = document.getElementById('player2-score-mobile');
 const scoreContainers = document.getElementsByClassName('score-container');
 const playerScores = document.getElementsByClassName('player-score');
 const victoryButtons = document.getElementsByClassName('player-victory-button');
@@ -37,6 +39,10 @@ const playerRaiseDispute = document.getElementById('player-raise-dispute-button'
 
 const playerResolve = document.getElementById('player-resolve-content');
 const playerResolveDispute = document.getElementById('player-resolve-dispute');
+
+const toggleMatchChat = document.getElementById('toggle-match-chat');
+const toggleMatchStrikes = document.getElementById('toggle-match-strikes');
+const notifications = document.getElementsByClassName('notification-icon');
 
 // Admin
 const adminContent = document.getElementById('admin-content');
@@ -51,6 +57,7 @@ const adminUnbanPlayer1Content = document.getElementById('admin-unban-player1-co
 const adminUnbanPlayer1Button = document.getElementById('admin-unban-player1-button');
 const adminBanPlayer1Details = document.getElementById('admin-ban-player1-details');
 const adminBanPlayer1Length = document.getElementById('admin-ban-player1-length');
+const adminBanPlayer1Reason = document.getElementById('admin-ban-player1-reason');
 
 const adminBanPlayer2Content = document.getElementById('admin-ban-player2-content');
 const adminBanPlayer2Button = document.getElementById('admin-ban-player2-button');
@@ -58,6 +65,7 @@ const adminUnbanPlayer2Content = document.getElementById('admin-unban-player2-co
 const adminUnbanPlayer2Button = document.getElementById('admin-unban-player2-button');
 const adminBanPlayer2Details = document.getElementById('admin-ban-player2-details');
 const adminBanPlayer2Length = document.getElementById('admin-ban-player2-length');
+const adminBanPlayer2Reason = document.getElementById('admin-ban-player2-reason');
 
 // Match options
 const setLength = document.getElementById('set-length');
@@ -74,6 +82,7 @@ const confirmationMessage = document.getElementById('confirmation-message');
 const gameMessage = document.getElementById('game-messages');
 
 // Strike elements
+const matchStrikeContent = document.getElementById('match-strike-content');
 const currentStrikerName = document.getElementById('current-striker');
 const strikerSection = document.getElementById('striker-section');
 const strikeContent = document.getElementById('strike-content');
@@ -81,6 +90,7 @@ const strikeInfo = document.getElementById('strike-info');
 const strikeButton = document.getElementById('confirm-map-selection');
 
 // Chat elements
+const matchChatContent = document.getElementById('match-chat-content');
 const chatLog = document.getElementById('match-chat-log');
 const chatForm = document.getElementById('match-chat-form');
 const chatInput = document.getElementById('match-chat-input');
@@ -205,15 +215,35 @@ for (let victoryButton of victoryButtons ) {
         var data = { winnerId: victoryButton.value };
         var response = await postData('/match/WinGame', data);
         console.log(response);
-        if ( response == 201 ) {
+        if ( response.code == 201 ) {
             console.log('Winner was marked at least');
             confirmationMessage.style.display = 'block';
             player1VictoryButton.style.display = 'none';
             player2VictoryButton.style.display = 'none';
-            confirmationMessage.innerHTML = 'Waiting for opponent to confirm the winner.';
+            //confirmationMessage.innerHTML = 'Waiting for opponent to confirm the winner.';
         }
     });
 }
+
+toggleMatchChat.addEventListener('click', async (e) => {
+    if ( !toggleMatchChat.classList.contains('active') ) {
+        toggleMatchChat.classList.toggle('active');
+        toggleMatchStrikes.classList.toggle('active');
+        matchChatContent.classList.toggle('untoggled');
+        matchStrikeContent.classList.toggle('untoggled');
+        removeNotifications();
+    }
+});
+
+toggleMatchStrikes.addEventListener('click', async (e) => {
+    if ( !toggleMatchStrikes.classList.contains('active') ) {
+        toggleMatchChat.classList.toggle('active');
+        toggleMatchStrikes.classList.toggle('active');
+        matchChatContent.classList.toggle('untoggled');
+        matchStrikeContent.classList.toggle('untoggled');
+        removeNotifications();
+    }
+});
 
 // Chat send listener
 chatForm.addEventListener('submit', async (e) => {
@@ -233,7 +263,7 @@ chatForm.addEventListener('submit', async (e) => {
         }
         console.log('chat message send response: ' + response);
 
-        if ( response == 201 ) {
+        if ( response.code == 201 ) {
             // If the message is accepted by the server
             chatInput.value = '';
         }
@@ -274,7 +304,7 @@ strikeButton.addEventListener('click', async (e) => {
         }
         console.log(response);
 
-        if ( response == 201 ) {
+        if ( response.code == 201 ) {
             stageStrikes = [];
         }
 
@@ -301,7 +331,7 @@ playerResolveDispute.addEventListener('click', async (e) => {
     playerResolve.style.display = 'none';
     var response = await postData('/match/ResolveDispute');
     console.log(response);
-    if ( response == 201 ) {
+    if ( response.code == 201 ) {
         // idk
     }
 });
@@ -335,13 +365,13 @@ if ( user.role== 2 ) {
         var data = { matchId: matchId, resolveOption: parseInt(adminDisputeOptions.value) };
         var response = await postData('/admin/ResolveDispute', data);
         console.log(response);
-        if ( response == 201 ) {
+        if ( response.code == 201 ) {
             adminContent.style.display = 'none';
         }
     });
 
     adminBanPlayer1Button.addEventListener('click', async (e) => {
-        var data = { bannedUserId: players[0].id, banLength: parseInt(adminBanPlayer1Length.value) };
+        var data = { bannedUserId: players[0].id, banLength: parseInt(adminBanPlayer1Length.value), reason: adminBanPlayer1Reason.value };
         var response = await postData('/admin/BanUser', data);
 
         console.log(response);
@@ -355,7 +385,7 @@ if ( user.role== 2 ) {
     });
 
     adminBanPlayer2Button.addEventListener('click', async (e) => {
-        var data = { bannedUserId: players[1].id, banLength: parseInt(adminBanPlayer2Length.value) };
+        var data = { bannedUserId: players[1].id, banLength: parseInt(adminBanPlayer2Length.value), reason: adminBanPlayer2Reason.value };
         var response = await postData('/admin/BanUser', data);
 
         console.log(response);
@@ -372,7 +402,7 @@ if ( user.role== 2 ) {
 // Page functions
 async function getUserInfo() {
     var data = {};
-    var result = await fetchData('/user/GetUserInfo');
+    var result = await getData('/user/GetUserInfo');
     return result;
 }
 
@@ -381,7 +411,7 @@ async function setUserInfo() {
     try {
         var userInfo = await getUserInfo(userID);
 
-        user = userInfo.user;
+        user = userInfo.data.user;
         username = sanitizeDisplayName( user.username );
         userID = user.id;
         userELO = user.g2_rating;
@@ -403,8 +433,8 @@ async function setUserInfo() {
 async function getMatchInfo(matchId) {
     var data = {matchId: matchId};
     console.log(data);
-    var result = await getData('/match/GetMatchInfo', data);
-    matchInfo = result;
+    var result = await postData('/match/GetMatchInfo', data);
+    matchInfo = result.data;
     console.log(matchInfo);
 }
 
@@ -485,6 +515,7 @@ async function setMatchInfo() {
         }
         player1VictoryButton.value = players[0].id;
         player1Score.setAttribute('player-id', players[0].id);
+        player1ScoreMobile.setAttribute('player-id', players[0].id);
         player1RankIcon.src = player1Rank.imageURL;
         player1RankLabel.innerHTML = player1Rank.name;
     } catch (error) {
@@ -510,6 +541,7 @@ async function setMatchInfo() {
         }
         player2VictoryButton.value = players[1].id;
         player2Score.setAttribute('player-id', players[1].id);
+        player2ScoreMobile.setAttribute('player-id', players[1].id);
         player2RankIcon.src = player2Rank.imageURL;
         player2RankLabel.innerHTML = player2Rank.name;
     } catch (error) {
@@ -542,6 +574,7 @@ async function setMatchInfo() {
                 // player 1 win
                 stageList.style.display = 'none';
                 currentStrikerName.style.display = 'none';
+                strikeContent.style.display = 'none';
                 gameMessage.innerHTML = sanitizeDisplayName( players[0].username ) + ' has won the match!';
                 requeueButton.style.display = 'block';
                 confirmationMessage.style.display = 'none';
@@ -551,6 +584,7 @@ async function setMatchInfo() {
                 // player 2 win
                 stageList.style.display = 'none';
                 currentStrikerName.style.display = 'none';
+                strikeContent.style.display = 'none';
                 gameMessage.innerHTML = sanitizeDisplayName( players[1].username ) + ' has won the match!';
                 requeueButton.style.display = 'block';
                 confirmationMessage.style.display = 'none';
@@ -569,7 +603,7 @@ async function setMatchInfo() {
 
 async function getChatMessages(matchId, amountMessages) {
     var data = { matchId: matchId, loadedMessagesAmount: amountMessages };
-    var response = await getData('/match/LoadChatMessages', data);
+    var response = await postData('/match/LoadChatMessages', data);
     console.log(response);
     loadingMessages = false;
     return response;
@@ -846,6 +880,7 @@ function isPlayerStriker() {
     console.log(userID);
     console.log(currentStriker);
     if ( userID == currentStriker ) {
+        tabAlert(toggleMatchStrikes);
         gameMessage.style.display = 'none';
         strikeContent.style.display = 'block';
     } else {
@@ -904,6 +939,7 @@ function setCasualGame() {
 }
 
 function startGame() {
+    tabAlert(toggleMatchStrikes);
     playingStage.innerHTML = 'This game will be played on';
     playingStage.style.display = 'block';
     strikerSection.style.display = 'none';
@@ -987,6 +1023,7 @@ async function gameFinish(winnerId) {
     stageList.style.display = 'none';
     strikerSection.style.display = 'block';
     currentStrikerName.style.display = 'none';
+    leaveMatch.style.display = 'none';
 
     console.log(players);
 
@@ -1032,7 +1069,7 @@ function showPlayerResolve() {
 
 async function getModUser(users) {
     var data = { userIdList: users };
-    var result = await getData('/user/GetUsers', data);
+    var result = await postData('/user/GetUsers', data);
     return result;
 }
 
@@ -1113,6 +1150,19 @@ async function checkPlayerRanked(newPlayerRatings) {
 
 }
 
+function tabAlert(button) {
+    if ( !button.classList.contains('active') ) {
+        var notification = button.childNodes[0];
+        notification.classList.add('alert')
+    }
+}
+
+function removeNotifications() {
+    for (let notification of notifications ) {
+        notification.classList.remove('alert');
+    }
+}
+
 // Strike validation
 function validateStrikes(strikes, strikeAmount) {
     if ( strikes.length != strikeAmount ) {
@@ -1146,6 +1196,7 @@ socket.emit('join', 'match' + matchId);
 
 socket.on('chatMessage', async (chatData) => {
     console.log(chatData);
+    tabAlert(toggleMatchChat);
     var chatString = await getMessageString(chatData);
     await addMessage(chatString);
 });
@@ -1217,7 +1268,6 @@ socket.on('matchEnd', async (data) => {
         setPlayerLeftMessage( leftPlayer, false );
         requeueButton.style.display = 'block';
         leaveMatch.style.display = 'none';
-
     }
 });
 

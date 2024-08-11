@@ -29,8 +29,13 @@ const countryInput = document.getElementById('country-select');
 const countrySubmit = document.getElementById('user-profile-country-submit');
 const editCountryClose = document.getElementById('user-country-edit-close');
 
+const toggleMatchHistory = document.getElementById('toggle-match-history');
+const toggleRatingGraph = document.getElementById('toggle-rating-graph');
+
+const matchInfo = document.getElementById('user-match-info');
 const matchHistory = document.getElementById('user-match-history');
 
+const ratingGraph = document.getElementById('user-rating-graph');
 const graphTimeframe = document.getElementById('user-rating-graph-timeframe');
 const graphSubmit = document.getElementById('user-rating-graph-submit');
 var chosenTimeframe;
@@ -47,6 +52,7 @@ const adminBanUserButton = document.getElementById('admin-ban-user-button');
 const adminUnbanUserContent = document.getElementById('admin-unban-user-content');
 const adminUnbanUserButton = document.getElementById('admin-unban-user-button');
 const adminBanLength = document.getElementById('admin-ban-user-length');
+const adminBanReason = document.getElementById('admin-ban-user-reason');
 
 var loggedInUserInfo;
 var loggedInUserID = '';
@@ -119,10 +125,12 @@ displayNameSubmit.addEventListener('click', (e) => {
         var response = postData('/user/SetUsername', data);
 
         // On successful response
-        editDisplayNameForm.classList.toggle('editing');
-        userDisplayNameContent.classList.toggle('editing');
-        displayNameInput.value = '';
-        userDisplayName.textContent = newDisplayName;
+        if ( response.code == 200 ) {
+            editDisplayNameForm.classList.toggle('editing');
+            userDisplayNameContent.classList.toggle('editing');
+            displayNameInput.value = '';
+            userDisplayName.textContent = newDisplayName;
+        }
     } else {
         alert('The submitted display name is invalid. Please try again.');
     }
@@ -136,21 +144,40 @@ countrySubmit.addEventListener('click', async (e) => {
 
     // On Success
     console.log(response);
-
-    editCountryForm.classList.toggle('editing');
-    userCountry.classList.toggle('editing');
-    var countryElement = document.createElement('img');
-    countryElement.src = 'https://flagcdn.com/w20/' + newCountry.toLowerCase() + '.png';
-    countryFlag = countryElement;
-    userCountryValue.innerHTML = '';
-    userCountryValue.append(countryFlag);
+    if ( response.code == 200 ) {
+        editCountryForm.classList.toggle('editing');
+        userCountry.classList.toggle('editing');
+        var countryElement = document.createElement('img');
+        countryElement.src = 'https://flagcdn.com/w20/' + newCountry.toLowerCase() + '.png';
+        countryFlag = countryElement;
+        userCountryValue.innerHTML = '';
+        userCountryValue.append(countryFlag);
+    }
 });
 
 logoutButton.addEventListener('click', async (e) => {
     var response = await postData('/user/DeleteUserLoginData');
-    if ( response == 201 ) {
+    if ( response.code == 201 ) {
         window.location.href = '/';
     }
+});
+
+toggleMatchHistory.addEventListener('click', async (e) => {
+    if ( !toggleMatchHistory.classList.contains('active') ) {
+        toggleMatchHistory.classList.toggle('active');
+        toggleRatingGraph.classList.toggle('active');
+        matchInfo.classList.toggle('untoggled');
+        ratingGraph.classList.toggle('untoggled');
+    }
+});
+
+toggleRatingGraph.addEventListener('click', async (e) => {
+    if ( !toggleRatingGraph.classList.contains('active') ) {
+        toggleMatchHistory.classList.toggle('active');
+        toggleRatingGraph.classList.toggle('active');
+        matchInfo.classList.toggle('untoggled');
+        ratingGraph.classList.toggle('untoggled'); 
+    } 
 });
 
 graphSubmit.addEventListener('click', async (e) => {
@@ -158,7 +185,7 @@ graphSubmit.addEventListener('click', async (e) => {
 });
 
 // Admin actions
-if ( loggedInUserInfo.user.role== 2 ) {
+if ( !loggedInUserInfo.error && loggedInUserInfo.user.role== 2 ) {
     adminBanUser.addEventListener('click', async (e) => {
         adminBanUserContent.style.display = 'block';
     });
@@ -172,11 +199,11 @@ if ( loggedInUserInfo.user.role== 2 ) {
     });
 
     adminBanUserButton.addEventListener('click', async (e) => {
-        var data = { bannedUserId: userId, banLength: parseInt(adminBanLength.value) };
+        var data = { bannedUserId: userId, banLength: parseInt(adminBanLength.value), reason: adminBanReason.value };
         var response = await postData('/admin/BanUser', data);
 
         console.log(response);
-        if ( response == 201 ) {
+        if ( response.code == 201 ) {
             adminUnbanUserContent.style.display = 'block';
             adminBanUser.style.display = 'none';
             adminBanUserContent.style.display = 'none';
@@ -189,7 +216,7 @@ if ( loggedInUserInfo.user.role== 2 ) {
         var response = await postData('/admin/UnbanUser', data);
 
         console.log(response);
-        if ( response == 201 ) {
+        if ( response.code == 201 ) {
             adminUnbanUserContent.style.display = 'none';
             banDetails.style.display = 'none';
             adminBanUser.style.display = 'block';
@@ -200,8 +227,8 @@ if ( loggedInUserInfo.user.role== 2 ) {
 async function getUserInfo() {
     try {
         var data = {};
-        var result = await fetchData('/user/GetUserInfo');
-        return result;
+        var result = await getData('/user/GetUserInfo');
+        return result.data;
     } catch (error) {
         return null;
     }
@@ -210,12 +237,13 @@ async function getUserInfo() {
 async function setUserInfo() {
     try {
         loggedInUserInfo = await getUserInfo();
-        if ( loggedInUserInfo ) {
+        if ( loggedInUserInfo && !loggedInUserInfo.error ) {
             loggedInUserID = loggedInUserInfo.user.id;
         }
         // If no playerID is set, try the default get current user info
         if ( playerID != '' ) {
             userInfo = await getMatchUsers([playerID]);
+            console.log(userInfo);
             user = userInfo[0];
         } else {
             userInfo = loggedInUserInfo;
@@ -259,7 +287,7 @@ async function setUserInfo() {
         hideNonUserElements();
     } catch (error) {
         console.log(error);
-        window.location.href = '/';
+        //window.location.href = '/';
     }
 }
 
@@ -272,16 +300,16 @@ async function getMatchHistory() {
     } else {
         data = { userId: userId, pageNumber: parseInt(page), hitsPerPage: parseInt(hits) };
     }
-    var result = await getData('/matchHistory/GetUserMatchHistory', data);
-    return result;
+    var result = await postData('/matchHistory/GetUserMatchHistory', data);
+    return result.data;
 }
 
 async function setMatchHistory() {
     matchList = await getMatchHistory();
-    matches = matchList.matchHistory;
-    matchUsers = matchList.users;
-
-    if ( matches ) {
+    console.log(matchList);
+    if ( matchList.matchHistory.length > 0 ) {
+        matches = matchList.matchHistory;
+        matchUsers = matchList.users;
         for ( let match of matches ) {
             try {
                 let row = document.createElement('div');
@@ -304,10 +332,12 @@ async function setMatchHistory() {
                 var player2 = getMatchPlayer(matchUsers, match.player2_id);
                 matchupCell.classList.add('matchup');
 
-                let matchPlayer1 = document.createElement('div');
+                let matchPlayer1 = document.createElement('a');
+                matchPlayer1.href = '/profile?playerId=' + match.player1_id;
                 matchPlayer1.classList.add('recent-matchup-player');
                 matchPlayer1.classList.add('recent-matchup-player1');
-                let matchPlayer2 = document.createElement('div');
+                let matchPlayer2 = document.createElement('a');
+                matchPlayer2.href = '/profile?playerId=' + match.player2_id;
                 matchPlayer2.classList.add('recent-matchup-player');
                 matchPlayer2.classList.add('recent-matchup-player2');
 
@@ -352,8 +382,8 @@ async function setMatchHistory() {
                         break;
                 }
 
-                player1Name.append( sanitizeDisplayName( player1[0].username ) );
-                player2Name.append( sanitizeDisplayName( player2[0].username ) );
+                player1Name.innerHTML = sanitizeDisplayName( player1[0].username );
+                player2Name.innerHTML = sanitizeDisplayName( player2[0].username );
 
                 matchPlayer1.append(avatarPlayer1);
                 matchPlayer1.append( player1Name );
@@ -365,7 +395,7 @@ async function setMatchHistory() {
 
                 let vsImg = document.createElement('img');
                 vsImg.classList.add('recent-matchup-vs');
-                vsImg.src = 'https://comicvine.gamespot.com/a/uploads/original/11136/111361078/6676820-vs.png';
+                vsImg.src = '/assets/images/vs-icon.png';
                 //matchupCell.append('vs');
                 matchupCell.append(vsImg);
                 matchupCell.append( matchPlayer2 );
@@ -394,18 +424,23 @@ async function setMatchHistory() {
                 console.log(error);
             }
         }
+    } else {
+        let emptyCell = document.createElement('div');
+        emptyCell.classList.add('match-history-empty');
+        emptyCell.innerHTML = 'User has no recent matches';
+        matchHistory.append(emptyCell);
     }
 }
 
 async function getMatchUsers(users) {
     var data = { userIdList: users };
-    var result = await getData('/user/GetUsers', data);
-    return result;
+    var result = await postData('/user/GetUsers', data);
+    return result.data;
 }
 
 async function getELOGraph(timeframe) {
     var data = { userId: userId, ratingHistoryOption: ratingHistoryOptions[timeframe] };
-    var result = await getData('/user/GetUserRatingHistory', data);
+    var result = await postData('/user/GetUserRatingHistory', data);
     /*if (result.length > 0){
         result.unshift({
             match_id: null,
@@ -421,7 +456,7 @@ async function getELOGraph(timeframe) {
         });
     }*/
     console.log(result);
-    return result;
+    return result.data;
 }
 
 async function setELOGraph(timeframe = 'month') {
@@ -436,6 +471,7 @@ async function setELOGraph(timeframe = 'month') {
 
 function GetChartOptions(timeframe){
     var result = {
+        width: 750,
         legend: { position: 'bottom' },
         lineWidth: 4,
         dataOpacity: 0.6,
@@ -596,10 +632,10 @@ async function setUserBanLength() {
                 var remainingTime = banLength - currentTime;
                 var readableLength = getReadableTime(remainingTime);
 
-                banDetails.innerHTML = 'You are suspened from using TableturfQ until ' + new Date(banLength*1000) + `<br />` + 'Which is ' + readableLength + ' from now';
+                banDetails.innerHTML = 'You are suspened from using TableturfQ until ' + new Date(banLength*1000) + `<br />` + 'Which is ' + readableLength + ' from now.' + `<br />` + 'Reason: ' + banInfo.reason;
                 banDetails.style.display = 'block';
             } else {
-                banDetails.innerHTML = 'You are banned from using TableturfQ';
+                banDetails.innerHTML = 'You are banned from using TableturfQ.' + `<br />` + 'Reason: ' + banInfo.reason;
                 banDetails.style.display = 'block';
             }
         }
@@ -608,9 +644,9 @@ async function setUserBanLength() {
 
 async function getUserBanLength() {
     //var data = { user: userID };
-    var result = await fetchData('/user/GetUserBanInfo');
+    var result = await getData('/user/GetUserBanInfo');
     console.log(result);
-    return result;
+    return result.data;
 }
 
 async function setAdminBanLength(userID) {
@@ -623,10 +659,10 @@ async function setAdminBanLength(userID) {
             var remainingTime = banLength - currentTime;
             var readableLength = getReadableTime(remainingTime);
 
-            banDetails.innerHTML = 'User is suspended from using TableturfQ until ' + new Date(banLength*1000) + `<br />` + 'Which is ' + readableLength + ' from now';
+            banDetails.innerHTML = 'User is suspended from using TableturfQ until ' + new Date(banLength*1000) + `<br />` + 'Which is ' + readableLength + ' from now.' + `<br />` + 'Reason: ' + banInfo.reason;
             banDetails.style.display = 'block';
         } else {
-            banDetails.innerHTML = 'User is banned from using TableturfQ';
+            banDetails.innerHTML = 'User is banned from using TableturfQ.' + `<br />` + 'Reason: ' + banInfo.reason;
             banDetails.style.display = 'block';
         }
     }
@@ -635,9 +671,9 @@ async function setAdminBanLength(userID) {
 async function getAdminBanLength(userID) {
     console.log(userID);
     var data = { userId: userID };
-    var result = await getData('/admin/GetUserBanInfo', data);
+    var result = await postData('/admin/GetUserBanInfo', data);
     console.log(result);
-    return result;
+    return result.data;
 }
 
 function getMatchPlayer( matchUsers, playerId ) {
@@ -654,7 +690,7 @@ function hideNonUserElements() {
 }
 
 async function showAdminBanInfo() {
-    if ( loggedInUserInfo.user.role == 2 ) {
+    if ( !loggedInUserInfo.error && loggedInUserInfo.user.role == 2 ) {
         adminContent.style.display = 'block';
         if ( user.banned ) {
             adminBanUserContent.style.display = 'none';
