@@ -33,6 +33,7 @@ const scoreContainers = document.getElementsByClassName('score-container');
 const playerScores = document.getElementsByClassName('player-score');
 const victoryButtons = document.getElementsByClassName('player-victory-button');
 const leaveMatch = document.getElementById('leave-match-button');
+const toggleContent = document.getElementById('toggle-content');
 
 const needHelp = document.getElementById('player-need-help');
 const playerRaiseDispute = document.getElementById('player-raise-dispute-button');
@@ -929,6 +930,7 @@ function setCasualGame() {
     player1VictoryButton.style.display = 'none';
     player2VictoryButton.style.display = 'none';
     gameMessage.style.display = 'none';
+    toggleContent.style.display = 'none';
 
     for ( let scoreContainer of scoreContainers ) {
         scoreContainer.style.display = 'none';
