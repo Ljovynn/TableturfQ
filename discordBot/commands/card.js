@@ -43,9 +43,7 @@ export async function autocomplete(interaction){
     for (let i = 0; i < choices.length; i++){
         if (choices[i].sanitizedName.search(SanitizeString(focusedValue)) != -1) filteredChoices.push(choices[i].name);
     }
-    if (filteredChoices.length > 25){
-        filteredChoices = filteredChoices.splice(0, 25);
-    }
+    if (filteredChoices.length > 25) filteredChoices = filteredChoices.splice(0, 25);
 	await interaction.respond(
 		filteredChoices.map(choice => ({ name: choice, value: choice })),
 	);
