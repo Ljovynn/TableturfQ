@@ -397,6 +397,9 @@ export function PlayerSentMatchDispute(playerId){
 
     if (match.status == matchStatuses.dispute) return disputeErrors.alreadyDispute;
 
+    //temp fix
+    if (match.mode == matchModes.casual) return disputeErrors.privateBattle;
+
     StartMatchDispute(match);
     return new ResponseData(201, match.id);
 }
