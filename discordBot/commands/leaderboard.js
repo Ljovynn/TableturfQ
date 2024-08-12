@@ -16,6 +16,7 @@ export const data = new SlashCommandBuilder()
             .setMinValue(1))
 
 export async function execute(interaction) { 
+    await interaction.deferReply();
     const startPosition = interaction.options.getInteger('position') ?? 1;
     const leaderboard = await GetLeaderboard(startPosition - 1, limit);
 
@@ -45,5 +46,5 @@ export async function execute(interaction) {
         }
     };
 
-    await interaction.reply({ embeds: [leaderboardEmbed] });
+    await interaction.editReply({ embeds: [leaderboardEmbed] });
 }
