@@ -16,7 +16,6 @@ export const data = new SlashCommandBuilder()
             .setMinValue(1))
 
 export async function execute(interaction) { 
-    await interaction.deferReply();
     const startPosition = interaction.options.getInteger('position') ?? 1;
     const leaderboard = await GetLeaderboard(startPosition - 1, limit);
 
@@ -26,12 +25,16 @@ export async function execute(interaction) {
         value: ''},
     ];
 
-    for (let i = 0; i < leaderboard.length; i++){
-        const rank = GetRank(leaderboard[i].g2_rating);
+    const userIds = leaderboard.map((x) => x.discord_id.toString());
+    const guildMembers = await interaction.guild.members.fetch({ user: userIds, withPresences: false });
 
-        const isMember = await interaction.guild.members.fetch(leaderboard[i].discord_id).then(() => true).catch(() => false);
-        const tagValue = (isMember) ? `<@${leaderboard[i].discord_id}>` : SanitizeDiscordLog(leaderboard[i].discord_username);
-        const countryValue = (leaderboard[i].country !== null) ? `:flag_${leaderboard[i].country}:` : ':earth_africa:';
+    for (let i = 0; i < leaderboard.length; i++){
+        let rank = GetRank(leaderboard[i].g2_rating);
+
+        let isMember = guildMembers.find(discordUser => (discordUser.user.id === leaderboard[i].discord_id));
+
+        let tagValue = (isMember) ? `<@${leaderboard[i].discord_id}>` : SanitizeDiscordLog(leaderboard[i].discord_username);
+        let countryValue = (leaderboard[i].country !== null) ? `:flag_${leaderboard[i].country}:` : ':earth_africa:';
 
         leaderboardsFields[0].value += `\n${startPosition + i}. ${countryValue} ${rank.emoji} **${Math.floor(leaderboard[i].g2_rating)}** ${tagValue}`;
     }
@@ -46,5 +49,5 @@ export async function execute(interaction) {
         }
     };
 
-    await interaction.editReply({ embeds: [leaderboardEmbed] });
+    await interaction.reply({ embeds: [leaderboardEmbed] });
 }
