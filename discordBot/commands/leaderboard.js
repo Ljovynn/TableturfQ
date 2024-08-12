@@ -16,6 +16,7 @@ export const data = new SlashCommandBuilder()
             .setMinValue(1))
 
 export async function execute(interaction) { 
+    await interaction.deferReply();
     const startPosition = interaction.options.getInteger('position') ?? 1;
     const leaderboard = await GetLeaderboard(startPosition - 1, limit);
 
@@ -32,7 +33,7 @@ export async function execute(interaction) {
         const tagValue = (isMember) ? `<@${leaderboard[i].discord_id}>` : SanitizeDiscordLog(leaderboard[i].discord_username);
         const countryValue = (leaderboard[i].country !== null) ? `:flag_${leaderboard[i].country}:` : ':earth_africa:';
 
-        leaderboardsFields[0].value += `\n${startPosition + i}. ${countryValue} ${tagValue}  ${rank.emoji} **${Math.floor(leaderboard[i].g2_rating)}**`;
+        leaderboardsFields[0].value += `\n${startPosition + i}. ${countryValue} ${rank.emoji} **${Math.floor(leaderboard[i].g2_rating)}** ${tagValue}`;
     }
     leaderboardsFields[0].value += '\u200B';
     
@@ -45,5 +46,5 @@ export async function execute(interaction) {
         }
     };
 
-    await interaction.reply({ embeds: [leaderboardEmbed] });
+    await interaction.editReply({ embeds: [leaderboardEmbed] });
 }

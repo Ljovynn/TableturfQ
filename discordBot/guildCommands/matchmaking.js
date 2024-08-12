@@ -33,7 +33,7 @@ export async function execute(interaction) {
     }
     SetQueAvailible(enabled);
 
-    const embed = BuildSimpleEmbed('Updated matchmaking abailability', `Queue enabled: ${enabled}`, '\u200B');
+    const embed = BuildSimpleEmbed('Updated matchmaking availability', `Queue enabled: ${enabled}`, '\u200B');
 
     await interaction.reply({ embeds: [embed] });
 }
