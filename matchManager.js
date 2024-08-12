@@ -374,6 +374,7 @@ export async function UserSentChatMessage(matchId, playerId, content){
 //trust server that its a mod and verified user
 export async function ModSentChatMessage(matchId, userId, content){
     if (HasBadWords(content)) return chatMessageErrors.badWords;
+    if (content.length > 256 || content.length == 0) return chatMessageErrors.tooLong;
     
     var match = FindMatch(matchId);
     if (!match){
@@ -397,7 +398,7 @@ export function PlayerSentMatchDispute(playerId){
 
     if (match.status == matchStatuses.dispute) return disputeErrors.alreadyDispute;
 
-    //temp fix
+    //temp fix?
     if (match.mode == matchModes.casual) return disputeErrors.privateBattle;
 
     StartMatchDispute(match);
@@ -438,14 +439,14 @@ export async function PlayerSentResolveDispute(playerId){
     if (match.players[0].disputeResolveSent && match.players[1].disputeResolveSent){
         match.players[0].disputeResolveSent = false;
         match.players[1].disputeResolveSent = false;
+        match.chat.push(new ChatMessage(ResolveDisputeChatMessage(match.players[0].id, match.players[1].id, disputeResolveOptions.noChanges), systemId));
 
         if (match.mode == matchModes.casual){
-            match.status == matchStatuses.ingame;
+            match.status = matchStatuses.ingame;
             SendDisputeMessage(GetDisputedMatchesList(), false);
             return new ResponseData(201, matchModes.casual);
         }
 
-        match.chat.push(new ChatMessage(ResolveDisputeChatMessage(match.players[0].id, match.players[1].id, disputeResolveOptions.noChanges), systemId));
         var responseData = HandleNoChangesResolve(match);
         responseData.data = match.id;
         return responseData;
@@ -463,7 +464,8 @@ export async function ResolveMatchDispute(matchId, resolveOption){
     match.players[1].disputeResolveSent = false;
 
     if (match.mode == matchModes.casual){
-        match.status == matchStatuses.ingame;
+        match.chat.push(new ChatMessage(ResolveDisputeChatMessage(match.players[0].id, match.players[1].id, disputeResolveOptions.noChanges), systemId));
+        match.status = matchStatuses.ingame;
         SendDisputeMessage(GetDisputedMatchesList(), false);
         return new ResponseData(201, matchModes.casual);
     }
