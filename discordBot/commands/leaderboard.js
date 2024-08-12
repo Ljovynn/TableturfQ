@@ -5,7 +5,7 @@ import { SanitizeDiscordLog } from "../../utils/string.js";
 import { GetLeaderboard } from "../../database.js";
 import { GetLeaderboardSize } from "../../cache/leaderboardSize.js";
 
-const limit = 15;
+const limit = 10;
 
 export const data = new SlashCommandBuilder()
     .setName('leaderboard')
@@ -25,7 +25,7 @@ export async function execute(interaction) {
         name: '\u200B',
         value: ''},
     ];
-    
+
     for (let i = 0; i < leaderboard.length; i++){
         const rank = GetRank(leaderboard[i].g2_rating);
 
