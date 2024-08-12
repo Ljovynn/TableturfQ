@@ -118,7 +118,7 @@ async function setLeaderBoard(startPos, hitCount) {
             userLink.append(flagSpace);
         }
 
-        userLink.innerHTML = sanitizeDisplayName( user.username );
+        userLink.innerHTML = userLink.innerHTML + sanitizeDisplayName( user.username );
         nameCell.append(userLink);
 
         let eloCell = document.createElement('div');

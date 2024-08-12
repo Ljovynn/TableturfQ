@@ -45,7 +45,7 @@ if ( !rankedRules.dsr ) {
 for ( let link of aboutLinks ) {
 	link.addEventListener('click', (e) => {
 		matchRulesSection.style.display = 'none';
-		aboutButton.classList.remove('active');
+		matchButton.classList.remove('active');
 
 		siteRulesSection.style.display = 'none';
 		siteButton.classList.remove('active');
