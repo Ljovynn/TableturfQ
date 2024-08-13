@@ -621,7 +621,7 @@ export function FindMatchWithPlayer(playerId){
     }
 }
 
-async function FinishMatch(match, cancelled = false){
+export async function FinishMatch(match, cancelled = false){
     if (!cancelled) {
         if (!await SetMatchResult(match)) return false;
         if (!match.privateBattle) UpdateRecentMatches(match);
