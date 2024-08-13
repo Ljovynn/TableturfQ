@@ -1044,6 +1044,9 @@ div.recent-matchup-name {
         width: 100%;
     }
 
+    .modal {
+        width: 80%;
+    }
 
     /**** HEADER ****/
     .header-expanded {

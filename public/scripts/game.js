@@ -951,14 +951,18 @@ function startGame() {
     playerResolve.style.display = 'none';
 
     var selectedStage = document.getElementsByClassName('stage-selected');
+    console.log(selectedStage);
     if ( selectedStage.length > 0 ) {
+        if ( selectedStage[0].classList.contains('mobile-selected') );
+            selectedStage[0].classList.remove('mobile-selected');
         selectedStage[0].classList.remove('stage-selected');
-        selectedStage[0].classList.remove('mobile-selected');
     }
 
     var strickenStages = document.getElementsByClassName('stage-stricken');
     for ( let stage of strickenStages ) {
         stage.style.display = 'none';
+        if ( stage.classList.contains('mobile-selected') );
+            stage.classList.remove('mobile-selected');
     }
 
     for (let victoryButton of victoryButtons ) {

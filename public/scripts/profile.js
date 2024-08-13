@@ -578,7 +578,15 @@ function drawELOChart() {
     var currentMatch;
     var previousMatch;
     for ( let match of graphData ) {
-        currentMatch = match;
+        console.log(match);
+        var matchDate = new Date(match.unix_date*1000);
+        if ( match == graphData[0] ) {
+            console.log('first element!');
+            dataArray.push([matchDate, match.old_rating, null, null]);
+        } else {
+            dataArray.push([matchDate, match.new_rating, null, null]);
+        }
+        /*currentMatch = match;
         if ( !previousMatch || currentMatch.old_rating == previousMatch.new_rating ) {
             var matchDate = new Date(match.unix_date*1000);
             //dateString = getMatchDateString(matchDate);
@@ -595,11 +603,11 @@ function drawELOChart() {
             dataArray.push([endDate, currentMatch.old_rating, null, null, null]);
             dataArray.push([endDate, currentMatch.new_rating, null, null, null]);
         }
-        previousMatch = match;
+        previousMatch = match;*/
     }
     if (graphData.length > 0){
         dataArray.unshift([new Date(Date.now() - ratingHistoryOptions[chosenTimeframe]), graphData[0].old_rating,
-        'point { size: 0; visible: false; }', `Start rating: ${graphData[0].old_rating}`, null]);
+        'point { size: 0; visible: false; }', `Start rating: ${graphData[0].old_rating}`]);
         //dataArray.push([new Date(Date.now()), graphData[graphData.length - 1].new_rating, null, 'point {visible: false; }']);
     }
 
@@ -608,7 +616,7 @@ function drawELOChart() {
     data.addColumn('number', 'Match Rating');
     data.addColumn({'type': 'string', 'role': 'style'});
     data.addColumn({'type': 'string', 'role': 'tooltip'});
-    data.addColumn('number', 'Rating Decay/Manual adjustments');
+    //data.addColumn('number', 'Rating Decay/Manual adjustments');
     data.addRows(dataArray);
 
     var options = GetChartOptions(chosenTimeframe);
