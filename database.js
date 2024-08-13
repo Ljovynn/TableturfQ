@@ -485,12 +485,13 @@ export async function SearchDecks(searchOptions, offset = 0){
     switch(sortOption){
         case deckSearchSortingOptions.mostLiked:
             sortString = 'likes DESC';
-        case deckSearchSortingOptions.newest:
-            sortString = 'created_at DESC';
         case deckSearchSortingOptions.oldest:
             sortString = 'created_at ASC';
         case deckSearchSortingOptions.updated:
             sortString = 'last_updated DESC';
+        case deckSearchSortingOptions.newest:
+        default:
+            sortString = 'created_at DESC';
     }
 
     //offset, limit
