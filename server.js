@@ -48,6 +48,7 @@ const app = express();
 
 const server = app.listen(port, () => {
     //Deploy();
+    //TESTMATCH();
     console.log(`TableturfQ is up at port ${port}`);
 
     //que
