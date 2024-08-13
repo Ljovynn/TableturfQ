@@ -28,11 +28,13 @@ matches.push(m2);*/
 //Ljovynn testing
 
 /*export async function TESTMATCH(){
-    var m1 = await MakeNewMatch('_Ff5JrWoX2xll6uJ', 'zJ_XilI__FFQxP7_', matchModes.casual);
-    for (let i = 0; i < 10; i++){
-        await ModSentChatMessage(m1.id, '_Ff5JrWoX2xll6uJ', 'test' + i.toString());
-    }
-    await PlayerSentCasualMatchEnd('_Ff5JrWoX2xll6uJ');
+    var m1 = await MakeNewMatch('8wUa0c7ksw5e8y1p', 'wZOf--ev5yq6NrAj', matchModes.ranked);
+    PlayerSentStageStrikes('8wUa0c7ksw5e8y1p', [stages.mainStreet]);
+    PlayerSentStageStrikes('wZOf--ev5yq6NrAj', [stages.thunderPoint, stages.riverDrift]);
+    PlayerSentStageStrikes('8wUa0c7ksw5e8y1p', [stages.girderForBattle]);
+    await PlayerSentGameWin('8wUa0c7ksw5e8y1p', '8wUa0c7ksw5e8y1p');
+    await PlayerSentGameWin('wZOf--ev5yq6NrAj', '8wUa0c7ksw5e8y1p');
+    console.log(JSON.stringify(m1));
 }*/
 
 export async function CancelOldMatches(cutoffTime){
@@ -61,12 +63,12 @@ export async function CancelOldMatches(cutoffTime){
 export function MakeNewMatch(player1Id, player2Id, matchMode, privateBattle = false, setLength = null){
 
     //randomize player positions
-    let r = Math.floor(Math.random() * 2);
+    /*let r = Math.floor(Math.random() * 2);
     if (r == 1){
         let tempId = player1Id;
         player1Id = player2Id;
         player2Id = tempId;
-    }
+    }*/
 
     const matchId = GenerateNanoId();
 
@@ -211,35 +213,38 @@ export async function PlayerSentGameWin(playerId, winnerId){
     data.matchId = match.id;
 
     var playerPos = FindPlayerPosInMatch(match, playerId);
+    var otherPos = (playerPos % 2) + 1;
 
     if (match.mode == matchModes.casual) return gameWinErrors.casual;
     if (match.status != matchStatuses.ingame) return gameWinErrors.wrongStatus;
+    if (match.players[playerPos - 1].markedWinner != 0) return gameWinErrors.alreadySent;
 
     const winnerPos = (match.players[0].id == winnerId) ? 1 : 2;
 
-    match.players[playerPos - 1].gameConfirmed = true;
+    match.players[playerPos - 1].markedWinner = winnerPos;
 
     var game = match.gamesArr[match.gamesArr.length - 1];
 
     match.chat.push(new ChatMessage(GamePlayerConfirmMessage(playerId, winnerId), systemId));
 
-    if (game.winnerId == null){
-        game.winnerId = winnerId;
-    } else if (game.winnerId != winnerId){
-        game.winnerId = null;
-
+    if (match.players[otherPos - 1].markedWinner !== 0 && match.players[0].markedWinner != match.players[1].markedWinner){
         StartMatchDispute(match);
         data.dispute = true;
     }
 
     //check game verified
-    if (match.players[0].gameConfirmed && match.players[1].gameConfirmed){
+    if (match.players[otherPos - 1].markedWinner != 0){
+        if (match.players[0].markedWinner != match.players[1].markedWinner){
+            StartMatchDispute(match);
+            data.dispute = true;
+            return new ResponseData(201, data);
+        }
 
+        game.winnerId = winnerId;
+        match.status = matchStatuses.stageSelection;
         if (rulesets[match.mode].dsr){
             match.players[winnerPos - 1].unpickableStagesArr.push(game.stage);
         }
-
-        match.status = matchStatuses.stageSelection;
 
         if (CheckMatchWin(match, winnerId)){
             if (match.createdAt > Date.now() - (5 * 60 * 1000)){
@@ -256,8 +261,8 @@ export async function PlayerSentGameWin(playerId, winnerId){
         } else{
             match.chat.push(new ChatMessage(GameWinChatMessage(winnerId, match.gamesArr.length), systemId));
             match.gamesArr.push(new Game());
-            match.players[0].gameConfirmed = false;
-            match.players[1].gameConfirmed = false;
+            match.players[0].markedWinner = 0;
+            match.players[1].markedWinner = 0;
         }
 
         data.confirmed = true;
@@ -406,8 +411,8 @@ export function PlayerSentMatchDispute(playerId){
 }
 
 function StartMatchDispute(match){
-    match.players[0].gameConfirmed = false;
-    match.players[1].gameConfirmed = false;
+    match.players[0].markedWinner = 0;
+    match.players[1].markedWinner = 0;
     match.gamesArr[match.gamesArr.length - 1].winnerId = null;
     if (match.privateBattle) return;
     match.chat.push(new ChatMessage(DisputeChatMessage(), systemId));
@@ -562,8 +567,8 @@ async function HandleDisputeGameWin(match, winnerIndex){
         return false;
     } else{
         match.gamesArr.push(new Game());
-        match.players[0].gameConfirmed = false;
-        match.players[1].gameConfirmed = false;
+        match.players[0].markedWinner = 0;
+        match.players[1].markedWinner = 0;
     }
 
     SendDisputeMessage(GetDisputedMatchesList(), false);
@@ -586,7 +591,7 @@ export async function HandleBannedPlayerInMatch(playerId){
         if (!await FinishMatch(match)) return databaseErrors.matchFinishError;
     } else{
         var playerPos = FindPlayerPosInMatch(match, playerId);
-        var otherPos = (playerPos + 1) % 2;
+        var otherPos = (playerPos % 2) + 1;
         match.winnerId = match.players[otherPos - 1].id;
         result.winnerId = match.winnerId;
         result.newPlayerRatings = await HandleRankedMatchWin(match);
