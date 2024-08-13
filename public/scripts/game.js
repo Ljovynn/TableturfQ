@@ -249,7 +249,7 @@ toggleMatchStrikes.addEventListener('click', async (e) => {
 // Chat send listener
 chatForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    var chatMessage = chatInput.value;
+    var chatMessage = sanitizeInput( chatInput.value );
     console.log( 'Player is sending the message: ' + chatMessage );
 
     // Do front end validation/sanitization functions
@@ -413,7 +413,7 @@ async function setUserInfo() {
         var userInfo = await getUserInfo(userID);
 
         user = userInfo.data.user;
-        username = sanitizeDisplayName( user.username );
+        username = sanitizeInput( user.username );
         userID = user.id;
         userELO = user.g2_rating;
 
@@ -506,12 +506,12 @@ async function setMatchInfo() {
             countryElement = '';
         }
 
-        player1InGameName.innerHTML = countryElement + sanitizeDisplayName( players[0].username );
+        player1InGameName.innerHTML = countryElement + sanitizeInput( players[0].username );
         if ( players[0].discord_id ) {
             player1InGameName.href = '/profile?playerId=' + players[0].id;
             player1InGameName.setAttribute('target', '_blank');
             player1DiscordName.style.display = 'block';
-            player1Name.innerHTML = sanitizeDisplayName( players[0].discord_username );
+            player1Name.innerHTML = sanitizeInput( players[0].discord_username );
             player1Avatar.src = player1AvatarString;
         }
         player1VictoryButton.value = players[0].id;
@@ -532,12 +532,12 @@ async function setMatchInfo() {
             countryElement = '';
         }
 
-        player2InGameName.innerHTML = countryElement + sanitizeDisplayName( players[1].username );
+        player2InGameName.innerHTML = countryElement + sanitizeInput( players[1].username );
         if ( players[1].discord_id ) {
             player2InGameName.href = '/profile?playerId=' + players[1].id;
             player2InGameName.setAttribute('target', '_blank');
             player2DiscordName.style.display = 'block';
-            player2Name.innerHTML = sanitizeDisplayName( players[1].discord_username );
+            player2Name.innerHTML = sanitizeInput( players[1].discord_username );
             player2Avatar.src = player2AvatarString;
         }
         player2VictoryButton.value = players[1].id;
@@ -578,7 +578,7 @@ async function setMatchInfo() {
                 stageList.style.display = 'none';
                 currentStrikerName.style.display = 'none';
                 strikeContent.style.display = 'none';
-                gameMessage.innerHTML = sanitizeDisplayName( players[0].username ) + ' has won the match!';
+                gameMessage.innerHTML = sanitizeInput( players[0].username ) + ' has won the match!';
                 requeueButton.style.display = 'block';
                 confirmationMessage.style.display = 'none';
                 break;
@@ -588,7 +588,7 @@ async function setMatchInfo() {
                 stageList.style.display = 'none';
                 currentStrikerName.style.display = 'none';
                 strikeContent.style.display = 'none';
-                gameMessage.innerHTML = sanitizeDisplayName( players[1].username ) + ' has won the match!';
+                gameMessage.innerHTML = sanitizeInput( players[1].username ) + ' has won the match!';
                 requeueButton.style.display = 'block';
                 confirmationMessage.style.display = 'none';
                 break;
@@ -679,12 +679,12 @@ async function getMessageString(chatData) {
 
     // Get the sender username
     if ( players[0].id == userId ) {
-        senderName = sanitizeDisplayName( players[0].username );
+        senderName = sanitizeInput( players[0].username );
     } else if ( players[1].id == userId ) {
-        senderName = sanitizeDisplayName( players[1].username );
+        senderName = sanitizeInput( players[1].username );
     } else if ( 'System' == userId || userId === null ) {
-        chatMessage = chatMessage.replaceAll('<' + players[0].id + '>', sanitizeDisplayName( players[0].username) );
-        chatMessage = chatMessage.replaceAll('<' + players[1].id + '>', sanitizeDisplayName( players[1].username) );
+        chatMessage = chatMessage.replaceAll('<' + players[0].id + '>', sanitizeInput( players[0].username) );
+        chatMessage = chatMessage.replaceAll('<' + players[1].id + '>', sanitizeInput( players[1].username) );
         senderName = 'System';
         senderClass = 'match-chat-system';
     } else {
@@ -693,7 +693,7 @@ async function getMessageString(chatData) {
         /*if ( matchInfo.user.id == userId && matchInfo.user.role == 2 ) {
             senderName = matchInfo.user.username + ' (Admin)';
         }*/
-        senderName = sanitizeDisplayName( modUser[0].username ) + ' (Moderator)';
+        senderName = sanitizeInput( modUser[0].username ) + ' (Moderator)';
         senderClass = 'match-chat-moderator';
         // idk who sent this
         // probably for mods
@@ -826,27 +826,27 @@ function setCurrentStriker() {
     // TODO: Rewrite this whole function, this is horrible
     if ( strikeableStages.length == 5 ) {
         currentStriker = players[0].id;
-        name = sanitizeDisplayName( players[0].username );
+        name = sanitizeInput( players[0].username );
     }
 
     if ( strikeableStages.length == 4 ) {
         currentStriker = players[1].id;
-        name = sanitizeDisplayName( players[1].username );
+        name = sanitizeInput( players[1].username );
     }
 
     if ( strikeableStages.length == 2 ) {
         currentStriker = players[0].id;
-        name = sanitizeDisplayName( players[0].username );
+        name = sanitizeInput( players[0].username );
     }
 
     if ( match.gamesArr.length > 1 ) {
         currentStriker = match.gamesArr.at(-2).winnerId;
         if ( currentStriker == players[0].id ) {
-            name = sanitizeDisplayName( players[0].username );
+            name = sanitizeInput( players[0].username );
             oppUnpickableStages = match.players[1].unpickableStagesArr;
             oppID = match.players[1].id;
         } else {
-            name = sanitizeDisplayName( players[1].username );
+            name = sanitizeInput( players[1].username );
             oppUnpickableStages = match.players[0].unpickableStagesArr;
             oppID = match.players[0].id;
         }
@@ -862,10 +862,10 @@ function setCurrentStriker() {
     if ( strikeableStages.length == (counterpicks.length - oppUnpickableStages.length - counterpickStrikeAmount) ) {
         if ( currentStriker == players[0].id ) {
             currentStriker = players[1].id;
-            name = sanitizeDisplayName( players[1].username );
+            name = sanitizeInput( players[1].username );
         } else {
             currentStriker = players[0].id;
-            name = sanitizeDisplayName( players[0].username );
+            name = sanitizeInput( players[0].username );
         }
 
         setDSRStages(currentStriker);
@@ -1038,9 +1038,9 @@ async function gameFinish(winnerId) {
     console.log(players);
 
     if ( players[0].id == winnerId ) {
-        name = sanitizeDisplayName( players[0].username );
+        name = sanitizeInput( players[0].username );
     } else {
-        name = sanitizeDisplayName( players[1].username );
+        name = sanitizeInput( players[1].username );
     }
 
     console.log('winner name: ' + name);
@@ -1194,7 +1194,7 @@ function validateChatMessage(chatMessage) {
     return true;
 }
 
-function sanitizeDisplayName(s) {
+function sanitizeInput(s) {
     if ( null == s )
         return;
     
