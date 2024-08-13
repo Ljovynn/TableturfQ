@@ -116,13 +116,14 @@ editCountryClose.addEventListener('click', (e) => {
 });
 
 
-displayNameSubmit.addEventListener('click', (e) => {
+displayNameSubmit.addEventListener('click', async (e) => {
     var newDisplayName = displayNameInput.value;
     // Validate the name update
     if ( validateDisplayName(newDisplayName) ) {
 
         var data = { username: newDisplayName };
-        var response = postData('/user/SetUsername', data);
+        var response = await postData('/user/SetUsername', data);
+        console.log(response);
 
         // On successful response
         if ( response.code == 201 ) {
