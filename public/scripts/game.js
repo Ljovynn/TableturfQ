@@ -1201,6 +1201,10 @@ function sanitizeDisplayName(s) {
 
 socket.emit('join', 'match' + matchId);
 
+socket.on('connection', async () => {
+    await setMatchInfo();
+});
+
 socket.on('chatMessage', async (chatData) => {
     console.log(chatData);
     tabAlert(toggleMatchChat);
