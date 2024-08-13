@@ -227,11 +227,6 @@ export async function PlayerSentGameWin(playerId, winnerId){
 
     match.chat.push(new ChatMessage(GamePlayerConfirmMessage(playerId, winnerId), systemId));
 
-    if (match.players[otherPos - 1].markedWinner !== 0 && match.players[0].markedWinner != match.players[1].markedWinner){
-        StartMatchDispute(match);
-        data.dispute = true;
-    }
-
     //check game verified
     if (match.players[otherPos - 1].markedWinner != 0){
         if (match.players[0].markedWinner != match.players[1].markedWinner){
