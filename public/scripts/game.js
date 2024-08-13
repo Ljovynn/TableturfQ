@@ -569,6 +569,8 @@ async function setMatchInfo() {
                 break;
             case 2:
                 //idk dispute?
+                await showAdminDispute();
+                await showPlayerResolve();
                 break;
             case 3:
                 console.log('setting winner - player1');
@@ -949,8 +951,10 @@ function startGame() {
     playerResolve.style.display = 'none';
 
     var selectedStage = document.getElementsByClassName('stage-selected');
-    if ( selectedStage.length > 0 )
+    if ( selectedStage.length > 0 ) {
         selectedStage[0].classList.remove('stage-selected');
+        selectedStage[0].classList.remove('mobile-selected');
+    }
 
     var strickenStages = document.getElementsByClassName('stage-stricken');
     for ( let stage of strickenStages ) {
@@ -1065,6 +1069,7 @@ function showAdminBanInfo() {
 
 function showPlayerResolve() {
     if ( !privateMatch ) {
+        needHelp.style.display = 'none';
         playerResolve.style.display = 'block';
     }
 }
@@ -1072,7 +1077,7 @@ function showPlayerResolve() {
 async function getModUser(users) {
     var data = { userIdList: users };
     var result = await postData('/user/GetUsers', data);
-    return result;
+    return result.data;
 }
 
 async function setStrikeSystemMessages(currentStriker, receivedStrikes) {
@@ -1195,6 +1200,10 @@ function sanitizeDisplayName(s) {
 // SOCKET FUNCTIONS
 
 socket.emit('join', 'match' + matchId);
+
+socket.on('connection', async () => {
+    await setMatchInfo();
+});
 
 socket.on('chatMessage', async (chatData) => {
     console.log(chatData);

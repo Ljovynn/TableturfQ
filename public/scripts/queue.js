@@ -173,10 +173,16 @@ async function setUserInfo() {
 
                 if ( userInfo.queData ) {
                     setQueueInfo(userInfo.queData);
+                    for ( let queueButton of queueButtons ) {
+                        queueButton.style.display = 'none';
+                    }
                 }
 
                 if ( userInfo.readyData ) {
                     setReadyUp(userInfo.readyData);
+                    for ( let queueButton of queueButtons ) {
+                        queueButton.style.display = 'none';
+                    }
                 }
             }
         } else {
@@ -282,8 +288,8 @@ function displayRecentMatches(recentMatchData) {
                         break;
                 }
 
-                player1Name.append( sanitizeDisplayName( match.player1_username ) );
-                player2Name.append( sanitizeDisplayName( match.player2_username ) );
+                player1Name.innerHTML = sanitizeDisplayName( match.player1_username );
+                player2Name.innerHTML = sanitizeDisplayName( match.player2_username );
 
                 matchPlayer1.append(avatarPlayer1);
                 matchPlayer1.append( player1Name );
