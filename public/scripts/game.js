@@ -609,7 +609,7 @@ async function getChatMessages(matchId, amountMessages) {
     var response = await postData('/match/LoadChatMessages', data);
     console.log(response);
     loadingMessages = false;
-    return response;
+    return response.data;
 }
 
 // Grab all messages associated with the game and add them to the chat log
