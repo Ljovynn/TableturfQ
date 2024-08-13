@@ -155,7 +155,7 @@ router.post("/GetUserRatingHistory", async (req, res) => {
 
         if (ratingHistoryOption != ratingHistoryOptions.day && result.length > 0){
             let currentEndOfDayRating = result[result.length - 1].unix_date;
-            let clumpingThreshold = 60 * 60 * 24;
+            let clumpingThreshold = 60 * 60 * 16;
             for (let i = result.length - 2; i >= 0; i--){
                 if (result[i].unix_date > currentEndOfDayRating - clumpingThreshold){
                     result.splice(i, 1);
