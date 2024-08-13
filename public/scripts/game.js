@@ -569,6 +569,8 @@ async function setMatchInfo() {
                 break;
             case 2:
                 //idk dispute?
+                await showAdminDispute();
+                await showPlayerResolve();
                 break;
             case 3:
                 console.log('setting winner - player1');
@@ -1065,6 +1067,7 @@ function showAdminBanInfo() {
 
 function showPlayerResolve() {
     if ( !privateMatch ) {
+        needHelp.style.display = 'none';
         playerResolve.style.display = 'block';
     }
 }
@@ -1072,7 +1075,7 @@ function showPlayerResolve() {
 async function getModUser(users) {
     var data = { userIdList: users };
     var result = await postData('/user/GetUsers', data);
-    return result;
+    return result.data;
 }
 
 async function setStrikeSystemMessages(currentStriker, receivedStrikes) {

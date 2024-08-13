@@ -48,7 +48,7 @@ async function setUserInfo() {
 async function getUserInfo() {
     var data = {};
     var result = await fetchData('/user/GetUserInfo');
-    return result;
+    return result.data;
 }
 
 function openModal() {
