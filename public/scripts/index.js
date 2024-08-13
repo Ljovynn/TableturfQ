@@ -24,7 +24,7 @@ guestSubmit.addEventListener('click', async (e) => {
         var data = { username: guestName.value };
         var response = await postData('/api/auth/unverified/login', data);
         console.log(response);
-        if ( response == 201 ) {
+        if ( response.code == 201 ) {
             window.location.href = '/queue';
         }
     }

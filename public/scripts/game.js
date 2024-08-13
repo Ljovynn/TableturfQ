@@ -951,8 +951,10 @@ function startGame() {
     playerResolve.style.display = 'none';
 
     var selectedStage = document.getElementsByClassName('stage-selected');
-    if ( selectedStage.length > 0 )
+    if ( selectedStage.length > 0 ) {
         selectedStage[0].classList.remove('stage-selected');
+        selectedStage[0].classList.remove('mobile-selected');
+    }
 
     var strickenStages = document.getElementsByClassName('stage-stricken');
     for ( let stage of strickenStages ) {

@@ -125,7 +125,7 @@ displayNameSubmit.addEventListener('click', (e) => {
         var response = postData('/user/SetUsername', data);
 
         // On successful response
-        if ( response.code == 200 ) {
+        if ( response.code == 201 ) {
             editDisplayNameForm.classList.toggle('editing');
             userDisplayNameContent.classList.toggle('editing');
             displayNameInput.value = '';
@@ -144,14 +144,18 @@ countrySubmit.addEventListener('click', async (e) => {
 
     // On Success
     console.log(response);
-    if ( response.code == 200 ) {
+    if ( response.code == 201 ) {
         editCountryForm.classList.toggle('editing');
         userCountry.classList.toggle('editing');
-        var countryElement = document.createElement('img');
-        countryElement.src = 'https://flagcdn.com/w20/' + newCountry.toLowerCase() + '.png';
-        countryFlag = countryElement;
-        userCountryValue.innerHTML = '';
-        userCountryValue.append(countryFlag);
+        if ( newCountry != 'none' ) {
+            var countryElement = document.createElement('img');
+            countryElement.src = 'https://flagcdn.com/w20/' + newCountry.toLowerCase() + '.png';
+            countryFlag = countryElement;
+            userCountryValue.innerHTML = '';
+            userCountryValue.append(countryFlag);
+        } else {
+            userCountryValue.innerHTML = 'No Country Set';
+        }
     }
 });
 
