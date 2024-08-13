@@ -151,9 +151,22 @@ router.post("/GetUserRatingHistory", async (req, res) => {
 
         const endCutoffDate = Date.now();
 
-        const data = await GetUserRatingHistory(userId, cutoffDate, endCutoffDate);
+        var result = await GetUserRatingHistory(userId, cutoffDate, endCutoffDate);
 
-        res.status(200).send(data);
+        if (ratingHistoryOption != ratingHistoryOptions.day && result.length > 0){
+            let currentEndOfDayRating = result[result.length - 1].unix_date;
+            let clumpingThreshold = 60 * 60 * 24;
+            for (let i = result.length - 2; i >= 0; i--){
+                if (result[i].unix_date > currentEndOfDayRating - clumpingThreshold){
+                    result.splice(i, 1);
+                    continue;
+                }
+                currentEndOfDayRating = result[i].unix_date;
+            }
+        }
+
+
+        res.status(200).send(result);
     } catch(error){
         console.error(error);
         res.sendStatus(400);
