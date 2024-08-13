@@ -166,12 +166,12 @@ export async function SetUserDiscordTokens(userId, discordAccessToken, discordRe
 export async function UpdateRankDecay(ratingDecay, rdIncrease, timeThreshold, ratingLimit){
     const cutoffDate = Math.round((Date.now() - timeThreshold) / 1000);
     try {
-        await pool.execute(`UPDATE users u SET g2_rating = u.g2_rating - ?, g2_rd = u.g2_rd + ? WHERE NOT EXISTS (SELECT id FROM matches m
+        await pool.execute(`UPDATE users u SET g2_rating = GREATEST(u.g2_rating - ?, ?), g2_rd = u.g2_rd + ? WHERE NOT EXISTS (SELECT id FROM matches m
 			WHERE (m.player1_id = u.id) AND m.created_at > FROM_UNIXTIME(?)
             UNION SELECT * FROM matches m
             WHERE (m.player2_id = u.id) AND m.created_at > FROM_UNIXTIME(?))
             AND u.g2_rating > ? AND hide_rank = FALSE`,
-        [ratingDecay, rdIncrease, cutoffDate, cutoffDate, ratingLimit]);
+        [ratingDecay, ratingLimit, rdIncrease, cutoffDate, cutoffDate, ratingLimit]);
     }
     catch(error){
         console.log(error);
