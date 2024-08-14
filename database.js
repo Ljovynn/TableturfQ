@@ -330,6 +330,16 @@ export async function AddChatMessage(matchId, ownerId, content){
     await pool.execute(`INSERT INTO chat_messages (match_id, owner_id, content) VALUES (?, ?, ?)`, [matchId, ownerId, content]);
 }
 
+export async function DeleteOldChatMessages(ageThreshold){
+    const cutoffDate = Date.now() - ageThreshold;
+    let convertedDate = Math.round(cutoffDate / 1000);
+    try {
+        await pool.execute(`DELETE c FROM chat_messages c INNER JOIN matches m ON m.id = c.match_id WHERE m.created_at < FROM_UNIXTIME(?);`, [convertedDate]);
+    }
+    catch(error){
+        console.log(error);
+    }
+}
 
 //leaderboard
 export async function GetLeaderboard(startPosition, limit = leaderboardLimit){

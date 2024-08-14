@@ -9,7 +9,7 @@ import { sessionMiddleware } from "./utils/session.js";
 import { MatchMakingTick, CheckMatchmadePlayers } from "./queManager.js";
 
 import { StartDiscordBot } from "./discordBot/discordBotManager.js";
-import { DeleteOldSuspensions, DeleteOldUnverifiedAccounts, DeleteUnfinishedMatches, UpdateRankDecay } from "./database.js";
+import { DeleteOldChatMessages, DeleteOldSuspensions, DeleteOldUnverifiedAccounts, DeleteUnfinishedMatches, UpdateRankDecay } from "./database.js";
 import { CancelOldMatches } from "./matchManager.js";
 import { AnnouncementManagerSetup, DeletePastAnnouncements } from "./cache/announcementManager.js";
 import { LeaderboardSizeSetup, UpdateLeaderboardSize } from "./cache/leaderboardSize.js";
@@ -29,12 +29,14 @@ const updateLeaderboardSizeInterval = 5 * 60 * 1000;
 const deleteOldUnverifiedUsersInterval = 24 * 60 * 60 * 1000;
 const deleteOldSuspensionsInterval = 60 * 60 * 1000;
 const deleteOldAnnouncementsInterval = 2 * 60 * 60 * 1000;
+const deleteOldChatMessagesInterval = 24 * 60 * 60 * 1000;
 const decayRankInterval = 24 * 60 * 60 * 1000;
 const cleanupChatRateLimitInterval = 30 * 1000;
 
 //Todo: test if account deletion when user is in match messes anything
 const unverifiedUserDeletionThreshold = 7 * 24 * 60 * 60 * 1000;
 const matchDeletionThreshold = 3 * 60 * 60 * 1000;
+const chatMessageDeletionThreshold = 31 * 24 * 60 * 60 * 1000;
 
 const decayRankAmount = 10;
 const rdIncrease = 1;
@@ -58,6 +60,11 @@ const server = app.listen(port, () => {
 
     //match
     setInterval(TickCancelOldMatches, cancelLongMatchesInterval);
+    
+    //chat
+    setInterval(() => {
+        DeleteOldChatMessages(chatMessageDeletionThreshold);
+    }, deleteOldChatMessagesInterval);
 
     //users
     setInterval(() => {
