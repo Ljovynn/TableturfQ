@@ -295,20 +295,26 @@ export async function DeleteUnfinishedMatches(){
 
 //match history
 export async function GetRecentMatches(cutoff){
-    const [rows] = await pool.query(`SELECT id, player1_id, player2_id, ranked, set_length, result, UNIX_TIMESTAMP(created_at) AS unix_created_at FROM matches
-        WHERE created_at > SUBDATE(CURRENT_TIMESTAMP, INTERVAL 1 MONTH) AND private_battle = FALSE
-	    ORDER BY created_at DESC LIMIT ?`, [cutoff]);
+    const [rows] = await pool.query(`SELECT DISTINCT m.id, m.player1_id, m.player2_id, m.ranked, m.set_length, m.result, UNIX_TIMESTAMP(m.created_at) AS unix_created_at,
+        (select count(*) from games where match_id = m.id AND result = 1) AS player1_score,
+        (select count(*) from games where match_id = m.id AND result = 2) AS player2_score FROM matches m
+        WHERE m.created_at > SUBDATE(CURRENT_TIMESTAMP, INTERVAL 1 MONTH) AND m.private_battle = FALSE GROUP BY m.id
+        ORDER BY m.created_at DESC limit ?`, [cutoff]);
     return rows;
 }
 
 export async function GetUserMatchHistory(userId, hitsPerPage, pageNumber)
 {
     var offset = (pageNumber - 1) * hitsPerPage;
-    const [rows] = await pool.execute(`SELECT id, player1_id, player2_id, ranked, set_length, result, private_battle, UNIX_TIMESTAMP(created_at) AS unix_created_at FROM matches
-        WHERE player1_id = ? AND created_at > SUBDATE(CURRENT_TIMESTAMP, INTERVAL 3 MONTH) AND private_battle = FALSE 
-        UNION SELECT id, player1_id, player2_id, ranked, set_length, result, private_battle, UNIX_TIMESTAMP(created_at) AS unix_created_at FROM matches
-        WHERE player2_id = ? AND created_at > SUBDATE(CURRENT_TIMESTAMP, INTERVAL 3 MONTH) AND private_battle = FALSE
-        ORDER BY unix_created_at DESC LIMIT ? OFFSET ?`, [userId, userId, hitsPerPage.toString(), offset.toString()]);
+    const [rows] = await pool.execute(`SELECT DISTINCT m.id, m.player1_id, m.player2_id, m.ranked, m.set_length, m.result, UNIX_TIMESTAMP(m.created_at) AS unix_created_at,
+        (select count(*) from games where match_id = m.id AND result = 1) AS player1_score,
+        (select count(*) from games where match_id = m.id AND result = 2) AS player2_score FROM matches m
+        WHERE m.player1_id = ? AND m.created_at > SUBDATE(CURRENT_TIMESTAMP, INTERVAL 3 MONTH) AND m.private_battle = FALSE
+        UNION SELECT DISTINCT m2.id, m2.player1_id, m2.player2_id, m2.ranked, m2.set_length, m2.result, UNIX_TIMESTAMP(m2.created_at) AS unix_created_at,
+        (select count(*) from games where match_id = m2.id AND result = 1) AS player1_score,
+        (select count(*) from games where match_id = m2.id AND result = 2) AS player2_score FROM matches m2
+        WHERE m2.player2_id = ? AND m2.created_at > SUBDATE(CURRENT_TIMESTAMP, INTERVAL 3 MONTH) AND m2.private_battle = FALSE GROUP BY m2.id
+        ORDER BY unix_created_at DESC limit ? OFFSET ?`, [userId, userId, hitsPerPage.toString(), offset.toString()]);
     return rows;
 }
 

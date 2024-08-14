@@ -37,15 +37,28 @@ export async function UpdateRecentMatches(match){
     const player1Data = await GetUserData (match.players[0].id);
     const player2Data = await GetUserData (match.players[1].id);
 
+    var p1ScoreCount = 0;
+    var p2ScoreCount = 0;
+    for (let i = 0; i < match.gamesArr.length; i++){
+        if (match.gamesArr[i].winnerId == null) continue;
+        if (match.gamesArr[i].winnerId == match.players[0].id){
+            p1ScoreCount++;
+        } else{
+            p2ScoreCount++;
+        }
+    }
+
     var newMatch = {
         id: match.id,
         player1_id: match.players[0].id,
         player1_username: player1Data.username,
+        player1_score: p1ScoreCount,
         player1_rating: player1Data.g2_rating,
         player1_discord_id: player1Data.discord_id,
         player1_discord_avatar_hash: player1Data.discord_avatar_hash,
         player2_id: match.players[1].id,
         player2_username: player2Data.username,
+        player2_score: p2ScoreCount,
         player2_rating: player2Data.g2_rating,
         player2_discord_id: player2Data.discord_id,
         player2_discord_avatar_hash: player2Data.discord_avatar_hash,
