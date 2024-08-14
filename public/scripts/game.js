@@ -565,7 +565,10 @@ async function setMatchInfo() {
 
         switch(match.status) {
             case 1:
+                console.log('Setting picked stage!');
+                console.log(match.gamesArr.at(-1).stage);
                 startGame();
+                setSelectedStage(match.gamesArr.at(-1).stage);
                 break;
             case 2:
                 //idk dispute?
@@ -726,6 +729,8 @@ function setStages() {
             } else {
                 if ( stage.getAttribute('stage-value') != currentStage ) {
                     stage.classList.add('stage-stricken');
+                } else {
+                    stage.style.display = 'inline-block';
                 }
             }
             stage.classList.remove('stage-unselectable');
@@ -897,6 +902,9 @@ function setSelectedStage(selectedStage) {
     for ( let stage of stages ) {
         if ( parseInt(stage.getAttribute('stage-value')) != selectedStage ) {
             stage.classList.add('stage-stricken');
+        } else {
+            stage.classList.remove('stage-stricken');
+            stage.style.display = 'inline-block';
         }
     }
 }
@@ -951,7 +959,6 @@ function startGame() {
     playerResolve.style.display = 'none';
 
     var selectedStage = document.getElementsByClassName('stage-selected');
-    console.log(selectedStage);
     if ( selectedStage.length > 0 ) {
         if ( selectedStage[0].classList.contains('mobile-selected') );
             selectedStage[0].classList.remove('mobile-selected');
@@ -1322,6 +1329,7 @@ socket.on('resolveDispute', async (resolveOption) => {
     }
     await setMatchInfo();
     console.log(match);
+    confirmationMessage.style.display = 'none';
     // If the game or the match has to be reset, go through the reset function
     // We'll check based on whether or not the strikes have been reset
     if ( match.gamesArr.at(-1).strikes.length == 0 ) {
