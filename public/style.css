@@ -750,17 +750,23 @@ div.match-type, div.match-date {
 }
 
 .recent-matchup-player1 {
-    margin-right: 50px;
+    /*margin-right: 50px;*/
 }
 
 .recent-matchup-player2 {
-    margin-left: 50px;
+    /*margin-left: 50px;*/
 }
 
 .recent-matchup-avatar {
     display: inline;
     width: 50px;
     border-radius: 50%;
+}
+
+.recent-matchup-score {
+    display: inline;
+    margin: 0 50px;
+    font-size: 3rem;
 }
 
 div.recent-matchup-name {

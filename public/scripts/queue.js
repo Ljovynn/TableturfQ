@@ -269,6 +269,14 @@ function displayRecentMatches(recentMatchData) {
                 let player2Name = document.createElement('div');
                 player2Name.classList.add('recent-matchup-name');
 
+                let player1Score = document.createElement('div');
+                player1Score.classList.add('recent-matchup-score');
+                player1Score.innerHTML = match.player1_score;
+
+                let player2Score = document.createElement('div');
+                player2Score.classList.add('recent-matchup-score');
+                player2Score.innerHTML = match.player2_score;
+
                 switch ( match.result ) {
                     case 0:
                     case 1:
@@ -277,11 +285,13 @@ function displayRecentMatches(recentMatchData) {
                         break;
                     case 3:
                         // player 1 win
-                        player1Name.classList.add('recent-matchup-victor');
+                        //player1Name.classList.add('recent-matchup-victor');
+                        player1Score.classList.add('recent-matchup-victor');
                         break;
                     case 4:
                         // player 2 win
-                        player2Name.classList.add('recent-matchup-victor');
+                        //player2Name.classList.add('recent-matchup-victor');
+                        player2Score.classList.add('recent-matchup-victor');
                         break;
                     default:
                         //
@@ -298,6 +308,7 @@ function displayRecentMatches(recentMatchData) {
                 matchPlayer2.append( player2Name );
 
                 matchupCell.append( matchPlayer1 );
+                matchupCell.append( player1Score );
 
                 let vsImg = document.createElement('img');
                 vsImg.classList.add('recent-matchup-vs');
@@ -305,6 +316,7 @@ function displayRecentMatches(recentMatchData) {
 
                 //matchupCell.append('vs');
                 matchupCell.append(vsImg);
+                matchupCell.append( player2Score );
                 matchupCell.append( matchPlayer2 );
 
                 /*let outcomeCell = document.createElement('div');
