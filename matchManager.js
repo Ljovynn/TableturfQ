@@ -2,7 +2,7 @@ import {matchStatuses, rulesets, Game, Match, ChatMessage, disputeResolveOptions
 import { GenerateNanoId } from "./nanoIdManager.js";
 import { stages } from "./public/constants/stageData.js";
 import { ApplyMatchEloResults, placementMatchCount } from "./glicko2Manager.js";
-import { AddChatMessage, GetMatch, GetUserRankedMatchCount, SetMatchResult, SetUserHideRank } from "./database.js";
+import { AddChatMessage, GetMatch, GetUserSeasonRankedMatchCount, SetMatchResult, SetUserHideRank } from "./database.js";
 import { FindPlayerPosInMatch } from "./utils/matchUtils.js";
 import { AddRecentlyMatchedPlayers } from "./queManager.js";
 import { SendDisputeMessage, SendNewSuspiciousAction, SuspiciousAction } from "./discordBot/discordBotManager.js";
@@ -12,6 +12,7 @@ import { HasBadWords, SanitizeDiscordLog } from "./utils/string.js";
 import { CasualMatchEndChatMessage, ChooseStageChatMessage, DisputeChatMessage, ForfeitChatMessage, GamePlayerConfirmMessage, GameWinChatMessage, MatchStartChatMessage, MatchWinChatMessage, ResolveDisputeChatMessage, StrikeStagesChatMessage } from "./public/scripts/utils/systemChatMessages.js";
 import { CheckChatLimitReached, NewMessage } from "./chatRateLimitManager.js";
 import { UpdateRecentMatches } from "./cache/matchHistoryManager.js";
+import { currentSeason } from "./public/constants/seasonData.js";
 
 var matches = [];
 
@@ -320,7 +321,7 @@ export async function PlayerSentForfeit(playerId){
 }
 
 async function CheckPlacements(playerId){
-    const rankedMatchCount = await GetUserRankedMatchCount(playerId);
+    const rankedMatchCount = await GetUserSeasonRankedMatchCount(currentSeason.id);
 
     if (rankedMatchCount == placementMatchCount){
         await SetUserHideRank(playerId, false);

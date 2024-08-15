@@ -10,6 +10,7 @@ import { HandleBanUser } from './utils/userUtils.js';
 import { leaderboardLimit, userSearchLimit } from './public/constants/searchData.js';
 import { Deck, deckSearchPageLimit, deckSearchSortingOptions } from './public/constants/deckData.js';
 import { ranks } from './public/constants/rankData.js';
+import { seasons } from './public/constants/seasonData.js';
 
 dotenv.config();
 
@@ -213,6 +214,19 @@ export async function GetUserRankedMatchCount(userId)
 {
     const [count] = await pool.execute(`SELECT SUM(total) AS total FROM (SELECT COUNT(*) AS total FROM matches WHERE player1_id = ? AND ranked = TRUE
         UNION ALL SELECT COUNT(*) AS total FROM matches WHERE player2_id = ? AND ranked = TRUE) x`, [userId, userId]);
+    if (count[0]) return count[0].total;
+}
+
+export async function GetUserSeasonRankedMatchCount(userId, seasonId){
+    const season = seasons.find(x => x.id === seasonId);
+    if (!season) return 0;
+    const convertedStartDate = Math.floor(season.startDate / 1000);
+    const convertedEndDate = Math.floor(season.endDate / 1000);
+
+    const [count] = await pool.execute(`SELECT SUM(total) AS total FROM (SELECT COUNT(*) AS total FROM matches WHERE player1_id = ? AND ranked = TRUE
+        AND created_at > FROM_UNIXTIME(?) AND created_at < FROM_UNIXTIME(?)
+        UNION ALL SELECT COUNT(*) AS total FROM matches WHERE player2_id = ? AND ranked = TRUE
+        AND created_at > FROM_UNIXTIME(?) AND created_at < FROM_UNIXTIME(?)) x`, [userId, convertedStartDate, convertedEndDate, userId, convertedStartDate, convertedEndDate]);
     if (count[0]) return count[0].total;
 }
 
