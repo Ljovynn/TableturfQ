@@ -271,11 +271,19 @@ function displayRecentMatches(recentMatchData) {
 
                 let player1Score = document.createElement('div');
                 player1Score.classList.add('recent-matchup-score');
-                player1Score.innerHTML = match.player1_score;
+                if ( match.ranked ) {
+                    player1Score.innerHTML = match.player1_score;
+                } else {
+                    player1Score.innerHTML = `&ndash;`;
+                }
 
                 let player2Score = document.createElement('div');
                 player2Score.classList.add('recent-matchup-score');
-                player2Score.innerHTML = match.player2_score;
+                if ( match.ranked ) {
+                    player2Score.innerHTML = match.player2_score;
+                } else {
+                    player2Score.innerHTML = `&ndash;`;
+                }
 
                 switch ( match.result ) {
                     case 0:

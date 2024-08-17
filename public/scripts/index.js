@@ -111,7 +111,9 @@ function addNextAnnouncement(announcement) {
 
     let announcementDate = document.createElement('div');
     announcementDate.classList.add('announcement-date');
-    announcementDate.innerHTML = new Date(announcement.date*1000).toLocaleString();
+    if ( announcement.isEvent ) {
+        announcementDate.innerHTML = new Date(announcement.date*1000).toLocaleString();
+    }
 
     let announcementDescription = document.createElement('p');
     announcementDescription.innerHTML = announcement.description;
@@ -145,7 +147,9 @@ function addUpcomingAnnouncements(announcements) {
 
         var upcomingDate = document.createElement('div');
         upcomingDate.classList.add('announcement-date');
-        upcomingDate.innerHTML = new Date(announcement.date*1000).toLocaleString();
+        if ( announcement.isEvent ) {
+            upcomingDate.innerHTML = new Date(announcement.date*1000).toLocaleString();
+        }
 
         let upcomingDescription = document.createElement('p');
         upcomingDescription.innerHTML = announcement.description;

@@ -565,8 +565,6 @@ async function setMatchInfo() {
 
         switch(match.status) {
             case 1:
-                console.log('Setting picked stage!');
-                console.log(match.gamesArr.at(-1).stage);
                 startGame();
                 setSelectedStage(match.gamesArr.at(-1).stage);
                 break;
