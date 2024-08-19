@@ -193,7 +193,11 @@ for (let stage of stages ) {
                 }
 
                 if ( !pickingStage ) {
-                    strikeInfo.innerHTML = strikesRemaining + ' stage strike' + ( strikesRemaining == 1 ? '' : 's' ) + ' remaining.';
+                    if ( strikesRemaining > 0 ) {
+                        strikeInfo.innerHTML = 'Strike <span class="strike-counter">' + strikesRemaining + '</span> stage' + ( strikesRemaining == 1 ? '' : 's' ) + ' you do not want to play on.';
+                    } else {
+                        strikeInfo.innerHTML = 'Confirm your stage strikes.';
+                    }
                 }
             }
         }
@@ -803,7 +807,12 @@ function setStrikeAmount() {
         if ( strikeableStages.length == 2 )
             strikeAmount = 1;
         strikesRemaining = strikeAmount;
-        strikeInfo.innerHTML = strikesRemaining + ' stage strike' + ( strikesRemaining == 1 ? '' : 's' ) + ' remaining.';
+
+        if ( strikesRemaining > 0 ) {
+            strikeInfo.innerHTML = 'Strike <span class="strike-counter">' + strikesRemaining + '</span> stage' + ( strikesRemaining == 1 ? '' : 's' ) + ' you do not want to play on.';
+        } else {
+            strikeInfo.innerHTML = 'Confirm your stage strikes.';
+        }
     } else {
         strikeableStages = document.getElementsByClassName('stage-selectable');
         console.log(counterpicks.length);
@@ -814,11 +823,16 @@ function setStrikeAmount() {
             strikeButton.innerHTML = 'Confirm Strikes';
         } else {
             strikeAmount = 1;
-            strikeButton.innerHTML = 'Select Map';
+            strikeButton.innerHTML = 'Select Stage';
             mapSelect = true;
         }
         strikesRemaining = strikeAmount;
-        strikeInfo.innerHTML = strikesRemaining + ' stage strike' + ( strikesRemaining == 1 ? '' : 's' ) + ' remaining.';
+
+        if ( strikesRemaining > 0 ) {
+            strikeInfo.innerHTML = 'Strike <span class="strike-counter">' + strikesRemaining + '</span> stage' + ( strikesRemaining == 1 ? '' : 's' ) + ' you do not want to play on.';
+        } else {
+            strikeInfo.innerHTML = 'Confirm your stage strikes.';
+        }
     }
 }
 
@@ -875,8 +889,8 @@ function setCurrentStriker() {
 
         pickingStage = true;
 
-        currentStrikerName.innerHTML = name + ' is currently picking the map to play on.';
-        strikeInfo.innerHTML = 'Select the map to play on.';
+        currentStrikerName.innerHTML = name + ' is currently picking the stage to play on.';
+        strikeInfo.innerHTML = 'Select the stage to play on.';
     }
 
     currentStrikerName.style.display = 'block';
