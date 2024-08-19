@@ -47,14 +47,14 @@ export async function CancelOldMatches(cutoffTime){
 
         match.status = matchStatuses.noWinner;
         try {
-            if (await FinishMatch(match)) result.push(match.id);
+            if (match.mode == matchModes.ranked){
+            const suspiciousAction = new SuspiciousAction(matches[i].players[0].id, `Ranked match cancelled for taking too long, against player ID ${SanitizeDiscordLog(matches[i].players[1].id)}`, Date.now());
+            await SendNewSuspiciousAction(suspiciousAction);
+        }
+            if (await FinishMatch(match, true)) result.push(match.id);
         }
         catch(error){
             console.log(error);
-        }
-        if (match.mode == matchModes.ranked){
-            const suspiciousAction = new SuspiciousAction(matches[i].players[0].id, `Ranked match cancelled for taking too long, against player ID ${SanitizeDiscordLog(matches[i].players[1].id)}`, Date.now());
-            await SendNewSuspiciousAction(suspiciousAction);
         }
     }
     return result;
