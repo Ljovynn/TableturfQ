@@ -1179,6 +1179,13 @@ function removeNotifications() {
     }
 }
 
+async function reconnectSocket() {
+    alert('RECONNECTING!!!');
+    await setMatchInfo();
+    socket.connect();
+    socket.emit('join', 'match' + matchId);
+}
+
 // Strike validation
 function validateStrikes(strikes, strikeAmount) {
     if ( strikes.length != strikeAmount ) {
@@ -1211,7 +1218,7 @@ function sanitizeInput(s) {
 socket.emit('join', 'match' + matchId);
 
 socket.on('connection', async () => {
-    console.log('connecting');
+    alert('connecting');
     await setMatchInfo();
 });
 
@@ -1346,8 +1353,7 @@ socket.on("connect_error", (err) => {
   Context: ${err.context}
 
   Attempting to rejoin`);
-  socket.connect();
-  socket.emit('join', 'match' + matchId);
+  reconnectSocket();
 });
 
 socket.on("disconnect", (reason, details) => {
@@ -1362,6 +1368,5 @@ socket.on("disconnect", (reason, details) => {
   Context: ${details.context}
 
   Attempting to rejoin`);
-  socket.connect();
-  socket.emit('join', 'match' + matchId);
+  reconnectSocket();
 });
