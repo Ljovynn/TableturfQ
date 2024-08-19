@@ -1346,7 +1346,7 @@ socket.on("connect_error", (err) => {
   Context: ${err.context}
 
   Attempting to rejoin`);
-  socket.io.reconnect();
+  socket.connect();
   socket.emit('join', 'match' + matchId);
 });
 
@@ -1362,6 +1362,6 @@ socket.on("disconnect", (reason, details) => {
   Context: ${details.context}
 
   Attempting to rejoin`);
-  socket.io.reconnect();
+  socket.connect();
   socket.emit('join', 'match' + matchId);
 });
