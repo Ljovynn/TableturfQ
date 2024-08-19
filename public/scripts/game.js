@@ -1011,7 +1011,7 @@ function checkPrivateMatch() {
 
 function checkMatchOver() {
     console.log(matchInfo.match.status);
-    if ( matchInfo.match.status == 3 || matchInfo.match.status == 4 ) {
+    if ( matchInfo.match.status == 3 || matchInfo.match.status == 4 || matchInfo.match.status == 5 ) {
         needHelp.style.display = 'none';
         leaveMatch.style.display = 'none';
         playerRaiseDispute.style.display = 'none';
