@@ -1180,10 +1180,10 @@ function removeNotifications() {
 }
 
 async function reconnectSocket() {
-    alert('RECONNECTING!!!');
     await setMatchInfo();
     socket.connect();
     socket.emit('join', 'match' + matchId);
+    socket.emit('join', 'userRoom');
 }
 
 // Strike validation
@@ -1216,6 +1216,7 @@ function sanitizeInput(s) {
 // SOCKET FUNCTIONS
 
 socket.emit('join', 'match' + matchId);
+socket.emit('join', 'userRoom');
 
 socket.on('connection', async () => {
     alert('connecting');
@@ -1344,7 +1345,7 @@ socket.on('resolveDispute', async (resolveOption) => {
 });
 
 socket.on("connect_error", async (err) => {
-  alert(`Socket connection error. Please report this to the devs! (And reload the page to reconnect).
+  /*alert(`Socket connection error. Please report this to the devs! (And reload the page to reconnect).
   
   Message: ${err.message}
   
@@ -1352,12 +1353,12 @@ socket.on("connect_error", async (err) => {
   
   Context: ${err.context}
 
-  Attempting to rejoin`);
+  Attempting to rejoin`);*/
   await reconnectSocket();
 });
 
 socket.on("disconnect", async (reason, details) => {
-  alert(`Socket disconnect. This shouldnt be pushed to prod!
+  /*alert(`Socket disconnect. This shouldnt be pushed to prod!
 
   Reason: ${reason}
   
@@ -1367,6 +1368,6 @@ socket.on("disconnect", async (reason, details) => {
   
   Context: ${details.context}
 
-  Attempting to rejoin`);
+  Attempting to rejoin`);*/
   await reconnectSocket();
 });
