@@ -3,6 +3,7 @@ import { userError } from "./error.js";
 
 // Elements
 const loading = document.getElementById('loading');
+const loginContent = document.getElementById('login-content');
 const matchMakingUnavailable = document.getElementById('matchmaking-unavailable');
 const matchMakingQueues = document.getElementById('matchmaking-queues');
 const competitiveQueue = document.getElementById('competitive-queue');
@@ -23,6 +24,10 @@ const joinCasual = document.getElementById('join-casual-queue');
 const queueButtons = document.getElementsByClassName('queue-section');
 const readyButton = document.getElementById('ranked-match-ready-button-non-modal');
 const leaveButton = document.getElementById('leave-queue-button');
+
+// Login
+const guestName = document.getElementById('guest-login-name');
+const guestSubmit = document.getElementById('guest-login-button');
 
 const socket = io();
 
@@ -127,6 +132,17 @@ leaveButton.addEventListener('click', async (e) => {
     }
 });
 
+guestSubmit.addEventListener('click', async (e) => {
+    if ( validateDisplayname(guestName.value) ) {
+        var data = { username: guestName.value };
+        var response = await postData('/api/auth/unverified/login', data);
+        console.log(response);
+        if ( response.code == 201 ) {
+            window.location.href = '/queue';
+        }
+    }
+});
+
 async function getMatchMakingStatus() {
     var data = {};
     var result = await getData('/que/GetMatchmakingStatus');
@@ -160,6 +176,7 @@ async function setUserInfo() {
         user = userInfo.user;
         if ( !user.banned ) {
             userID = user.id;
+            loginContent.style.display = 'none';
             loading.style.display = 'none';
             if ( matchMakingStatus ) {
                 matchMakingQueues.style.display = 'block';
@@ -190,7 +207,9 @@ async function setUserInfo() {
         }
     } catch (error) {
         console.log(error);
-        window.location.href = '/';
+        //window.location.href = '/';
+        matchMakingQueues.style.display = 'none';
+        loading.style.display = 'none';
     }
 }
 

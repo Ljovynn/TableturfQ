@@ -77,6 +77,17 @@
                     <div id="join-casual-queue" class="button" class="queue-button">Join Queue</div>
                 </div>
             </div>
+            <div id="login-content">
+
+                <a id="login-button" class="login-button button" href="https://discord.com/oauth2/authorize?client_id=1226952880569847960&response_type=code&redirect_uri=https%3A%2F%2Fwww.tableturfq.com%2Fapi%2Fauth%2Fdiscord%2Fredirect&scope=identify">Log In with Discord</a>
+                </a>
+                <div id="guest-login">
+                    <p>If you'd like to play as a guest, please enter your username. You will only be able to play casual matches.</p>
+                    <input type="text" id="guest-login-name" placeholder="Enter username" />
+                    <label id="guest-login-label" class="button" for="guest-login-button">Log in as guest</label>
+                    <input type="submit" id="guest-login-button" class="input-button" name="guest-login-button"/>
+                </div>
+            </div>
             <div id="queue-matchmaking">
                 <div id="queue-info">
                     <p id="queue-timer">Finding Match... 00:00:00</p>
