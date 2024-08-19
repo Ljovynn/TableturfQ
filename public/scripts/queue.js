@@ -318,12 +318,17 @@ function displayRecentMatches(recentMatchData) {
                 matchupCell.append( matchPlayer1 );
                 matchupCell.append( player1Score );
 
+                let matchLink = document.createElement('a');
+                matchLink.href = '/game?matchID=' + match.id;
+
                 let vsImg = document.createElement('img');
                 vsImg.classList.add('recent-matchup-vs');
                 vsImg.src = '/assets/images/vs-icon.png';
 
+                matchLink.append(vsImg);
+
                 //matchupCell.append('vs');
-                matchupCell.append(vsImg);
+                matchupCell.append(matchLink);
                 matchupCell.append( player2Score );
                 matchupCell.append( matchPlayer2 );
 
@@ -488,6 +493,12 @@ function getMatchPlayer( matchUsers, playerId ) {
     return player;
 }
 
+async function reconnectSocket() {
+    await setUserInfo();
+    socket.connect();
+    socket.emit('join', 'userRoom');
+}
+
 // SOCKET JS
 socket.emit('join', 'userRoom');
 
@@ -509,18 +520,19 @@ socket.on('matchReady', (matchID) => {
     window.location.href = '/game?matchID=' + matchID;
 });
 
-socket.on("connect_error", (err) => {
-  alert(`Socket connection error. Please report this to the devs! (And reload the page to reconnect).
+socket.on("connect_error", async (err) => {
+  /*alert(`Socket connection error. Please report this to the devs! (And reload the page to reconnect).
   
   Message: ${err.message}
   
   Decription: ${err.description}
   
-  Context: ${err.context}`);
+  Context: ${err.context}`);*/
+    await reconnectSocket();
 });
 
-/*socket.on("disconnect", (reason, details) => {
-  alert(`Socket disconnect. This shouldnt be pushed to prod!
+socket.on("disconnect", async (reason, details) => {
+  /*alert(`Socket disconnect. This shouldnt be pushed to prod!
 
   Reason: ${reason}
   
@@ -528,8 +540,9 @@ socket.on("connect_error", (err) => {
   
   Decription: ${details.description}
   
-  Context: ${details.context}`);
-});*/
+  Context: ${details.context}`);*/
+    await reconnectSocket();
+});
 
 function sanitizeDisplayName(s) {
     if ( null == s )
