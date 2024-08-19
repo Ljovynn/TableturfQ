@@ -972,6 +972,7 @@ function startGame() {
     strikerSection.style.display = 'none';
     strikeContent.style.display = 'none';
     playerResolve.style.display = 'none';
+    pickingStage = false;
 
     var selectedStage = document.getElementsByClassName('stage-selected');
     if ( selectedStage.length > 0 ) {
