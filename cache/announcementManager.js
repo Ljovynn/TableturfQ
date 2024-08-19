@@ -18,12 +18,12 @@ var announcements = [];
 export async function AnnouncementManagerSetup(){
     try {
         let data = await GetFutureAnnouncements();
+        if (!data) return;
+        for (let i = 0; i < data.length; i++){
+            announcements.push(new Announcement(data[i].id, data[i].title, data[i].description, data[i].icon_src, data[i].unix_date, data[i].is_event));
+        }
     } catch (error){
         console.log(error);
-    }
-    if (!data) return;
-    for (let i = 0; i < data.length; i++){
-        announcements.push(new Announcement(data[i].id, data[i].title, data[i].description, data[i].icon_src, data[i].unix_date, data[i].is_event));
     }
 }
 
