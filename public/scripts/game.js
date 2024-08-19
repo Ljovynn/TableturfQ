@@ -1343,7 +1343,7 @@ socket.on('resolveDispute', async (resolveOption) => {
     }
 });
 
-socket.on("connect_error", (err) => {
+socket.on("connect_error", async (err) => {
   alert(`Socket connection error. Please report this to the devs! (And reload the page to reconnect).
   
   Message: ${err.message}
@@ -1353,10 +1353,10 @@ socket.on("connect_error", (err) => {
   Context: ${err.context}
 
   Attempting to rejoin`);
-  reconnectSocket();
+  await reconnectSocket();
 });
 
-socket.on("disconnect", (reason, details) => {
+socket.on("disconnect", async (reason, details) => {
   alert(`Socket disconnect. This shouldnt be pushed to prod!
 
   Reason: ${reason}
@@ -1368,5 +1368,5 @@ socket.on("disconnect", (reason, details) => {
   Context: ${details.context}
 
   Attempting to rejoin`);
-  reconnectSocket();
+  await reconnectSocket();
 });
