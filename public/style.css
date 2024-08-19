@@ -217,8 +217,20 @@ footer {
     margin: 10px auto;
 }
 
+.login-button {
+    color: white;
+}
+
+.login-button:hover {
+    color: white;
+}
+
 #guest-login {
     width: auto;
+}
+
+#guest-login-label {
+    width: 120px;
 }
 
 #homepage-play-now {
