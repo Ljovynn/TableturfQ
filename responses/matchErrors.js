@@ -31,6 +31,7 @@ export const stagePickErrors = Object.freeze({
 export const gameWinErrors = Object.freeze({ 
     casual: new ResponseData(403, 'Match is casual'),
     wrongStatus: new ResponseData(403, 'Match is not in gameplay status'),
+    alreadySent: new ResponseData(403, 'Player already marked someone as winner'),
 });
 
 export const casualMatchEndErrors = Object.freeze({ 

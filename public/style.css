@@ -449,6 +449,10 @@ footer {
     display: none;
 }
 
+.strike-counter {
+    color: #dbc639;
+}
+
 .stage-selectable {
     display: inline-block;
 }
@@ -504,6 +508,10 @@ footer {
     margin: 10px 0;
 }
 
+#striker-section {
+    font-size: 1.3rem;
+}
+
 #current-striker {
     margin: 10px;
 }
@@ -514,6 +522,7 @@ footer {
 
 #strike-info {
     margin: 10px;
+    font-size: 1.3rem;
 }
 
 #select-map-message {
@@ -761,6 +770,12 @@ div.match-type, div.match-date {
     display: inline;
     width: 50px;
     border-radius: 50%;
+}
+
+.recent-matchup-score {
+    display: inline;
+    margin: 0 50px;
+    font-size: 3rem;
 }
 
 div.recent-matchup-name {
@@ -1044,6 +1059,9 @@ div.recent-matchup-name {
         width: 100%;
     }
 
+    .modal {
+        width: 80%;
+    }
 
     /**** HEADER ****/
     .header-expanded {
@@ -1161,6 +1179,11 @@ div.recent-matchup-name {
     .recent-matchup-player {
         display: inline-block;
         width: 100%;
+    }
+
+    .recent-matchup-score {
+        display: block;
+        margin: 0;
     }
 
     .recent-matchup-player1, .recent-matchup-player2 {

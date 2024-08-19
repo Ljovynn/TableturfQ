@@ -113,7 +113,7 @@ export function Game(){
 export function Player(id){
     this.id = id;
     this.unpickableStagesArr = [];
-    this.gameConfirmed = false;
+    this.markedWinner = 0;
     this.disputeResolveSent = false;
 }
 

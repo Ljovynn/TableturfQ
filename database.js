@@ -10,6 +10,7 @@ import { HandleBanUser } from './utils/userUtils.js';
 import { leaderboardLimit, userSearchLimit } from './public/constants/searchData.js';
 import { Deck, deckSearchPageLimit, deckSearchSortingOptions } from './public/constants/deckData.js';
 import { ranks } from './public/constants/rankData.js';
+import { seasons } from './public/constants/seasonData.js';
 
 dotenv.config();
 
@@ -216,6 +217,19 @@ export async function GetUserRankedMatchCount(userId)
     if (count[0]) return count[0].total;
 }
 
+export async function GetUserSeasonRankedMatchCount(userId, seasonId){
+    const season = seasons.find(x => x.id === seasonId);
+    if (!season) return 0;
+    const convertedStartDate = Math.floor(season.startDate / 1000);
+    const convertedEndDate = Math.floor(season.endDate / 1000);
+
+    const [count] = await pool.execute(`SELECT SUM(total) AS total FROM (SELECT COUNT(*) AS total FROM matches WHERE player1_id = ? AND ranked = TRUE
+        AND created_at > FROM_UNIXTIME(?) AND created_at < FROM_UNIXTIME(?)
+        UNION ALL SELECT COUNT(*) AS total FROM matches WHERE player2_id = ? AND ranked = TRUE
+        AND created_at > FROM_UNIXTIME(?) AND created_at < FROM_UNIXTIME(?)) x`, [userId, convertedStartDate, convertedEndDate, userId, convertedStartDate, convertedEndDate]);
+    if (count[0]) return count[0].total;
+}
+
 export async function GetMatchGames(matchId){
     const [rows] = await pool.execute(`SELECT id, stage, result FROM games WHERE match_id = ? ORDER BY id`, [matchId]);
     return rows;
@@ -295,20 +309,26 @@ export async function DeleteUnfinishedMatches(){
 
 //match history
 export async function GetRecentMatches(cutoff){
-    const [rows] = await pool.query(`SELECT id, player1_id, player2_id, ranked, set_length, result, UNIX_TIMESTAMP(created_at) AS unix_created_at FROM matches
-        WHERE created_at > SUBDATE(CURRENT_TIMESTAMP, INTERVAL 1 MONTH) AND private_battle = FALSE
-	    ORDER BY created_at DESC LIMIT ?`, [cutoff]);
+    const [rows] = await pool.query(`SELECT DISTINCT m.id, m.player1_id, m.player2_id, m.ranked, m.set_length, m.result, UNIX_TIMESTAMP(m.created_at) AS unix_created_at,
+        (select count(*) from games where match_id = m.id AND result = 1) AS player1_score,
+        (select count(*) from games where match_id = m.id AND result = 2) AS player2_score FROM matches m
+        WHERE m.created_at > SUBDATE(CURRENT_TIMESTAMP, INTERVAL 1 MONTH) AND m.private_battle = FALSE GROUP BY m.id
+        ORDER BY m.created_at DESC limit ?`, [cutoff]);
     return rows;
 }
 
 export async function GetUserMatchHistory(userId, hitsPerPage, pageNumber)
 {
     var offset = (pageNumber - 1) * hitsPerPage;
-    const [rows] = await pool.execute(`SELECT id, player1_id, player2_id, ranked, set_length, result, private_battle, UNIX_TIMESTAMP(created_at) AS unix_created_at FROM matches
-        WHERE player1_id = ? AND created_at > SUBDATE(CURRENT_TIMESTAMP, INTERVAL 3 MONTH) AND private_battle = FALSE 
-        UNION SELECT id, player1_id, player2_id, ranked, set_length, result, private_battle, UNIX_TIMESTAMP(created_at) AS unix_created_at FROM matches
-        WHERE player2_id = ? AND created_at > SUBDATE(CURRENT_TIMESTAMP, INTERVAL 3 MONTH) AND private_battle = FALSE
-        ORDER BY unix_created_at DESC LIMIT ? OFFSET ?`, [userId, userId, hitsPerPage.toString(), offset.toString()]);
+    const [rows] = await pool.execute(`SELECT DISTINCT m.id, m.player1_id, m.player2_id, m.ranked, m.set_length, m.result, UNIX_TIMESTAMP(m.created_at) AS unix_created_at,
+        (select count(*) from games where match_id = m.id AND result = 1) AS player1_score,
+        (select count(*) from games where match_id = m.id AND result = 2) AS player2_score FROM matches m
+        WHERE m.player1_id = ? AND m.created_at > SUBDATE(CURRENT_TIMESTAMP, INTERVAL 3 MONTH) AND m.private_battle = FALSE
+        UNION SELECT DISTINCT m2.id, m2.player1_id, m2.player2_id, m2.ranked, m2.set_length, m2.result, UNIX_TIMESTAMP(m2.created_at) AS unix_created_at,
+        (select count(*) from games where match_id = m2.id AND result = 1) AS player1_score,
+        (select count(*) from games where match_id = m2.id AND result = 2) AS player2_score FROM matches m2
+        WHERE m2.player2_id = ? AND m2.created_at > SUBDATE(CURRENT_TIMESTAMP, INTERVAL 3 MONTH) AND m2.private_battle = FALSE GROUP BY m2.id
+        ORDER BY unix_created_at DESC limit ? OFFSET ?`, [userId, userId, hitsPerPage.toString(), offset.toString()]);
     return rows;
 }
 
@@ -324,6 +344,16 @@ export async function AddChatMessage(matchId, ownerId, content){
     await pool.execute(`INSERT INTO chat_messages (match_id, owner_id, content) VALUES (?, ?, ?)`, [matchId, ownerId, content]);
 }
 
+export async function DeleteOldChatMessages(ageThreshold){
+    const cutoffDate = Date.now() - ageThreshold;
+    let convertedDate = Math.round(cutoffDate / 1000);
+    try {
+        await pool.execute(`DELETE c FROM chat_messages c INNER JOIN matches m ON m.id = c.match_id WHERE m.created_at < FROM_UNIXTIME(?);`, [convertedDate]);
+    }
+    catch(error){
+        console.log(error);
+    }
+}
 
 //leaderboard
 export async function GetLeaderboard(startPosition, limit = leaderboardLimit){
@@ -485,12 +515,13 @@ export async function SearchDecks(searchOptions, offset = 0){
     switch(sortOption){
         case deckSearchSortingOptions.mostLiked:
             sortString = 'likes DESC';
-        case deckSearchSortingOptions.newest:
-            sortString = 'created_at DESC';
         case deckSearchSortingOptions.oldest:
             sortString = 'created_at ASC';
         case deckSearchSortingOptions.updated:
             sortString = 'last_updated DESC';
+        case deckSearchSortingOptions.newest:
+        default:
+            sortString = 'created_at DESC';
     }
 
     //offset, limit

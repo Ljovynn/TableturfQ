@@ -173,10 +173,16 @@ async function setUserInfo() {
 
                 if ( userInfo.queData ) {
                     setQueueInfo(userInfo.queData);
+                    for ( let queueButton of queueButtons ) {
+                        queueButton.style.display = 'none';
+                    }
                 }
 
                 if ( userInfo.readyData ) {
                     setReadyUp(userInfo.readyData);
+                    for ( let queueButton of queueButtons ) {
+                        queueButton.style.display = 'none';
+                    }
                 }
             }
         } else {
@@ -263,6 +269,22 @@ function displayRecentMatches(recentMatchData) {
                 let player2Name = document.createElement('div');
                 player2Name.classList.add('recent-matchup-name');
 
+                let player1Score = document.createElement('div');
+                player1Score.classList.add('recent-matchup-score');
+                if ( match.ranked ) {
+                    player1Score.innerHTML = match.player1_score;
+                } else {
+                    player1Score.innerHTML = `&ndash;`;
+                }
+
+                let player2Score = document.createElement('div');
+                player2Score.classList.add('recent-matchup-score');
+                if ( match.ranked ) {
+                    player2Score.innerHTML = match.player2_score;
+                } else {
+                    player2Score.innerHTML = `&ndash;`;
+                }
+
                 switch ( match.result ) {
                     case 0:
                     case 1:
@@ -271,19 +293,21 @@ function displayRecentMatches(recentMatchData) {
                         break;
                     case 3:
                         // player 1 win
-                        player1Name.classList.add('recent-matchup-victor');
+                        //player1Name.classList.add('recent-matchup-victor');
+                        player1Score.classList.add('recent-matchup-victor');
                         break;
                     case 4:
                         // player 2 win
-                        player2Name.classList.add('recent-matchup-victor');
+                        //player2Name.classList.add('recent-matchup-victor');
+                        player2Score.classList.add('recent-matchup-victor');
                         break;
                     default:
                         //
                         break;
                 }
 
-                player1Name.append( sanitizeDisplayName( match.player1_username ) );
-                player2Name.append( sanitizeDisplayName( match.player2_username ) );
+                player1Name.innerHTML = sanitizeDisplayName( match.player1_username );
+                player2Name.innerHTML = sanitizeDisplayName( match.player2_username );
 
                 matchPlayer1.append(avatarPlayer1);
                 matchPlayer1.append( player1Name );
@@ -292,13 +316,20 @@ function displayRecentMatches(recentMatchData) {
                 matchPlayer2.append( player2Name );
 
                 matchupCell.append( matchPlayer1 );
+                matchupCell.append( player1Score );
+
+                let matchLink = document.createElement('a');
+                matchLink.href = '/game?matchID=' + match.id;
 
                 let vsImg = document.createElement('img');
                 vsImg.classList.add('recent-matchup-vs');
                 vsImg.src = '/assets/images/vs-icon.png';
 
+                matchLink.append(vsImg);
+
                 //matchupCell.append('vs');
-                matchupCell.append(vsImg);
+                matchupCell.append(matchLink);
+                matchupCell.append( player2Score );
                 matchupCell.append( matchPlayer2 );
 
                 /*let outcomeCell = document.createElement('div');
@@ -462,6 +493,12 @@ function getMatchPlayer( matchUsers, playerId ) {
     return player;
 }
 
+async function reconnectSocket() {
+    await setUserInfo();
+    socket.connect();
+    socket.emit('join', 'userRoom');
+}
+
 // SOCKET JS
 socket.emit('join', 'userRoom');
 
@@ -483,18 +520,19 @@ socket.on('matchReady', (matchID) => {
     window.location.href = '/game?matchID=' + matchID;
 });
 
-socket.on("connect_error", (err) => {
-  alert(`Socket connection error. Please report this to the devs! (And reload the page to reconnect).
+socket.on("connect_error", async (err) => {
+  /*alert(`Socket connection error. Please report this to the devs! (And reload the page to reconnect).
   
   Message: ${err.message}
   
   Decription: ${err.description}
   
-  Context: ${err.context}`);
+  Context: ${err.context}`);*/
+    await reconnectSocket();
 });
 
-/*socket.on("disconnect", (reason, details) => {
-  alert(`Socket disconnect. This shouldnt be pushed to prod!
+socket.on("disconnect", async (reason, details) => {
+  /*alert(`Socket disconnect. This shouldnt be pushed to prod!
 
   Reason: ${reason}
   
@@ -502,8 +540,9 @@ socket.on("connect_error", (err) => {
   
   Decription: ${details.description}
   
-  Context: ${details.context}`);
-});*/
+  Context: ${details.context}`);*/
+    await reconnectSocket();
+});
 
 function sanitizeDisplayName(s) {
     if ( null == s )

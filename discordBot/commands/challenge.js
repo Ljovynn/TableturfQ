@@ -73,7 +73,7 @@ export async function execute(interaction) {
     const challengeEmbed = BuildSimpleEmbed('Challenge player', 
         `${setLengthOptions[setLength - 2].name}`,
         `<@${discordUser.id}> has challenged <@${challengedDiscordUser.id}> for a Tableturf Battle!
-        <@${challengedDiscordUser.id}> may accept or deny`);
+        <@${challengedDiscordUser.id}> has 1 minute to accept.`);
 
     const response = await interaction.reply({ embeds: [challengeEmbed], components: [row] });
     const ping = await interaction.followUp({content: `<@${challengedDiscordUser.id}>`});

@@ -35,6 +35,8 @@ const victoryButtons = document.getElementsByClassName('player-victory-button');
 const leaveMatch = document.getElementById('leave-match-button');
 const toggleContent = document.getElementById('toggle-content');
 
+const matchContent = document.getElementById('match-content');
+
 const needHelp = document.getElementById('player-need-help');
 const playerRaiseDispute = document.getElementById('player-raise-dispute-button');
 
@@ -193,7 +195,11 @@ for (let stage of stages ) {
                 }
 
                 if ( !pickingStage ) {
-                    strikeInfo.innerHTML = strikesRemaining + ' stage strike' + ( strikesRemaining == 1 ? '' : 's' ) + ' remaining.';
+                    if ( strikesRemaining > 0 ) {
+                        strikeInfo.innerHTML = 'Strike <span class="strike-counter">' + strikesRemaining + '</span> stage' + ( strikesRemaining == 1 ? '' : 's' ) + ' you do not want to play on.';
+                    } else {
+                        strikeInfo.innerHTML = 'Confirm your stage strikes.';
+                    }
                 }
             }
         }
@@ -249,7 +255,7 @@ toggleMatchStrikes.addEventListener('click', async (e) => {
 // Chat send listener
 chatForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    var chatMessage = chatInput.value;
+    var chatMessage = sanitizeInput( chatInput.value );
     console.log( 'Player is sending the message: ' + chatMessage );
 
     // Do front end validation/sanitization functions
@@ -413,7 +419,7 @@ async function setUserInfo() {
         var userInfo = await getUserInfo(userID);
 
         user = userInfo.data.user;
-        username = sanitizeDisplayName( user.username );
+        username = sanitizeInput( user.username );
         userID = user.id;
         userELO = user.g2_rating;
 
@@ -506,12 +512,12 @@ async function setMatchInfo() {
             countryElement = '';
         }
 
-        player1InGameName.innerHTML = countryElement + sanitizeDisplayName( players[0].username );
+        player1InGameName.innerHTML = countryElement + sanitizeInput( players[0].username );
         if ( players[0].discord_id ) {
             player1InGameName.href = '/profile?playerId=' + players[0].id;
             player1InGameName.setAttribute('target', '_blank');
             player1DiscordName.style.display = 'block';
-            player1Name.innerHTML = sanitizeDisplayName( players[0].discord_username );
+            player1Name.innerHTML = sanitizeInput( players[0].discord_username );
             player1Avatar.src = player1AvatarString;
         }
         player1VictoryButton.value = players[0].id;
@@ -532,12 +538,12 @@ async function setMatchInfo() {
             countryElement = '';
         }
 
-        player2InGameName.innerHTML = countryElement + sanitizeDisplayName( players[1].username );
+        player2InGameName.innerHTML = countryElement + sanitizeInput( players[1].username );
         if ( players[1].discord_id ) {
             player2InGameName.href = '/profile?playerId=' + players[1].id;
             player2InGameName.setAttribute('target', '_blank');
             player2DiscordName.style.display = 'block';
-            player2Name.innerHTML = sanitizeDisplayName( players[1].discord_username );
+            player2Name.innerHTML = sanitizeInput( players[1].discord_username );
             player2Avatar.src = player2AvatarString;
         }
         player2VictoryButton.value = players[1].id;
@@ -566,9 +572,12 @@ async function setMatchInfo() {
         switch(match.status) {
             case 1:
                 startGame();
+                setSelectedStage(match.gamesArr.at(-1).stage);
                 break;
             case 2:
                 //idk dispute?
+                await showAdminDispute();
+                await showPlayerResolve();
                 break;
             case 3:
                 console.log('setting winner - player1');
@@ -576,7 +585,7 @@ async function setMatchInfo() {
                 stageList.style.display = 'none';
                 currentStrikerName.style.display = 'none';
                 strikeContent.style.display = 'none';
-                gameMessage.innerHTML = sanitizeDisplayName( players[0].username ) + ' has won the match!';
+                gameMessage.innerHTML = sanitizeInput( players[0].username ) + ' has won the match!';
                 requeueButton.style.display = 'block';
                 confirmationMessage.style.display = 'none';
                 break;
@@ -586,7 +595,7 @@ async function setMatchInfo() {
                 stageList.style.display = 'none';
                 currentStrikerName.style.display = 'none';
                 strikeContent.style.display = 'none';
-                gameMessage.innerHTML = sanitizeDisplayName( players[1].username ) + ' has won the match!';
+                gameMessage.innerHTML = sanitizeInput( players[1].username ) + ' has won the match!';
                 requeueButton.style.display = 'block';
                 confirmationMessage.style.display = 'none';
                 break;
@@ -600,6 +609,7 @@ async function setMatchInfo() {
     }
     checkPrivateMatch();
     checkMatchOver();
+    checkPlayerStatus();
 }
 
 async function getChatMessages(matchId, amountMessages) {
@@ -607,7 +617,7 @@ async function getChatMessages(matchId, amountMessages) {
     var response = await postData('/match/LoadChatMessages', data);
     console.log(response);
     loadingMessages = false;
-    return response;
+    return response.data;
 }
 
 // Grab all messages associated with the game and add them to the chat log
@@ -677,12 +687,12 @@ async function getMessageString(chatData) {
 
     // Get the sender username
     if ( players[0].id == userId ) {
-        senderName = sanitizeDisplayName( players[0].username );
+        senderName = sanitizeInput( players[0].username );
     } else if ( players[1].id == userId ) {
-        senderName = sanitizeDisplayName( players[1].username );
+        senderName = sanitizeInput( players[1].username );
     } else if ( 'System' == userId || userId === null ) {
-        chatMessage = chatMessage.replaceAll('<' + players[0].id + '>', sanitizeDisplayName( players[0].username) );
-        chatMessage = chatMessage.replaceAll('<' + players[1].id + '>', sanitizeDisplayName( players[1].username) );
+        chatMessage = chatMessage.replaceAll('<' + players[0].id + '>', sanitizeInput( players[0].username) );
+        chatMessage = chatMessage.replaceAll('<' + players[1].id + '>', sanitizeInput( players[1].username) );
         senderName = 'System';
         senderClass = 'match-chat-system';
     } else {
@@ -691,7 +701,7 @@ async function getMessageString(chatData) {
         /*if ( matchInfo.user.id == userId && matchInfo.user.role == 2 ) {
             senderName = matchInfo.user.username + ' (Admin)';
         }*/
-        senderName = sanitizeDisplayName( modUser[0].username ) + ' (Moderator)';
+        senderName = sanitizeInput( modUser[0].username ) + ' (Moderator)';
         senderClass = 'match-chat-moderator';
         // idk who sent this
         // probably for mods
@@ -724,6 +734,8 @@ function setStages() {
             } else {
                 if ( stage.getAttribute('stage-value') != currentStage ) {
                     stage.classList.add('stage-stricken');
+                } else {
+                    stage.style.display = 'inline-block';
                 }
             }
             stage.classList.remove('stage-unselectable');
@@ -798,7 +810,12 @@ function setStrikeAmount() {
         if ( strikeableStages.length == 2 )
             strikeAmount = 1;
         strikesRemaining = strikeAmount;
-        strikeInfo.innerHTML = strikesRemaining + ' stage strike' + ( strikesRemaining == 1 ? '' : 's' ) + ' remaining.';
+
+        if ( strikesRemaining > 0 ) {
+            strikeInfo.innerHTML = 'Strike <span class="strike-counter">' + strikesRemaining + '</span> stage' + ( strikesRemaining == 1 ? '' : 's' ) + ' you do not want to play on.';
+        } else {
+            strikeInfo.innerHTML = 'Confirm your stage strikes.';
+        }
     } else {
         strikeableStages = document.getElementsByClassName('stage-selectable');
         console.log(counterpicks.length);
@@ -809,11 +826,16 @@ function setStrikeAmount() {
             strikeButton.innerHTML = 'Confirm Strikes';
         } else {
             strikeAmount = 1;
-            strikeButton.innerHTML = 'Select Map';
+            strikeButton.innerHTML = 'Select Stage';
             mapSelect = true;
         }
         strikesRemaining = strikeAmount;
-        strikeInfo.innerHTML = strikesRemaining + ' stage strike' + ( strikesRemaining == 1 ? '' : 's' ) + ' remaining.';
+
+        if ( strikesRemaining > 0 ) {
+            strikeInfo.innerHTML = 'Strike <span class="strike-counter">' + strikesRemaining + '</span> stage' + ( strikesRemaining == 1 ? '' : 's' ) + ' you do not want to play on.';
+        } else {
+            strikeInfo.innerHTML = 'Confirm your stage strikes.';
+        }
     }
 }
 
@@ -824,27 +846,27 @@ function setCurrentStriker() {
     // TODO: Rewrite this whole function, this is horrible
     if ( strikeableStages.length == 5 ) {
         currentStriker = players[0].id;
-        name = sanitizeDisplayName( players[0].username );
+        name = sanitizeInput( players[0].username );
     }
 
     if ( strikeableStages.length == 4 ) {
         currentStriker = players[1].id;
-        name = sanitizeDisplayName( players[1].username );
+        name = sanitizeInput( players[1].username );
     }
 
     if ( strikeableStages.length == 2 ) {
         currentStriker = players[0].id;
-        name = sanitizeDisplayName( players[0].username );
+        name = sanitizeInput( players[0].username );
     }
 
     if ( match.gamesArr.length > 1 ) {
         currentStriker = match.gamesArr.at(-2).winnerId;
         if ( currentStriker == players[0].id ) {
-            name = sanitizeDisplayName( players[0].username );
+            name = sanitizeInput( players[0].username );
             oppUnpickableStages = match.players[1].unpickableStagesArr;
             oppID = match.players[1].id;
         } else {
-            name = sanitizeDisplayName( players[1].username );
+            name = sanitizeInput( players[1].username );
             oppUnpickableStages = match.players[0].unpickableStagesArr;
             oppID = match.players[0].id;
         }
@@ -860,18 +882,18 @@ function setCurrentStriker() {
     if ( strikeableStages.length == (counterpicks.length - oppUnpickableStages.length - counterpickStrikeAmount) ) {
         if ( currentStriker == players[0].id ) {
             currentStriker = players[1].id;
-            name = sanitizeDisplayName( players[1].username );
+            name = sanitizeInput( players[1].username );
         } else {
             currentStriker = players[0].id;
-            name = sanitizeDisplayName( players[0].username );
+            name = sanitizeInput( players[0].username );
         }
 
         setDSRStages(currentStriker);
 
         pickingStage = true;
 
-        currentStrikerName.innerHTML = name + ' is currently picking the map to play on.';
-        strikeInfo.innerHTML = 'Select the map to play on.';
+        currentStrikerName.innerHTML = name + ' is currently picking the stage to play on.';
+        strikeInfo.innerHTML = 'Select the stage to play on.';
     }
 
     currentStrikerName.style.display = 'block';
@@ -895,6 +917,9 @@ function setSelectedStage(selectedStage) {
     for ( let stage of stages ) {
         if ( parseInt(stage.getAttribute('stage-value')) != selectedStage ) {
             stage.classList.add('stage-stricken');
+        } else {
+            stage.classList.remove('stage-stricken');
+            stage.style.display = 'inline-block';
         }
     }
 }
@@ -947,14 +972,20 @@ function startGame() {
     strikerSection.style.display = 'none';
     strikeContent.style.display = 'none';
     playerResolve.style.display = 'none';
+    pickingStage = false;
 
     var selectedStage = document.getElementsByClassName('stage-selected');
-    if ( selectedStage.length > 0 )
+    if ( selectedStage.length > 0 ) {
+        if ( selectedStage[0].classList.contains('mobile-selected') );
+            selectedStage[0].classList.remove('mobile-selected');
         selectedStage[0].classList.remove('stage-selected');
+    }
 
     var strickenStages = document.getElementsByClassName('stage-stricken');
     for ( let stage of strickenStages ) {
         stage.style.display = 'none';
+        if ( stage.classList.contains('mobile-selected') );
+            stage.classList.remove('mobile-selected');
     }
 
     for (let victoryButton of victoryButtons ) {
@@ -980,11 +1011,18 @@ function checkPrivateMatch() {
 
 function checkMatchOver() {
     console.log(matchInfo.match.status);
-    if ( matchInfo.match.status == 3 || matchInfo.match.status == 4 ) {
+    if ( matchInfo.match.status == 3 || matchInfo.match.status == 4 || matchInfo.match.status == 5 ) {
         needHelp.style.display = 'none';
         leaveMatch.style.display = 'none';
         playerRaiseDispute.style.display = 'none';
         strikerSection.style.display = 'none';
+    }
+}
+
+function checkPlayerStatus() {
+    // Hide everything but players and score if user isn't admin or in the match
+    if ( user.role != 2 && userID != players[0].id && userID != players[1].id ) {
+        matchContent.style.display = 'none';
     }
 }
 
@@ -1030,9 +1068,9 @@ async function gameFinish(winnerId) {
     console.log(players);
 
     if ( players[0].id == winnerId ) {
-        name = sanitizeDisplayName( players[0].username );
+        name = sanitizeInput( players[0].username );
     } else {
-        name = sanitizeDisplayName( players[1].username );
+        name = sanitizeInput( players[1].username );
     }
 
     console.log('winner name: ' + name);
@@ -1065,6 +1103,7 @@ function showAdminBanInfo() {
 
 function showPlayerResolve() {
     if ( !privateMatch ) {
+        needHelp.style.display = 'none';
         playerResolve.style.display = 'block';
     }
 }
@@ -1072,7 +1111,7 @@ function showPlayerResolve() {
 async function getModUser(users) {
     var data = { userIdList: users };
     var result = await postData('/user/GetUsers', data);
-    return result;
+    return result.data;
 }
 
 async function setStrikeSystemMessages(currentStriker, receivedStrikes) {
@@ -1165,6 +1204,13 @@ function removeNotifications() {
     }
 }
 
+async function reconnectSocket() {
+    await setMatchInfo();
+    socket.connect();
+    socket.emit('join', 'match' + matchId);
+    socket.emit('join', 'userRoom');
+}
+
 // Strike validation
 function validateStrikes(strikes, strikeAmount) {
     if ( strikes.length != strikeAmount ) {
@@ -1185,7 +1231,7 @@ function validateChatMessage(chatMessage) {
     return true;
 }
 
-function sanitizeDisplayName(s) {
+function sanitizeInput(s) {
     if ( null == s )
         return;
     
@@ -1195,6 +1241,12 @@ function sanitizeDisplayName(s) {
 // SOCKET FUNCTIONS
 
 socket.emit('join', 'match' + matchId);
+socket.emit('join', 'userRoom');
+
+socket.on('connection', async () => {
+    alert('connecting');
+    await setMatchInfo();
+});
 
 socket.on('chatMessage', async (chatData) => {
     console.log(chatData);
@@ -1309,6 +1361,7 @@ socket.on('resolveDispute', async (resolveOption) => {
     }
     await setMatchInfo();
     console.log(match);
+    confirmationMessage.style.display = 'none';
     // If the game or the match has to be reset, go through the reset function
     // We'll check based on whether or not the strikes have been reset
     if ( match.gamesArr.at(-1).strikes.length == 0 ) {
@@ -1316,18 +1369,21 @@ socket.on('resolveDispute', async (resolveOption) => {
     }
 });
 
-socket.on("connect_error", (err) => {
-  alert(`Socket connection error. Please report this to the devs! (And reload the page to reconnect).
+socket.on("connect_error", async (err) => {
+  /*alert(`Socket connection error. Please report this to the devs! (And reload the page to reconnect).
   
   Message: ${err.message}
   
   Decription: ${err.description}
   
-  Context: ${err.context}`);
+  Context: ${err.context}
+
+  Attempting to rejoin`);*/
+  await reconnectSocket();
 });
 
-/*socket.on("disconnect", (reason, details) => {
-  alert(`Socket disconnect. This shouldnt be pushed to prod!
+socket.on("disconnect", async (reason, details) => {
+  /*alert(`Socket disconnect. This shouldnt be pushed to prod!
 
   Reason: ${reason}
   
@@ -1335,5 +1391,8 @@ socket.on("connect_error", (err) => {
   
   Decription: ${details.description}
   
-  Context: ${details.context}`);
-});*/
+  Context: ${details.context}
+
+  Attempting to rejoin`);*/
+  await reconnectSocket();
+});

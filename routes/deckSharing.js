@@ -62,7 +62,7 @@ router.post("/SearchDecks", async (req, res) => {
 ;
         if (typeof(searchOptions.input) !== 'undefined' && typeof(searchOptions.input) !== 'string') return SetErrorResponse(res, deckSharingErrors.inputWrongFormat);
         if (searchOptions.input){
-            if (searchOptions.input.length > 32) return SetErrorResponse(res, deckSharingErrors.inputWrongFormat);
+            if (searchOptions.input.length > deckDescriptionCharLimit) return SetErrorResponse(res, deckSharingErrors.inputWrongFormat);
             if (searchOptions.input.length > 0) searchOptions.input = SanitizeFulltextSearch(searchOptions.input);
         }
 

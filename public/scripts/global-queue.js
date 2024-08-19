@@ -14,6 +14,8 @@ var queuedMatchMode;
 var ready = false;
 var readyUp;
 
+var readySound = new Audio('../assets/sounds/UI_Lobby_MatchStart_00.mp3');
+
 readyButton.addEventListener('click', async (e) => {
     console.log('User is ready for competitive match.');
     readyButton.style.display = 'none';
@@ -48,13 +50,14 @@ async function setUserInfo() {
 async function getUserInfo() {
     var data = {};
     var result = await fetchData('/user/GetUserInfo');
-    return result;
+    return result.data;
 }
 
 function openModal() {
     modal.classList.remove('hidden');
     overlay.classList.remove('hidden');
     overlay.scrollTop = 0;
+    readySound.play();
 }
 
 function closeModal() {
@@ -98,6 +101,12 @@ function secondsToMS(d) {
     return ('0' + m).slice(-2) + ":" + ('0' + s).slice(-2);
 }
 
+async function reconnectSocket() {
+    await setUserInfo();
+    socket.connect();
+    socket.emit('join', 'userRoom');
+}
+
 socket.emit('join', 'userRoom');
 
 socket.on('matchFound', async () => {
@@ -118,4 +127,28 @@ socket.on('matchReady', (matchID) => {
     clearTimer(readyUp);
     console.log('/game?matchID=' + matchID);
     window.location.href = '/game?matchID=' + matchID;
+});
+
+socket.on("connect_error", async (err) => {
+  /*alert(`Socket connection error. Please report this to the devs! (And reload the page to reconnect).
+  
+  Message: ${err.message}
+  
+  Decription: ${err.description}
+  
+  Context: ${err.context}`);*/
+    await reconnectSocket();
+});
+
+socket.on("disconnect", async (reason, details) => {
+  /*alert(`Socket disconnect. This shouldnt be pushed to prod!
+
+  Reason: ${reason}
+  
+  Message: ${details.message}
+  
+  Decription: ${details.description}
+  
+  Context: ${details.context}`);*/
+    await reconnectSocket();
 });
