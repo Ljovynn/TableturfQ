@@ -4,8 +4,8 @@ function Season(id, startDate, endDate){
     this.endDate = endDate;
 }
 
-export const currentSeason = seasons[seasons.length - 1];
-
 export const seasons = Object.freeze([
     new Season(0, 1721488200000, 1735661400000),
 ]);
+
+export const currentSeason = seasons[seasons.length - 1];
