@@ -122,8 +122,8 @@ export function Match(id, player1Id, player2Id, matchMode, privateBattle = false
     this.id = id;
     this.status = (rulesets[matchMode].setLength == setLengths.unlimited || setLength == 0) ? matchStatuses.ingame : matchStatuses.stageSelection;
 
-    var player1 = new Player(player1Id);
-    var player2 = new Player(player2Id);
+    let player1 = new Player(player1Id);
+    let player2 = new Player(player2Id);
     this.players = [player1, player2];
 
     this.mode = matchMode;

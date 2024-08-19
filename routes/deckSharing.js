@@ -16,9 +16,9 @@ const router = Router();
 //res: deck
 router.post("/GetDeck", async (req, res) => {
     try{
-        var deckId = req.body.deckId;
+        let deckId = req.body.deckId;
         if (typeof(deckId) !== 'undefined' && typeof(deckId) !== 'string') return SetErrorResponse(res, deckSharingErrors.deckIdWrongFormat);
-        var result = await GetDeck(deckId);
+        let result = await GetDeck(deckId);
 
         res.status(200).send(result);
     } catch(error){
@@ -31,8 +31,8 @@ router.post("/GetDeck", async (req, res) => {
 //res: decks
 router.post("/GetUserDecks", async (req, res) => {
     try{
-        var userId = req.body.userId;
-        var offset = (req.body.offset) ? req.body.offset : 0;
+        let userId = req.body.userId;
+        let offset = (req.body.offset) ? req.body.offset : 0;
         if (typeof(offset) !== 'number') offset = 0;
         if (offset < 0) offset = 0;
 
@@ -40,7 +40,7 @@ router.post("/GetUserDecks", async (req, res) => {
             if (!CheckUserDefined(req)) return SetErrorResponse(res, userErrors.notLoggedIn);
             userId = req.session.user;
         }
-        var result = await GetUserDecks(userId, offset);
+        let result = await GetUserDecks(userId, offset);
 
         res.status(200).send(result);
     } catch(error){
@@ -53,8 +53,8 @@ router.post("/GetUserDecks", async (req, res) => {
 //res: decks
 router.post("/SearchDecks", async (req, res) => {
     try{
-        var searchOptions = req.body.searchOptions;
-        var offset = (req.body.offset) ? req.body.offset : 0;
+        let searchOptions = req.body.searchOptions;
+        let offset = (req.body.offset) ? req.body.offset : 0;
         if (typeof(offset) !== 'number') offset = 0;
         if (offset < 0) offset = 0;
 
@@ -88,7 +88,7 @@ router.post("/SearchDecks", async (req, res) => {
         if (typeof(searchOptions.startDate) !== 'undefined' && typeof(searchOptions.minRank) !== 'number') return SetErrorResponse(res, deckSharingErrors.startDateWrongFormat);
         if (typeof(searchOptions.endDate) !== 'undefined' && typeof(searchOptions.endDate) !== 'number') return SetErrorResponse(res, deckSharingErrors.endDateWrongFormat);
 
-        var result = await SearchDecks(searchOptions, offset);
+        let result = await SearchDecks(searchOptions, offset);
 
         res.status(200).send(result);
     } catch(error){
@@ -103,13 +103,13 @@ router.post("/GetLikedDecks", async (req, res) => {
     try{
         const userId = req.session.user;
 
-        var offset = (req.body.offset) ? req.body.offset : 0;
+        let offset = (req.body.offset) ? req.body.offset : 0;
         if (typeof(offset) !== 'number') offset = 0;
         if (offset < 0) offset = 0;
 
         if (!CheckUserDefined(req)) return SetErrorResponse(res, userErrors.notLoggedIn);
 
-        var result = await GetLikedDecks(userId, offset);
+        let result = await GetLikedDecks(userId, offset);
 
         res.status(200).send(result);
     } catch(error){
@@ -128,7 +128,7 @@ router.post("/CreateDeck", async (req, res) => {
         const deck = req.body.deck;
 
         if (!CheckUserDefined(req)) return SetErrorResponse(res, userErrors.notLoggedIn);
-        var banned = GetUserBanState(userId);
+        let banned = GetUserBanState(userId);
         if (banned) return SetErrorResponse(res, userErrors.banned);
 
         if (!CheckDeckLegality(deck)) return SetErrorResponse(res, deckSharingErrors.deckWrongFormat);
@@ -153,7 +153,7 @@ router.post("/UpdateDeck", async (req, res) => {
         const deck = req.body.deck;
 
         if (!CheckUserDefined(req)) return SetErrorResponse(res, userErrors.notLoggedIn);
-        var banned = GetUserBanState(userId);
+        let banned = GetUserBanState(userId);
         if (banned) return SetErrorResponse(res, userErrors.banned);
 
         if (!CheckDeckLegality(deck)) return SetErrorResponse(res, deckSharingErrors.deckWrongFormat);
@@ -196,7 +196,7 @@ router.post("/DeleteDeck", async (req, res) => {
         const deckId = req.body.deckId;
 
         if (!CheckUserDefined(req)) return SetErrorResponse(res, userErrors.notLoggedIn);
-        var banned = GetUserBanState(userId);
+        let banned = GetUserBanState(userId);
         if (banned) return SetErrorResponse(res, userErrors.banned);
 
         if (typeof(deckId) !== 'undefined' && typeof(deckId) !== 'string') return SetErrorResponse(res, deckSharingErrors.deckIdWrongFormat);

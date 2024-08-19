@@ -29,7 +29,7 @@ matches.push(m2);*/
 //Ljovynn testing
 
 /*export async function TESTMATCH(){
-    var m1 = await MakeNewMatch('8wUa0c7ksw5e8y1p', 'wZOf--ev5yq6NrAj', matchModes.ranked);
+    let m1 = await MakeNewMatch('8wUa0c7ksw5e8y1p', 'wZOf--ev5yq6NrAj', matchModes.ranked);
     PlayerSentStageStrikes('8wUa0c7ksw5e8y1p', [stages.mainStreet]);
     PlayerSentStageStrikes('wZOf--ev5yq6NrAj', [stages.thunderPoint, stages.riverDrift]);
     PlayerSentStageStrikes('8wUa0c7ksw5e8y1p', [stages.girderForBattle]);
@@ -39,22 +39,22 @@ matches.push(m2);*/
 }*/
 
 export async function CancelOldMatches(cutoffTime){
-    var result = [];
-    var cutoffDate = Date.now() - cutoffTime;
+    let result = [];
+    let cutoffDate = Date.now() - cutoffTime;
     for (let i = matches.length - 1; i >= 0; i--){
         let match = matches[i];
         if (match.createdAt > cutoffDate) continue;
 
         match.status = matchStatuses.noWinner;
         try {
-            if (await FinishMatch(match)) result.push(match.id);
+            if (match.mode == matchModes.ranked){
+            const suspiciousAction = new SuspiciousAction(matches[i].players[0].id, `Ranked match cancelled for taking too long, against player ID ${SanitizeDiscordLog(matches[i].players[1].id)}`, Date.now());
+            await SendNewSuspiciousAction(suspiciousAction);
+        }
+            if (await FinishMatch(match, true)) result.push(match.id);
         }
         catch(error){
             console.log(error);
-        }
-        if (match.mode == matchModes.ranked){
-            const suspiciousAction = new SuspiciousAction(matches[i].players[0].id, `Ranked match cancelled for taking too long, against player ID ${SanitizeDiscordLog(matches[i].players[1].id)}`, Date.now());
-            await SendNewSuspiciousAction(suspiciousAction);
         }
     }
     return result;
@@ -73,21 +73,21 @@ export function MakeNewMatch(player1Id, player2Id, matchMode, privateBattle = fa
 
     const matchId = GenerateNanoId();
 
-    var match = new Match(matchId, player1Id, player2Id, matchMode, privateBattle, setLength);
+    let match = new Match(matchId, player1Id, player2Id, matchMode, privateBattle, setLength);
     match.chat.push(new ChatMessage(MatchStartChatMessage(), systemId));
     matches.push(match);
     return match;
 }
 
 export function PlayerSentStageStrikes(playerId, stages){
-    var match = FindMatchWithPlayer(playerId);
+    let match = FindMatchWithPlayer(playerId);
     if (!match) return nullErrors.noMatch;
 
-    var playerPos = FindPlayerPosInMatch(match, playerId);
+    let playerPos = FindPlayerPosInMatch(match, playerId);
 
     if (match.status != matchStatuses.stageSelection) return stageStrikeErrors.wrongStatus;
 
-    var strikeResponse;
+    let strikeResponse;
     if (match.gamesArr.length == 1){
         strikeResponse = StarterStrikeLogic(match, playerPos, stages);
     } else{
@@ -99,9 +99,9 @@ export function PlayerSentStageStrikes(playerId, stages){
 
 function StarterStrikeLogic(match, playerPos, stages){
     const stageList = rulesets[match.mode].starterStagesArr;
-    var game = match.gamesArr[0];
+    let game = match.gamesArr[0];
 
-    var correctStagesLength = 2;
+    let correctStagesLength = 2;
     if (game.strikes.length == 0 || game.strikes.length >= stageList.length - 2){
         correctStagesLength = 1;
     }
@@ -116,7 +116,7 @@ function StarterStrikeLogic(match, playerPos, stages){
     }
 
     //check each stage
-    var alreadySentStages = [];
+    let alreadySentStages = [];
     for (let i = 0; i < stages.length; i++){
         if (!stageList.includes(stages[i])) return stageStrikeErrors.stageNotInStagelist;
 
@@ -149,13 +149,13 @@ function CheckStarterStrikesFinished(game, stageList){
 
 function CounterpickStrikingLogic(match, playerId, playerPos, stages){
     const stageList = rulesets[match.mode].counterPickStagesArr;
-    var game = match.gamesArr[match.gamesArr.length - 1];
+    let game = match.gamesArr[match.gamesArr.length - 1];
 
     if (stages.length != rulesets[match.mode].counterPickBans) return stageStrikeErrors.stageAmountIncorrect;
 
     if (match.gamesArr[match.gamesArr.length - 2].winnerId != playerId) return stageStrikeErrors.wrongPlayer;
 
-    var alreadySentStages = [];
+    let alreadySentStages = [];
     //for each stage
     for (let i = 0; i < stages.length; i++){
         if (!stageList.includes(stages[i])) return stageStrikeErrors.stageNotInStagelist;
@@ -175,10 +175,10 @@ function CounterpickStrikingLogic(match, playerId, playerPos, stages){
 }
 
 export function PlayerSentStagePick(playerId, stage){
-    var match = FindMatchWithPlayer(playerId);
+    let match = FindMatchWithPlayer(playerId);
     if (!match) return nullErrors.noMatch;
 
-    var playerPos = FindPlayerPosInMatch(match, playerId);
+    let playerPos = FindPlayerPosInMatch(match, playerId);
 
     if (match.status != matchStatuses.stageSelection) return stagePickErrors.wrongStatus;
 
@@ -188,7 +188,7 @@ export function PlayerSentStagePick(playerId, stage){
 
     if (match.gamesArr[match.gamesArr.length - 2].winnerId == playerId) return stagePickErrors.wrongPlayer;
 
-    var game = match.gamesArr[match.gamesArr.length - 1];
+    let game = match.gamesArr[match.gamesArr.length - 1];
 
     if (game.strikes.length < rulesets[match.mode].counterPickBans) return stagePickErrors.notEnoughStrikes;
 
@@ -201,8 +201,8 @@ export function PlayerSentStagePick(playerId, stage){
 }
 
 export async function PlayerSentGameWin(playerId, winnerId){
-    var match = await FindMatchWithPlayer(playerId);
-    var data = {
+    let match = await FindMatchWithPlayer(playerId);
+    let data = {
         matchId: undefined,
         dispute: false,
         confirmed: false,
@@ -213,8 +213,8 @@ export async function PlayerSentGameWin(playerId, winnerId){
 
     data.matchId = match.id;
 
-    var playerPos = FindPlayerPosInMatch(match, playerId);
-    var otherPos = (playerPos % 2) + 1;
+    let playerPos = FindPlayerPosInMatch(match, playerId);
+    let otherPos = (playerPos % 2) + 1;
 
     if (match.mode == matchModes.casual) return gameWinErrors.casual;
     if (match.status != matchStatuses.ingame) return gameWinErrors.wrongStatus;
@@ -224,7 +224,7 @@ export async function PlayerSentGameWin(playerId, winnerId){
 
     match.players[playerPos - 1].markedWinner = winnerPos;
 
-    var game = match.gamesArr[match.gamesArr.length - 1];
+    let game = match.gamesArr[match.gamesArr.length - 1];
 
     match.chat.push(new ChatMessage(GamePlayerConfirmMessage(playerId, winnerId), systemId));
 
@@ -268,7 +268,7 @@ export async function PlayerSentGameWin(playerId, winnerId){
 }
 
 function CheckMatchWin(match, winnerId){
-    var winCount = 0;
+    let winCount = 0;
     for (let i = 0; i < match.gamesArr.length; i++){
         if (match.gamesArr[i].winnerId != winnerId){
             continue;
@@ -294,16 +294,16 @@ async function HandleRankedMatchWin(match){
 }
 
 export async function PlayerSentForfeit(playerId){
-    var match = FindMatchWithPlayer(playerId);
+    let match = FindMatchWithPlayer(playerId);
     if (!match) return nullErrors.noMatch;
 
     if (match.mode == matchModes.casual) return forfeitErrors.casual;
 
-    var playerPos = FindPlayerPosInMatch(match, playerId);
+    let playerPos = FindPlayerPosInMatch(match, playerId);
 
     match.winnerId = match.players[playerPos % 2].id;
 
-    var result = {
+    let result = {
         matchId: match.id,
         newPlayerRatings: undefined,
     }
@@ -329,7 +329,7 @@ async function CheckPlacements(playerId){
 }
 
 export async function PlayerSentCasualMatchEnd(playerId){
-    var match = FindMatchWithPlayer(playerId);
+    let match = FindMatchWithPlayer(playerId);
     if (!match) return nullErrors.noMatch;
 
     if (match.status == matchStatuses.dispute) return casualMatchEndErrors.inDispute;
@@ -355,7 +355,7 @@ export async function UserSentChatMessage(matchId, playerId, content){
     if (content.length > 256 || content.length == 0) return chatMessageErrors.tooLong;
     if (CheckChatLimitReached(playerId)) return chatMessageErrors.rateLimitReached;
 
-    var match = FindMatch(matchId);
+    let match = FindMatch(matchId);
     if (!match){
         match = await GetMatch(matchId);
         if (!match) return nullErrors.matchDoesntExist;
@@ -366,7 +366,7 @@ export async function UserSentChatMessage(matchId, playerId, content){
         return new ResponseData(201);
     }
 
-    var chatMessage = new ChatMessage(content, playerId);
+    let chatMessage = new ChatMessage(content, playerId);
     match.chat.push(chatMessage);
     NewMessage(playerId);
     return new ResponseData(201);
@@ -377,7 +377,7 @@ export async function ModSentChatMessage(matchId, userId, content){
     if (HasBadWords(content)) return chatMessageErrors.badWords;
     if (content.length > 256 || content.length == 0) return chatMessageErrors.tooLong;
     
-    var match = FindMatch(matchId);
+    let match = FindMatch(matchId);
     if (!match){
         match = await GetMatch(matchId);
         if (!match) return nullErrors.matchDoesntExist;
@@ -386,13 +386,13 @@ export async function ModSentChatMessage(matchId, userId, content){
         return new ResponseData(201);
     }
 
-    var chatMessage = new ChatMessage(content, userId);
+    let chatMessage = new ChatMessage(content, userId);
     match.chat.push(chatMessage);
     return new ResponseData(201);
 }
 
 export function PlayerSentMatchDispute(playerId){
-    var match = FindMatchWithPlayer(playerId);
+    let match = FindMatchWithPlayer(playerId);
     if (!match) return nullErrors.noMatch;
 
     if (match.privateBattle) return disputeErrors.privateBattle;
@@ -417,7 +417,7 @@ function StartMatchDispute(match){
 }
 
 export function GetDisputedMatchesList(){
-    var result = [];
+    let result = [];
     for (let i = 0; i < matches.length; i++){
         if (matches[i].status == matchStatuses.dispute){
             result.push(matches[i]);
@@ -428,12 +428,12 @@ export function GetDisputedMatchesList(){
 
 //only able to cancel the dispute, no other actions. has to be confirmed by both players
 export async function PlayerSentResolveDispute(playerId){
-    var match = FindMatchWithPlayer(playerId);
+    let match = FindMatchWithPlayer(playerId);
     if (!match) return nullErrors.noMatch;
 
     if (match.status != matchStatuses.dispute) return resolveErrors.notDisputed;
 
-    var playerPos = FindPlayerPosInMatch(match, playerId);
+    let playerPos = FindPlayerPosInMatch(match, playerId);
     if (match.players[playerPos - 1].disputeResolveSent == true) return resolveErrors.alreadyConfirmed;
     match.players[playerPos - 1].disputeResolveSent = true;
 
@@ -448,7 +448,7 @@ export async function PlayerSentResolveDispute(playerId){
             return new ResponseData(201, matchModes.casual);
         }
 
-        var responseData = HandleNoChangesResolve(match);
+        let responseData = HandleNoChangesResolve(match);
         responseData.data = match.id;
         return responseData;
     }
@@ -456,7 +456,7 @@ export async function PlayerSentResolveDispute(playerId){
 }
 
 export async function ResolveMatchDispute(matchId, resolveOption){
-    var match = FindMatch(matchId);
+    let match = FindMatch(matchId);
     if (!match) return nullErrors.matchDoesntExist;
 
     if (match.status != matchStatuses.dispute) return resolveErrors.notDisputed;
@@ -498,17 +498,17 @@ export async function ResolveMatchDispute(matchId, resolveOption){
             return HandleDisputeGameWin(match, 1);
         case disputeResolveOptions.matchWinPlayer1:
             match.winnerId = match.players[0].id;
-            var result = { winnerId: match.winnerId }
+            let p1WinResult = { winnerId: match.winnerId }
             SendDisputeMessage(GetDisputedMatchesList(), false);
-            result.newPlayerRatings = await HandleRankedMatchWin(match);
-            if (result.newPlayerRatings) return new ResponseData(201, result);
+            p1WinResult.newPlayerRatings = await HandleRankedMatchWin(match);
+            if (p1WinResult.newPlayerRatings) return new ResponseData(201, p1WinResult);
             return databaseErrors.matchFinishError;
         case disputeResolveOptions.matchWinPlayer2:
             match.winnerId = match.players[1].id;
-            var result = { winnerId: match.winnerId }
+            let p2WinResult = { winnerId: match.winnerId }
             SendDisputeMessage(GetDisputedMatchesList(), false);
-            result.newPlayerRatings = await HandleRankedMatchWin(match);
-            if (result.newPlayerRatings) return new ResponseData(201, result);
+            p2WinResult.newPlayerRatings = await HandleRankedMatchWin(match);
+            if (p2WinResult.newPlayerRatings) return new ResponseData(201, p2WinResult);
             return databaseErrors.matchFinishError;
         default:
             return resolveErrors.illegalResolveOption;
@@ -516,7 +516,7 @@ export async function ResolveMatchDispute(matchId, resolveOption){
 }
 
 function HandleNoChangesResolve(match){
-    var currentGame = match.gamesArr[match.gamesArr.length - 1];
+    let currentGame = match.gamesArr[match.gamesArr.length - 1];
 
     if (currentGame.stage == stages.unpicked){
         match.status = matchStatuses.stageSelection;
@@ -530,14 +530,14 @@ function HandleNoChangesResolve(match){
 }
 
 async function HandleDisputeGameWin(match, winnerIndex){
-    var newPlayerRatings;
-    var data = {
+    let newPlayerRatings;
+    let data = {
         matchFinished: false,
         winnerId: 0,
         newPlayerRatings
     }
-    var currentGame = match.gamesArr[match.gamesArr.length - 1];
-    var winnerPos;
+    let currentGame = match.gamesArr[match.gamesArr.length - 1];
+    let winnerPos;
 
     currentGame.winnerId = match.players[winnerIndex].id;
 
@@ -573,21 +573,21 @@ async function HandleDisputeGameWin(match, winnerIndex){
 
 //förlust på ranked, ta bort casual
 export async function HandleBannedPlayerInMatch(playerId){
-    var result = {
+    let result = {
         matchId: null,
         mode: null,
         winnerId: null,
         newPlayerRatings: null,
     }
-    var match = FindMatchWithPlayer(playerId);
+    let match = FindMatchWithPlayer(playerId);
     if (!match) return;
 
 
     if (match.mode == matchModes.casual){
         if (!await FinishMatch(match)) return databaseErrors.matchFinishError;
     } else{
-        var playerPos = FindPlayerPosInMatch(match, playerId);
-        var otherPos = (playerPos % 2) + 1;
+        let playerPos = FindPlayerPosInMatch(match, playerId);
+        let otherPos = (playerPos % 2) + 1;
         match.winnerId = match.players[otherPos - 1].id;
         result.winnerId = match.winnerId;
         result.newPlayerRatings = await HandleRankedMatchWin(match);

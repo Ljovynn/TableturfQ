@@ -1,6 +1,6 @@
 //lowercase, remove special characters
 export function SanitizeString(string){
-    var result;
+    let result;
     result = string.toLowerCase();
     result = result.replace(/\s|-|\'|\.|#/g, '');
     return result;
@@ -13,7 +13,7 @@ export function SanitizeDiscordLog(string){
 export function SanitizeFulltextSearch(string){
     string = string.replace(/\@|\+|\*|,|\(|\)|~|%|<|>|-|\'|\.|#/g, '');
     const words = string.split(' ');
-    var result = '';
+    let result = '';
     for (let i = 0; i < words.length; i++){
         if (words[i].length > 0){
             result += ' +' + words[i];
@@ -34,7 +34,7 @@ const badWords = Object.freeze([
 ]);
 
 export function HasBadWords(string){
-    var lowerCaseString = string.toLowerCase();
+    let lowerCaseString = string.toLowerCase();
     if (badWords.some(substring=>lowerCaseString.includes(substring))) return true;
     return false;
 }

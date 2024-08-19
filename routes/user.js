@@ -44,7 +44,7 @@ router.post("/SetUsername", async (req, res) => {
 router.post("/SetUserCountry", async (req, res) => {
     try{
         const userId = req.session.user;
-        var country = req.body.country;
+        let country = req.body.country;
 
         if (!CheckUserDefined(req)) return SetErrorResponse(res, userErrors.notLoggedIn);
         if (typeof(country) !== 'string') return SetErrorResponse(res, definitionErrors.countryUndefined);
@@ -125,7 +125,7 @@ router.post("/SearchUser", async (req, res) => {
 //ratings are truncated
 router.post("/GetUserRatingHistory", async (req, res) => {
     try{
-        var userId = req.body.userId;
+        let userId = req.body.userId;
         const ratingHistoryOption = req.body.ratingHistoryOption;
 
         if (!userId){
@@ -136,14 +136,14 @@ router.post("/GetUserRatingHistory", async (req, res) => {
         if (typeof(ratingHistoryOption) !== 'number') return SetErrorResponse(res, definitionErrors.ratingHistoryOptionUndefined);
         if (!Object.values(ratingHistoryOptions).includes(ratingHistoryOption)) return SetErrorResponse(res, definitionErrors.ratingHistoryOptionWrongFormat);
 
-        var ignoreHideRank = false;
+        let ignoreHideRank = false;
         //todo implement season
         if (ratingHistoryOption === ratingHistoryOptions.season){
             return res.sendStatus(501);
         }
 
         if (!ignoreHideRank){
-            var userRankData = await GetUserRankData(userId);
+            let userRankData = await GetUserRankData(userId);
             if (!userRankData) return SetErrorResponse(res, definitionErrors.userNotDefined);
             if (userRankData.hide_rank) return res.status(200).send([]);
         }
@@ -151,7 +151,7 @@ router.post("/GetUserRatingHistory", async (req, res) => {
 
         const endCutoffDate = Date.now();
 
-        var result = await GetUserRatingHistory(userId, cutoffDate, endCutoffDate);
+        let result = await GetUserRatingHistory(userId, cutoffDate, endCutoffDate);
 
         if (ratingHistoryOption != ratingHistoryOptions.day && result.length > 0){
             let currentEndOfDayRating = result[result.length - 1].unix_date;
@@ -194,14 +194,14 @@ router.post("/GetUserRatingHistory", async (req, res) => {
 //matchId: just the id of match player is in, undefined if not in match
 router.get("/GetUserInfo", async (req, res) => {
     try{
-        var user = await GetCurrentUser(req);
+        let user = await GetCurrentUser(req);
         if (!user) return SetErrorResponse(res, userErrors.notLoggedIn);
 
-        var queData = FindIfPlayerInQue(user.id);
-        var readyData = FindIfPlayerWaitingForReady(user.id);
-        var matchId = FindMatchWithPlayer(user.id);
+        let queData = FindIfPlayerInQue(user.id);
+        let readyData = FindIfPlayerWaitingForReady(user.id);
+        let matchId = FindMatchWithPlayer(user.id);
 
-        var data = {user, queData, readyData, matchId};
+        let data = {user, queData, readyData, matchId};
 
         res.status(200).send(data);
     } catch(error){
@@ -215,8 +215,8 @@ router.get("/GetUserBanInfo", async (req, res) => {
         const userId = req.session.user;
         if (!CheckUserDefined(req)) return SetErrorResponse(res, userErrors.notLoggedIn);
 
-        var banInfo = await GetUserBanState(userId);
-        var data = {
+        let banInfo = await GetUserBanState(userId);
+        let data = {
             banned: false,
         }
         if (banInfo){
@@ -237,7 +237,7 @@ router.get("/GetUserPlacementInfo", async (req, res) => {
         const userId = req.session.user;
         if (!CheckUserDefined(req)) return SetErrorResponse(res, userErrors.notLoggedIn);
 
-        var matchCount = await GetUserRankedMatchCount(userId);
+        let matchCount = await GetUserRankedMatchCount(userId);
 
         res.status(200).send(matchCount);
     } catch(error){

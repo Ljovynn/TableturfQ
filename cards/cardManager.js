@@ -17,7 +17,7 @@ async function SetupCards(){
         if (err) throw err;
     
         console.log("setting up cards");
-        var sortedCards = JSON.parse(data);
+        let sortedCards = JSON.parse(data);
 
         sortedCards.sort((a, b) => a.name.localeCompare(b.name));
 
@@ -42,7 +42,7 @@ async function SetupCards(){
 }
 
 export function GetCardByName(inputName, language){
-    var cards = GetCardListByLanguage(language);
+    let cards = GetCardListByLanguage(language);
     for (let i = 0; i < cards.length; i++){
         if (SanitizeString(cards[i].name) == SanitizeString(inputName)){
             return cards[i];
@@ -51,7 +51,7 @@ export function GetCardByName(inputName, language){
 }
 
 export function GetCardById(inputId, language){
-    var cards = GetCardListByLanguage(language);
+    let cards = GetCardListByLanguage(language);
     for (let i = 0; i < cards.length; i++){
         if (cards[i].id == inputId){
             return cards[i];

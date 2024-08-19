@@ -10,9 +10,9 @@ export function FindPlayerPosInMatch(match, playerId){
 }
 
 export function ConvertDBMatchToMatch(matchData, gamesData, strikeData, chatMessages){
-    var matchMode = (matchData.ranked || matchData.private_battle) ? matchModes.ranked : matchModes.casual;
+    let matchMode = (matchData.ranked || matchData.private_battle) ? matchModes.ranked : matchModes.casual;
 
-    var match = new Match(matchData.id, matchData.player1_id, matchData.player2_id, matchMode, matchData.private_battle, matchData.set_length);
+    let match = new Match(matchData.id, matchData.player1_id, matchData.player2_id, matchMode, matchData.private_battle, matchData.set_length);
     match.status = matchData.result;
     match.createdAt = matchData.unix_created_at;
 
@@ -31,8 +31,8 @@ export function ConvertDBMatchToMatch(matchData, gamesData, strikeData, chatMess
     }
 
     for (let i = chatMessages.length - 1; i >= 0; i--){
-        var ownerId = (chatMessages[i].owner_id) ? chatMessages[i].owner_id : systemId;
-        var chatMessage = new ChatMessage(chatMessages[i].content, ownerId, (chatMessages[i].unix_date * 1000));
+        let ownerId = (chatMessages[i].owner_id) ? chatMessages[i].owner_id : systemId;
+        let chatMessage = new ChatMessage(chatMessages[i].content, ownerId, (chatMessages[i].unix_date * 1000));
         match.chat.push(chatMessage);
     }
 

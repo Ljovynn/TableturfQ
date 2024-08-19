@@ -13,8 +13,8 @@ const router = Router();
 //req: startPos, hitCount
 router.post('/GetLeaderboard', async (req, res) => {
     try {
-        var startPos = req.body.startPos;
-        var hitCount = req.body.hitCount;
+        let startPos = req.body.startPos;
+        let hitCount = req.body.hitCount;
 
         if (typeof(startPos) !== 'number' && typeof(startPos) !== 'undefined') return SetErrorResponse(res, definitionErrors.leaderboardStartPosWrongFormat);
         if (typeof(hitCount) !== 'number' && typeof(hitCount) !== 'undefined') return SetErrorResponse(res, definitionErrors.leaderboardHitCountWrongFormat);

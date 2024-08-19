@@ -242,7 +242,7 @@ export async function GetStageStrikes(gameId){
 
 export async function SetMatchResult(match){
     try{
-        var ranked = (match.mode == matchModes.ranked && !match.privateBattle);
+        let ranked = (match.mode == matchModes.ranked && !match.privateBattle);
 
         await pool.execute(`INSERT INTO matches (id, player1_id, player2_id, ranked, set_length, result, private_battle) VALUES (?, ?, ?, ?, ?, ?, ?)`,
         [match.id, match.players[0].id, match.players[1].id, ranked, match.setLength, match.status, match.privateBattle]);
@@ -253,7 +253,7 @@ export async function SetMatchResult(match){
             CreateCounterpickGameAndStrikes(match, i + 1);
         }
 
-        var chatData = [];
+        let chatData = [];
         for (let i = 0; i < match.chat.length; i++){
             let ownerId = (match.chat[i].ownerId == systemId) ? null : match.chat[i].ownerId;
             chatData[i] = [match.id, ownerId, match.chat[i].content, Math.round(match.chat[i].date / 1000)];
@@ -277,8 +277,8 @@ export async function SetMatchResult(match){
 }
 
 async function CreateFirstGameStrikes(match){
-    var game = match.gamesArr[0];
-    var strikePos = FindPlayerPosInMatch(match, game.winnerId);
+    let game = match.gamesArr[0];
+    let strikePos = FindPlayerPosInMatch(match, game.winnerId);
     const result = await pool.execute(`INSERT INTO games (match_id, stage, result) VALUES (?, ?, ?)`, [match.id, game.stage, strikePos]);
 
     const gameId = result[0].insertId;
@@ -287,8 +287,8 @@ async function CreateFirstGameStrikes(match){
 }
 
 async function CreateCounterpickGameAndStrikes(match, gameNumber){
-    var game = match.gamesArr[gameNumber - 1];
-    var winnerPos = FindPlayerPosInMatch(match, game.winnerId);
+    let game = match.gamesArr[gameNumber - 1];
+    let winnerPos = FindPlayerPosInMatch(match, game.winnerId);
     const result = await pool.execute(`INSERT INTO games (match_id, stage, result) VALUES (?, ?, ?)`, [match.id, game.stage, winnerPos]);
 
     const gameId = result[0].insertId;
@@ -319,7 +319,7 @@ export async function GetRecentMatches(cutoff){
 
 export async function GetUserMatchHistory(userId, hitsPerPage, pageNumber)
 {
-    var offset = (pageNumber - 1) * hitsPerPage;
+    let offset = (pageNumber - 1) * hitsPerPage;
     const [rows] = await pool.execute(`SELECT DISTINCT m.id, m.player1_id, m.player2_id, m.ranked, m.set_length, m.result, UNIX_TIMESTAMP(m.created_at) AS unix_created_at,
         (select count(*) from games where match_id = m.id AND result = 1) AS player1_score,
         (select count(*) from games where match_id = m.id AND result = 2) AS player2_score FROM matches m
@@ -387,7 +387,7 @@ export async function GetFutureAnnouncements(){
 }
 
 export async function CreateAnnouncement(title, description, iconSrc, date, isEvent){
-    var announcement = await pool.execute(`INSERT INTO announcements (title, description, icon_src, date, is_event) VALUES (?, ?, ?, FROM_UNIXTIME(?), ?)`,
+    let announcement = await pool.execute(`INSERT INTO announcements (title, description, icon_src, date, is_event) VALUES (?, ?, ?, FROM_UNIXTIME(?), ?)`,
     [title, description, iconSrc, date, isEvent]);
     return announcement[0].insertId;
 }
@@ -410,7 +410,7 @@ export async function BanUser(userId, reason){
 export async function UnbanUser(userId){
     await pool.execute(`DELETE FROM ban_list WHERE user_id = ?`, [userId]);
 
-    var role = await GetUserRole(userId);
+    let role = await GetUserRole(userId);
     if (!role) return;
     if (role === userRoles.mod){
         await SetUserRole(userId, userRoles.verified);
@@ -440,7 +440,7 @@ export async function GetUserDecks(userId, offset = 0){
     FROM decks d LEFT JOIN user_deck_likes l ON d.id = l.deck_id WHERE d.owner_id = ? GROUP BY d.id ORDER BY d.created_at DESC LIMIT ? OFFSET ?`,
     [userId, deckSearchPageLimit.toString(), offset.toString()]);
 
-    var result = [];
+    let result = [];
     for (let i = 0; i < decks.length; i++){
         const [cards] = await pool.execute(`SELECT card_id FROM deck_cards WHERE deck_id = ?`, [decks[i].id]);
         result[i] = BuildDeckObject(decks[i], cards);
@@ -450,10 +450,10 @@ export async function GetUserDecks(userId, offset = 0){
 
 //searchOptions (all optional) = input (string), users (array), cards (array), stages (array), minRank, start date, end date, sortOption
 export async function SearchDecks(searchOptions, offset = 0){
-    var conditions = [];
-    var values = [];
-    var conditionsStr;
-    var joinUsers = false;
+    let conditions = [];
+    let values = [];
+    let conditionsStr;
+    let joinUsers = false;
 
     if (typeof searchOptions.input !== 'undefined') {
         conditions.push("MATCH (title, description) AGAINST (? IN BOOLEAN MODE)");
@@ -510,8 +510,8 @@ export async function SearchDecks(searchOptions, offset = 0){
 
     conditionsStr = conditions.length ? conditions.join(' AND ') : '1';
 
-    var sortString = '';
-    var sortOption = (searchOptions.sortOption) ? searchOptions.sortOption : deckSearchSortingOptions.newest;
+    let sortString = '';
+    let sortOption = (searchOptions.sortOption) ? searchOptions.sortOption : deckSearchSortingOptions.newest;
     switch(sortOption){
         case deckSearchSortingOptions.mostLiked:
             sortString = 'likes DESC';
@@ -528,13 +528,13 @@ export async function SearchDecks(searchOptions, offset = 0){
     values.push(deckSearchPageLimit.toString());
     values.push(offset.toString());
 
-    var queryString = (joinUsers) ? `SELECT d.id, d.owner_id, d.title, d.description, d.stage, UNIX_TIMESTAMP(d.created_at) AS unix_created_at, count(l.deck_id) AS 'likes'
+    let queryString = (joinUsers) ? `SELECT d.id, d.owner_id, d.title, d.description, d.stage, UNIX_TIMESTAMP(d.created_at) AS unix_created_at, count(l.deck_id) AS 'likes'
     FROM decks d LEFT JOIN user_deck_likes l ON d.id = l.deck_id INNER JOIN users u ON d.owner_id = u.id WHERE ${conditionsStr} GROUP BY d.id ORDER BY ${sortString} LIMIT ? OFFSET ?`:
     `SELECT d.id, d.owner_id, d.title, d.description, d.stage, UNIX_TIMESTAMP(d.created_at) AS unix_created_at, count(l.deck_id) AS 'likes'
     FROM decks d LEFT JOIN user_deck_likes l ON d.id = l.deck_id WHERE ${conditionsStr} GROUP BY d.id ORDER BY ${sortString} LIMIT ? OFFSET ?`;
 
     const [decks] = await pool.query (queryString, values);
-    var result = [];
+    let result = [];
     for (let i = 0; i < decks.length; i++){
         const [cards] = await pool.execute(`SELECT card_id FROM deck_cards WHERE deck_id = ?`, [decks[i].id]);
         result[i] = BuildDeckObject(decks[i], cards);
@@ -548,7 +548,7 @@ export async function GetLikedDecks(userId, offset = 0){
     INNER JOIN user_deck_likes lfull ON d.id = lfull.deck_id
     WHERE l.user_id = ? GROUP BY d.id ORDER BY l.created_at DESC LIMIT ? OFFSET ?`, [userId, deckSearchPageLimit.toString(), offset.toString()]);
 
-    var result = [];
+    let result = [];
     for (let i = 0; i < decks.length; i++){
         const [cards] = await pool.execute(`SELECT card_id FROM deck_cards WHERE deck_id = ?`, [decks[i].id]);
         result[i] = BuildDeckObject(decks[i], cards);
@@ -590,7 +590,7 @@ export async function GetDeckOwner(deckId){
 }
 
 function BuildDeckObject(dbDeck, dbCards){
-    var cards = [];
+    let cards = [];
     for (let i = 0; i < dbCards.length; i++){
         cards.push(dbCards[i].card_id);
     }

@@ -8,7 +8,7 @@ var matchHistory = [];
 export async function MatchHistoryManagerSetup(){
     try {
         //get name, avatar hash
-        var loadedMatches = await GetRecentMatches(matchHistoryLength);
+        let loadedMatches = await GetRecentMatches(matchHistoryLength);
         for (let i = 0; i < loadedMatches.length; i++){
             const player1Data = (loadedMatches[i].player1_id) ? await GetUserData(loadedMatches[i].player1_id) : {};
             const player2Data = (loadedMatches[i].player2_id) ? await GetUserData(loadedMatches[i].player2_id) : {};
@@ -37,8 +37,8 @@ export async function UpdateRecentMatches(match){
     const player1Data = await GetUserData (match.players[0].id);
     const player2Data = await GetUserData (match.players[1].id);
 
-    var p1ScoreCount = 0;
-    var p2ScoreCount = 0;
+    let p1ScoreCount = 0;
+    let p2ScoreCount = 0;
     for (let i = 0; i < match.gamesArr.length; i++){
         if (match.gamesArr[i].winnerId == null) continue;
         if (match.gamesArr[i].winnerId == match.players[0].id){
@@ -48,7 +48,7 @@ export async function UpdateRecentMatches(match){
         }
     }
 
-    var newMatch = {
+    let newMatch = {
         id: match.id,
         player1_id: match.players[0].id,
         player1_username: player1Data.username,

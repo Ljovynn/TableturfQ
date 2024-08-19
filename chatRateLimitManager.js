@@ -13,8 +13,8 @@ export function NewMessage(id){
 }
 
 export function CheckChatLimitReached(id){
-    var messageAmount = 0;
-    var now = Date.now();
+    let messageAmount = 0;
+    let now = Date.now();
     for (let i = 0; i < recentMessagesList.length; i++){
         if (recentMessagesList[i].id == id && recentMessagesList[i].expiresAt > now) messageAmount++;
     }
@@ -23,7 +23,7 @@ export function CheckChatLimitReached(id){
 }
 
 export function CleanupChatRateLimitList(){
-    var now = Date.now();
+    let now = Date.now();
     for (let i = recentMessagesList.length - 1; i >= 0; i--){
         if (recentMessagesList[i].expiresAt > now) recentMessagesList.splice(i, 1);
     }
