@@ -35,6 +35,8 @@ const victoryButtons = document.getElementsByClassName('player-victory-button');
 const leaveMatch = document.getElementById('leave-match-button');
 const toggleContent = document.getElementById('toggle-content');
 
+const matchContent = document.getElementById('match-content');
+
 const needHelp = document.getElementById('player-need-help');
 const playerRaiseDispute = document.getElementById('player-raise-dispute-button');
 
@@ -193,7 +195,11 @@ for (let stage of stages ) {
                 }
 
                 if ( !pickingStage ) {
-                    strikeInfo.innerHTML = strikesRemaining + ' stage strike' + ( strikesRemaining == 1 ? '' : 's' ) + ' remaining.';
+                    if ( strikesRemaining > 0 ) {
+                        strikeInfo.innerHTML = 'Strike <span class="strike-counter">' + strikesRemaining + '</span> stage' + ( strikesRemaining == 1 ? '' : 's' ) + ' you do not want to play on.';
+                    } else {
+                        strikeInfo.innerHTML = 'Confirm your stage strikes.';
+                    }
                 }
             }
         }
@@ -603,6 +609,7 @@ async function setMatchInfo() {
     }
     checkPrivateMatch();
     checkMatchOver();
+    checkPlayerStatus();
 }
 
 async function getChatMessages(matchId, amountMessages) {
@@ -803,7 +810,12 @@ function setStrikeAmount() {
         if ( strikeableStages.length == 2 )
             strikeAmount = 1;
         strikesRemaining = strikeAmount;
-        strikeInfo.innerHTML = strikesRemaining + ' stage strike' + ( strikesRemaining == 1 ? '' : 's' ) + ' remaining.';
+
+        if ( strikesRemaining > 0 ) {
+            strikeInfo.innerHTML = 'Strike <span class="strike-counter">' + strikesRemaining + '</span> stage' + ( strikesRemaining == 1 ? '' : 's' ) + ' you do not want to play on.';
+        } else {
+            strikeInfo.innerHTML = 'Confirm your stage strikes.';
+        }
     } else {
         strikeableStages = document.getElementsByClassName('stage-selectable');
         console.log(counterpicks.length);
@@ -814,11 +826,16 @@ function setStrikeAmount() {
             strikeButton.innerHTML = 'Confirm Strikes';
         } else {
             strikeAmount = 1;
-            strikeButton.innerHTML = 'Select Map';
+            strikeButton.innerHTML = 'Select Stage';
             mapSelect = true;
         }
         strikesRemaining = strikeAmount;
-        strikeInfo.innerHTML = strikesRemaining + ' stage strike' + ( strikesRemaining == 1 ? '' : 's' ) + ' remaining.';
+
+        if ( strikesRemaining > 0 ) {
+            strikeInfo.innerHTML = 'Strike <span class="strike-counter">' + strikesRemaining + '</span> stage' + ( strikesRemaining == 1 ? '' : 's' ) + ' you do not want to play on.';
+        } else {
+            strikeInfo.innerHTML = 'Confirm your stage strikes.';
+        }
     }
 }
 
@@ -875,8 +892,8 @@ function setCurrentStriker() {
 
         pickingStage = true;
 
-        currentStrikerName.innerHTML = name + ' is currently picking the map to play on.';
-        strikeInfo.innerHTML = 'Select the map to play on.';
+        currentStrikerName.innerHTML = name + ' is currently picking the stage to play on.';
+        strikeInfo.innerHTML = 'Select the stage to play on.';
     }
 
     currentStrikerName.style.display = 'block';
@@ -998,6 +1015,13 @@ function checkMatchOver() {
         leaveMatch.style.display = 'none';
         playerRaiseDispute.style.display = 'none';
         strikerSection.style.display = 'none';
+    }
+}
+
+function checkPlayerStatus() {
+    // Hide everything but players and score if user isn't admin or in the match
+    if ( user.role != 2 && userID != players[0].id && userID != players[1].id ) {
+        matchContent.style.display = 'none';
     }
 }
 

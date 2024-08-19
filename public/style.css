@@ -449,6 +449,10 @@ footer {
     display: none;
 }
 
+.strike-counter {
+    color: #dbc639;
+}
+
 .stage-selectable {
     display: inline-block;
 }
@@ -504,6 +508,10 @@ footer {
     margin: 10px 0;
 }
 
+#striker-section {
+    font-size: 1.3rem;
+}
+
 #current-striker {
     margin: 10px;
 }
@@ -514,6 +522,7 @@ footer {
 
 #strike-info {
     margin: 10px;
+    font-size: 1.3rem;
 }
 
 #select-map-message {

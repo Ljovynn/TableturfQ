@@ -169,110 +169,112 @@
                 <div id="admin-resolve-dispute" class="button">Resolve Dispute</div>
             </div>
 
-            <div id="player-raise-dispute">
-                <a id="player-need-help">Need Help?</a>
-                <div id="player-raise-dispute-button" class="button">Dispute Match</div>
-            </div>
-            <div id="player-resolve-content">
-                <div id="player-resolve-dispute" class="button">Resolve Dispute</div>
-            </div>
-
-            <p id="confirmation-message"></p>
-
-            <div id="toggle-content">
-                <div id="toggle-match-chat" class="toggle-button button active"><div id="chat-notification" class="notification-icon">!</div>Chat</div>
-                <div id="toggle-match-strikes" class="toggle-button button"><div id="strike-notification" class="notification-icon">!</div>Strikes</div>
-            </div>
-
-            <div id="match-chat-content">
-                <div id="match-chat-log"></div>
-                <form id="match-chat-form">
-                    <input type="text" id="match-chat-input" name="match-chat-input" maxlength="256" autocomplete="off"/>
-                    <label class="button" for="match-chat-button">Send</label>
-                    <input type="submit" id="match-chat-button" class="input-button" value="Send" />
-                </form>
-            </div>
-            <div id="match-strike-content" class="untoggled">
-                <div id="striker-section">
-                    <p id="current-striker"></p>
-                    <p id="game-messages">Please wait for your opponent.</p>
+            <div id="match-content">
+                <div id="player-raise-dispute">
+                    <a id="player-need-help">Need Help?</a>
+                    <div id="player-raise-dispute-button" class="button">Dispute Match</div>
                 </div>
-                <div id="strike-content">
-                    <p id="strike-info">1 stage strike remaining.</p>
-                    <p id="select-map-message">Please select the stage to play on.</p>
-                    <div id="confirm-map-selection" class="button">Confirm Strikes</div>
+                <div id="player-resolve-content">
+                    <div id="player-resolve-dispute" class="button">Resolve Dispute</div>
                 </div>
-                <p id="playing-stage"></p>
-                <div id="stages-list" class="stages-list">
-                    <div id="mainStreet" stage-value="1" class="stage stage-stricken stage-unselectable">
-                        <h3>Main Street</h3>
-                        <img  src="./assets/images/Main-Street-Icon.png" />
-                    </div>
-                    <div id="thunderPoint" stage-value="2" class="stage stage-stricken stage-unselectable">
-                        <h3>Thunder Point</h3>
-                        <img  src="./assets/images/Thunder-Point-Icon.png" />
-                    </div>
-                    <div id="xMarksTheGarden" stage-value="3" class="stage stage-stricken stage-unselectable">
-                        <h3>X Marks The Garden</h3>
-                        <img src="./assets/images/X-Marks-Icon.png" />
-                    </div>
-                    <div id="squareSquared" stage-value="4" class="stage stage-stricken stage-unselectable">
-                        <h3>Square Squared</h3>
-                        <img  src="./assets/images/Square-Squared-Icon.png" />
-                    </div>
-                    <div id="lakefrontProperty" stage-value="5" class="stage stage-stricken stage-unselectable">
-                        <h3>Lakefront Property</h3>
-                        <img  src="./assets/images/Lakefront-Icon.png" />
-                    </div>
-                        <div id="doubleGemini" stage-value="6" class="stage stage-stricken stage-unselectable">
-                        <h3>Double Gemini</h3>
-                        <img  src="./assets/images/Double-Gemini-Icon.png" />
-                    </div>
-                        <div id="riverDrift" stage-value="7" class="stage stage-stricken stage-unselectable">
-                        <h3>River Drift</h3>
-                        <img src="./assets/images/River-Drift-Icon.png" />
-                    </div>
-                        <div id="boxSeats" stage-value="8" class="stage stage-stricken stage-unselectable">
-                        <h3>Box Seats</h3>
-                        <img src="./assets/images/Box-Seats-Icon.png" />
-                    </div>
-                    <div id="girderForBattle" stage-value="9" class="stage stage-stricken stage-unselectable">
-                        <h3>Girder For Battle</h3>
-                        <img  src="./assets/images/Girder-Icon.png" />
-                    </div>
-                    <div id="maskMansion" stage-value="10" class="stage stage-stricken stage-unselectable">
-                        <h3>Mask Mansion</h3>
-                        <img  src="./assets/images/Mask-Mansion-Icon.png" />
-                    </div>
 
-                    <div id="stickyThicket" stage-value="11" class="stage stage-stricken stage-unselectable">
-                        <h3>Sticky Thicket</h3>
-                        <img  src="./assets/images/Sticky-Thicket-Icon.png" />
+                <p id="confirmation-message"></p>
+
+                <div id="toggle-content">
+                    <div id="toggle-match-chat" class="toggle-button button active"><div id="chat-notification" class="notification-icon">!</div>Chat</div>
+                    <div id="toggle-match-strikes" class="toggle-button button"><div id="strike-notification" class="notification-icon">!</div>Strikes</div>
+                </div>
+
+                <div id="match-chat-content">
+                    <div id="match-chat-log"></div>
+                    <form id="match-chat-form">
+                        <input type="text" id="match-chat-input" name="match-chat-input" maxlength="256" autocomplete="off"/>
+                        <label class="button" for="match-chat-button">Send</label>
+                        <input type="submit" id="match-chat-button" class="input-button" value="Send" />
+                    </form>
+                </div>
+                <div id="match-strike-content" class="untoggled">
+                    <div id="striker-section">
+                        <p id="current-striker"></p>
+                        <p id="game-messages">Please wait for your opponent.</p>
                     </div>
-                    <div id="crackerSnap" stage-value="12" class="stage stage-stricken stage-unselectable">
-                        <h3>Cracker Snap</h3>
-                        <img  src="./assets/images/Cracker-Snap-Icon.png" />
+                    <div id="strike-content">
+                        <p id="strike-info">Strike <span class="strike-counter">1</span> stage you do not want to play on.</p>
+                        <p id="select-map-message">Please select the stage to play on.</p>
+                        <div id="confirm-map-selection" class="button">Confirm Strikes</div>
                     </div>
-                    <div id="twoLaneSplattop" stage-value="13" class="stage stage-stricken stage-unselectable">
-                        <h3>Two-Lane Splattop</h3>
-                        <img  src="./assets/images/Two-Lane-Icon.png" />
-                    </div>
-                    <div id="pedalToTheMedal" stage-value="14" class="stage stage-stricken stage-unselectable">
-                        <h3>Pedal to the Metal</h3>
-                        <img  src="./assets/images/Pedal-Icon.png" />
-                    </div>
-                    <div id="overTheLine" stage-value="15" class="stage stage-stricken stage-unselectable">
-                        <h3>Over the Line</h3>
-                        <img  src="./assets/images/Over-the-Line-Icon.png" />
+                    <p id="playing-stage"></p>
+                    <div id="stages-list" class="stages-list">
+                        <div id="mainStreet" stage-value="1" class="stage stage-stricken stage-unselectable">
+                            <h3>Main Street</h3>
+                            <img  src="./assets/images/Main-Street-Icon.png" />
+                        </div>
+                        <div id="thunderPoint" stage-value="2" class="stage stage-stricken stage-unselectable">
+                            <h3>Thunder Point</h3>
+                            <img  src="./assets/images/Thunder-Point-Icon.png" />
+                        </div>
+                        <div id="xMarksTheGarden" stage-value="3" class="stage stage-stricken stage-unselectable">
+                            <h3>X Marks The Garden</h3>
+                            <img src="./assets/images/X-Marks-Icon.png" />
+                        </div>
+                        <div id="squareSquared" stage-value="4" class="stage stage-stricken stage-unselectable">
+                            <h3>Square Squared</h3>
+                            <img  src="./assets/images/Square-Squared-Icon.png" />
+                        </div>
+                        <div id="lakefrontProperty" stage-value="5" class="stage stage-stricken stage-unselectable">
+                            <h3>Lakefront Property</h3>
+                            <img  src="./assets/images/Lakefront-Icon.png" />
+                        </div>
+                            <div id="doubleGemini" stage-value="6" class="stage stage-stricken stage-unselectable">
+                            <h3>Double Gemini</h3>
+                            <img  src="./assets/images/Double-Gemini-Icon.png" />
+                        </div>
+                            <div id="riverDrift" stage-value="7" class="stage stage-stricken stage-unselectable">
+                            <h3>River Drift</h3>
+                            <img src="./assets/images/River-Drift-Icon.png" />
+                        </div>
+                            <div id="boxSeats" stage-value="8" class="stage stage-stricken stage-unselectable">
+                            <h3>Box Seats</h3>
+                            <img src="./assets/images/Box-Seats-Icon.png" />
+                        </div>
+                        <div id="girderForBattle" stage-value="9" class="stage stage-stricken stage-unselectable">
+                            <h3>Girder For Battle</h3>
+                            <img  src="./assets/images/Girder-Icon.png" />
+                        </div>
+                        <div id="maskMansion" stage-value="10" class="stage stage-stricken stage-unselectable">
+                            <h3>Mask Mansion</h3>
+                            <img  src="./assets/images/Mask-Mansion-Icon.png" />
+                        </div>
+
+                        <div id="stickyThicket" stage-value="11" class="stage stage-stricken stage-unselectable">
+                            <h3>Sticky Thicket</h3>
+                            <img  src="./assets/images/Sticky-Thicket-Icon.png" />
+                        </div>
+                        <div id="crackerSnap" stage-value="12" class="stage stage-stricken stage-unselectable">
+                            <h3>Cracker Snap</h3>
+                            <img  src="./assets/images/Cracker-Snap-Icon.png" />
+                        </div>
+                        <div id="twoLaneSplattop" stage-value="13" class="stage stage-stricken stage-unselectable">
+                            <h3>Two-Lane Splattop</h3>
+                            <img  src="./assets/images/Two-Lane-Icon.png" />
+                        </div>
+                        <div id="pedalToTheMedal" stage-value="14" class="stage stage-stricken stage-unselectable">
+                            <h3>Pedal to the Metal</h3>
+                            <img  src="./assets/images/Pedal-Icon.png" />
+                        </div>
+                        <div id="overTheLine" stage-value="15" class="stage stage-stricken stage-unselectable">
+                            <h3>Over the Line</h3>
+                            <img  src="./assets/images/Over-the-Line-Icon.png" />
+                        </div>
                     </div>
                 </div>
+                <div id="play-game">
+                    <p id="game-info"></p>
+                    <p></p>
+                </div>
+                <a id="requeue-button" href="/queue"><div class="button">Queue Again</div></a>
+                <div id="leave-match-button" class="button">Leave Match</div>
             </div>
-            <div id="play-game">
-                <p id="game-info"></p>
-                <p></p>
-            </div>
-            <a id="requeue-button" href="/queue"><div class="button">Queue Again</div></a>
-            <div id="leave-match-button" class="button">Leave Match</div>
         </div>
     </main>
   </body>

@@ -318,12 +318,17 @@ function displayRecentMatches(recentMatchData) {
                 matchupCell.append( matchPlayer1 );
                 matchupCell.append( player1Score );
 
+                let matchLink = document.createElement('a');
+                matchLink.href = '/game?matchID=' + match.id;
+
                 let vsImg = document.createElement('img');
                 vsImg.classList.add('recent-matchup-vs');
                 vsImg.src = '/assets/images/vs-icon.png';
 
+                matchLink.append(vsImg);
+
                 //matchupCell.append('vs');
-                matchupCell.append(vsImg);
+                matchupCell.append(matchLink);
                 matchupCell.append( player2Score );
                 matchupCell.append( matchPlayer2 );
 
