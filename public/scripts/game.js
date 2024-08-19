@@ -1346,10 +1346,11 @@ socket.on("connect_error", (err) => {
   Context: ${err.context}
 
   Attempting to rejoin`);
+  socket.io.reconnect();
   socket.emit('join', 'match' + matchId);
 });
 
-/*socket.on("disconnect", (reason, details) => {
+socket.on("disconnect", (reason, details) => {
   alert(`Socket disconnect. This shouldnt be pushed to prod!
 
   Reason: ${reason}
@@ -1358,5 +1359,9 @@ socket.on("connect_error", (err) => {
   
   Decription: ${details.description}
   
-  Context: ${details.context}`);
-});*/
+  Context: ${details.context}
+
+  Attempting to rejoin`);
+  socket.io.reconnect();
+  socket.emit('join', 'match' + matchId);
+});
