@@ -515,7 +515,7 @@ socket.on('matchReady', (matchID) => {
     window.location.href = '/game?matchID=' + matchID;
 });
 
-socket.on("connect_error", (err) => {
+socket.on("connect_error", async (err) => {
   /*alert(`Socket connection error. Please report this to the devs! (And reload the page to reconnect).
   
   Message: ${err.message}
@@ -526,7 +526,7 @@ socket.on("connect_error", (err) => {
     await reconnectSocket();
 });
 
-socket.on("disconnect", (reason, details) => {
+socket.on("disconnect", async (reason, details) => {
   /*alert(`Socket disconnect. This shouldnt be pushed to prod!
 
   Reason: ${reason}
