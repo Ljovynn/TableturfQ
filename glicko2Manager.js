@@ -21,16 +21,16 @@ export var settings = {
 export async function ApplyMatchEloResults(match){
 
   //get rank data
-  var player1Data = await GetUserRankData(match.players[0].id);
-  var player2Data = await GetUserRankData(match.players[1].id);
+  let player1Data = await GetUserRankData(match.players[0].id);
+  let player2Data = await GetUserRankData(match.players[1].id);
   if (!player1Data || !player2Data) return false;
 
   //initialize g2 player rankings
-  var ranking = new glicko2.Glicko2(settings);
-  var player1 = ranking.makePlayer(player1Data.g2_rating, player1Data.g2_rd, player1Data.g2_vol);
-  var player2 = ranking.makePlayer(player2Data.g2_rating, player2Data.g2_rd, player2Data.g2_vol);
+  let ranking = new glicko2.Glicko2(settings);
+  let player1 = ranking.makePlayer(player1Data.g2_rating, player1Data.g2_rd, player1Data.g2_vol);
+  let player2 = ranking.makePlayer(player2Data.g2_rating, player2Data.g2_rd, player2Data.g2_vol);
 
-  var matchResult;
+  let matchResult;
   switch (match.status){
     case matchStatuses.player1Win:
       matchResult = 1;
@@ -45,8 +45,8 @@ export async function ApplyMatchEloResults(match){
   ranking.addResult(player1, player2, matchResult);
   ranking.calculatePlayersRatings();
 
-  var newPlayer1Rating = player1.getRating();
-  var newPlayer2Rating = player2.getRating();
+  let newPlayer1Rating = player1.getRating();
+  let newPlayer2Rating = player2.getRating();
 
   //update database
   try {
@@ -60,7 +60,7 @@ export async function ApplyMatchEloResults(match){
   if (player1Data.hide_rank) newPlayer1Rating = null;
   if (player2Data.hide_rank) newPlayer2Rating = null;
 
-  var data = {
+  let data = {
     newPlayer1Rating,
     newPlayer2Rating
   }

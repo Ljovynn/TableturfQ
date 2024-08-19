@@ -65,7 +65,7 @@ export async function execute(interaction) {
     const date = interaction.options.getInteger('date');
     const isEvent = interaction.options.getBoolean('isevent');
 
-    var newAnnouncementId = await SetNewAnnouncement(title, description, iconSrc, date, isEvent);
+    let newAnnouncementId = await SetNewAnnouncement(title, description, iconSrc, date, isEvent);
 
     //if error
     if (typeof(newAnnouncementId) === 'string'){

@@ -29,7 +29,7 @@ export const data = new SlashCommandBuilder()
 export async function autocomplete(interaction){
     const focusedValue = interaction.options.getFocused();
 	const choices = GetCardListByLanguage('ja');
-    var filteredChoices = [];
+    let filteredChoices = [];
     for (let i = 0; i < choices.length; i++){
         if (choices[i].sanitizedName.search(SanitizeString(focusedValue)) != -1) filteredChoices.push(choices[i].name);
     }
@@ -42,7 +42,7 @@ export async function autocomplete(interaction){
 }
 
 export async function execute(interaction) { 
-    var card;
+    let card;
 
     const subCommand = interaction.options.getSubcommand();
     if (subCommand === 'byname'){

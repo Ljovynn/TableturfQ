@@ -29,7 +29,7 @@ router.post("/GetUserMatchHistory", async (req, res) => {
 
         const matchHistory = await GetUserMatchHistory(userId, matchHistoryHitsPerPage, pageNumber);
 
-        var users = null;
+        let users = null;
         if (matchHistory.length > 0) users = await GetUsers(matchHistory);
 
         res.status(200).send({matchHistory, users});
@@ -54,7 +54,7 @@ router.get("/GetRecentMatches", async (req, res) => {
 });
 
 async function GetUsers(matches){
-    var userIdList = [];
+    let userIdList = [];
     for (let i = 0; i < matches.length; i++){
         if (!userIdList.some((player) => player.id === matches[i].player1_id) && matches[i].player1_id !== null) userIdList.push(matches[i].player1_id);
         if (!userIdList.some((player) => player.id === matches[i].player2_id) && matches[i].player2_id !== null) userIdList.push(matches[i].player2_id);

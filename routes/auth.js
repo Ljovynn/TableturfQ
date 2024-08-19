@@ -115,24 +115,24 @@ async function StoreUserData(accessToken, refreshToken, userId){
         },
     });
 
-    var avatar = null;
+    let avatar = null;
     if (response.data.avatar) avatar = HandleAvatarGif(response.data.avatar);
 
     //If logged in to account, update that account
     if (userId){
-        var user = await GetUserData(userId);
+        let user = await GetUserData(userId);
         if (user && user.role == userRoles.unverified){
             await VerifyAccount(userId, response.data.id, response.data.username, accessToken, refreshToken, avatar);
             return userId;
         }
     }
 
-    var newUser = await GetUserByDiscordId(response.data.id);
-    var newUserId;
+    let newUser = await GetUserByDiscordId(response.data.id);
+    let newUserId;
     if (!newUser){
         newUserId = GenerateNanoId();
 
-        var username = response.data.global_name;
+        let username = response.data.global_name;
         if (!username) username = response.data.username;
 
         await CreateUserWithDiscord(newUserId, username, response.data.id, response.data.username, accessToken, refreshToken, avatar);

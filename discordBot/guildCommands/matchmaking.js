@@ -21,7 +21,7 @@ export const data = new SlashCommandBuilder()
 
 export async function execute(interaction) { 
     const subCommand = interaction.options.getSubcommand();
-    var enabled = true;
+    let enabled = true;
     if (subCommand === 'status'){
         const statusEmbed = BuildSimpleEmbed('Matchmaking status:', `Enabled: ${GetQueAvailible()}`, '\u200B');
 

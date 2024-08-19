@@ -17,7 +17,7 @@ var announcements = [];
 
 export async function AnnouncementManagerSetup(){
     try {
-        var data = await GetFutureAnnouncements();
+        let data = await GetFutureAnnouncements();
     } catch (error){
         console.log(error);
     }
@@ -28,7 +28,7 @@ export async function AnnouncementManagerSetup(){
 }
 
 export function DeletePastAnnouncements(){
-    var cutoffDate = (Date.now() - announcementLifeAfterDate) / 1000;
+    let cutoffDate = (Date.now() - announcementLifeAfterDate) / 1000;
     for (let i = announcements.length - 1; i >= 0; i--){
         if (announcements[i].date >= cutoffDate) continue;
 
@@ -42,8 +42,8 @@ export function GetNextAnnouncementInfo(){
 }
 
 export function GetUpcomingAnnouncementInfos(){
-    var cutoffDate = (Date.now() + upcomingAnnouncementCutoff) / 1000;
-    var result = [];
+    let cutoffDate = (Date.now() + upcomingAnnouncementCutoff) / 1000;
+    let result = [];
     for (let i = 0; i < announcements.length; i++){
         if (announcements[i].date >= cutoffDate) break;
 
@@ -54,9 +54,9 @@ export function GetUpcomingAnnouncementInfos(){
 
 export async function SetNewAnnouncement(title, description, iconSrc, date, isEvent){
     try {
-        var announcementId = await CreateAnnouncement(title, description, iconSrc, date, isEvent);
+        let announcementId = await CreateAnnouncement(title, description, iconSrc, date, isEvent);
 
-        var announcement = new Announcement(announcementId, title, description, iconSrc, date, isEvent);
+        let announcement = new Announcement(announcementId, title, description, iconSrc, date, isEvent);
         announcements.push(announcement);
         announcements.sort((a, b) => a.date - b.date);
 

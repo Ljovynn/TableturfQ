@@ -132,8 +132,8 @@ export async function SendDisputeMessage(matchDisputes, sendNewMessage){
 		if (!channel) return;
 
 		//build embed
-		var fields = [];
-		var limit = Math.min(matchDisputes.length, 25);
+		let fields = [];
+		let limit = Math.min(matchDisputes.length, 25);
 
 		for (let i = 0; i < limit; i++){
 			var field = {
@@ -178,13 +178,13 @@ export async function SendNewSuspiciousAction(suspiciousAction){
 		if (!channel) return;
 
 		//build embed
-		var fields = [];
+		let fields = [];
 
 		for (let i = 0; i < suspiciousActionsList.length; i++){
-			var user = await GetUserData(suspiciousActionsList[i].userId);
+			let user = await GetUserData(suspiciousActionsList[i].userId);
 			if (!user) continue;
 
-			var field = {
+			let field = {
 				name: `User ${SanitizeDiscordLog(user.username)}\nID ${SanitizeDiscordLog(user.id)}`,
 				value: `${suspiciousActionsList[i].description}\n\n<t:${suspiciousActionsList[i].timestamp}:f>`,
 			}

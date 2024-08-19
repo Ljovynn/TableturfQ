@@ -21,7 +21,7 @@ router.post("/PlayerEnterQue", async (req, res) => {
         if (await CheckUserBanned(userId)) return SetErrorResponse(res, userErrors.banned);
         if (typeof(matchMode) !== 'string') return SetErrorResponse(res, definitionErrors.matchModeUndefined);
 
-        var responseData = await AddPlayerToQue(userId, matchMode);
+        let responseData = await AddPlayerToQue(userId, matchMode);
         if (!ResponseSucceeded(responseData.code)) return SetErrorResponse(res, responseData);
 
         res.status(responseData.code).send({});
@@ -58,16 +58,16 @@ router.post("/PlayerReady", async (req, res) => {
 
         if (!CheckUserDefined(req)) return SetErrorResponse(res, userErrors.notLoggedIn);
 
-        var responseData = await PlayerSentReady(userId);
+        let responseData = await PlayerSentReady(userId);
         if (!ResponseSucceeded(responseData.code)) return SetErrorResponse(res, responseData);
         res.status(responseData.code).send({});
 
         if (!responseData.data) return;
 
-        var match = responseData.data;
+        let match = responseData.data;
         
-        var player1Room = "userRoom" + match.players[0].id.toString();
-        var player2Room = "userRoom" + match.players[1].id.toString();
+        let player1Room = "userRoom" + match.players[0].id.toString();
+        let player2Room = "userRoom" + match.players[1].id.toString();
         SendSocketMessage(player1Room, "matchReady", match.id.toString());
         SendSocketMessage(player2Room, "matchReady", match.id.toString());
     } catch (err){
@@ -78,7 +78,7 @@ router.post("/PlayerReady", async (req, res) => {
 
 router.get('/GetMatchmakingStatus', async (req, res) => {
     try {
-        var data = GetQueAvailible();
+        let data = GetQueAvailible();
 
         res.status(200).send(data);
     } catch (err){

@@ -39,7 +39,7 @@ export const data = new SlashCommandBuilder()
 export async function autocomplete(interaction){
     const focusedValue = interaction.options.getFocused();
 	const choices = GetCardListByLanguage('en');
-    var filteredChoices = [];
+    let filteredChoices = [];
     for (let i = 0; i < choices.length; i++){
         if (choices[i].sanitizedName.search(SanitizeString(focusedValue)) != -1) filteredChoices.push(choices[i].name);
     }
@@ -50,7 +50,7 @@ export async function autocomplete(interaction){
 }
 
 export async function execute(interaction) { 
-    var card;
+    let card;
 
     const subCommand = interaction.options.getSubcommand();
     if (subCommand === 'byname'){
@@ -74,7 +74,7 @@ export function BuildCardEmbed(card, level){
 		return noCardEmbed;
     }
 
-	var cardTitle = card.name;
+	let cardTitle = card.name;
 
 	switch (level){
 		case 2: cardTitle += ' ★★';
@@ -83,7 +83,7 @@ export function BuildCardEmbed(card, level){
 		break;
 	}
 
-	var tempFooter = null;
+	let tempFooter = null;
 	//temp solution for missing JP cards
 	if (level == 4 && card.id > 209){
 		level = 1;

@@ -57,22 +57,22 @@ var recentlyMatchedPlayersList = [];
 export async function AddPlayerToQue(playerId, matchMode){
     if (!queAvailible) return enterQueErrors.queUnavailible;
 
-    var que = GetQueFromMatchmode(matchMode);
+    let que = GetQueFromMatchmode(matchMode);
     if (!que) return enterQueErrors.illegalMatchMode;
     
     if (FindIfPlayerInQue(playerId)) return enterQueErrors.inQue;
     if (FindIfPlayerInMatch(playerId)) return enterQueErrors.inMatch; 
 
-    var user = await GetUserRankData(playerId);
+    let user = await GetUserRankData(playerId);
     if (!user) return enterQueErrors.noUser;
     if (que.matchMode == matchModes.ranked){
         if (user.role == userRoles.unverified) return enterQueErrors.unverified;
     }
 
-    var index = SearchMatchedPlayersList(matchingPlayersList, playerId);
+    let index = SearchMatchedPlayersList(matchingPlayersList, playerId);
     if (index != -1) return enterQueErrors.inQue;
 
-    var baseSearchElo = Math.max(user.g2_rating, queDatas[que.matchMode].minEloStart);
+    let baseSearchElo = Math.max(user.g2_rating, queDatas[que.matchMode].minEloStart);
     baseSearchElo = Math.min(user.g2_rating, queDatas[que.matchMode].maxEloStart);
 
     que.players.push(new PlayerInQue(playerId, baseSearchElo));
@@ -84,9 +84,9 @@ export async function MatchMakingTick(){
     CheckMatchmadePlayers();
     CheckRecentlyMatchedPlayers();
     
-    var newlyMatchedPlayers = [];
+    let newlyMatchedPlayers = [];
     for (let i = 0; i < ques.length; i++){
-        var matchedPlayers = await QueTick(ques[i]);
+        let matchedPlayers = await QueTick(ques[i]);
         if (matchedPlayers) newlyMatchedPlayers.push(matchedPlayers);
     }
 
@@ -96,21 +96,21 @@ export async function MatchMakingTick(){
 
     //set up match
     for (let i = 0; i < newlyMatchedPlayers.length; i++){
-        var que = GetQueFromMatchmode(newlyMatchedPlayers[i].matchMode);
+        let que = GetQueFromMatchmode(newlyMatchedPlayers[i].matchMode);
         if (queDatas[newlyMatchedPlayers[i].matchMode].readyTimer == 0){
             RemovePlayersFromQue(que.players, newlyMatchedPlayers[i].players[0], newlyMatchedPlayers[i].players[1]);
-            var match = MakeNewMatch(newlyMatchedPlayers[i].players[0], newlyMatchedPlayers[i].players[1], newlyMatchedPlayers[i].matchMode);
+            let match = MakeNewMatch(newlyMatchedPlayers[i].players[0], newlyMatchedPlayers[i].players[1], newlyMatchedPlayers[i].matchMode);
 
-            var player1Room = "userRoom" + match.players[0].id.toString();
-            var player2Room = "userRoom" + match.players[1].id.toString();
+            let player1Room = "userRoom" + match.players[0].id.toString();
+            let player2Room = "userRoom" + match.players[1].id.toString();
             SendSocketMessage(player1Room, "matchReady", match.id);
             SendSocketMessage(player2Room, "matchReady", match.id);
         } else{
             RemovePlayersFromQue(que.players, newlyMatchedPlayers[i].players[0], newlyMatchedPlayers[i].players[1]);
             matchingPlayersList.push(new MatchedPlayers(newlyMatchedPlayers[i].players[0], newlyMatchedPlayers[i].players[1], newlyMatchedPlayers[i].matchMode));
 
-            var player1Room = "userRoom" + newlyMatchedPlayers[i].players[0].toString();
-            var player2Room = "userRoom" + newlyMatchedPlayers[i].players[1].toString();
+            let player1Room = "userRoom" + newlyMatchedPlayers[i].players[0].toString();
+            let player2Room = "userRoom" + newlyMatchedPlayers[i].players[1].toString();
             SendEmptySocketMessage(player1Room, "matchFound");
             SendEmptySocketMessage(player2Room, "matchFound");
         }
@@ -122,7 +122,7 @@ export async function MatchMakingTick(){
 async function QueTick(que){
     //set all players search range
     for (let i = 0; i < que.players.length; i++){
-        var secondsPlayerWaited = (Date.now() - que.players[i].startedQue) / 1000;
+        let secondsPlayerWaited = (Date.now() - que.players[i].startedQue) / 1000;
         que.players[i].eloSearchRange = Math.min(queDatas[que.matchMode].baseEloRange + (secondsPlayerWaited * queDatas[que.matchMode].eloGrowthPerSecond), queDatas[que.matchMode].maxEloRange);
     }
 
@@ -138,11 +138,11 @@ function FindPlayersToMatch(que){
             if (que.players[j].baseSearchElo - que.players[j].eloSearchRange > que.players[i].baseSearchElo + que.players[i].eloSearchRange) continue;
 
             //check if players didn't match recently
-            var index = SearchMatchedPlayersList(recentlyMatchedPlayersList, que.players[i].id);
+            let index = SearchMatchedPlayersList(recentlyMatchedPlayersList, que.players[i].id);
             if (index != -1){
                 if (recentlyMatchedPlayersList[index].players[0].id == que.players[j].id || recentlyMatchedPlayersList[index].players[1].id == que.players[j].id) continue;
             }
-            var data = {
+            let data = {
                 players: [que.players[i].id, que.players[j].id],
                 matchMode: que.matchMode,
                 matchId: 0
@@ -175,7 +175,7 @@ export function FindIfPlayerInQue(playerId){
     for (let i = 0; i < ques.length; i++){
         for (let j = 0; j < ques[i].players.length; j++){
             if (ques[i].players[j].id == playerId){
-                var data = {
+                let data = {
                     matchMode: ques[i].matchMode, 
                     timeQueStarted: ques[i].players[j].startedQue
                 };
@@ -187,7 +187,7 @@ export function FindIfPlayerInQue(playerId){
 }
 
 export function FindIfPlayerWaitingForReady(playerId){
-    var data = {
+    let data = {
     matchMode: null,
     ready: false,
     timeWaitingStarted: null,
@@ -212,7 +212,7 @@ export function FindIfPlayerWaitingForReady(playerId){
 
 //doesnt remove from ready list
 export function RemovePlayerFromQue(playerId, matchMode){
-    var que = GetQueFromMatchmode(matchMode);
+    let que = GetQueFromMatchmode(matchMode);
     for (let i = 0; i < que.players.length; i++){
         if (que.players[i].id == playerId){
             que.players.splice(i, 1);
@@ -232,14 +232,14 @@ export function RemovePlayerFromAnyQue(playerId){
             }
         }
     }
-    var index = SearchMatchedPlayersList(matchingPlayersList, playerId);
+    let index = SearchMatchedPlayersList(matchingPlayersList, playerId);
     if (index != -1) matchingPlayersList.splice(index, 1);
     return false;
 }
 
 export function AddRecentlyMatchedPlayers(player1Id, player2Id, matchMode){
     //delete older data
-    var index = SearchMatchedPlayersList(recentlyMatchedPlayersList, player1Id);
+    let index = SearchMatchedPlayersList(recentlyMatchedPlayersList, player1Id);
     if (index != -1) recentlyMatchedPlayersList.splice(index, 1);
     index = SearchMatchedPlayersList(recentlyMatchedPlayersList, player2Id);
     if (index != -1) recentlyMatchedPlayersList.splice(index, 1);
@@ -254,18 +254,18 @@ function RemovePlayersFromQue(playersArr, player1Id, player2Id){
 }
 
 export async function PlayerSentReady(playerId){
-    var index = SearchMatchedPlayersList(matchingPlayersList, playerId);
+    let index = SearchMatchedPlayersList(matchingPlayersList, playerId);
     if (index == -1) return readyUpErrors.notMatched;
-    var playerPos = FindPlayerPositionInMatchedPlayers(matchingPlayersList[index], playerId);
+    let playerPos = FindPlayerPositionInMatchedPlayers(matchingPlayersList[index], playerId);
     matchingPlayersList[index].players[playerPos - 1].ready = true;
-    var match = await CheckIfBothPlayersReady(index)
+    let match = await CheckIfBothPlayersReady(index)
     return new ResponseData(201, match);
 }
 
 async function CheckIfBothPlayersReady(matchingPlayersListIndex){
-    var matchingPlayers = matchingPlayersList[matchingPlayersListIndex];
+    let matchingPlayers = matchingPlayersList[matchingPlayersListIndex];
     if (matchingPlayers.players[0].ready && matchingPlayers.players[1].ready){
-        var match = MakeNewMatch(matchingPlayers.players[0].id, matchingPlayers.players[1].id, matchingPlayers.matchMode);
+        let match = MakeNewMatch(matchingPlayers.players[0].id, matchingPlayers.players[1].id, matchingPlayers.matchMode);
         matchingPlayersList.splice(matchingPlayersListIndex, 1);
         return match;
     }

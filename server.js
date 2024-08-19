@@ -98,7 +98,7 @@ const server = app.listen(port, () => {
 CreateSocketConnection(server);
 
 async function TickCancelOldMatches(){
-    var cancelledMatchIds = await CancelOldMatches(matchDeletionThreshold);
+    let cancelledMatchIds = await CancelOldMatches(matchDeletionThreshold);
     for (let i = 0; i < cancelledMatchIds.length; i++){
         SendSocketMessage('match' + cancelledMatchIds[i], "matchCancelled");
     }

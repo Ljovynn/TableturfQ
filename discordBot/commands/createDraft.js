@@ -110,7 +110,7 @@ export async function execute(interaction) {
             }
         );
 
-        var timerString = 'None';
+        let timerString = 'None';
         if (timer != 0) timerString = `${timer} seconds`;
         
         if (response.status != 201){

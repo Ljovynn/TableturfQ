@@ -18,8 +18,8 @@ const commands = [];
 const guildCommands = [];
 
 export async function Deploy(){
-	var folderPath = path.join(__dirname, 'commands');
-	var commandFolder = fs.readdirSync(folderPath);
+	let folderPath = path.join(__dirname, 'commands');
+	let commandFolder = fs.readdirSync(folderPath);
 
 	for (const file of commandFolder) {
 		const filePath = `./commands/${file}`;
