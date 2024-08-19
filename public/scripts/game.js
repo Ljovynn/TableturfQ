@@ -1211,6 +1211,7 @@ function sanitizeInput(s) {
 socket.emit('join', 'match' + matchId);
 
 socket.on('connection', async () => {
+    console.log('connecting');
     await setMatchInfo();
 });
 
@@ -1342,7 +1343,10 @@ socket.on("connect_error", (err) => {
   
   Decription: ${err.description}
   
-  Context: ${err.context}`);
+  Context: ${err.context}
+
+  Attempting to rejoin`);
+  socket.emit('join', 'match' + matchId);
 });
 
 /*socket.on("disconnect", (reason, details) => {
