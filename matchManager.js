@@ -64,12 +64,12 @@ export async function CancelOldMatches(cutoffTime){
 export function MakeNewMatch(player1Id, player2Id, matchMode, privateBattle = false, setLength = null){
 
     //randomize player positions
-    /*let r = Math.floor(Math.random() * 2);
+    let r = Math.floor(Math.random() * 2);
     if (r == 1){
         let tempId = player1Id;
         player1Id = player2Id;
         player2Id = tempId;
-    }*/
+    }
 
     const matchId = GenerateNanoId();
 
