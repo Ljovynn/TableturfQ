@@ -175,22 +175,26 @@ for (let stage of stages ) {
         if ( currentStriker == userID ) {
             if ( stage.classList.contains('stage-selectable') ) {
                 // Prevent toggle for new stages when you have no strikes remaining for that round of striking
-                if ( strikesRemaining != 0 || stage.classList.contains('stage-selected') ) {
+                /*if ( strikesRemaining != 0 || stage.classList.contains('stage-selected') ) {
                     stage.classList.toggle('stage-selected');
-                }
+                }*/
                 var stageValue = parseInt(stage.getAttribute('stage-value'));
 
                 // Add/Remove stage from the list of strikes that will be sent off to the server when the confirm strikes button is selected
                 var i = stageStrikes.indexOf( stageValue );
-                console.log(i);
                 if ( i === -1 ) {
                     // Don't go into negative strikes
                     if ( strikesRemaining > 0 ) {
                         strikesRemaining = strikesRemaining - 1;
-                        stageStrikes.push( stageValue );
+                    } else{
+                        stages[stageStrikes[0] - 1].classList.remove('stage-selected');
+                        stageStrikes.shift();
                     }
+                    stage.classList.add('stage-selected');
+                    stageStrikes.push( stageValue );
                 } else {
                     strikesRemaining = strikesRemaining + 1;
+                    stage.classList.remove('stage-selected');
                     stageStrikes.splice(i,1);
                 }
 
