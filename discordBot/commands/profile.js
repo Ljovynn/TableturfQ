@@ -40,7 +40,7 @@ export async function execute(interaction) {
 	const lastPlayedValue = (matches[0]) ? `<t:${matches[0].unix_created_at}:R>` : (matchCount > 0) ? 'Over 3 months ago' : 'Never';
 	const joinedValue = `<t:${user.unix_created_at}:D>`;
 
-    var profileFields = [ 
+    let profileFields = [ 
 	{
         name: 'Rating',
         value: ratingValue,

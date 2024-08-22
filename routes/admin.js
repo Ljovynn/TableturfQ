@@ -24,12 +24,12 @@ router.post("/ResolveDispute", async (req, res) => {
         if (typeof(matchId) !== 'string') return SetErrorResponse(res, definitionErrors.matchUndefined);
         if (typeof(resolveOption) !== 'number') return SetErrorResponse(res, definitionErrors.resolveOptionUndefined);
 
-        var userError = await CheckIfNotAdmin(req);
+        let userError = await CheckIfNotAdmin(req);
         if (userError) return SetErrorResponse(res, userError);
 
-        var responseData = await ResolveMatchDispute(matchId, resolveOption);
+        let responseData = await ResolveMatchDispute(matchId, resolveOption);
         if (!ResponseSucceeded(responseData.code)) return SetErrorResponse(res, responseData);
-        var matchData = responseData.data;
+        let matchData = responseData.data;
 
         if (responseData.data === matchModes.casual){
             res.status(responseData.code).send({});
@@ -42,7 +42,7 @@ router.post("/ResolveDispute", async (req, res) => {
             case disputeResolveOptions.gameWinPlayer2:
                 if (responseData.data.matchFinished){
                     res.status(responseData.code).send({});
-                    var data = {winnerId: winnerId, newPlayerRatings: matchData.newPlayerRatings};
+                    let data = {winnerId: winnerId, newPlayerRatings: matchData.newPlayerRatings};
                     SendSocketMessage('match' + matchId, "matchWin", data);
                 } else{
                     res.status(responseData.code).send({});
@@ -52,7 +52,7 @@ router.post("/ResolveDispute", async (req, res) => {
             case disputeResolveOptions.matchWinPlayer1:
             case disputeResolveOptions.matchWinPlayer2:
                 res.status(responseData.code).send({});
-                var data = {winnerId: winnerId, newPlayerRatings: matchData.newPlayerRatings};
+                let data = {winnerId: winnerId, newPlayerRatings: matchData.newPlayerRatings};
                 SendSocketMessage('match' + matchId, "matchWin", data);
                 break;
             case disputeResolveOptions.noChanges:
@@ -84,10 +84,10 @@ router.post("/BanUser", async (req, res) => {
         if (typeof(reason) !== 'string' && typeof(reason) !== 'undefined') return SetErrorResponse(res, definitionErrors.banReasonWrongFormat);
         if (reason.length > 128) return SetErrorResponse(res, definitionErrors.banReasonTooLong);
 
-        var userError = await CheckIfNotAdmin(req);
+        let userError = await CheckIfNotAdmin(req);
         if (userError) return SetErrorResponse(res, userError);
 
-        var bannedUser = await GetUserBanAndRole(bannedUserId);
+        let bannedUser = await GetUserBanAndRole(bannedUserId);
 
         if (!bannedUser) return SetErrorResponse(res, definitionErrors.userNotDefined);
 
@@ -118,7 +118,7 @@ router.post("/UnbanUser", async (req, res) => {
 
         if (typeof(unbannedUserId) !== 'string') return SetErrorResponse(res, definitionErrors.unbannedUserUndefined);
 
-        var userError = await CheckIfNotAdmin(req);
+        let userError = await CheckIfNotAdmin(req);
         if (userError) return SetErrorResponse(res, userError);
 
         await UnbanUser(unbannedUserId);
@@ -139,12 +139,12 @@ router.post("/GetUserBanInfo", async (req, res) => {
 
         if (typeof(bannedUserId) !== 'string') return SetErrorResponse(res, definitionErrors.unbannedUserUndefined);
 
-        var userError = await CheckIfNotAdmin(req);
+        let userError = await CheckIfNotAdmin(req);
         if (userError) return SetErrorResponse(res, userError);
 
-        var banInfo = await GetUserBanState(bannedUserId);
+        let banInfo = await GetUserBanState(bannedUserId);
 
-        var data = {
+        let data = {
             banned: false,
         }
         if (banInfo){
@@ -170,14 +170,14 @@ router.post("/ModChatMessage", async (req, res) => {
         if (typeof(matchId) !== 'string') return SetErrorResponse(res, definitionErrors.matchUndefined);
         if (typeof(message) !== 'string') return SetErrorResponse(res, definitionErrors.chatMessageUndefined);
         
-        var userError = await CheckIfNotAdmin(req);
+        let userError = await CheckIfNotAdmin(req);
         if (userError) return SetErrorResponse(res, userError);
 
-        var responseData = await ModSentChatMessage(matchId, userId, message)
+        let responseData = await ModSentChatMessage(matchId, userId, message)
         if (!ResponseSucceeded(responseData.code)) return SetErrorResponse(res, responseData);
 
         res.status(responseData.code).send({});
-        var socketMessage = {ownerId: userId, content: message, date: Date.now()};
+        let socketMessage = {ownerId: userId, content: message, date: Date.now()};
         SendSocketMessage('match' + matchId, "chatMessage", socketMessage);
     } catch (err){
         console.error(err);
@@ -189,11 +189,11 @@ router.post("/ModChatMessage", async (req, res) => {
 
 router.get('/GetDisputedMatchesList', async (req, res) => {
     try {
-        var userId = req.session.user;
-        var userError = await CheckIfNotAdmin(req);
+        let userId = req.session.user;
+        let userError = await CheckIfNotAdmin(req);
         if (userError) return SetErrorResponse(res, userError);
 
-        var data = GetDisputedMatchesList(userId);
+        let data = GetDisputedMatchesList(userId);
 
         res.status(200).send(data);
     } catch (err){
@@ -206,7 +206,7 @@ export default router;
 
 async function CheckIfNotAdmin(req){
     if (!CheckUserDefined(req)) return userErrors.notLoggedIn;
-    var role = await GetUserRole(req.session.user);
+    let role = await GetUserRole(req.session.user);
     if (role != userRoles.mod){
         return userErrors.notAdmin;
     }

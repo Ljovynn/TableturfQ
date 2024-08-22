@@ -21,7 +21,7 @@ export async function CheckUserBanned(userId){
 
 export async function HandleBanUser(bannedUserId){
     RemovePlayerFromAnyQue(bannedUserId);
-    var matchData = await HandleBannedPlayerInMatch(bannedUserId);
+    let matchData = await HandleBannedPlayerInMatch(bannedUserId);
     if (!matchData) return;
 
     switch (matchData.mode){

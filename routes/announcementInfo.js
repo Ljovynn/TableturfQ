@@ -7,7 +7,7 @@ const router = Router();
 
 router.get('/GetNextAnnouncement', async (req, res) => {
     try {
-        var data = GetNextAnnouncementInfo();
+        let data = GetNextAnnouncementInfo();
 
         res.status(200).send(data);
     } catch (err){
@@ -17,7 +17,7 @@ router.get('/GetNextAnnouncement', async (req, res) => {
 
 router.get('/GetUpcomingAnnouncements', async (req, res) => {
     try {
-        var data = GetUpcomingAnnouncementInfos();
+        let data = GetUpcomingAnnouncementInfos();
 
         res.status(200).send(data);
     } catch (err){

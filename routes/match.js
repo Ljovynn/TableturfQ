@@ -43,7 +43,7 @@ router.post("/StrikeStages", async (req, res) => {
         if (!CheckUserDefined(req)) return SetErrorResponse(res, userErrors.notLoggedIn);
         if (!CheckIfArray(stages, res) || stages.length == 0) return SetErrorResponse(res, definitionErrors.stagesUndefined);
 
-        var responseData = PlayerSentStageStrikes(userId, stages);
+        let responseData = PlayerSentStageStrikes(userId, stages);
         if (!ResponseSucceeded(responseData.code)) return SetErrorResponse(res, responseData);
 
         res. sendStatus(responseData.code);
@@ -63,7 +63,7 @@ router.post("/PickStage", async (req, res) => {
         if (!CheckUserDefined(req)) return SetErrorResponse(res, userErrors.notLoggedIn);
         if (typeof(stage) !== 'number') return SetErrorResponse(res, definitionErrors.stageUndefined);
 
-        var responseData = PlayerSentStagePick(userId, stage);
+        let responseData = PlayerSentStagePick(userId, stage);
         if (!ResponseSucceeded(responseData.code)) return SetErrorResponse(res, responseData);
 
         res.status(responseData.code).send({});
@@ -82,15 +82,15 @@ router.post("/WinGame", async (req, res) => {
         if (!CheckUserDefined(req)) return SetErrorResponse(res, userErrors.notLoggedIn);
         if (typeof(winnerId) !== 'string') return SetErrorResponse(res, definitionErrors.winnerUndefined);
 
-        var responseData = await PlayerSentGameWin(userId, winnerId);
+        let responseData = await PlayerSentGameWin(userId, winnerId);
         if (!ResponseSucceeded(responseData.code)) return SetErrorResponse(res, responseData);
 
-        var matchData = responseData.data;
+        let matchData = responseData.data;
         SendSocketMessage('match' + matchData.matchId, "playerConfirmedWin", {playerId: userId, winnerId: winnerId});
         if (matchData.dispute){
             SendEmptySocketMessage('match' + matchData.matchId, "dispute");
         } else if (matchData.matchWin){
-            var data = {winnerId: winnerId, newPlayerRatings: matchData.newPlayerRatings}
+            let data = {winnerId: winnerId, newPlayerRatings: matchData.newPlayerRatings}
             SendSocketMessage('match' + matchData.matchId, "matchWin", data);
         } else if (matchData.confirmed){
             SendSocketMessage('match' + matchData.matchId, "gameWin", winnerId);
@@ -104,11 +104,11 @@ router.post("/WinGame", async (req, res) => {
 
 router.post("/CasualMatchEnd", async (req, res) => {
     try {
-        var userId = req.body.userId;
+        let userId = req.body.userId;
 
         if (!CheckUserDefined(req)) return SetErrorResponse(res, userErrors.notLoggedIn);
 
-        var responseData = await PlayerSentCasualMatchEnd(userId);
+        let responseData = await PlayerSentCasualMatchEnd(userId);
         if (!ResponseSucceeded(responseData.code)) return SetErrorResponse(res, responseData);
 
         res.status(responseData.code).send({});
@@ -121,16 +121,16 @@ router.post("/CasualMatchEnd", async (req, res) => {
 
 router.post("/ForfeitMatch", async (req, res) => {
     try {
-        var userId = req.body.userId;
+        let userId = req.body.userId;
 
         if (!CheckUserDefined(req)) return SetErrorResponse(res, userErrors.notLoggedIn);
 
-        var responseData = await PlayerSentForfeit(userId);
+        let responseData = await PlayerSentForfeit(userId);
         if (!ResponseSucceeded(responseData.code)) return SetErrorResponse(res, responseData);
 
-        var matchId = responseData.data.matchId;
+        let matchId = responseData.data.matchId;
 
-        var data = {
+        let data = {
             forfeitId: userId,
             newPlayerRatings: responseData.data.newPlayerRatings,
         }
@@ -145,11 +145,11 @@ router.post("/ForfeitMatch", async (req, res) => {
 
 router.post("/Dispute", async (req, res) => {
     try {
-        var userId = req.body.userId;
+        let userId = req.body.userId;
 
         if (!CheckUserDefined(req)) return SetErrorResponse(res, userErrors.notLoggedIn);
 
-        var responseData = PlayerSentMatchDispute(userId);
+        let responseData = PlayerSentMatchDispute(userId);
         if (!ResponseSucceeded(responseData.code)) return SetErrorResponse(res, responseData);
 
         res.status(responseData.code).send({});
@@ -165,7 +165,7 @@ router.post("/ResolveDispute", async (req, res) => {
         const userId = req.session.user;
         if (!CheckUserDefined(req)) return SetErrorResponse(res, userErrors.notLoggedIn);
 
-        var responseData = await PlayerSentResolveDispute(userId);
+        let responseData = await PlayerSentResolveDispute(userId);
         if (!ResponseSucceeded(responseData.code)) return SetErrorResponse(res, responseData);
 
         if (responseData.data === matchModes.casual){
@@ -198,11 +198,11 @@ router.post("/SendChatMessage", async (req, res) => {
         if (typeof(matchId) !== 'string') return SetErrorResponse(res, definitionErrors.matchUndefined);
         if (typeof(message) !== 'string') return SetErrorResponse(res, definitionErrors.chatMessageUndefined);
 
-        var responseData = await UserSentChatMessage(matchId, userId, message);
+        let responseData = await UserSentChatMessage(matchId, userId, message);
         if (!ResponseSucceeded(responseData.code)) return SetErrorResponse(res, responseData);
 
         res.status(responseData.code).send({});
-        var socketMessage = {ownerId: userId, content: message, date: Date.now()};
+        let socketMessage = {ownerId: userId, content: message, date: Date.now()};
         SendSocketMessage('match' + matchId, "chatMessage", socketMessage);
     } catch (err){
         res.sendStatus(500);
@@ -220,21 +220,21 @@ router.post("/LoadChatMessages", async (req, res) => {
         if (typeof(loadedMessagesAmount) !== 'number') return SetErrorResponse(res, definitionErrors.chatMessageUndefined);
         if (loadedMessagesAmount < 0) return SetErrorResponse(res, definitionErrors.chatMessageUndefined);
 
-        var userRole = userRoles.unverified;
+        let userRole = userRoles.unverified;
         if (userId) userRole = await GetUserRole(userId);
 
         //change after here, create match search first and DB query
-        var match = structuredClone(FindMatch(matchId));
-        var players = [];
-        var data = [];
+        let match = structuredClone(FindMatch(matchId));
+        let players = [];
+        let data = [];
         if (!match){
             let matchData = await GetMatch(matchId);
             if (!matchData) return SetErrorResponse(res, nullErrors.noMatch);
 
-            var chatMessages = await GetChatMessages(matchId, loadedMessagesAmount);
+            let chatMessages = await GetChatMessages(matchId, loadedMessagesAmount);
 
             for (let i = chatMessages.length - 1; i >= 0; i--){
-                var chatMessage = new ChatMessage(chatMessages[i].content, chatMessages[i].owner_id, chatMessages[i].unix_date);
+                let chatMessage = new ChatMessage(chatMessages[i].content, chatMessages[i].owner_id, chatMessages[i].unix_date);
                 data.push(chatMessage);
             }
             players = [matchData.player1_id, matchData.player2_id];
@@ -278,12 +278,12 @@ router.post("/GetMatchInfo", async (req, res) => {
 
         if (typeof(matchId) !== 'string') return SetErrorResponse(res, definitionErrors.matchUndefined);
 
-        var userRole = userRoles.unverified;
+        let userRole = userRoles.unverified;
         if (userId) userRole = await GetUserRole(userId);
 
-        var matchHidden = true;
+        let matchHidden = true;
 
-        var match = structuredClone(FindMatch(matchId));
+        let match = structuredClone(FindMatch(matchId));
         if (!match){
             matchHidden = false;
 
@@ -301,7 +301,7 @@ router.post("/GetMatchInfo", async (req, res) => {
             match = ConvertDBMatchToMatch(matchData, gameData, strikeData, chatMessages);
         }
 
-        var players = [null, null]
+        let players = [null, null]
         if (match.players[0].id !== null){
             players[0] = await GetUserData(match.players[0].id);
         }
@@ -323,7 +323,7 @@ router.post("/GetMatchInfo", async (req, res) => {
             match.chat.splice(0, match.chat.length - chatLoadLimit);
         }
 
-        var othersInChatIds = [null, 
+        let othersInChatIds = [null, 
         (players[0]) ? players[0].id : null,
         (players[1]) ? players[1].id : null];
 
@@ -335,7 +335,7 @@ router.post("/GetMatchInfo", async (req, res) => {
 
         const othersInChat = (othersInChatIds.length > 0) ? await GetUserChatData(othersInChatIds) : [];
 
-        var data = {
+        let data = {
             match: match,
             players: players,
             othersInChat: othersInChat

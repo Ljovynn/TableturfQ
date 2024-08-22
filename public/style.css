@@ -217,8 +217,20 @@ footer {
     margin: 10px auto;
 }
 
+.login-button {
+    color: white;
+}
+
+.login-button:hover {
+    color: white;
+}
+
 #guest-login {
     width: auto;
+}
+
+#guest-login-label {
+    width: 120px;
 }
 
 #homepage-play-now {
@@ -330,10 +342,6 @@ footer {
 #player1-in-game-name[href]:hover, #player2-in-game-name[href]:hover {
     color: #6858c2;
     text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
-}
-
-#player1-discord-name, #player2-discord-name {
-    display: none;
 }
 
 #player1-avatar, #player2-avatar {

@@ -108,8 +108,8 @@ export const data = new SlashCommandBuilder()
 export async function execute(interaction) {
     const subCommandGroup = interaction.options.getSubcommandGroup();
 
-    var discordUser;
-    var user;
+    let discordUser;
+    let user;
     if (subCommandGroup === 'bydiscord'){
         discordUser = interaction.options.getUser('user');
         user = await GetUserByDiscordId(discordUser.id);
@@ -128,7 +128,7 @@ export async function execute(interaction) {
         const banLengthObject = interaction.options.get('banlength', false);
         const banLength = (banLengthObject) ? banLengthObject.value : null;
         const reason = interaction.options.getString('reason', false);
-        var reasonEmbedText = (reason) ? reason : 'No reason provided.';
+        let reasonEmbedText = (reason) ? reason : 'No reason provided.';
 
         try{
             if (banLengthObject){

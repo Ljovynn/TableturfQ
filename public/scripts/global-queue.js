@@ -14,7 +14,7 @@ var queuedMatchMode;
 var ready = false;
 var readyUp;
 
-var readySound = new Audio('../assets/sounds/UI_Lobby_MatchStart_00.mp3');
+var readySound = new Audio('../assets/sounds/match-found');
 
 readyButton.addEventListener('click', async (e) => {
     console.log('User is ready for competitive match.');

@@ -31,7 +31,7 @@ export function CreateSocketConnection (server){
             if (room == 'userRoom'){
                 if (!userId) return; 
 
-                var userQueRoom = 'userRoom' + userId;
+                let userQueRoom = 'userRoom' + userId;
                 socket.join(userQueRoom);
                 return;
             }

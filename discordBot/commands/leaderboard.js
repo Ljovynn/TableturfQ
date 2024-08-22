@@ -19,7 +19,7 @@ export async function execute(interaction) {
     const startPosition = interaction.options.getInteger('position') ?? 1;
     const leaderboard = await GetLeaderboard(startPosition - 1, limit);
 
-    var leaderboardsFields = [ 
+    let leaderboardsFields = [ 
     {
         name: '\u200B',
         value: ''},
