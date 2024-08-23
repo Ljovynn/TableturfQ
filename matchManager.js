@@ -321,7 +321,7 @@ export async function PlayerSentForfeit(playerId){
 }
 
 async function CheckPlacements(playerId){
-    const rankedMatchCount = await GetUserSeasonRankedMatchCount(currentSeason.id);
+    const rankedMatchCount = await GetUserSeasonRankedMatchCount(playerId, currentSeason.id);
 
     if (rankedMatchCount == placementMatchCount){
         await SetUserHideRank(playerId, false);
