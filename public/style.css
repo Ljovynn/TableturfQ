@@ -675,7 +675,7 @@ footer {
 
 #user-match-history {
     display: block;
-    width: 80%;
+    width: 90%;
     margin: auto;
     outline: 2px solid #6858c2;
 }
@@ -1059,6 +1059,15 @@ div.recent-matchup-name {
 
 #admin-unban-player1-content, #admin-unban-player2-content {
     display: none;
+}
+
+/**** SMALLER WIDTH BREAK POINT ****/
+@media only screen and (max-width: 1574px) {
+    /**** PROFILE ****/
+
+    #user-match-history {
+        width: 100%;
+    }
 }
 
 /**** MOBILE STLYES ****/

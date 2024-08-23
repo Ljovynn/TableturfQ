@@ -14,7 +14,7 @@ var queuedMatchMode;
 var ready = false;
 var readyUp;
 
-var readySound = new Audio('../assets/sounds/match-found');
+var readySound = new Audio('../assets/sounds/match-found.wav');
 
 readyButton.addEventListener('click', async (e) => {
     console.log('User is ready for competitive match.');
@@ -54,6 +54,7 @@ async function getUserInfo() {
 }
 
 function openModal() {
+    readyButton.style.display = 'block';
     modal.classList.remove('hidden');
     overlay.classList.remove('hidden');
     overlay.scrollTop = 0;

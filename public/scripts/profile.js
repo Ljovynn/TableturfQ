@@ -368,6 +368,22 @@ async function setMatchHistory() {
                 let player2Name = document.createElement('div');
                 player2Name.classList.add('recent-matchup-name');
 
+                let player1Score = document.createElement('div');
+                player1Score.classList.add('recent-matchup-score');
+                if ( match.ranked ) {
+                    player1Score.innerHTML = match.player1_score;
+                } else {
+                    player1Score.innerHTML = `&ndash;`;
+                }
+
+                let player2Score = document.createElement('div');
+                player2Score.classList.add('recent-matchup-score');
+                if ( match.ranked ) {
+                    player2Score.innerHTML = match.player2_score;
+                } else {
+                    player2Score.innerHTML = `&ndash;`;
+                }
+
                 switch ( match.result ) {
                     case 0:
                     case 1:
@@ -376,11 +392,11 @@ async function setMatchHistory() {
                         break;
                     case 3:
                         // player 1 win
-                        player1Name.classList.add('recent-matchup-victor');
+                        player1Score.classList.add('recent-matchup-victor');
                         break;
                     case 4:
                         // player 2 win
-                        player2Name.classList.add('recent-matchup-victor');
+                        player2Score.classList.add('recent-matchup-victor');
                         break;
                     default:
                         //
@@ -397,6 +413,7 @@ async function setMatchHistory() {
                 matchPlayer2.append( player2Name );
 
                 matchupCell.append( matchPlayer1 );
+                matchupCell.append( player1Score );
 
                 let matchLink = document.createElement('a');
                 matchLink.href = '/game?matchID=' + match.id;
@@ -409,6 +426,7 @@ async function setMatchHistory() {
 
                 //matchupCell.append('vs');
                 matchupCell.append(matchLink);
+                matchupCell.append( player2Score );
                 matchupCell.append( matchPlayer2 );
 
                 /*let outcomeCell = document.createElement('div');

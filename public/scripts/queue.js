@@ -1,5 +1,5 @@
 import { PublicQueDatas } from "../constants/queData.js";
-import { userError } from "./error.js";
+import { userError, clearError } from "./error.js";
 
 // Elements
 const loading = document.getElementById('loading');
@@ -49,6 +49,8 @@ await setUserInfo();
 await getRecentMatches();
 
 joinCompetitive.addEventListener('click', async (e) => {
+    await clearError();
+
     console.log('User has joined the competitive queue');
     var data = { matchMode: 'ranked' }
     queuedMatchMode = 'ranked';
@@ -76,6 +78,8 @@ joinCompetitive.addEventListener('click', async (e) => {
 });
 
 joinCasual.addEventListener('click', async (e) => {
+    await clearError();
+
     console.log('User has joined the casual queue');
 
     // Check that there is a username entered
@@ -312,12 +316,10 @@ function displayRecentMatches(recentMatchData) {
                         break;
                     case 3:
                         // player 1 win
-                        //player1Name.classList.add('recent-matchup-victor');
                         player1Score.classList.add('recent-matchup-victor');
                         break;
                     case 4:
                         // player 2 win
-                        //player2Name.classList.add('recent-matchup-victor');
                         player2Score.classList.add('recent-matchup-victor');
                         break;
                     default:
