@@ -218,7 +218,7 @@ export async function GetUserRankedMatchCount(userId)
 }
 
 export async function GetUserSeasonRankedMatchCount(userId, seasonId){
-    const season = seasons.find(x => x.id === seasonId);
+    let season = seasons.find(x => x.id === seasonId);
     if (!season) season = currentSeason;
     const convertedStartDate = Math.floor(season.startDate / 1000);
     const convertedEndDate = Math.floor(season.endDate / 1000);
