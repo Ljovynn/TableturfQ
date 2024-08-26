@@ -243,6 +243,7 @@ toggleMatchChat.addEventListener('click', async (e) => {
         matchChatContent.classList.toggle('untoggled');
         matchStrikeContent.classList.toggle('untoggled');
         removeNotifications();
+        chatInput.focus();
     }
 });
 
@@ -970,7 +971,6 @@ function setCasualGame() {
 }
 
 function startGame() {
-    tabAlert(toggleMatchStrikes);
     playingStage.innerHTML = 'This game will be played on';
     playingStage.style.display = 'block';
     strikerSection.style.display = 'none';
@@ -1084,10 +1084,19 @@ async function gameFinish(winnerId) {
     requeueButton.style.display = 'block';
 }
 
+function playerResetDispute() {
+    needHelp.style.display = 'block';
+    playerRaiseDispute.style.display = 'none';
+}
+
 function showAdminDispute() {
     if ( user.role == 2 && match.status == 2 ) {
         adminContent.style.display = 'block';
     }
+}
+
+function hideAdminDispute() {
+    adminContent.style.display = 'none';
 }
 
 function showAdminBanInfo() {
@@ -1364,6 +1373,8 @@ socket.on('resolveDispute', async (resolveOption) => {
         alert('The dispute has been resolved.');
     }
     await setMatchInfo();
+    await playerResetDispute();
+    await hideAdminDispute();
     console.log(match);
     confirmationMessage.style.display = 'none';
     // If the game or the match has to be reset, go through the reset function

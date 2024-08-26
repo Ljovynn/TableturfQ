@@ -10,7 +10,7 @@ import { HandleBanUser } from './utils/userUtils.js';
 import { leaderboardLimit, userSearchLimit } from './public/constants/searchData.js';
 import { Deck, deckSearchPageLimit, deckSearchSortingOptions } from './public/constants/deckData.js';
 import { ranks } from './public/constants/rankData.js';
-import { seasons } from './public/constants/seasonData.js';
+import { currentSeason, seasons } from './public/constants/seasonData.js';
 
 dotenv.config();
 
@@ -218,8 +218,8 @@ export async function GetUserRankedMatchCount(userId)
 }
 
 export async function GetUserSeasonRankedMatchCount(userId, seasonId){
-    const season = seasons.find(x => x.id === seasonId);
-    if (!season) return 0;
+    let season = seasons.find(x => x.id === seasonId);
+    if (!season) season = currentSeason;
     const convertedStartDate = Math.floor(season.startDate / 1000);
     const convertedEndDate = Math.floor(season.endDate / 1000);
 
