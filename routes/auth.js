@@ -7,7 +7,7 @@ import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import path from 'path';
 
-import { GetUserByDiscordId, CreateUserWithDiscord, SetUserDiscord, CreateUser, GetUserData, VerifyAccount } from '../database.js';
+import { GetUserByDiscordId, CreateUserWithDiscord, SetUserDiscord, CreateUser, GetUserData, VerifyAccount, GetUserLoginData } from '../database.js';
 import { GenerateNanoId } from '../nanoIdManager.js';
 import { CheckUserDefined } from '../utils/checkDefined.js';
 import { authErrors, databaseErrors } from '../responses/authErrors.js';
@@ -39,12 +39,55 @@ router.post("/unverified/login", async (req, res) => {
     if (username.length < usernameMinLength || username.length > usernameMaxLength) return SetErrorResponse(res, definitionErrors.usernameWrongFormat);
     if (HasBadWords(username)) return SetErrorResponse(res, definitionErrors.usernameContainsBadWord);
 
-    const userId = GenerateNanoId();
-    await CreateUser(userId, username);
+    try{
+        await CreateUser(userId, username);
 
-    await SerializeSession(req, userId);
+        await SerializeSession(req, userId);
+    }catch(error){
+        console.log(error);
+        res.sendStatus(400);
+    }
+
+    const userId = GenerateNanoId();
 
     res.status(201).send({});
+});
+
+//req: userId
+router.post("/discord/updateAvatar", async (req, res) => {
+    const userId = req.body.userId;
+    if (typeof(userId) !== 'string') return SetErrorResponse(res, definitionErrors.userNotDefined);
+    try{
+        const userData = await GetUserLoginData(userId);
+        if (!userData || userData.discord_id == null) return SetErrorResponse(res, definitionErrors.userNotDefined);
+
+        const formData = new url.URLSearchParams({
+            client_id: clientId,
+            client_secret: clientSecret,
+            grant_type: "refresh_token",
+            refresh_token: userData.discord_refresh_token,
+        });
+    
+        const response = await axios.post(apiRouteOauth2Token,
+            formData, {
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+            }
+        );
+
+        const {access_token, refresh_token} = response.data;
+    
+        if (response.data) {
+
+            await StoreUserData(access_token, refresh_token);
+            
+            res.sendStatus(400);
+        }
+    } catch(error){
+        console.log(error);
+        res.sendStatus(400);
+    }
 });
 
 router.get("/discord/redirect", async (req, res) => {
@@ -84,21 +127,10 @@ router.get("/discord/redirect", async (req, res) => {
 
             if (!newUserId) return SetErrorResponse(res, databaseErrors.verifiedCreateError);
             await SerializeSession(req, newUserId);
-    
-            //refresh token
-            /*const requestFormData = new url.URLSearchParams({
-                client_id: process.env.CLIENT_ID,
-                client_secret: process.env.CLIENT_SECRET,
-                grant_type: "refresh_token",
-                refresh_token: output.data.refresh_token,
-            });
-    
-            const refresh = await AxiosPost(requestFormData, apiRouteOauth2Token);*/
             
             res.writeHead(301, {
                 Location: `${websiteURL}`
             }).end();
-            //res.end();
         }
     } catch(error){
         console.log(error);
@@ -108,7 +140,7 @@ router.get("/discord/redirect", async (req, res) => {
 
 export default router;
 
-async function StoreUserData(accessToken, refreshToken, userId){
+async function StoreUserData(accessToken, refreshToken, userId = undefined){
     const response = await axios.get(apiRouteUserInfo, {
         headers: {
             "Authorization": `Bearer ${accessToken}`,
@@ -118,33 +150,31 @@ async function StoreUserData(accessToken, refreshToken, userId){
     let avatar = null;
     if (response.data.avatar) avatar = HandleAvatarGif(response.data.avatar);
 
-    //If logged in to account, update that account
-    if (userId){
-        let user = await GetUserData(userId);
-        if (user && user.role == userRoles.unverified){
-            await VerifyAccount(userId, response.data.id, response.data.username, accessToken, refreshToken, avatar);
-            return userId;
+    let discordUser = await GetUserByDiscordId(response.data.id);
+    if (!discordUser){
+        //If logged in to unverified account, update that account
+        if (userId){
+            let user = await GetUserData(userId);
+            if (user){
+                await VerifyAccount(userId, response.data.id, response.data.username, accessToken, refreshToken, avatar);
+                return userId;
+            }
         }
-    }
 
-    let newUser = await GetUserByDiscordId(response.data.id);
-    let newUserId;
-    if (!newUser){
-        newUserId = GenerateNanoId();
+        let newUserId = GenerateNanoId();
 
         let username = response.data.global_name;
         if (!username) username = response.data.username;
 
         await CreateUserWithDiscord(newUserId, username, response.data.id, response.data.username, accessToken, refreshToken, avatar);
+        return newUserId;
     } else {
-        newUserId = newUser.id;
-        await SetUserDiscord(newUserId, response.data.id, response.data.username, accessToken, refreshToken, avatar); 
+        await SetUserDiscord(discordUser.id, response.data.id, response.data.username, accessToken, refreshToken, avatar); 
+        return discordUser.id;
     }
-    return newUserId;
 }
 
 function HandleAvatarGif(avatar){
-    console.log(avatar);
     if (avatar.slice(0, 2) === 'a_') return avatar.slice(2);
     return avatar;
 }
