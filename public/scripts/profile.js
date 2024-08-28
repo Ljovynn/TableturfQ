@@ -201,7 +201,7 @@ graphSubmit.addEventListener('click', async (e) => {
 window.addEventListener('scroll', async (e) => {
     // Only do this when they're on the correct tab
     if ( toggleMatchHistory.classList.contains('active') ) {
-        if ( window.scrollY >= matchHistory.offsetHeight - 10 ) {
+        if ( window.scrollY + (screen.height/3) >= matchHistory.offsetHeight - 10 ) {
             console.log('Loading matches', loadingMatches);
             if ( !loadingMatches ) {
                 loadingMatches = true;
