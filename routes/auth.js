@@ -82,7 +82,7 @@ router.post("/discord/updateAvatar", async (req, res) => {
 
             await StoreUserData(access_token, refresh_token);
             
-            res.sendStatus(400);
+            res.sendStatus(200);
         }
     } catch(error){
         console.log(error);
