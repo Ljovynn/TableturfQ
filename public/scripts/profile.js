@@ -102,6 +102,18 @@ userProfilePictureRefresh.addEventListener('click', async (e) => {
     let data = { userId: playerID };
     let response = await postData('/api/auth/discord/updateAvatar', data);
     console.log(response);
+    if ( response.code == 200 ) {
+        console.log('update!');
+        userInfo = await getMatchUsers([playerID]);
+        console.log(userInfo);
+        let avatarString = '';
+        if ( userInfo[0].discord_avatar_hash ) {
+            avatarString = 'https://cdn.discordapp.com/avatars/' + userInfo[0].discord_id + '/' + userInfo[0].discord_avatar_hash + '.jpg' + '?size=512';
+        } else {
+            avatarString = '/assets/images/chumper.png';
+        }
+        userProfilePicture.src = avatarString;
+    }
 });
 
 editDisplayName.addEventListener('click', (e) => {
