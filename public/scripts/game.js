@@ -1410,11 +1410,11 @@ socket.on("disconnect", async (reason, details) => {
 
   Reason: ${reason}
   
-  Message: ${details.message}
+  Message: ${(details) ? details.message : ''}
   
-  Decription: ${details.description}
+  Decription: ${(details) ? details.description : ''}
   
-  Context: ${details.context}
+  Context: ${(details) ? details.context : ''}
 
   Attempting to rejoin`);*/
   await reconnectSocket();
