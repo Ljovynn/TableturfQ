@@ -39,6 +39,8 @@ router.post("/unverified/login", async (req, res) => {
     if (username.length < usernameMinLength || username.length > usernameMaxLength) return SetErrorResponse(res, definitionErrors.usernameWrongFormat);
     if (HasBadWords(username)) return SetErrorResponse(res, definitionErrors.usernameContainsBadWord);
 
+    const userId = GenerateNanoId();
+
     try{
         await CreateUser(userId, username);
 
@@ -47,8 +49,6 @@ router.post("/unverified/login", async (req, res) => {
         console.log(error);
         res.sendStatus(400);
     }
-
-    const userId = GenerateNanoId();
 
     res.status(201).send({});
 });
