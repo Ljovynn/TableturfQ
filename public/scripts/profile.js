@@ -77,6 +77,8 @@ var playerID = '';
 
 var graphData;
 
+var loadingMatches = false;
+
 try {
     const url = window.location.href;
     const searchParams = new URL(url).searchParams;
@@ -196,24 +198,27 @@ graphSubmit.addEventListener('click', async (e) => {
     await setELOGraph(graphTimeframe.value);
 });
 
-/*window.addEventListener('scroll', async (e) => {
+window.addEventListener('scroll', async (e) => {
     // Only do this when they're on the correct tab
     if ( toggleMatchHistory.classList.contains('active') ) {
-        if ( window.scrollY >= matchHistory.offsetHeight ) {
-            console.log('Bottom!');
-            let hits = document.getElementsByClassName('match-row');
-            let page = 1;
-            console.log(hits.length);
-            if ( hits.length % 10 == 0 ) {
-                page += hits.length/10;
-                console.log(page);
-                let result = await getMatchHistory(page);
-                console.log(result);
-                await appendMatches(result);
+        if ( window.scrollY >= matchHistory.offsetHeight - 10 ) {
+            console.log('Loading matches', loadingMatches);
+            if ( !loadingMatches ) {
+                loadingMatches = true;
+                let hits = document.getElementsByClassName('match-row');
+                let page = 1;
+                console.log(hits.length);
+                if ( hits.length % 10 == 0 ) {
+                    page += hits.length/10;
+                    console.log(page);
+                    let result = await getMatchHistory(page);
+                    console.log(result);
+                    await appendMatches(result);
+                }
             }
         }
     }
-});*/
+});
 
 // Admin actions
 if ( !loggedInUserInfo.error && loggedInUserInfo.user.role== 2 ) {
@@ -323,6 +328,7 @@ async function setUserInfo() {
 }
 
 async function getMatchHistory(page = 1, hits = 10) {
+    console.log('Page', page);
     let data = {};
     if ( playerID != '' ) {
         data = { userId: playerID, pageNumber: parseInt(page), hitsPerPage: parseInt(hits) };
@@ -330,6 +336,7 @@ async function getMatchHistory(page = 1, hits = 10) {
         data = { userId: userId, pageNumber: parseInt(page), hitsPerPage: parseInt(hits) };
     }
     let result = await postData('/matchHistory/GetUserMatchHistory', data);
+    loadingMatches = false;
     return result.data;
 }
 

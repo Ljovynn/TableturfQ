@@ -16,7 +16,7 @@ const matchHistoryHitsPerPage = 10;
 router.post("/GetUserMatchHistory", async (req, res) => {
     try{
         var userId = req.body.userId;
-        var pageNumber = req.pageNumber;
+        var pageNumber = req.body.pageNumber;
 
         if (typeof(userId) !== 'string'){
             userId = req.session.user;
