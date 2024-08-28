@@ -69,7 +69,7 @@ async function setLeaderBoard(startPos, hitCount) {
     result = await getLeaderBoard(startPos, hitCount);
     users = result.result;
     totalPlayers = result.totalPlayers;
-    var placement = 1 + startPos;
+    let placement = 1 + startPos;
 
     // If the current page is 0, hide the prev button, otherwise show it
     if ( page == 0 ) {
@@ -184,8 +184,8 @@ async function refreshLeaderBoard(startPos, hitCount) {
 }
 
 async function getLeaderBoard(startPos, hitCount) {
-    var data = { startPos: startPos, hitCount: hitCount }
-    var result = await postData('/leaderboard/GetLeaderboard', data);
+    let data = { startPos: startPos, hitCount: hitCount }
+    let result = await postData('/leaderboard/GetLeaderboard', data);
     return result.data;
 }
 

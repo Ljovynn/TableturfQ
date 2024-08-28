@@ -21,8 +21,8 @@ setAnnouncements();
 
 guestSubmit.addEventListener('click', async (e) => {
     if ( validateDisplayname(guestName.value) ) {
-        var data = { username: guestName.value };
-        var response = await postData('/api/auth/unverified/login', data);
+        let data = { username: guestName.value };
+        let response = await postData('/api/auth/unverified/login', data);
         console.log(response);
         if ( response.code == 201 ) {
             window.location.href = '/queue';
@@ -50,8 +50,8 @@ async function setUserInfo() {
 }
 
 async function getUserInfo() {
-    var data = {};
-    var result = await getData('/user/GetUserInfo');
+    let data = {};
+    let result = await getData('/user/GetUserInfo');
     return result.data;
 }
 
@@ -65,7 +65,7 @@ function showLoggedInButton() {
 
 async function setAnnouncements() {
     try {
-        var announcement = await getNextAnnouncement();
+        let announcement = await getNextAnnouncement();
         console.log(announcement);
         if ( announcement ) {
             console.log('adding');
@@ -73,7 +73,7 @@ async function setAnnouncements() {
             nextAnnouncement.style.display = 'block';
 
             // If there's no next announcement, there can't be any upcoming ones right?
-            var announcements = await getUpcomingAnnouncements();
+            let announcements = await getUpcomingAnnouncements();
             console.log(announcements);
             if ( announcements ) {
                 upcomingAnnouncements.style.display = 'block';
@@ -95,7 +95,7 @@ async function setAnnouncements() {
 }
 
 async function getNextAnnouncement() {
-    var result = await getData('/announcementInfo/GetNextAnnouncement');
+    let result = await getData('/announcementInfo/GetNextAnnouncement');
     console.log(result);
     return result.data;
 }
@@ -127,7 +127,7 @@ function addNextAnnouncement(announcement) {
 }
 
 async function getUpcomingAnnouncements() {
-    var result = await getData('/announcementInfo/GetUpcomingAnnouncements');
+    let result = await getData('/announcementInfo/GetUpcomingAnnouncements');
     return result.data;
 }
 
@@ -145,7 +145,7 @@ function addUpcomingAnnouncements(announcements) {
         upcomingIcon.classList.add('announcement-icon');
         upcomingIcon.src = announcement.iconSrc;
 
-        var upcomingDate = document.createElement('div');
+        let upcomingDate = document.createElement('div');
         upcomingDate.classList.add('announcement-date');
         if ( announcement.isEvent ) {
             upcomingDate.innerHTML = new Date(announcement.date*1000).toLocaleString();

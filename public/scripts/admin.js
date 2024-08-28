@@ -39,8 +39,8 @@ if ( isAdmin ) {
 }*/
 
 async function checkUserAdmin() {
-    var data = {};
-    var result = await fetchData('/user/GetUserInfo');
+    let data = {};
+    let result = await fetchData('/user/GetUserInfo');
     console.log(result);
     if ( result.user.role == 2 ) {
     	isAdmin = true;
@@ -50,21 +50,21 @@ async function checkUserAdmin() {
 }
 
 async function getDisputedMatches() {
-	var data = {};
+	let data = {};
     console.log(data);
-    var result = await fetchData('/admin/GetDisputedMatchesList', data);
-    var disputedMatches = result;
+    let result = await fetchData('/admin/GetDisputedMatchesList', data);
+    let disputedMatches = result;
 
     console.log(disputedMatches);
     for ( let match of disputedMatches ) {
-    	var players = await getMatchUsers( [match.players[0].id, match.players[1].id] );
+    	let players = await getMatchUsers( [match.players[0].id, match.players[1].id] );
     	await addDisputedMatch(match, players);
     }
 }
 
 async function addDisputedMatch(match, players) {
 	console.log(players);
-	var scores = [];
+	let scores = [];
 	scores[players[0].id] = 0;
 	scores[players[1].id] = 0;
 
@@ -90,7 +90,7 @@ async function addDisputedMatch(match, players) {
     selectOption.classList.add('admin-dispute-options');
     selectOption.setAttribute('id', 'match-action-' + match.id);
 
-    for ( var i=0; i <= 7; i++ ) {
+    for ( let i=0; i <= 7; i++ ) {
     	let optionValue = document.createElement('option');
     	optionValue.setAttribute('value', i);
     	optionValue.append(disputeOptions[i]);
@@ -114,9 +114,9 @@ async function addDisputedMatch(match, players) {
 }
 
 async function getMatchUsers(users) {
-    var data = { userIdList: users };
+    let data = { userIdList: users };
     console.log(data);
-    var result = await getData('/user/GetUsers', data);
+    let result = await getData('/user/GetUsers', data);
     return result;
 }
 
@@ -125,14 +125,14 @@ async function setListeners() {
 		console.log(resolutionButton);
 	    resolutionButton.addEventListener('click', async (e) => {
 		    	console.log('clicked resolution button');
-		    	var matchId = resolutionButton.value;
-		    	var resolveOption = document.getElementById('match-action-' + matchId);
+		    	let matchId = resolutionButton.value;
+		    	let resolveOption = document.getElementById('match-action-' + matchId);
 
-		        var data = { matchId: matchId, resolveOption: parseInt(resolveOption.value) };
-		        var response = await postData('/admin/ResolveDispute', data);
+		        let data = { matchId: matchId, resolveOption: parseInt(resolveOption.value) };
+		        let response = await postData('/admin/ResolveDispute', data);
 		        console.log(response);
 		        if ( response == 201 ) {
-		        	var disputedRow = document.getElementById('disputed-match-row-' + matchId);
+		        	let disputedRow = document.getElementById('disputed-match-row-' + matchId);
 		        	disputedRow.remove();
 		        }
 	    });

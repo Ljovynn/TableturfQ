@@ -138,12 +138,12 @@ editCountryClose.addEventListener('click', (e) => {
 
 
 displayNameSubmit.addEventListener('click', async (e) => {
-    var newDisplayName = displayNameInput.value;
+    let newDisplayName = displayNameInput.value;
     // Validate the name update
     if ( validateDisplayName(newDisplayName) ) {
 
-        var data = { username: newDisplayName };
-        var response = await postData('/user/SetUsername', data);
+        let data = { username: newDisplayName };
+        let response = await postData('/user/SetUsername', data);
         console.log(response);
 
         // On successful response
@@ -159,10 +159,10 @@ displayNameSubmit.addEventListener('click', async (e) => {
 });
 
 countrySubmit.addEventListener('click', async (e) => {
-    var newCountry = countryInput.value;
+    let newCountry = countryInput.value;
 
-    var data = { country: newCountry };
-    var response = await postData('/user/SetUserCountry', data);
+    let data = { country: newCountry };
+    let response = await postData('/user/SetUserCountry', data);
 
     // On Success
     console.log(response);
@@ -170,7 +170,7 @@ countrySubmit.addEventListener('click', async (e) => {
         editCountryForm.classList.toggle('editing');
         userCountry.classList.toggle('editing');
         if ( newCountry != 'none' ) {
-            var countryElement = document.createElement('img');
+            let countryElement = document.createElement('img');
             countryElement.src = 'https://flagcdn.com/w20/' + newCountry.toLowerCase() + '.png';
             countryFlag = countryElement;
             userCountryValue.innerHTML = '';
@@ -182,7 +182,7 @@ countrySubmit.addEventListener('click', async (e) => {
 });
 
 logoutButton.addEventListener('click', async (e) => {
-    var response = await postData('/user/DeleteUserLoginData');
+    let response = await postData('/user/DeleteUserLoginData');
     if ( response.code == 200 ) {
         window.location.href = '/';
     }
@@ -247,8 +247,8 @@ if ( !loggedInUserInfo.error && loggedInUserInfo.user.role== 2 ) {
     });
 
     adminBanUserButton.addEventListener('click', async (e) => {
-        var data = { bannedUserId: userId, banLength: parseInt(adminBanLength.value), reason: adminBanReason.value };
-        var response = await postData('/admin/BanUser', data);
+        let data = { bannedUserId: userId, banLength: parseInt(adminBanLength.value), reason: adminBanReason.value };
+        let response = await postData('/admin/BanUser', data);
 
         console.log(response);
         if ( response.code == 201 ) {
@@ -260,8 +260,8 @@ if ( !loggedInUserInfo.error && loggedInUserInfo.user.role== 2 ) {
     });
 
     adminUnbanUserButton.addEventListener('click', async (e) => {
-        var data = { unbannedUserId: userId };
-        var response = await postData('/admin/UnbanUser', data);
+        let data = { unbannedUserId: userId };
+        let response = await postData('/admin/UnbanUser', data);
 
         console.log(response);
         if ( response.code == 201 ) {
@@ -274,8 +274,8 @@ if ( !loggedInUserInfo.error && loggedInUserInfo.user.role== 2 ) {
 
 async function getUserInfo() {
     try {
-        var data = {};
-        var result = await getData('/user/GetUserInfo');
+        let data = {};
+        let result = await getData('/user/GetUserInfo');
         return result.data;
     } catch (error) {
         return null;
@@ -309,7 +309,7 @@ async function setUserInfo() {
 
         userDisplayName.innerHTML = sanitizeDisplayName(username);
         userDiscordName.innerHTML = sanitizeDisplayName(discordUsername);
-        var avatarString = '';
+        let avatarString = '';
         if ( discordAvatarHash ) {
             avatarString = 'https://cdn.discordapp.com/avatars/' + discordId + '/' + discordAvatarHash + '.jpg' + '?size=512';
         } else {
@@ -318,7 +318,7 @@ async function setUserInfo() {
         userProfilePicture.src = avatarString;
 
         if ( user.country ) {
-            var countryElement = document.createElement('img');
+            let countryElement = document.createElement('img');
             countryElement.src = 'https://flagcdn.com/w20/' + user.country + '.png';
             countryFlag = countryElement;
         } else {
@@ -375,19 +375,19 @@ async function appendMatches(matchList) {
 
             let dateCell = document.createElement('div');
             dateCell.classList.add('match-date');
-            var matchDate = match.unix_created_at;
+            let matchDate = match.unix_created_at;
             matchDate = new Date(matchDate);
             matchDate = matchDate.getTime();
-            var timeNow = Math.floor(Date.now() / 1000);
-            var timeElapsed = timeNow - matchDate;
-            var readableTime = getReadableMatchTime(timeElapsed);
+            let timeNow = Math.floor(Date.now() / 1000);
+            let timeElapsed = timeNow - matchDate;
+            let readableTime = getReadableMatchTime(timeElapsed);
 
             dateCell.append(readableTime);
 
             let matchupCell = document.createElement('div');
-           // var players = await getMatchUsers( [match.player1_id, match.player2_id] );
-            var player1 = getMatchPlayer(matchUsers, match.player1_id);
-            var player2 = getMatchPlayer(matchUsers, match.player2_id);
+           // let players = await getMatchUsers( [match.player1_id, match.player2_id] );
+            let player1 = getMatchPlayer(matchUsers, match.player1_id);
+            let player2 = getMatchPlayer(matchUsers, match.player2_id);
             matchupCell.classList.add('matchup');
 
             let matchPlayer1 = document.createElement('a');
@@ -509,14 +509,14 @@ async function appendMatches(matchList) {
 }
 
 async function getMatchUsers(users) {
-    var data = { userIdList: users };
-    var result = await postData('/user/GetUsers', data);
+    let data = { userIdList: users };
+    let result = await postData('/user/GetUsers', data);
     return result.data;
 }
 
 async function getELOGraph(timeframe) {
-    var data = { userId: userId, ratingHistoryOption: ratingHistoryOptions[timeframe] };
-    var result = await postData('/user/GetUserRatingHistory', data);
+    let data = { userId: userId, ratingHistoryOption: ratingHistoryOptions[timeframe] };
+    let result = await postData('/user/GetUserRatingHistory', data);
     /*if (result.length > 0){
         result.unshift({
             match_id: null,
@@ -546,7 +546,7 @@ async function setELOGraph(timeframe = 'month') {
 }
 
 function GetChartOptions(timeframe){
-    var result = {
+    let result = {
         width: 750,
         legend: { position: 'bottom' },
         lineWidth: 4,
@@ -632,7 +632,7 @@ function GetChartOptions(timeframe){
 
 function drawELOChart() {
 
-    var testData = [
+    let testData = [
         {unix_date: 1719835276, old_rating: 1458, new_rating: 1479 },
         {unix_date: 1719975276, old_rating: 1479, new_rating: 1485 },
         {unix_date: 1720440076, old_rating: 1463, new_rating: 1491 },
@@ -641,16 +641,16 @@ function drawELOChart() {
         {unix_date: 1720463596, old_rating: 1463, new_rating: 1475 }
     ];
 
-    /*var dataArray = [
+    /*let dataArray = [
         ['Date', 'Match Rating', 'Rating Decay/Manual Adjustments']
     ];*/
-    var dataArray = [];
+    let dataArray = [];
 
-    var currentMatch;
-    var previousMatch;
+    let currentMatch;
+    let previousMatch;
     for ( let match of graphData ) {
         console.log(match);
-        var matchDate = new Date(match.unix_date*1000);
+        let matchDate = new Date(match.unix_date*1000);
         if ( match == graphData[0] ) {
             console.log('first element!');
             dataArray.push([matchDate, match.old_rating, null, null]);
@@ -659,16 +659,16 @@ function drawELOChart() {
         }
         /*currentMatch = match;
         if ( !previousMatch || currentMatch.old_rating == previousMatch.new_rating ) {
-            var matchDate = new Date(match.unix_date*1000);
+            let matchDate = new Date(match.unix_date*1000);
             //dateString = getMatchDateString(matchDate);
             dataArray.push([matchDate, match.new_rating, null, null, null]);
         } else {
             // Set up the rating decay graph
-            var startDate = new Date(previousMatch.unix_date*1000);
+            let startDate = new Date(previousMatch.unix_date*1000);
             //dateString = getMatchDateString(startDate);
             dataArray.push([startDate, null, null, null, previousMatch.new_rating]);
 
-            var endDate = new Date(currentMatch.unix_date*1000);
+            let endDate = new Date(currentMatch.unix_date*1000);
             //dateString = getMatchDateString(endDate);
             dataArray.push([endDate, null, null, null, currentMatch.old_rating]);
             dataArray.push([endDate, currentMatch.old_rating, null, null, null]);
@@ -682,7 +682,7 @@ function drawELOChart() {
         //dataArray.push([new Date(Date.now()), graphData[graphData.length - 1].new_rating, null, 'point {visible: false; }']);
     }
 
-    var data = new google.visualization.DataTable();
+    let data = new google.visualization.DataTable();
     data.addColumn('date', 'Date');
     data.addColumn('number', 'Match Rating');
     data.addColumn({'type': 'string', 'role': 'style'});
@@ -690,12 +690,12 @@ function drawELOChart() {
     //data.addColumn('number', 'Rating Decay/Manual adjustments');
     data.addRows(dataArray);
 
-    var options = GetChartOptions(chosenTimeframe);
+    let options = GetChartOptions(chosenTimeframe);
 
     //series[0] = {visibleInLegend: false, pointsVisible: false};
     //series[graphData.length - 1] = {visibleInLegend: false, pointsVisible: false, color: 'd3d3d3'};
 
-    var chart = new google.visualization.LineChart(document.getElementById('user-graph'));
+    let chart = new google.visualization.LineChart(document.getElementById('user-graph'));
 
     chart.draw(data, options);
 }
@@ -708,13 +708,13 @@ function getMatchDateString(matchDate) {
 
 async function setUserBanLength() {
     if ( user.banned && user.id == loggedInUserID ) {
-        var banInfo = await getUserBanLength();
+        let banInfo = await getUserBanLength();
         if ( banInfo.banned ) {
             if ( banInfo.banLength ) {
-                var banLength = banInfo.banLength
-                var currentTime = new Date().getTime() / 1000;
-                var remainingTime = banLength - currentTime;
-                var readableLength = getReadableTime(remainingTime);
+                let banLength = banInfo.banLength
+                let currentTime = new Date().getTime() / 1000;
+                let remainingTime = banLength - currentTime;
+                let readableLength = getReadableTime(remainingTime);
 
                 banDetails.innerHTML = 'You are suspened from using TableturfQ until ' + new Date(banLength*1000) + `<br />` + 'Which is ' + readableLength + ' from now.' + `<br />` + 'Reason: ' + banInfo.reason;
                 banDetails.style.display = 'block';
@@ -727,21 +727,21 @@ async function setUserBanLength() {
 }
 
 async function getUserBanLength() {
-    //var data = { user: userID };
-    var result = await getData('/user/GetUserBanInfo');
+    //let data = { user: userID };
+    let result = await getData('/user/GetUserBanInfo');
     console.log(result);
     return result.data;
 }
 
 async function setAdminBanLength(userID) {
-    var banInfo = await getAdminBanLength(userID);
+    let banInfo = await getAdminBanLength(userID);
     if ( banInfo.banned ) {
         if ( banInfo.banLength ) {
 
-            var banLength = banInfo.banLength
-            var currentTime = new Date().getTime() / 1000;
-            var remainingTime = banLength - currentTime;
-            var readableLength = getReadableTime(remainingTime);
+            let banLength = banInfo.banLength
+            let currentTime = new Date().getTime() / 1000;
+            let remainingTime = banLength - currentTime;
+            let readableLength = getReadableTime(remainingTime);
 
             banDetails.innerHTML = 'User is suspended from using TableturfQ until ' + new Date(banLength*1000) + `<br />` + 'Which is ' + readableLength + ' from now.' + `<br />` + 'Reason: ' + banInfo.reason;
             banDetails.style.display = 'block';
@@ -754,14 +754,14 @@ async function setAdminBanLength(userID) {
 
 async function getAdminBanLength(userID) {
     console.log(userID);
-    var data = { userId: userID };
-    var result = await postData('/admin/GetUserBanInfo', data);
+    let data = { userId: userID };
+    let result = await postData('/admin/GetUserBanInfo', data);
     console.log(result);
     return result.data;
 }
 
 function getMatchPlayer( matchUsers, playerId ) {
-    var player = matchUsers.filter( (user) => user.id === playerId );
+    let player = matchUsers.filter( (user) => user.id === playerId );
     return player;
 }
 
@@ -788,21 +788,21 @@ async function showAdminBanInfo() {
 
 function getReadableTime(time) {
     time = Number(time);
-    var d = Math.floor(time / (3600*24));
-    var h = Math.floor(time % (3600*24) / 3600);
-    var m = Math.floor(time % 3600 / 60);
-    var s = Math.floor(time % 60);
+    let d = Math.floor(time / (3600*24));
+    let h = Math.floor(time % (3600*24) / 3600);
+    let m = Math.floor(time % 3600 / 60);
+    let s = Math.floor(time % 60);
 
-    var dDisplay = d > 0 ? d + (d == 1 ? " day, " : " days, ") : "";
-    var hDisplay = h > 0 ? h + (h == 1 ? " hour, " : " hours, ") : "";
-    var mDisplay = m > 0 ? m + (m == 1 ? " minute, " : " minutes, ") : "";
-    var sDisplay = s > 0 ? s + (s == 1 ? " second" : " seconds") : "";
+    let dDisplay = d > 0 ? d + (d == 1 ? " day, " : " days, ") : "";
+    let hDisplay = h > 0 ? h + (h == 1 ? " hour, " : " hours, ") : "";
+    let mDisplay = m > 0 ? m + (m == 1 ? " minute, " : " minutes, ") : "";
+    let sDisplay = s > 0 ? s + (s == 1 ? " second" : " seconds") : "";
     return dDisplay + hDisplay + mDisplay + sDisplay;
 }
 
 function getReadableMatchTime(time) {
-    var returnTime;
-    var timeUnit;
+    let returnTime;
+    let timeUnit;
     if ( time / 3600 > 24 ) {
         returnTime = Math.floor( time / 3600 / 24);
         if ( returnTime != 1 ) {

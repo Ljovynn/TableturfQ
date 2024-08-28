@@ -6,11 +6,11 @@ const searchResults = document.getElementById('user-search-results');
 
 userSearchForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    var searchValue = searchInput.value;
+    let searchValue = searchInput.value;
 
     if ( validateSeach(searchValue) ) {
-        var data = { input: searchValue };
-        var response = await postData('/user/SearchUser', data);
+        let data = { input: searchValue };
+        let response = await postData('/user/SearchUser', data);
 
         addSearchUser(response.data);
         // If success, recreate the table with the retrieved results

@@ -14,7 +14,7 @@ var userInfo;
 setUserInfo();
 
 logOut.addEventListener('click', async (e) => {
-    var response = await postData('/user/DeleteUserLoginData');
+    let response = await postData('/user/DeleteUserLoginData');
     if ( response == 201 ) {
         window.location.href = '/';
     }
@@ -42,8 +42,8 @@ async function setUserInfo() {
 }
 
 async function getUserInfo() {
-    var data = {};
-    var result = await getData('/user/GetUserInfo');
+    let data = {};
+    let result = await getData('/user/GetUserInfo');
     return result.data;
 }
 

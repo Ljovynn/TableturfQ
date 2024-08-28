@@ -82,10 +82,10 @@ for ( let link of siteRulesLinks ) {
 }
 
 async function getStageList(stageElement, stageList) {
-	var stages = rankedRules[stageList];
-	var stageString = '';
+	let stages = rankedRules[stageList];
+	let stageString = '';
 
-	var i = 1;
+	let i = 1;
 	console.log(stages.length);
 	for ( let stage of stages ) {
 		console.log(i);

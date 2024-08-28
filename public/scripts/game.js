@@ -178,10 +178,10 @@ for (let stage of stages ) {
                 /*if ( strikesRemaining != 0 || stage.classList.contains('stage-selected') ) {
                     stage.classList.toggle('stage-selected');
                 }*/
-                var stageValue = parseInt(stage.getAttribute('stage-value'));
+                let stageValue = parseInt(stage.getAttribute('stage-value'));
 
                 // Add/Remove stage from the list of strikes that will be sent off to the server when the confirm strikes button is selected
-                var i = stageStrikes.indexOf( stageValue );
+                let i = stageStrikes.indexOf( stageValue );
                 if ( i === -1 ) {
                     // Don't go into negative strikes
                     if ( strikesRemaining > 0 ) {
@@ -223,12 +223,12 @@ for (let victoryButton of victoryButtons ) {
     victoryButton.addEventListener('click', async (e) => {
         console.log('Marked victory for ' + victoryButton.value);
         // Send off the victory mark event for the selected player and wait for the other player to submit the victor
-        var data = { winnerId: victoryButton.value };
-        var response = await postData('/match/WinGame', data);
+        let data = { winnerId: victoryButton.value };
+        let response = await postData('/match/WinGame', data);
         console.log(response);
         if ( response.code == 201 ) {
             console.log('Winner was marked at least');
-            confirmationMessage.style.display = 'block';
+            //confirmationMessage.style.display = 'block';
             player1VictoryButton.style.display = 'none';
             player2VictoryButton.style.display = 'none';
             //confirmationMessage.innerHTML = 'Waiting for opponent to confirm the winner.';
@@ -260,18 +260,19 @@ toggleMatchStrikes.addEventListener('click', async (e) => {
 // Chat send listener
 chatForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    var chatMessage = sanitizeInput( chatInput.value );
+    let chatMessage = sanitizeInput( chatInput.value );
     console.log( 'Player is sending the message: ' + chatMessage );
+    let response = null;
 
     // Do front end validation/sanitization functions
     if ( validateChatMessage(chatMessage) ) {
-        var data;
+        let data;
         if ( user.role == 2 ) {
             data = { matchId: matchId, message: chatMessage };
-            var response = await postData('/admin/ModChatMessage', data);
+            response = await postData('/admin/ModChatMessage', data);
         } else {
             data = { matchId: matchId, userId: userID, message: chatMessage };
-            var response = await postData('/match/SendChatMessage', data);
+            response = await postData('/match/SendChatMessage', data);
         }
         console.log('chat message send response: ' + response);
 
@@ -290,7 +291,7 @@ chatLog.addEventListener('scroll', async (e) => {
         if ( !loadingMessages ) {
             loadingMessages = true;
             console.log('trying to load new messages!');
-            var response = await getChatMessages(matchId, chatLog.childElementCount);
+            let response = await getChatMessages(matchId, chatLog.childElementCount);
             console.log(response);
             if ( response ) {
                 response = response.reverse();
@@ -304,8 +305,8 @@ chatLog.addEventListener('scroll', async (e) => {
 strikeButton.addEventListener('click', async (e) => {
     console.log(stageStrikes);
     if ( validateStrikes(stageStrikes, strikeAmount) ) {
-        var data = {};
-        var response;
+        let data = {};
+        let response;
         if ( !mapSelect ) {
             data = { stages: stageStrikes };
             response = await postData('/match/StrikeStages', data);
@@ -331,8 +332,8 @@ needHelp.addEventListener('click', async (e) => {
 
 playerRaiseDispute.addEventListener('click', async (e) => {
     if ( !privateMatch ) {
-        var data = { userId: userID };
-        var response = await postData('/match/Dispute', data);
+        let data = { userId: userID };
+        let response = await postData('/match/Dispute', data);
         console.log(response);
         playerRaiseDispute.style.display = 'none';
     }
@@ -340,7 +341,7 @@ playerRaiseDispute.addEventListener('click', async (e) => {
 
 playerResolveDispute.addEventListener('click', async (e) => {
     playerResolve.style.display = 'none';
-    var response = await postData('/match/ResolveDispute');
+    let response = await postData('/match/ResolveDispute');
     console.log(response);
     if ( response.code == 201 ) {
         // idk
@@ -350,15 +351,15 @@ playerResolveDispute.addEventListener('click', async (e) => {
 leaveMatch.addEventListener('click', async (e) => {
     if ( casualMatch || privateMatch ) {
         userLeft = true;
-        var data = {userId: userID};
-        var response = await postData('/match/CasualMatchEnd', data);
+        let data = {userId: userID};
+        let response = await postData('/match/CasualMatchEnd', data);
         console.log(response);
         window.location.href = '/';
     } else {
         if ( window.confirm('Are you sure you want to leave the match? It will be considered a forfeit and result in a loss.') ) {
             userLeft = true;
-            var data = { userId: userID };
-            var response = await postData('/match/ForfeitMatch', data);
+            let data = { userId: userID };
+            let response = await postData('/match/ForfeitMatch', data);
             console.log(response);
             window.location.href = '/';
         }
@@ -373,8 +374,8 @@ closeModalBtn.addEventListener('click', (e) => {
 // Admin actions
 if ( user.role== 2 ) {
     adminResolveButton.addEventListener('click', async (e) => {
-        var data = { matchId: matchId, resolveOption: parseInt(adminDisputeOptions.value) };
-        var response = await postData('/admin/ResolveDispute', data);
+        let data = { matchId: matchId, resolveOption: parseInt(adminDisputeOptions.value) };
+        let response = await postData('/admin/ResolveDispute', data);
         console.log(response);
         if ( response.code == 201 ) {
             adminContent.style.display = 'none';
@@ -382,45 +383,53 @@ if ( user.role== 2 ) {
     });
 
     adminBanPlayer1Button.addEventListener('click', async (e) => {
-        var data = { bannedUserId: players[0].id, banLength: parseInt(adminBanPlayer1Length.value), reason: adminBanPlayer1Reason.value };
-        var response = await postData('/admin/BanUser', data);
-
-        console.log(response);
+        let data = { bannedUserId: players[0].id, banLength: parseInt(adminBanPlayer1Length.value), reason: adminBanPlayer1Reason.value };
+        let response = await postData('/admin/BanUser', data);
+        if ( response.code == 201 ) {
+            adminBanPlayer1Content.style.display = 'none';
+            adminUnbanPlayer1Content.style.display = 'block';
+        }
     });
 
     adminUnbanPlayer1Button.addEventListener('click', async (e) => {
-        var data = { unbannedUserId: players[0].id };
-        var response = await postData('/admin/UnbanUser', data);
-
-        console.log(response);
+        let data = { unbannedUserId: players[0].id };
+        let response = await postData('/admin/UnbanUser', data);
+        if ( response.code == 201 ) {
+            adminBanPlayer1Content.style.display = 'block';
+            adminUnbanPlayer1Content.style.display = 'none';
+        }
     });
 
     adminBanPlayer2Button.addEventListener('click', async (e) => {
-        var data = { bannedUserId: players[1].id, banLength: parseInt(adminBanPlayer2Length.value), reason: adminBanPlayer2Reason.value };
-        var response = await postData('/admin/BanUser', data);
-
-        console.log(response);
+        let data = { bannedUserId: players[1].id, banLength: parseInt(adminBanPlayer2Length.value), reason: adminBanPlayer2Reason.value };
+        let response = await postData('/admin/BanUser', data);
+        if ( response.code == 201 ) {
+            adminBanPlayer2Content.style.display = 'none';
+            adminUnbanPlayer2Content.style.display = 'block';
+        }
     });
 
     adminUnbanPlayer2Button.addEventListener('click', async (e) => {
-        var data = { unbannedUserId: players[1].id };
-        var response = await postData('/admin/UnbanUser', data);
-
-        console.log(response);
+        let data = { unbannedUserId: players[1].id };
+        let response = await postData('/admin/UnbanUser', data);
+        if ( response.code == 201 ) {
+            adminBanPlayer2Content.style.display = 'block';
+            adminUnbanPlayer2Content.style.display = 'none';
+        }
     });
 }
 
 // Page functions
 async function getUserInfo() {
-    var data = {};
-    var result = await getData('/user/GetUserInfo');
+    let data = {};
+    let result = await getData('/user/GetUserInfo');
     return result;
 }
 
 
 async function setUserInfo() {
     try {
-        var userInfo = await getUserInfo(userID);
+        let userInfo = await getUserInfo(userID);
 
         user = userInfo.data.user;
         username = sanitizeInput( user.username );
@@ -442,9 +451,9 @@ async function setUserInfo() {
 }
 
 async function getMatchInfo(matchId) {
-    var data = {matchId: matchId};
+    let data = {matchId: matchId};
     console.log(data);
-    var result = await postData('/match/GetMatchInfo', data);
+    let result = await postData('/match/GetMatchInfo', data);
     matchInfo = result.data;
     console.log(matchInfo);
 }
@@ -471,30 +480,40 @@ async function setMatchInfo() {
     privateMatch = match.privateBattle;
     chat = match.chat;
 
+    let player1DiscordId = null;
+    let player1DiscordAvatar = null;
+    let player1ELO = null;
+    let player1Rank = null;
+
+    let player2DiscordId = null;
+    let player2DiscordAvatar = null;
+    let player2ELO = null;
+    let player2Rank = null;
+
     try {
-        var player1DiscordId = players[0].discord_id;
-        var player1DiscordAvatar = players[0].discord_avatar_hash;
-        var player1ELO = players[0].g2_rating;
-        var player1Rank = GetRank(player1ELO);
+         player1DiscordId = players[0].discord_id;
+         player1DiscordAvatar = players[0].discord_avatar_hash;
+         player1ELO = players[0].g2_rating;
+         player1Rank = GetRank(player1ELO);
         console.log(player1Rank);
     } catch (error) {
         // Set Deleted player 1 stuff
     }
 
     try {
-        var player2DiscordId = players[1].discord_id;
-        var player2DiscordAvatar  = players[1].discord_avatar_hash;
-        var player2ELO = players[1].g2_rating;
-        var player2Rank = GetRank(player2ELO);
+         player2DiscordId = players[1].discord_id;
+         player2DiscordAvatar  = players[1].discord_avatar_hash;
+         player2ELO = players[1].g2_rating;
+         player2Rank = GetRank(player2ELO);
         console.log(player2Rank);
     } catch (error) {
         // Set Deleted player 2 stuff
     }
 
-    var countryElement;
+    let countryElement;
 
-    var player1AvatarString = 'https://cdn.discordapp.com/avatars/' + player1DiscordId + '/' + player1DiscordAvatar + '.jpg' + '?size=512';
-    var player2AvatarString = 'https://cdn.discordapp.com/avatars/' + player2DiscordId + '/' + player2DiscordAvatar + '.jpg' + '?size=512';
+    let player1AvatarString = 'https://cdn.discordapp.com/avatars/' + player1DiscordId + '/' + player1DiscordAvatar + '.jpg' + '?size=512';
+    let player2AvatarString = 'https://cdn.discordapp.com/avatars/' + player2DiscordId + '/' + player2DiscordAvatar + '.jpg' + '?size=512';
 
     if ( JSON.stringify(match.mode) === JSON.stringify(matchModes.casual) ) {
         casualMatch = true;
@@ -617,8 +636,8 @@ async function setMatchInfo() {
 }
 
 async function getChatMessages(matchId, amountMessages) {
-    var data = { matchId: matchId, loadedMessagesAmount: amountMessages };
-    var response = await postData('/match/LoadChatMessages', data);
+    let data = { matchId: matchId, loadedMessagesAmount: amountMessages };
+    let response = await postData('/match/LoadChatMessages', data);
     console.log(response);
     loadingMessages = false;
     return response.data;
@@ -629,8 +648,8 @@ async function addChatMessages(chat, prepend = false) {
     console.log(chat);
     console.log(prepend);
     console.log('Adding messages: ' + JSON.stringify(chat));
-    var amountMessages = chatLog.childElementCount;
-    var i;
+    let amountMessages = chatLog.childElementCount;
+    let i;
     if ( !prepend ) {
         i = 1;
     } else {
@@ -640,7 +659,7 @@ async function addChatMessages(chat, prepend = false) {
         console.log(i);
         console.log(amountMessages);
         if ( i > amountMessages ) {
-            var messageString = await getMessageString(message);
+            let messageString = await getMessageString(message);
             console.log(messageString);
             if ( !prepend ) {
                 console.log('adding message');
@@ -660,7 +679,7 @@ async function addMessage(chatString) {
 }
 
 async function prependMessage(chatString) {
-    var chatMessage = document.createElement('div');
+    let chatMessage = document.createElement('div');
     console.log(chatMessage);
     chatMessage.innerHTML = chatString.trim();
     console.log(chatMessage);
@@ -670,15 +689,15 @@ async function prependMessage(chatString) {
 async function getMessageString(chatData) {
     console.log('Adding message');
     console.log(chatData);
-    var userId = chatData.ownerId;
-    var chatMessage = chatData.content;
-    var chatDate = new Date(chatData.date);
+    let userId = chatData.ownerId;
+    let chatMessage = chatData.content;
+    let chatDate = new Date(chatData.date);
     console.log(userId);
     console.log(chatMessage);
-    var sentByCurrentPlayer = false;
-    var senderName = '';
-    var chatString = '';
-    var senderClass = 'match-chat-opponent-player';
+    let sentByCurrentPlayer = false;
+    let senderName = '';
+    let chatString = '';
+    let senderClass = 'match-chat-opponent-player';
 
     console.log('players');
     console.log(players);
@@ -700,7 +719,7 @@ async function getMessageString(chatData) {
         senderName = 'System';
         senderClass = 'match-chat-system';
     } else {
-        var modUser = await getModUser([userId]);
+        let modUser = await getModUser([userId]);
         // Admin message
         /*if ( matchInfo.user.id == userId && matchInfo.user.role == 2 ) {
             senderName = matchInfo.user.username + ' (Admin)';
@@ -728,9 +747,9 @@ function setScores() {
 
 function setStages() {
     if (match.gamesArr.length > 1) {
-        var currentStage = match.gamesArr.at(-1).stage;
+        let currentStage = match.gamesArr.at(-1).stage;
         for( let counterpick of counterpicks ) {
-            var stage = document.querySelectorAll('[stage-value="' + counterpick + '"]')[0];
+            let stage = document.querySelectorAll('[stage-value="' + counterpick + '"]')[0];
             // If the stage hasn't been selected, remove all stage-stricken classes first
             // If the stage has been selected, strike everything except the selected stage
             if ( !currentStage ) {
@@ -747,7 +766,7 @@ function setStages() {
         }
     } else {
         for ( let starter of starters ) {
-            var stage = document.querySelectorAll('[stage-value="' + starter + '"]')[0];
+            let stage = document.querySelectorAll('[stage-value="' + starter + '"]')[0];
             stage.classList.remove('stage-stricken');
             stage.classList.remove('stage-unselectable');
             stage.classList.add('stage-selectable');
@@ -758,7 +777,7 @@ function setStages() {
 function resetStages() {
     if ( match.gamesArr.length > 1 ) {
         for ( let counterpick of counterpicks ) {
-            var stage = document.querySelectorAll('[stage-value="' + counterpick + '"]')[0];
+            let stage = document.querySelectorAll('[stage-value="' + counterpick + '"]')[0];
             stage.classList.remove('stage-stricken');
             stage.classList.add('stage-selectable');
             stage.style.display = 'inline-block';
@@ -772,7 +791,7 @@ function resetStages() {
         }
 
         for ( let starter of starters ) {
-            var stage = document.querySelectorAll('[stage-value="' + starter + '"]')[0];
+            let stage = document.querySelectorAll('[stage-value="' + starter + '"]')[0];
             stage.classList.remove('stage-stricken');
             stage.classList.remove('stage-unselectable');
             stage.classList.add('stage-selectable');
@@ -788,7 +807,7 @@ function setStrikes(receivedStrikes) {
         console.log('strike array: ' + JSON.stringify(strikes));
         strikes.push(strike);
         //console.log('striking ' + strike);
-        var stage = document.querySelectorAll('[stage-value="' + strike + '"]')[0];
+        let stage = document.querySelectorAll('[stage-value="' + strike + '"]')[0];
         //console.log(stage);
         // Change the classes to remove selected stage from eligible selections
         if ( stage.classList.contains('stage-selected') )
@@ -801,9 +820,10 @@ function setStrikes(receivedStrikes) {
 }
 
 function setStrikeAmount() {
+    let strikeableStages = null;
     if ( matchInfo.match.gamesArr.length == 1 ) {
         // Figure out the current strike amount
-        var strikeableStages = document.getElementsByClassName('stage-selectable');
+        strikeableStages = document.getElementsByClassName('stage-selectable');
         /*if ( strikeableStages.length == 4 ) {
             strikeAmount = 2;
         } else {
@@ -844,9 +864,9 @@ function setStrikeAmount() {
 }
 
 function setCurrentStriker() {
-    var strikeableStages = document.getElementsByClassName('stage-selectable');
-    var oppUnpickableStages = [];
-    var oppID;
+    let strikeableStages = document.getElementsByClassName('stage-selectable');
+    let oppUnpickableStages = [];
+    let oppID;
     // TODO: Rewrite this whole function, this is horrible
     if ( strikeableStages.length == 5 ) {
         currentStriker = players[0].id;
@@ -929,7 +949,7 @@ function setSelectedStage(selectedStage) {
 }
 
 function setDSRStages(currentStriker) {
-    var unpickableStages = [];
+    let unpickableStages = [];
     if ( players[0].id == currentStriker ) {
         unpickableStages = match.players[0].unpickableStagesArr;
     } else {
@@ -940,7 +960,7 @@ function setDSRStages(currentStriker) {
 
     for ( let unpickableStage of unpickableStages ) {
         console.log('Force striking ' + unpickableStage);
-        var stage = document.querySelectorAll('[stage-value="' + unpickableStage + '"]')[0];
+        let stage = document.querySelectorAll('[stage-value="' + unpickableStage + '"]')[0];
 
         //console.log(stage);
         // Change the classes to remove selected stage from eligible selections
@@ -977,14 +997,14 @@ function startGame() {
     playerResolve.style.display = 'none';
     pickingStage = false;
 
-    var selectedStage = document.getElementsByClassName('stage-selected');
+    let selectedStage = document.getElementsByClassName('stage-selected');
     if ( selectedStage.length > 0 ) {
         if ( selectedStage[0].classList.contains('mobile-selected') );
             selectedStage[0].classList.remove('mobile-selected');
         selectedStage[0].classList.remove('stage-selected');
     }
 
-    var strickenStages = document.getElementsByClassName('stage-stricken');
+    let strickenStages = document.getElementsByClassName('stage-stricken');
     for ( let stage of strickenStages ) {
         stage.style.display = 'none';
         if ( stage.classList.contains('mobile-selected') );
@@ -1121,36 +1141,36 @@ function showPlayerResolve() {
 }
 
 async function getModUser(users) {
-    var data = { userIdList: users };
-    var result = await postData('/user/GetUsers', data);
+    let data = { userIdList: users };
+    let result = await postData('/user/GetUsers', data);
     return result.data;
 }
 
 async function setStrikeSystemMessages(currentStriker, receivedStrikes) {
     // {ownerId: '23M2UCi0s6BUdfFr', content: '50', date: 1720538721390}
-    var strikeString = '';
-    var i = 1;
-    var arrLength = receivedStrikes.length;
+    let strikeString = '';
+    let i = 1;
+    let arrLength = receivedStrikes.length;
     for (let strike of receivedStrikes) {
-        var stage = document.querySelectorAll('[stage-value="' + strike + '"]')[0];
-        var stageValue = stage.children[0].innerHTML;
+        let stage = document.querySelectorAll('[stage-value="' + strike + '"]')[0];
+        let stageValue = stage.children[0].innerHTML;
         strikeString += stageValue;
         ( i < arrLength ? strikeString += ', ' : strikeString += '.' );
         i++;
     }
-    var systemMessage = { ownerId: 'System', content: '<' + currentStriker + '> striked ' + strikeString, date: Date.now() }
-    var messageString = await getMessageString(systemMessage);
+    let systemMessage = { ownerId: 'System', content: '<' + currentStriker + '> striked ' + strikeString, date: Date.now() }
+    let messageString = await getMessageString(systemMessage);
     await addMessage(messageString);
 }
 
 async function setPickSystemMessage(currentStriker, selectedStage) {
-    var strikeString = '';
-    var stage = document.querySelectorAll('[stage-value="' + selectedStage + '"]')[0];
-    var stageValue = stage.children[0].innerHTML;
+    let strikeString = '';
+    let stage = document.querySelectorAll('[stage-value="' + selectedStage + '"]')[0];
+    let stageValue = stage.children[0].innerHTML;
     strikeString += stageValue;
-    var systemMessage = { ownerId: 'System', content: '<' + currentStriker + '> chose to play on ' + strikeString + '.', date: Date.now() }
+    let systemMessage = { ownerId: 'System', content: '<' + currentStriker + '> chose to play on ' + strikeString + '.', date: Date.now() }
     console.log(systemMessage);
-    var messageString = await getMessageString(systemMessage);
+    let messageString = await getMessageString(systemMessage);
     await addMessage(messageString);
     return;
 }
@@ -1158,35 +1178,35 @@ async function setPickSystemMessage(currentStriker, selectedStage) {
 async function setConfirmPlayerMessage(playerId, winnerId) {
     console.log(playerId);
     console.log(winnerId);
-    var confirmString = '';
-    var systemMessage = { ownerId: 'System', content: '<' + playerId + '> marked <' + winnerId + '> as the winner.', date: Date.now() }
-    var messageString = await getMessageString(systemMessage);
+    let confirmString = '';
+    let systemMessage = { ownerId: 'System', content: '<' + playerId + '> marked <' + winnerId + '> as the winner.', date: Date.now() }
+    let messageString = await getMessageString(systemMessage);
     await addMessage(messageString);
     return;
 }
 
 async function setMatchWinnerMessage(playerId) {
-    var systemMessage = { ownerId: 'System', content: '<' + playerId + '> won the match.', date: Date.now() }
-    var messageString = await getMessageString(systemMessage);
+    let systemMessage = { ownerId: 'System', content: '<' + playerId + '> won the match.', date: Date.now() }
+    let messageString = await getMessageString(systemMessage);
     await addMessage(messageString);
     return;
 }
 
 async function setPlayerLeftMessage(playerId, ranked) {
-    var systemMessage;
+    let systemMessage;
     if ( ranked ) {
         systemMessage = { ownerId: 'System', content: '<' + playerId + '> forfeited the match.', date: Date.now() }
     } else {
         systemMessage = { ownerId: 'System', content: '<' + playerId + '> has chosen to end the session.', date: Date.now() }
     }
-    var messageString = await getMessageString(systemMessage);
+    let messageString = await getMessageString(systemMessage);
     await addMessage(messageString);
     return;
 }
 
 async function checkPlayerRanked(newPlayerRatings) {
-    var newPlayerRating;
-    var ratingstring;
+    let newPlayerRating;
+    let ratingstring;
     if ( players[0].id == userID ) {
         newPlayerRating = newPlayerRatings.newPlayer1Rating;
     } else {
@@ -1194,7 +1214,7 @@ async function checkPlayerRanked(newPlayerRatings) {
     }
 
     if ( userELO == null && newPlayerRating != null ) {
-        var userRank = GetRank(newPlayerRating);
+        let userRank = GetRank(newPlayerRating);
         qualifierImage.src = userRank.imageURL;
         qualifierName.innerHTML = userRank.name;
         overlay.classList.remove('hidden');
@@ -1205,7 +1225,7 @@ async function checkPlayerRanked(newPlayerRatings) {
 
 function tabAlert(button) {
     if ( !button.classList.contains('active') ) {
-        var notification = button.childNodes[0];
+        let notification = button.childNodes[0];
         notification.classList.add('alert')
     }
 }
@@ -1272,7 +1292,7 @@ socket.on('connection', async () => {
 socket.on('chatMessage', async (chatData) => {
     console.log(chatData);
     tabAlert(toggleMatchChat);
-    var chatString = await getMessageString(chatData);
+    let chatString = await getMessageString(chatData);
     await addMessage(chatString);
 });
 
@@ -1284,7 +1304,7 @@ socket.on('stageStrikes', (receivedStrikes) => {
     setCurrentStriker();
     isPlayerStriker();
 
-    var strikeableStages = document.getElementsByClassName('stage-selectable');
+    let strikeableStages = document.getElementsByClassName('stage-selectable');
 
     if (strikeableStages.length == 1) {
         startGame();
@@ -1332,7 +1352,7 @@ socket.on('matchWin', async (data) => {
 socket.on('matchEnd', async (data) => {
     console.log(data);
     if ( !userLeft ) {
-        var leftPlayer;
+        let leftPlayer;
         if ( players[0].id == userID ) {
             leftPlayer = players[1].id;
         } else {
@@ -1349,7 +1369,7 @@ socket.on('matchEnd', async (data) => {
 socket.on('forfeit', async (data) => {
     console.log(data);
     if ( !userLeft ) {
-        var leftPlayer;
+        let leftPlayer;
         if ( players[0].id == userID ) {
             leftPlayer = players[1].id;
         } else {
@@ -1372,6 +1392,7 @@ socket.on('dispute', async () => {
     await showAdminDispute();
     await showPlayerResolve();
     confirmationMessage.innerHTML = 'Please wait for a moderator to resolve the match dispute. If the dispute was made by accident, please press the resolve dispute button and properly mark the winner.';
+    confirmationMessage.style.display = 'block';
     console.log(match);
 });
 
