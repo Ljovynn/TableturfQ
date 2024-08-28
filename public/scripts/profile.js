@@ -9,6 +9,7 @@ const userDiscordName = document.getElementById('user-discord-name');
 const userDisplayNameContent = document.getElementById('user-in-game-name');
 const userDisplayName =  document.getElementById('user-in-game-name-value');
 const userProfilePicture = document.getElementById('user-profile-picture');
+const userProfilePictureRefresh = document.getElementById('user-profile-picture-refresh');
 const userRankInfo = document.getElementById('user-rank-info');
 const userELO = document.getElementById('user-rank-elo');
 const userRank = document.getElementById('user-rank');
@@ -94,6 +95,12 @@ await setELOGraph();
 await setUserBanLength();
 
 await showAdminBanInfo();
+
+userProfilePictureRefresh.addEventListener('click', async (e) => {
+    let data = { userId: playerID };
+    let response = await postData('/api/auth/discord/updateAvatar', data);
+    console.log(response);
+});
 
 editDisplayName.addEventListener('click', (e) => {
     editDisplayNameForm.classList.toggle('editing');
@@ -188,6 +195,25 @@ toggleRatingGraph.addEventListener('click', async (e) => {
 graphSubmit.addEventListener('click', async (e) => {
     await setELOGraph(graphTimeframe.value);
 });
+
+/*window.addEventListener('scroll', async (e) => {
+    // Only do this when they're on the correct tab
+    if ( toggleMatchHistory.classList.contains('active') ) {
+        if ( window.scrollY >= matchHistory.offsetHeight ) {
+            console.log('Bottom!');
+            let hits = document.getElementsByClassName('match-row');
+            let page = 1;
+            console.log(hits.length);
+            if ( hits.length % 10 == 0 ) {
+                page += hits.length/10;
+                console.log(page);
+                let result = await getMatchHistory(page);
+                console.log(result);
+                await appendMatches(result);
+            }
+        }
+    }
+});*/
 
 // Admin actions
 if ( !loggedInUserInfo.error && loggedInUserInfo.user.role== 2 ) {
@@ -296,16 +322,14 @@ async function setUserInfo() {
     }
 }
 
-async function getMatchHistory() {
-    var page = 1;
-    var hits = 10;
-    var data = {};
+async function getMatchHistory(page = 1, hits = 10) {
+    let data = {};
     if ( playerID != '' ) {
         data = { userId: playerID, pageNumber: parseInt(page), hitsPerPage: parseInt(hits) };
     } else {
         data = { userId: userId, pageNumber: parseInt(page), hitsPerPage: parseInt(hits) };
     }
-    var result = await postData('/matchHistory/GetUserMatchHistory', data);
+    let result = await postData('/matchHistory/GetUserMatchHistory', data);
     return result.data;
 }
 
@@ -313,151 +337,155 @@ async function setMatchHistory() {
     matchList = await getMatchHistory();
     console.log(matchList);
     if ( matchList.matchHistory.length > 0 ) {
-        matches = matchList.matchHistory;
-        matchUsers = matchList.users;
-        for ( let match of matches ) {
-            try {
-                let row = document.createElement('div');
-                row.classList.add('match-row');
-
-                let dateCell = document.createElement('div');
-                dateCell.classList.add('match-date');
-                var matchDate = match.unix_created_at;
-                matchDate = new Date(matchDate);
-                matchDate = matchDate.getTime();
-                var timeNow = Math.floor(Date.now() / 1000);
-                var timeElapsed = timeNow - matchDate;
-                var readableTime = getReadableMatchTime(timeElapsed);
-
-                dateCell.append(readableTime);
-
-                let matchupCell = document.createElement('div');
-               // var players = await getMatchUsers( [match.player1_id, match.player2_id] );
-                var player1 = getMatchPlayer(matchUsers, match.player1_id);
-                var player2 = getMatchPlayer(matchUsers, match.player2_id);
-                matchupCell.classList.add('matchup');
-
-                let matchPlayer1 = document.createElement('a');
-                matchPlayer1.href = '/profile?playerId=' + match.player1_id;
-                matchPlayer1.classList.add('recent-matchup-player');
-                matchPlayer1.classList.add('recent-matchup-player1');
-                let matchPlayer2 = document.createElement('a');
-                matchPlayer2.href = '/profile?playerId=' + match.player2_id;
-                matchPlayer2.classList.add('recent-matchup-player');
-                matchPlayer2.classList.add('recent-matchup-player2');
-
-                let avatarPlayer1 = document.createElement('img')
-                avatarPlayer1.classList.add('recent-matchup-avatar');
-                let avatarPlayer2 = document.createElement('img');
-                avatarPlayer2.classList.add('recent-matchup-avatar');
-
-                if ( player1[0].discord_avatar_hash ) {
-                    avatarPlayer1.src = 'https://cdn.discordapp.com/avatars/' + player1[0].discord_id + '/' + player1[0].discord_avatar_hash + '.jpg' + '?size=512';
-                } else {
-                    avatarPlayer1.src = '/assets/images/chumper.png';
-                }
-
-                if ( player2[0].discord_avatar_hash ) {
-                    avatarPlayer2.src = 'https://cdn.discordapp.com/avatars/' + player2[0].discord_id + '/' + player2[0].discord_avatar_hash + '.jpg' + '?size=512';
-                } else {
-                    avatarPlayer2.src = '/assets/images/chumper.png';
-                }
-
-                let player1Name = document.createElement('div');
-                player1Name.classList.add('recent-matchup-name');
-                let player2Name = document.createElement('div');
-                player2Name.classList.add('recent-matchup-name');
-
-                let player1Score = document.createElement('div');
-                player1Score.classList.add('recent-matchup-score');
-                if ( match.ranked ) {
-                    player1Score.innerHTML = match.player1_score;
-                } else {
-                    player1Score.innerHTML = `&ndash;`;
-                }
-
-                let player2Score = document.createElement('div');
-                player2Score.classList.add('recent-matchup-score');
-                if ( match.ranked ) {
-                    player2Score.innerHTML = match.player2_score;
-                } else {
-                    player2Score.innerHTML = `&ndash;`;
-                }
-
-                switch ( match.result ) {
-                    case 0:
-                    case 1:
-                    case 2:
-                        //
-                        break;
-                    case 3:
-                        // player 1 win
-                        player1Score.classList.add('recent-matchup-victor');
-                        break;
-                    case 4:
-                        // player 2 win
-                        player2Score.classList.add('recent-matchup-victor');
-                        break;
-                    default:
-                        //
-                        break;
-                }
-
-                player1Name.innerHTML = sanitizeDisplayName( player1[0].username );
-                player2Name.innerHTML = sanitizeDisplayName( player2[0].username );
-
-                matchPlayer1.append(avatarPlayer1);
-                matchPlayer1.append( player1Name );
-
-                matchPlayer2.append(avatarPlayer2);
-                matchPlayer2.append( player2Name );
-
-                matchupCell.append( matchPlayer1 );
-                matchupCell.append( player1Score );
-
-                let matchLink = document.createElement('a');
-                matchLink.href = '/game?matchID=' + match.id;
-
-                let vsImg = document.createElement('img');
-                vsImg.classList.add('recent-matchup-vs');
-                vsImg.src = '/assets/images/vs-icon.png';
-
-                matchLink.append(vsImg);
-
-                //matchupCell.append('vs');
-                matchupCell.append(matchLink);
-                matchupCell.append( player2Score );
-                matchupCell.append( matchPlayer2 );
-
-                /*let outcomeCell = document.createElement('div');
-                outcomeCell.classList.add('match-outcome');
-                let outcome = '';
-                outcomeCell.append(outcome);*/
-
-                let typeCell = document.createElement('div');
-                typeCell.classList.add('match-type');
-
-                if ( match.ranked ) {
-                    typeCell.append('Ranked');
-                } else {
-                    typeCell.append('Casual');
-                }
-
-                row.append(matchupCell);
-                row.append(typeCell);
-                row.append(dateCell);
-                //row.append(outcomeCell);
-
-                matchHistory.append(row);
-            } catch (error) {
-                console.log(error);
-            }
-        }
+        await appendMatches(matchList);
     } else {
         let emptyCell = document.createElement('div');
         emptyCell.classList.add('match-history-empty');
         emptyCell.innerHTML = 'User has no recent matches';
         matchHistory.append(emptyCell);
+    }
+}
+
+async function appendMatches(matchList) {
+    matches = matchList.matchHistory;
+    matchUsers = matchList.users;
+    for ( let match of matches ) {
+        try {
+            let row = document.createElement('div');
+            row.classList.add('match-row');
+
+            let dateCell = document.createElement('div');
+            dateCell.classList.add('match-date');
+            var matchDate = match.unix_created_at;
+            matchDate = new Date(matchDate);
+            matchDate = matchDate.getTime();
+            var timeNow = Math.floor(Date.now() / 1000);
+            var timeElapsed = timeNow - matchDate;
+            var readableTime = getReadableMatchTime(timeElapsed);
+
+            dateCell.append(readableTime);
+
+            let matchupCell = document.createElement('div');
+           // var players = await getMatchUsers( [match.player1_id, match.player2_id] );
+            var player1 = getMatchPlayer(matchUsers, match.player1_id);
+            var player2 = getMatchPlayer(matchUsers, match.player2_id);
+            matchupCell.classList.add('matchup');
+
+            let matchPlayer1 = document.createElement('a');
+            matchPlayer1.href = '/profile?playerId=' + match.player1_id;
+            matchPlayer1.classList.add('recent-matchup-player');
+            matchPlayer1.classList.add('recent-matchup-player1');
+            let matchPlayer2 = document.createElement('a');
+            matchPlayer2.href = '/profile?playerId=' + match.player2_id;
+            matchPlayer2.classList.add('recent-matchup-player');
+            matchPlayer2.classList.add('recent-matchup-player2');
+
+            let avatarPlayer1 = document.createElement('img')
+            avatarPlayer1.classList.add('recent-matchup-avatar');
+            let avatarPlayer2 = document.createElement('img');
+            avatarPlayer2.classList.add('recent-matchup-avatar');
+
+            if ( player1[0].discord_avatar_hash ) {
+                avatarPlayer1.src = 'https://cdn.discordapp.com/avatars/' + player1[0].discord_id + '/' + player1[0].discord_avatar_hash + '.jpg' + '?size=512';
+            } else {
+                avatarPlayer1.src = '/assets/images/chumper.png';
+            }
+
+            if ( player2[0].discord_avatar_hash ) {
+                avatarPlayer2.src = 'https://cdn.discordapp.com/avatars/' + player2[0].discord_id + '/' + player2[0].discord_avatar_hash + '.jpg' + '?size=512';
+            } else {
+                avatarPlayer2.src = '/assets/images/chumper.png';
+            }
+
+            let player1Name = document.createElement('div');
+            player1Name.classList.add('recent-matchup-name');
+            let player2Name = document.createElement('div');
+            player2Name.classList.add('recent-matchup-name');
+
+            let player1Score = document.createElement('div');
+            player1Score.classList.add('recent-matchup-score');
+            if ( match.ranked ) {
+                player1Score.innerHTML = match.player1_score;
+            } else {
+                player1Score.innerHTML = `&ndash;`;
+            }
+
+            let player2Score = document.createElement('div');
+            player2Score.classList.add('recent-matchup-score');
+            if ( match.ranked ) {
+                player2Score.innerHTML = match.player2_score;
+            } else {
+                player2Score.innerHTML = `&ndash;`;
+            }
+
+            switch ( match.result ) {
+                case 0:
+                case 1:
+                case 2:
+                    //
+                    break;
+                case 3:
+                    // player 1 win
+                    player1Score.classList.add('recent-matchup-victor');
+                    break;
+                case 4:
+                    // player 2 win
+                    player2Score.classList.add('recent-matchup-victor');
+                    break;
+                default:
+                    //
+                    break;
+            }
+
+            player1Name.innerHTML = sanitizeDisplayName( player1[0].username );
+            player2Name.innerHTML = sanitizeDisplayName( player2[0].username );
+
+            matchPlayer1.append(avatarPlayer1);
+            matchPlayer1.append( player1Name );
+
+            matchPlayer2.append(avatarPlayer2);
+            matchPlayer2.append( player2Name );
+
+            matchupCell.append( matchPlayer1 );
+            matchupCell.append( player1Score );
+
+            let matchLink = document.createElement('a');
+            matchLink.href = '/game?matchID=' + match.id;
+
+            let vsImg = document.createElement('img');
+            vsImg.classList.add('recent-matchup-vs');
+            vsImg.src = '/assets/images/vs-icon.png';
+
+            matchLink.append(vsImg);
+
+            //matchupCell.append('vs');
+            matchupCell.append(matchLink);
+            matchupCell.append( player2Score );
+            matchupCell.append( matchPlayer2 );
+
+            /*let outcomeCell = document.createElement('div');
+            outcomeCell.classList.add('match-outcome');
+            let outcome = '';
+            outcomeCell.append(outcome);*/
+
+            let typeCell = document.createElement('div');
+            typeCell.classList.add('match-type');
+
+            if ( match.ranked ) {
+                typeCell.append('Ranked');
+            } else {
+                typeCell.append('Casual');
+            }
+
+            row.append(matchupCell);
+            row.append(typeCell);
+            row.append(dateCell);
+            //row.append(outcomeCell);
+
+            matchHistory.append(row);
+        } catch (error) {
+            console.log(error);
+        }
     }
 }
 

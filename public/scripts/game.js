@@ -284,7 +284,6 @@ chatForm.addEventListener('submit', async (e) => {
     }
 });
 
-// make this shit work when you scroll upwards instead I guess
 chatLog.addEventListener('scroll', async (e) => {
     console.log(chatLog.scrollTop);
     if ( chatLog.scrollTop <= 10 ) {
@@ -1218,6 +1217,7 @@ function removeNotifications() {
 }
 
 async function reconnectSocket() {
+    console.log('Reconnecting!');
     await setMatchInfo();
     socket.connect();
     socket.emit('join', 'match' + matchId);
@@ -1252,6 +1252,14 @@ function sanitizeInput(s) {
 }
 
 // SOCKET FUNCTIONS
+
+async function socketHeartBeat() {
+    console.log('badum');
+    await setMatchInfo();
+    if ( !socket.connected ) {
+        await reconnectSocket();
+    }
+}
 
 socket.emit('join', 'match' + matchId);
 socket.emit('join', 'userRoom');
@@ -1411,3 +1419,6 @@ socket.on("disconnect", async (reason, details) => {
   Attempting to rejoin`);*/
   await reconnectSocket();
 });
+
+// heart beat every 1:30
+setInterval(socketHeartBeat, 90*1000);
