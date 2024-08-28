@@ -6,7 +6,7 @@ import { AddChatMessage, GetMatch, GetUserSeasonRankedMatchCount, SetMatchResult
 import { FindPlayerPosInMatch } from "./utils/matchUtils.js";
 import { AddRecentlyMatchedPlayers } from "./queManager.js";
 import { SendDisputeMessage, SendNewSuspiciousAction, SuspiciousAction } from "./discordBot/discordBotManager.js";
-import { ResponseData } from "./responses/ResponseData.js";
+import { ResponseData, ResponseSucceeded } from "./responses/ResponseData.js";
 import { casualMatchEndErrors, chatMessageErrors, disputeErrors, gameWinErrors, databaseErrors, resolveErrors, stagePickErrors, stageStrikeErrors, nullErrors, forfeitErrors } from "./responses/matchErrors.js";
 import { HasBadWords, SanitizeDiscordLog } from "./utils/string.js";
 import { CasualMatchEndChatMessage, ChooseStageChatMessage, DisputeChatMessage, ForfeitChatMessage, GamePlayerConfirmMessage, GameWinChatMessage, MatchStartChatMessage, MatchWinChatMessage, ResolveDisputeChatMessage, StrikeStagesChatMessage } from "./public/scripts/utils/systemChatMessages.js";
@@ -93,7 +93,7 @@ export function PlayerSentStageStrikes(playerId, stages){
     } else{
         strikeResponse = CounterpickStrikingLogic(match, playerId, playerPos, stages);
     }
-    match.chat.push(new ChatMessage(StrikeStagesChatMessage(playerId, stages), systemId));
+    if (ResponseSucceeded(strikeResponse.code)) match.chat.push(new ChatMessage(StrikeStagesChatMessage(playerId, stages), systemId));
     return strikeResponse;
 }
 
