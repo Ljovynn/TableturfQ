@@ -14,6 +14,7 @@ import { SetErrorResponse } from '../responses/ResponseData.js';
 import { usernameMaxLength, usernameMinLength } from '../public/constants/userData.js';
 import { HasBadWords, SanitizeFulltextSearch } from '../utils/string.js';
 import { ratingHistoryOptions } from '../public/constants/ratingData.js';
+import { currentSeason, seasons } from '../public/constants/seasonData.js';
 
 const router = Router();
 const userGraphClumpingThreshold = 60 * 60 * 16;
@@ -127,6 +128,7 @@ router.post("/GetUserRatingHistory", async (req, res) => {
     try{
         let userId = req.body.userId;
         const ratingHistoryOption = req.body.ratingHistoryOption;
+        const seasonId = req.body.seasonId;
 
         if (!userId){
             if (!CheckUserDefined(req)) return SetErrorResponse(res, userErrors.notLoggedIn);
@@ -137,9 +139,19 @@ router.post("/GetUserRatingHistory", async (req, res) => {
         if (!Object.values(ratingHistoryOptions).includes(ratingHistoryOption)) return SetErrorResponse(res, definitionErrors.ratingHistoryOptionWrongFormat);
 
         let ignoreHideRank = false;
-        //todo implement season
+        let startDate;
+        let endDate;
         if (ratingHistoryOption === ratingHistoryOptions.season){
-            return res.sendStatus(501);
+            let season = seasons.find(x => x.id === seasonId);
+            if (!season) season = currentSeason;
+
+            if (season !== currentSeason) ignoreHideRank = true;
+
+            startDate = season.startDate;
+            endDate = season.endDate;
+        } else{
+            startDate = Date.now() - ratingHistoryOption;
+            endDate = Date.now();
         }
 
         if (!ignoreHideRank){
@@ -147,11 +159,8 @@ router.post("/GetUserRatingHistory", async (req, res) => {
             if (!userRankData) return SetErrorResponse(res, definitionErrors.userNotDefined);
             if (userRankData.hide_rank) return res.status(200).send([]);
         }
-        const cutoffDate = (ratingHistoryOption == 0) ? Date.now() : Date.now() - ratingHistoryOption;
 
-        const endCutoffDate = Date.now();
-
-        let result = await GetUserRatingHistory(userId, cutoffDate, endCutoffDate);
+        let result = await GetUserRatingHistory(userId, startDate, endDate);
 
         if (ratingHistoryOption != ratingHistoryOptions.day && result.length > 0){
             let currentEndOfDayRating = result[result.length - 1].unix_date;
