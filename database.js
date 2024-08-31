@@ -93,7 +93,7 @@ export async function GetUserChatData(userIdlist){
     return rows;
 }
 
-export async function GetUserRatingHistory(userId, cutoffDate, endCutoffDate = Date.now())
+export async function GetUserRatingHistory(userId, startDate, endDate = Date.now())
 {
     const [rows] = await pool.execute(`SELECT match_ratings.match_id,
         match_ratings.player1_old_rating AS old_rating, match_ratings.player1_new_rating AS new_rating,
@@ -106,7 +106,7 @@ export async function GetUserRatingHistory(userId, cutoffDate, endCutoffDate = D
         FROM match_ratings INNER JOIN matches ON match_ratings.match_id=matches.id
 		WHERE matches.player2_id = ? AND matches.created_at > FROM_UNIXTIME(?) AND matches.created_at <= FROM_UNIXTIME(?)
         ORDER BY unix_date ASC`,
-    [userId, Math.round(cutoffDate / 1000), Math.round(endCutoffDate / 1000), userId, Math.round(cutoffDate / 1000), Math.round(endCutoffDate / 1000)]);
+    [userId, Math.round(startDate / 1000), Math.round(endDate / 1000), userId, Math.round(startDate / 1000), Math.round(endDate / 1000)]);
     return rows;
 }
 
