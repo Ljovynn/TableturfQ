@@ -1,5 +1,6 @@
 import { GetRank } from "../constants/rankData.js";
 import { ratingHistoryOptions } from "../constants/ratingData.js";
+import { seasons } from "../constants/seasonData.js";
 
 // User elements
 const loadingSection = document.getElementById('page-loading');
@@ -40,6 +41,7 @@ const ratingGraph = document.getElementById('user-rating-graph');
 const graphTimeframe = document.getElementById('user-rating-graph-timeframe');
 const graphSubmit = document.getElementById('user-rating-graph-submit');
 var chosenTimeframe;
+var chosenSeason;
 const chartEndpointsOffset = 1300;
 
 // Logout
@@ -97,6 +99,8 @@ await setELOGraph();
 await setUserBanLength();
 
 await showAdminBanInfo();
+
+await addSeasonSelection();
 
 userProfilePictureRefresh.addEventListener('click', async (e) => {
     let data = { userId: playerID };
@@ -207,7 +211,8 @@ toggleRatingGraph.addEventListener('click', async (e) => {
 });
 
 graphSubmit.addEventListener('click', async (e) => {
-    await setELOGraph(graphTimeframe.value);
+    let seasonId = graphTimeframe.options[graphTimeframe.selectedIndex].getAttribute('season-id');
+    await setELOGraph(graphTimeframe.value, seasonId);
 });
 
 window.addEventListener('scroll', async (e) => {
@@ -514,8 +519,18 @@ async function getMatchUsers(users) {
     return result.data;
 }
 
-async function getELOGraph(timeframe) {
-    let data = { userId: userId, ratingHistoryOption: ratingHistoryOptions[timeframe] };
+async function addSeasonSelection() {
+    for ( let season of seasons ) {
+        let seasonOption = document.createElement('option');
+        seasonOption.value = 'season';
+        seasonOption.setAttribute('season-id', season.id);
+        seasonOption.innerHTML = 'Season ' + season.id;
+        graphTimeframe.prepend(seasonOption);
+    }
+}
+
+async function getELOGraph(timeframe, seasonId = null) {
+    let data = { userId: userId, ratingHistoryOption: ratingHistoryOptions[timeframe], seasonId: seasonId };
     let result = await postData('/user/GetUserRatingHistory', data);
     /*if (result.length > 0){
         result.unshift({
@@ -535,9 +550,10 @@ async function getELOGraph(timeframe) {
     return result.data;
 }
 
-async function setELOGraph(timeframe = 'month') {
+async function setELOGraph(timeframe = 'month', seasonId = null) {
     chosenTimeframe = timeframe;
-    graphData = await getELOGraph(timeframe);
+    chosenSeason = seasonId;
+    graphData = await getELOGraph(timeframe, seasonId);
 
     google.charts.load('current', {'packages':['corechart']});
     google.charts.setOnLoadCallback(drawELOChart);
@@ -677,9 +693,14 @@ function drawELOChart() {
         previousMatch = match;*/
     }
     if (graphData.length > 0){
-        dataArray.unshift([new Date(Date.now() - ratingHistoryOptions[chosenTimeframe]), graphData[0].old_rating,
-        'point { size: 0; visible: false; }', `Start rating: ${graphData[0].old_rating}`]);
-        //dataArray.push([new Date(Date.now()), graphData[graphData.length - 1].new_rating, null, 'point {visible: false; }']);
+        if ( chosenTimeframe != 'season' ) {
+            dataArray.unshift([new Date(Date.now() - ratingHistoryOptions[chosenTimeframe]), graphData[0].old_rating,
+            'point { size: 0; visible: false; }', `Start rating: ${graphData[0].old_rating}`]);
+            //dataArray.push([new Date(Date.now()), graphData[graphData.length - 1].new_rating, null, 'point {visible: false; }']);
+        } else {
+            dataArray.unshift([ new Date(seasons[chosenSeason].startDate), graphData[0].old_rating,
+            'point { size: 0; visible: false; }', `Start rating: ${graphData[0].old_rating}`]);
+        }
     }
 
     let data = new google.visualization.DataTable();
