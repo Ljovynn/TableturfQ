@@ -163,6 +163,7 @@ router.post("/GetUserRatingHistory", async (req, res) => {
         let result = await GetUserRatingHistory(userId, startDate, endDate);
 
         if (ratingHistoryOption != ratingHistoryOptions.day && result.length > 0){
+            let startOldRating = result[0].old_rating;
             let currentEndOfDayRating = result[result.length - 1].unix_date;
             for (let i = result.length - 2; i >= 0; i--){
                 if (result[i].unix_date > currentEndOfDayRating - userGraphClumpingThreshold){
@@ -171,6 +172,7 @@ router.post("/GetUserRatingHistory", async (req, res) => {
                 }
                 currentEndOfDayRating = result[i].unix_date;
             }
+            result[0].old_rating = startOldRating;
         }
 
 
