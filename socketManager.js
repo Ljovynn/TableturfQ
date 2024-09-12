@@ -40,6 +40,10 @@ export function CreateSocketConnection (server){
                 SocketJoinMatchRoom(socket, room);
             }
         });
+
+        socket.on('disconnect',function(){
+            console.log("disconnected, " + socket.id);
+        });
     });
 
     if (process.env.ADMIN_IO_ENABLED === 'true'){
