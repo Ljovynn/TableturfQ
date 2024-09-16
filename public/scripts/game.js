@@ -334,6 +334,7 @@ playerResolveDispute.addEventListener('click', async (e) => {
     let response = await postData('/match/ResolveDispute');
     if ( response.code == 201 ) {
         // idk
+        await setMatchInfo();
     }
 });
 
@@ -365,6 +366,7 @@ if ( user.role== 2 ) {
         let response = await postData('/admin/ResolveDispute', data);
         if ( response.code == 201 ) {
             adminContent.style.display = 'none';
+            await setMatchInfo();
         }
     });
 
@@ -781,8 +783,9 @@ function setStrikeAmount() {
         }*/
         strikeAmount = (strikes.length + 1) % 4;
         // Maybe I'm just dumb, I cannot get the mod logic to work correctly for the very last strike whether I count the amount of already stricken stages or the amount of stages remaining
-        if ( strikeableStages.length == 2 )
+        if ( strikeableStages.length == 2 ) {
             strikeAmount = 1;
+        }
         strikesRemaining = strikeAmount;
 
         if ( strikesRemaining > 0 ) {
@@ -1006,6 +1009,7 @@ async function nextGame(winnerId) {
 }
 
 async function resetGame() {
+    strikes = [];
     resetStages();
     setStrikeAmount();
     setCurrentStriker();
