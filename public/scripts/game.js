@@ -1111,6 +1111,8 @@ function playerResetDispute() {
 function showAdminDispute() {
     if ( user.role == 2 && match.status == 2 ) {
         adminContent.style.display = 'block';
+        // Hide player resolve if user is admin
+        playerResolve.style.display = 'none';
     }
 }
 
@@ -1136,7 +1138,10 @@ function showAdminBanInfo() {
 function showPlayerResolve() {
     if ( !privateMatch ) {
         needHelp.style.display = 'none';
-        playerResolve.style.display = 'block';
+        // Don't show player resolve for users who are admins
+        if ( user.role != 2 ) {
+            playerResolve.style.display = 'block';
+        }
     }
 }
 

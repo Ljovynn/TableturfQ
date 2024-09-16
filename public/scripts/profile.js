@@ -669,7 +669,7 @@ function drawELOChart() {
         let matchDate = new Date(match.unix_date*1000);
         if ( match == graphData[0] ) {
             console.log('first element!');
-            dataArray.push([matchDate, match.old_rating, null, null]);
+            dataArray.push([matchDate, match.new_rating, null, null]);
         } else {
             dataArray.push([matchDate, match.new_rating, null, null]);
         }
