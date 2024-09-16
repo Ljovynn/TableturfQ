@@ -211,7 +211,7 @@ toggleRatingGraph.addEventListener('click', async (e) => {
 });
 
 graphSubmit.addEventListener('click', async (e) => {
-    let seasonId = graphTimeframe.options[graphTimeframe.selectedIndex].getAttribute('season-id');
+    let seasonId = parseInt(graphTimeframe.options[graphTimeframe.selectedIndex].getAttribute('season-id'));
     await setELOGraph(graphTimeframe.value, seasonId);
 });
 
