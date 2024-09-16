@@ -51,13 +51,11 @@ await getRecentMatches();
 joinCompetitive.addEventListener('click', async (e) => {
     await clearError();
 
-    console.log('User has joined the competitive queue');
     let data = { matchMode: 'ranked' }
     queuedMatchMode = 'ranked';
 
     // Join the queue
     let response = await postData('/que/PlayerEnterQue', data);
-    console.log('Response data: ' + JSON.stringify(response));
     if ( response.code == 201 ) {
         for ( let queueButton of queueButtons ) {
             queueButton.style.display = 'none';
@@ -70,9 +68,7 @@ joinCompetitive.addEventListener('click', async (e) => {
         //matchMakingReady.style.display = 'block';
     } else {
         //alert('There was a problem joining the queue. Please refresh and try again');
-        console.log('error');
         let error = response.data.error;
-        console.log(error);
         await userError(error);
     }
 });
@@ -80,7 +76,6 @@ joinCompetitive.addEventListener('click', async (e) => {
 joinCasual.addEventListener('click', async (e) => {
     await clearError();
 
-    console.log('User has joined the casual queue');
 
     // Check that there is a username entered
     let data = { matchMode: 'casual' }
@@ -100,31 +95,25 @@ joinCasual.addEventListener('click', async (e) => {
         //matchMakingReady.style.display = 'block';
     } else {
         //alert('There was a problem joining the queue. Please refresh and try again');
-        console.log('error');
         let error = response.data.error;
-        console.log(error);
         await userError(error);
     }
 });
 
 readyButton.addEventListener('click', async (e) => {
-    console.log('User is ready for competitive match.');
     readyButton.style.display = 'none';
     ready = true;
 
     // Not sure if we need to send any data but we can leave it blank for now
 
     let response = await postData('/que/PlayerReady');
-    console.log(response);
 
     // Redirect to the game room once the game is created
 });
 
 leaveButton.addEventListener('click', async (e) => {
-    console.log('leaving queue');
     let data = { matchMode: queuedMatchMode };
     let response = await postData('/que/PlayerLeaveQue', data);
-    console.log(response);
     if ( response.code == 201 ) {
         for ( let queueButton of queueButtons ) {
             queueButton.style.display = 'block';
@@ -140,7 +129,6 @@ guestSubmit.addEventListener('click', async (e) => {
     if ( validateDisplayname(guestName.value) ) {
         let data = { username: guestName.value };
         let response = await postData('/api/auth/unverified/login', data);
-        console.log(response);
         if ( response.code == 201 ) {
             window.location.href = '/queue';
         }
@@ -156,14 +144,12 @@ async function getMatchMakingStatus() {
 async function setMatchMakingStatus() {
     try {
         let status = await getMatchMakingStatus();
-        console.log(status);
         if ( !status ) {
             loading.style.display = 'none';
             matchMakingUnavailable.style.display = 'block';
         }
         matchMakingStatus = status;
     } catch (error) {
-        console.log(error);
     }
 }
 
@@ -174,7 +160,6 @@ async function getUserInfo() {
 }
 
 async function setUserInfo() {
-    console.log('Setting user info');
     try {
         let userInfo = await getUserInfo();
         user = userInfo.user;
@@ -210,7 +195,6 @@ async function setUserInfo() {
             window.location.href = '/profile?playerId=' + user.id;
         }
     } catch (error) {
-        console.log(error);
         //window.location.href = '/';
         matchMakingQueues.style.display = 'none';
         loading.style.display = 'none';
@@ -230,7 +214,6 @@ function setQueueInfo(queueData) {
 async function getRecentMatches() {
     let data = {};
     let result = await getData('/matchHistory/GetRecentMatches');
-    console.log(result);
     displayRecentMatches(result.data);
 }
 
@@ -419,10 +402,8 @@ function countdownTimer() {
     if ( countdown == 0 ) {
         clearTimer(readyUp);
         if ( modal.offsetTop == 0 ) {
-            console.log('hidden modal');
             // Make the logic work if they clicked ready from the modal
             if ( readyButton.classList.contains('modal-readied') ) {
-                console.log('readied on modal');
                 ready = true;
                 readyButton.classList.remove('modal-readied');
             }
@@ -525,7 +506,6 @@ async function reconnectSocket() {
 socket.emit('join', 'userRoom');
 
 socket.on('matchFound', () => {
-    console.log('Socket event match ready');
     timer = 0;
     clearTimer(mainTimer);
     countdown = PublicQueDatas[queuedMatchMode].readyTimer;
@@ -538,7 +518,6 @@ socket.on('matchFound', () => {
 
 socket.on('matchReady', (matchID) => {
     clearTimer(readyUp);
-    console.log('/game?matchID=' + matchID);
     window.location.href = '/game?matchID=' + matchID;
 });
 

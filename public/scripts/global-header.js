@@ -28,7 +28,6 @@ hamburger.addEventListener('click', async(e) => {
 async function setUserInfo() {
     try {
         userInfo = await getUserInfo();
-        console.log(userInfo)
         if ( userInfo.user.id ) {
             setLoggedInLinks();
         }
@@ -37,13 +36,12 @@ async function setUserInfo() {
             setMatchLink(userInfo.matchId.id);
         }
     } catch (error) {
-        console.log(error);
     }
 }
 
 async function getUserInfo() {
-    let data = {};
-    let result = await getData('/user/GetUserInfo');
+    var data = {};
+    var result = await getData('/user/GetUserInfo');
     return result.data;
 }
 

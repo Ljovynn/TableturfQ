@@ -21,7 +21,6 @@ userSearchForm.addEventListener('submit', async (e) => {
 
 async function addSearchUser(users) {
     refreshSearch();
-    console.log(users);
     if ( users.length != 0 ) {
         for (  let user of users ) {
             let row = document.createElement('div');
@@ -62,7 +61,6 @@ async function addSearchUser(users) {
             let userRank = GetRank(user.g2_rating);
             let rankImage = document.createElement('img');
             rankImage.classList.add('user-search-rank-icon')
-            console.log(userRank);
             rankImage.src = userRank.imageURL;
             rankCell.append(rankImage);
 

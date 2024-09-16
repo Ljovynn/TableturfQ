@@ -88,7 +88,6 @@ try {
     const entriesArray = Array.from(entries);
     playerID = entriesArray[0][1];
 } catch (error) {
-    console.log(error);
     // idk who cares
 }
 
@@ -105,11 +104,8 @@ await addSeasonSelection();
 userProfilePictureRefresh.addEventListener('click', async (e) => {
     let data = { userId: playerID };
     let response = await postData('/api/auth/discord/updateAvatar', data);
-    console.log(response);
     if ( response.code == 200 ) {
-        console.log('update!');
         userInfo = await getMatchUsers([playerID]);
-        console.log(userInfo);
         let avatarString = '';
         if ( userInfo[0].discord_avatar_hash ) {
             avatarString = 'https://cdn.discordapp.com/avatars/' + userInfo[0].discord_id + '/' + userInfo[0].discord_avatar_hash + '.jpg' + '?size=512';
@@ -148,7 +144,6 @@ displayNameSubmit.addEventListener('click', async (e) => {
 
         let data = { username: newDisplayName };
         let response = await postData('/user/SetUsername', data);
-        console.log(response);
 
         // On successful response
         if ( response.code == 201 ) {
@@ -169,7 +164,6 @@ countrySubmit.addEventListener('click', async (e) => {
     let response = await postData('/user/SetUserCountry', data);
 
     // On Success
-    console.log(response);
     if ( response.code == 201 ) {
         editCountryForm.classList.toggle('editing');
         userCountry.classList.toggle('editing');
@@ -219,17 +213,13 @@ window.addEventListener('scroll', async (e) => {
     // Only do this when they're on the correct tab
     if ( toggleMatchHistory.classList.contains('active') ) {
         if ( window.scrollY + (screen.height/3) >= matchHistory.offsetHeight - 10 ) {
-            console.log('Loading matches', loadingMatches);
             if ( !loadingMatches ) {
                 loadingMatches = true;
                 let hits = document.getElementsByClassName('match-row');
                 let page = 1;
-                console.log(hits.length);
                 if ( hits.length % 10 == 0 ) {
                     page += hits.length/10;
-                    console.log(page);
                     let result = await getMatchHistory(page);
-                    console.log(result);
                     await appendMatches(result);
                 }
             }
@@ -255,7 +245,6 @@ if ( !loggedInUserInfo.error && loggedInUserInfo.user.role== 2 ) {
         let data = { bannedUserId: userId, banLength: parseInt(adminBanLength.value), reason: adminBanReason.value };
         let response = await postData('/admin/BanUser', data);
 
-        console.log(response);
         if ( response.code == 201 ) {
             adminUnbanUserContent.style.display = 'block';
             adminBanUser.style.display = 'none';
@@ -268,7 +257,6 @@ if ( !loggedInUserInfo.error && loggedInUserInfo.user.role== 2 ) {
         let data = { unbannedUserId: userId };
         let response = await postData('/admin/UnbanUser', data);
 
-        console.log(response);
         if ( response.code == 201 ) {
             adminUnbanUserContent.style.display = 'none';
             banDetails.style.display = 'none';
@@ -296,7 +284,6 @@ async function setUserInfo() {
         // If no playerID is set, try the default get current user info
         if ( playerID != '' ) {
             userInfo = await getMatchUsers([playerID]);
-            console.log(userInfo);
             user = userInfo[0];
         } else {
             userInfo = loggedInUserInfo;
@@ -339,13 +326,11 @@ async function setUserInfo() {
 
         hideNonUserElements();
     } catch (error) {
-        console.log(error);
         //window.location.href = '/';
     }
 }
 
 async function getMatchHistory(page = 1, hits = 10) {
-    console.log('Page', page);
     let data = {};
     if ( playerID != '' ) {
         data = { userId: playerID, pageNumber: parseInt(page), hitsPerPage: parseInt(hits) };
@@ -359,7 +344,6 @@ async function getMatchHistory(page = 1, hits = 10) {
 
 async function setMatchHistory() {
     matchList = await getMatchHistory();
-    console.log(matchList);
     if ( matchList.matchHistory.length > 0 ) {
         await appendMatches(matchList);
     } else {
@@ -508,7 +492,6 @@ async function appendMatches(matchList) {
 
             matchHistory.append(row);
         } catch (error) {
-            console.log(error);
         }
     }
 }
@@ -546,7 +529,6 @@ async function getELOGraph(timeframe, seasonId = null) {
             unix_date: Math.round((Date.now() / 1000))
         });
     }*/
-    console.log(result);
     return result.data;
 }
 
@@ -665,10 +647,8 @@ function drawELOChart() {
     let currentMatch;
     let previousMatch;
     for ( let match of graphData ) {
-        console.log(match);
         let matchDate = new Date(match.unix_date*1000);
         if ( match == graphData[0] ) {
-            console.log('first element!');
             dataArray.push([matchDate, match.new_rating, null, null]);
         } else {
             dataArray.push([matchDate, match.new_rating, null, null]);
@@ -750,7 +730,6 @@ async function setUserBanLength() {
 async function getUserBanLength() {
     //let data = { user: userID };
     let result = await getData('/user/GetUserBanInfo');
-    console.log(result);
     return result.data;
 }
 
@@ -774,10 +753,8 @@ async function setAdminBanLength(userID) {
 }
 
 async function getAdminBanLength(userID) {
-    console.log(userID);
     let data = { userId: userID };
     let result = await postData('/admin/GetUserBanInfo', data);
-    console.log(result);
     return result.data;
 }
 

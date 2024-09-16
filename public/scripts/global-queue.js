@@ -17,7 +17,6 @@ var readyUp;
 var readySound = new Audio('../assets/sounds/match-found.wav');
 
 readyButton.addEventListener('click', async (e) => {
-    console.log('User is ready for competitive match.');
     readyButton.style.display = 'none';
     ready = true;
 
@@ -28,7 +27,6 @@ readyButton.addEventListener('click', async (e) => {
     // Not sure if we need to send any data but we can leave it blank for now
 
     let response = await postData('/que/PlayerReady');
-    console.log(response);
 
     // Redirect to the game room once the game is created
 });
@@ -37,7 +35,6 @@ closeModalBtn.addEventListener('click', closeModal);
 
 async function setUserInfo() {
     let userInfo = await getUserInfo();
-    console.log(userInfo);
     if ( userInfo.queData ) {
         queuedMatchMode = userInfo.queData.matchMode;
     } else if ( userInfo.readyData ) {
@@ -116,9 +113,6 @@ socket.on('matchFound', async () => {
     openModal();
 
     // timer
-    console.log('Socket event match ready');
-    console.log(queuedMatchMode);
-    console.log(PublicQueDatas[queuedMatchMode]);
     countdown = PublicQueDatas[queuedMatchMode].readyTimer;
     ready = false;
     readyUp = window.setInterval(countdownTimer, 1000);
@@ -126,7 +120,6 @@ socket.on('matchFound', async () => {
 
 socket.on('matchReady', (matchID) => {
     clearTimer(readyUp);
-    console.log('/game?matchID=' + matchID);
     window.location.href = '/game?matchID=' + matchID;
 });
 

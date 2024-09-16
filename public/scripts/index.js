@@ -23,7 +23,6 @@ guestSubmit.addEventListener('click', async (e) => {
     if ( validateDisplayname(guestName.value) ) {
         let data = { username: guestName.value };
         let response = await postData('/api/auth/unverified/login', data);
-        console.log(response);
         if ( response.code == 201 ) {
             window.location.href = '/queue';
         }
@@ -38,14 +37,12 @@ async function setUserInfo() {
             throw new Error(userInfo.error);
         }
 
-        console.log(userInfo);
         if ( userInfo.user.id ) {
             hideLogInOptions();
             showLoggedInButton();
         }
     } catch (error) {
         // error
-        console.log(error);
     }
 }
 
@@ -66,15 +63,12 @@ function showLoggedInButton() {
 async function setAnnouncements() {
     try {
         let announcement = await getNextAnnouncement();
-        console.log(announcement);
         if ( announcement ) {
-            console.log('adding');
             addNextAnnouncement(announcement);
             nextAnnouncement.style.display = 'block';
 
             // If there's no next announcement, there can't be any upcoming ones right?
             let announcements = await getUpcomingAnnouncements();
-            console.log(announcements);
             if ( announcements ) {
                 upcomingAnnouncements.style.display = 'block';
                 addUpcomingAnnouncements(announcements);
@@ -90,13 +84,11 @@ async function setAnnouncements() {
         noAnnouncements.innerHTML = 'There are currently no announcements.';
         nextAnnouncement.append(noAnnouncements);
         nextAnnouncement.style.display = 'block';
-        console.log(error);
     }
 }
 
 async function getNextAnnouncement() {
     let result = await getData('/announcementInfo/GetNextAnnouncement');
-    console.log(result);
     return result.data;
 }
 

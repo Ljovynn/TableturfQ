@@ -24,7 +24,6 @@ setLeaderBoard(startPos, hitCount);
         data = { input: searchValue };
         response = await getData('/leaderboard/SearchLeaderboard', data);
 
-        console.log(response);
         addSearchedUser(response);
         // If success, recreate the table with the retrieved results
     } else {
