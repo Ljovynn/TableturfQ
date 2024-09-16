@@ -148,7 +148,7 @@ router.post("/GetUserRatingHistory", async (req, res) => {
             if (season !== currentSeason) ignoreHideRank = true;
 
             startDate = season.startDate;
-            endDate = season.endDate;
+            endDate = Math.min(Date.now(), season.endDate);
         } else{
             startDate = Date.now() - ratingHistoryOption;
             endDate = Date.now();
