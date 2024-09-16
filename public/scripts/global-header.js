@@ -40,8 +40,8 @@ async function setUserInfo() {
 }
 
 async function getUserInfo() {
-    var data = {};
-    var result = await getData('/user/GetUserInfo');
+    let data = {};
+    let result = await getData('/user/GetUserInfo');
     return result.data;
 }
 
