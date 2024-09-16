@@ -41,9 +41,9 @@ export function CreateSocketConnection (server){
             }
         });
 
-        socket.on('disconnect',function(){
+        /*socket.on('disconnect',function(){
             console.log("disconnected, " + socket.id);
-        });
+        });*/
     });
 
     if (process.env.ADMIN_IO_ENABLED === 'true'){
