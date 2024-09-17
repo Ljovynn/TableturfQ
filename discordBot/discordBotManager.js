@@ -172,7 +172,7 @@ export function SuspiciousAction(userId, description, timestamp){
 export async function SendNewSuspiciousAction(suspiciousAction){
 	suspiciousActionsList.push(suspiciousAction);
 
-	if (suspiciousActionsList > 25) suspiciousActionsList.shift();
+	if (suspiciousActionsList.length > 25) suspiciousActionsList.shift();
 
 	try {
 		if (!channel) return;
