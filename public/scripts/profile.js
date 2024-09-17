@@ -1,5 +1,6 @@
 import { GetRank } from "../constants/rankData.js";
 import { ratingHistoryOptions } from "../constants/ratingData.js";
+import { seasons } from "../constants/seasonData.js";
 
 // User elements
 const loadingSection = document.getElementById('page-loading');
@@ -9,6 +10,7 @@ const userDiscordName = document.getElementById('user-discord-name');
 const userDisplayNameContent = document.getElementById('user-in-game-name');
 const userDisplayName =  document.getElementById('user-in-game-name-value');
 const userProfilePicture = document.getElementById('user-profile-picture');
+const userProfilePictureRefresh = document.getElementById('user-profile-picture-refresh');
 const userRankInfo = document.getElementById('user-rank-info');
 const userELO = document.getElementById('user-rank-elo');
 const userRank = document.getElementById('user-rank');
@@ -39,6 +41,7 @@ const ratingGraph = document.getElementById('user-rating-graph');
 const graphTimeframe = document.getElementById('user-rating-graph-timeframe');
 const graphSubmit = document.getElementById('user-rating-graph-submit');
 var chosenTimeframe;
+var chosenSeason;
 const chartEndpointsOffset = 1300;
 
 // Logout
@@ -76,6 +79,8 @@ var playerID = '';
 
 var graphData;
 
+var loadingMatches = false;
+
 try {
     const url = window.location.href;
     const searchParams = new URL(url).searchParams;
@@ -83,7 +88,6 @@ try {
     const entriesArray = Array.from(entries);
     playerID = entriesArray[0][1];
 } catch (error) {
-    console.log(error);
     // idk who cares
 }
 
@@ -94,6 +98,23 @@ await setELOGraph();
 await setUserBanLength();
 
 await showAdminBanInfo();
+
+await addSeasonSelection();
+
+userProfilePictureRefresh.addEventListener('click', async (e) => {
+    let data = { userId: playerID };
+    let response = await postData('/api/auth/discord/updateAvatar', data);
+    if ( response.code == 200 ) {
+        userInfo = await getMatchUsers([playerID]);
+        let avatarString = '';
+        if ( userInfo[0].discord_avatar_hash ) {
+            avatarString = 'https://cdn.discordapp.com/avatars/' + userInfo[0].discord_id + '/' + userInfo[0].discord_avatar_hash + '.jpg' + '?size=512';
+        } else {
+            avatarString = '/assets/images/chumper.png';
+        }
+        userProfilePicture.src = avatarString;
+    }
+});
 
 editDisplayName.addEventListener('click', (e) => {
     editDisplayNameForm.classList.toggle('editing');
@@ -117,13 +138,12 @@ editCountryClose.addEventListener('click', (e) => {
 
 
 displayNameSubmit.addEventListener('click', async (e) => {
-    var newDisplayName = displayNameInput.value;
+    let newDisplayName = displayNameInput.value;
     // Validate the name update
     if ( validateDisplayName(newDisplayName) ) {
 
-        var data = { username: newDisplayName };
-        var response = await postData('/user/SetUsername', data);
-        console.log(response);
+        let data = { username: newDisplayName };
+        let response = await postData('/user/SetUsername', data);
 
         // On successful response
         if ( response.code == 201 ) {
@@ -138,18 +158,17 @@ displayNameSubmit.addEventListener('click', async (e) => {
 });
 
 countrySubmit.addEventListener('click', async (e) => {
-    var newCountry = countryInput.value;
+    let newCountry = countryInput.value;
 
-    var data = { country: newCountry };
-    var response = await postData('/user/SetUserCountry', data);
+    let data = { country: newCountry };
+    let response = await postData('/user/SetUserCountry', data);
 
     // On Success
-    console.log(response);
     if ( response.code == 201 ) {
         editCountryForm.classList.toggle('editing');
         userCountry.classList.toggle('editing');
         if ( newCountry != 'none' ) {
-            var countryElement = document.createElement('img');
+            let countryElement = document.createElement('img');
             countryElement.src = 'https://flagcdn.com/w20/' + newCountry.toLowerCase() + '.png';
             countryFlag = countryElement;
             userCountryValue.innerHTML = '';
@@ -161,7 +180,7 @@ countrySubmit.addEventListener('click', async (e) => {
 });
 
 logoutButton.addEventListener('click', async (e) => {
-    var response = await postData('/user/DeleteUserLoginData');
+    let response = await postData('/user/DeleteUserLoginData');
     if ( response.code == 200 ) {
         window.location.href = '/';
     }
@@ -186,7 +205,26 @@ toggleRatingGraph.addEventListener('click', async (e) => {
 });
 
 graphSubmit.addEventListener('click', async (e) => {
-    await setELOGraph(graphTimeframe.value);
+    let seasonId = parseInt(graphTimeframe.options[graphTimeframe.selectedIndex].getAttribute('season-id'));
+    await setELOGraph(graphTimeframe.value, seasonId);
+});
+
+window.addEventListener('scroll', async (e) => {
+    // Only do this when they're on the correct tab
+    if ( toggleMatchHistory.classList.contains('active') ) {
+        if ( window.scrollY + (screen.height/3) >= matchHistory.offsetHeight - 10 ) {
+            if ( !loadingMatches ) {
+                loadingMatches = true;
+                let hits = document.getElementsByClassName('match-row');
+                let page = 1;
+                if ( hits.length % 10 == 0 ) {
+                    page += hits.length/10;
+                    let result = await getMatchHistory(page);
+                    await appendMatches(result);
+                }
+            }
+        }
+    }
 });
 
 // Admin actions
@@ -204,10 +242,9 @@ if ( !loggedInUserInfo.error && loggedInUserInfo.user.role== 2 ) {
     });
 
     adminBanUserButton.addEventListener('click', async (e) => {
-        var data = { bannedUserId: userId, banLength: parseInt(adminBanLength.value), reason: adminBanReason.value };
-        var response = await postData('/admin/BanUser', data);
+        let data = { bannedUserId: userId, banLength: parseInt(adminBanLength.value), reason: adminBanReason.value };
+        let response = await postData('/admin/BanUser', data);
 
-        console.log(response);
         if ( response.code == 201 ) {
             adminUnbanUserContent.style.display = 'block';
             adminBanUser.style.display = 'none';
@@ -217,10 +254,9 @@ if ( !loggedInUserInfo.error && loggedInUserInfo.user.role== 2 ) {
     });
 
     adminUnbanUserButton.addEventListener('click', async (e) => {
-        var data = { unbannedUserId: userId };
-        var response = await postData('/admin/UnbanUser', data);
+        let data = { unbannedUserId: userId };
+        let response = await postData('/admin/UnbanUser', data);
 
-        console.log(response);
         if ( response.code == 201 ) {
             adminUnbanUserContent.style.display = 'none';
             banDetails.style.display = 'none';
@@ -231,8 +267,8 @@ if ( !loggedInUserInfo.error && loggedInUserInfo.user.role== 2 ) {
 
 async function getUserInfo() {
     try {
-        var data = {};
-        var result = await getData('/user/GetUserInfo');
+        let data = {};
+        let result = await getData('/user/GetUserInfo');
         return result.data;
     } catch (error) {
         return null;
@@ -248,7 +284,6 @@ async function setUserInfo() {
         // If no playerID is set, try the default get current user info
         if ( playerID != '' ) {
             userInfo = await getMatchUsers([playerID]);
-            console.log(userInfo);
             user = userInfo[0];
         } else {
             userInfo = loggedInUserInfo;
@@ -266,7 +301,7 @@ async function setUserInfo() {
 
         userDisplayName.innerHTML = sanitizeDisplayName(username);
         userDiscordName.innerHTML = sanitizeDisplayName(discordUsername);
-        var avatarString = '';
+        let avatarString = '';
         if ( discordAvatarHash ) {
             avatarString = 'https://cdn.discordapp.com/avatars/' + discordId + '/' + discordAvatarHash + '.jpg' + '?size=512';
         } else {
@@ -275,7 +310,7 @@ async function setUserInfo() {
         userProfilePicture.src = avatarString;
 
         if ( user.country ) {
-            var countryElement = document.createElement('img');
+            let countryElement = document.createElement('img');
             countryElement.src = 'https://flagcdn.com/w20/' + user.country + '.png';
             countryFlag = countryElement;
         } else {
@@ -291,168 +326,26 @@ async function setUserInfo() {
 
         hideNonUserElements();
     } catch (error) {
-        console.log(error);
         //window.location.href = '/';
     }
 }
 
-async function getMatchHistory() {
-    var page = 1;
-    var hits = 10;
-    var data = {};
+async function getMatchHistory(page = 1, hits = 10) {
+    let data = {};
     if ( playerID != '' ) {
         data = { userId: playerID, pageNumber: parseInt(page), hitsPerPage: parseInt(hits) };
     } else {
         data = { userId: userId, pageNumber: parseInt(page), hitsPerPage: parseInt(hits) };
     }
-    var result = await postData('/matchHistory/GetUserMatchHistory', data);
+    let result = await postData('/matchHistory/GetUserMatchHistory', data);
+    loadingMatches = false;
     return result.data;
 }
 
 async function setMatchHistory() {
     matchList = await getMatchHistory();
-    console.log(matchList);
     if ( matchList.matchHistory.length > 0 ) {
-        matches = matchList.matchHistory;
-        matchUsers = matchList.users;
-        for ( let match of matches ) {
-            try {
-                let row = document.createElement('div');
-                row.classList.add('match-row');
-
-                let dateCell = document.createElement('div');
-                dateCell.classList.add('match-date');
-                var matchDate = match.unix_created_at;
-                matchDate = new Date(matchDate);
-                matchDate = matchDate.getTime();
-                var timeNow = Math.floor(Date.now() / 1000);
-                var timeElapsed = timeNow - matchDate;
-                var readableTime = getReadableMatchTime(timeElapsed);
-
-                dateCell.append(readableTime);
-
-                let matchupCell = document.createElement('div');
-               // var players = await getMatchUsers( [match.player1_id, match.player2_id] );
-                var player1 = getMatchPlayer(matchUsers, match.player1_id);
-                var player2 = getMatchPlayer(matchUsers, match.player2_id);
-                matchupCell.classList.add('matchup');
-
-                let matchPlayer1 = document.createElement('a');
-                matchPlayer1.href = '/profile?playerId=' + match.player1_id;
-                matchPlayer1.classList.add('recent-matchup-player');
-                matchPlayer1.classList.add('recent-matchup-player1');
-                let matchPlayer2 = document.createElement('a');
-                matchPlayer2.href = '/profile?playerId=' + match.player2_id;
-                matchPlayer2.classList.add('recent-matchup-player');
-                matchPlayer2.classList.add('recent-matchup-player2');
-
-                let avatarPlayer1 = document.createElement('img')
-                avatarPlayer1.classList.add('recent-matchup-avatar');
-                let avatarPlayer2 = document.createElement('img');
-                avatarPlayer2.classList.add('recent-matchup-avatar');
-
-                if ( player1[0].discord_avatar_hash ) {
-                    avatarPlayer1.src = 'https://cdn.discordapp.com/avatars/' + player1[0].discord_id + '/' + player1[0].discord_avatar_hash + '.jpg' + '?size=512';
-                } else {
-                    avatarPlayer1.src = '/assets/images/chumper.png';
-                }
-
-                if ( player2[0].discord_avatar_hash ) {
-                    avatarPlayer2.src = 'https://cdn.discordapp.com/avatars/' + player2[0].discord_id + '/' + player2[0].discord_avatar_hash + '.jpg' + '?size=512';
-                } else {
-                    avatarPlayer2.src = '/assets/images/chumper.png';
-                }
-
-                let player1Name = document.createElement('div');
-                player1Name.classList.add('recent-matchup-name');
-                let player2Name = document.createElement('div');
-                player2Name.classList.add('recent-matchup-name');
-
-                let player1Score = document.createElement('div');
-                player1Score.classList.add('recent-matchup-score');
-                if ( match.ranked ) {
-                    player1Score.innerHTML = match.player1_score;
-                } else {
-                    player1Score.innerHTML = `&ndash;`;
-                }
-
-                let player2Score = document.createElement('div');
-                player2Score.classList.add('recent-matchup-score');
-                if ( match.ranked ) {
-                    player2Score.innerHTML = match.player2_score;
-                } else {
-                    player2Score.innerHTML = `&ndash;`;
-                }
-
-                switch ( match.result ) {
-                    case 0:
-                    case 1:
-                    case 2:
-                        //
-                        break;
-                    case 3:
-                        // player 1 win
-                        player1Score.classList.add('recent-matchup-victor');
-                        break;
-                    case 4:
-                        // player 2 win
-                        player2Score.classList.add('recent-matchup-victor');
-                        break;
-                    default:
-                        //
-                        break;
-                }
-
-                player1Name.innerHTML = sanitizeDisplayName( player1[0].username );
-                player2Name.innerHTML = sanitizeDisplayName( player2[0].username );
-
-                matchPlayer1.append(avatarPlayer1);
-                matchPlayer1.append( player1Name );
-
-                matchPlayer2.append(avatarPlayer2);
-                matchPlayer2.append( player2Name );
-
-                matchupCell.append( matchPlayer1 );
-                matchupCell.append( player1Score );
-
-                let matchLink = document.createElement('a');
-                matchLink.href = '/game?matchID=' + match.id;
-
-                let vsImg = document.createElement('img');
-                vsImg.classList.add('recent-matchup-vs');
-                vsImg.src = '/assets/images/vs-icon.png';
-
-                matchLink.append(vsImg);
-
-                //matchupCell.append('vs');
-                matchupCell.append(matchLink);
-                matchupCell.append( player2Score );
-                matchupCell.append( matchPlayer2 );
-
-                /*let outcomeCell = document.createElement('div');
-                outcomeCell.classList.add('match-outcome');
-                let outcome = '';
-                outcomeCell.append(outcome);*/
-
-                let typeCell = document.createElement('div');
-                typeCell.classList.add('match-type');
-
-                if ( match.ranked ) {
-                    typeCell.append('Ranked');
-                } else {
-                    typeCell.append('Casual');
-                }
-
-                row.append(matchupCell);
-                row.append(typeCell);
-                row.append(dateCell);
-                //row.append(outcomeCell);
-
-                matchHistory.append(row);
-            } catch (error) {
-                console.log(error);
-            }
-        }
+        await appendMatches(matchList);
     } else {
         let emptyCell = document.createElement('div');
         emptyCell.classList.add('match-history-empty');
@@ -461,15 +354,167 @@ async function setMatchHistory() {
     }
 }
 
+async function appendMatches(matchList) {
+    matches = matchList.matchHistory;
+    matchUsers = matchList.users;
+    for ( let match of matches ) {
+        try {
+            let row = document.createElement('div');
+            row.classList.add('match-row');
+
+            let dateCell = document.createElement('div');
+            dateCell.classList.add('match-date');
+            let matchDate = match.unix_created_at;
+            matchDate = new Date(matchDate);
+            matchDate = matchDate.getTime();
+            let timeNow = Math.floor(Date.now() / 1000);
+            let timeElapsed = timeNow - matchDate;
+            let readableTime = getReadableMatchTime(timeElapsed);
+
+            dateCell.append(readableTime);
+
+            let matchupCell = document.createElement('div');
+           // let players = await getMatchUsers( [match.player1_id, match.player2_id] );
+            let player1 = getMatchPlayer(matchUsers, match.player1_id);
+            let player2 = getMatchPlayer(matchUsers, match.player2_id);
+            matchupCell.classList.add('matchup');
+
+            let matchPlayer1 = document.createElement('a');
+            matchPlayer1.href = '/profile?playerId=' + match.player1_id;
+            matchPlayer1.classList.add('recent-matchup-player');
+            matchPlayer1.classList.add('recent-matchup-player1');
+            let matchPlayer2 = document.createElement('a');
+            matchPlayer2.href = '/profile?playerId=' + match.player2_id;
+            matchPlayer2.classList.add('recent-matchup-player');
+            matchPlayer2.classList.add('recent-matchup-player2');
+
+            let avatarPlayer1 = document.createElement('img')
+            avatarPlayer1.classList.add('recent-matchup-avatar');
+            let avatarPlayer2 = document.createElement('img');
+            avatarPlayer2.classList.add('recent-matchup-avatar');
+
+            if ( player1[0].discord_avatar_hash ) {
+                avatarPlayer1.src = 'https://cdn.discordapp.com/avatars/' + player1[0].discord_id + '/' + player1[0].discord_avatar_hash + '.jpg' + '?size=512';
+            } else {
+                avatarPlayer1.src = '/assets/images/chumper.png';
+            }
+
+            if ( player2[0].discord_avatar_hash ) {
+                avatarPlayer2.src = 'https://cdn.discordapp.com/avatars/' + player2[0].discord_id + '/' + player2[0].discord_avatar_hash + '.jpg' + '?size=512';
+            } else {
+                avatarPlayer2.src = '/assets/images/chumper.png';
+            }
+
+            let player1Name = document.createElement('div');
+            player1Name.classList.add('recent-matchup-name');
+            let player2Name = document.createElement('div');
+            player2Name.classList.add('recent-matchup-name');
+
+            let player1Score = document.createElement('div');
+            player1Score.classList.add('recent-matchup-score');
+            if ( match.ranked ) {
+                player1Score.innerHTML = match.player1_score;
+            } else {
+                player1Score.innerHTML = `&ndash;`;
+            }
+
+            let player2Score = document.createElement('div');
+            player2Score.classList.add('recent-matchup-score');
+            if ( match.ranked ) {
+                player2Score.innerHTML = match.player2_score;
+            } else {
+                player2Score.innerHTML = `&ndash;`;
+            }
+
+            switch ( match.result ) {
+                case 0:
+                case 1:
+                case 2:
+                    //
+                    break;
+                case 3:
+                    // player 1 win
+                    player1Score.classList.add('recent-matchup-victor');
+                    break;
+                case 4:
+                    // player 2 win
+                    player2Score.classList.add('recent-matchup-victor');
+                    break;
+                default:
+                    //
+                    break;
+            }
+
+            player1Name.innerHTML = sanitizeDisplayName( player1[0].username );
+            player2Name.innerHTML = sanitizeDisplayName( player2[0].username );
+
+            matchPlayer1.append(avatarPlayer1);
+            matchPlayer1.append( player1Name );
+
+            matchPlayer2.append(avatarPlayer2);
+            matchPlayer2.append( player2Name );
+
+            matchupCell.append( matchPlayer1 );
+            matchupCell.append( player1Score );
+
+            let matchLink = document.createElement('a');
+            matchLink.href = '/game?matchID=' + match.id;
+
+            let vsImg = document.createElement('img');
+            vsImg.classList.add('recent-matchup-vs');
+            vsImg.src = '/assets/images/vs-icon.png';
+
+            matchLink.append(vsImg);
+
+            //matchupCell.append('vs');
+            matchupCell.append(matchLink);
+            matchupCell.append( player2Score );
+            matchupCell.append( matchPlayer2 );
+
+            /*let outcomeCell = document.createElement('div');
+            outcomeCell.classList.add('match-outcome');
+            let outcome = '';
+            outcomeCell.append(outcome);*/
+
+            let typeCell = document.createElement('div');
+            typeCell.classList.add('match-type');
+
+            if ( match.ranked ) {
+                typeCell.append('Ranked');
+            } else {
+                typeCell.append('Casual');
+            }
+
+            row.append(matchupCell);
+            row.append(typeCell);
+            row.append(dateCell);
+            //row.append(outcomeCell);
+
+            matchHistory.append(row);
+        } catch (error) {
+        }
+    }
+}
+
 async function getMatchUsers(users) {
-    var data = { userIdList: users };
-    var result = await postData('/user/GetUsers', data);
+    let data = { userIdList: users };
+    let result = await postData('/user/GetUsers', data);
     return result.data;
 }
 
-async function getELOGraph(timeframe) {
-    var data = { userId: userId, ratingHistoryOption: ratingHistoryOptions[timeframe] };
-    var result = await postData('/user/GetUserRatingHistory', data);
+async function addSeasonSelection() {
+    for ( let season of seasons ) {
+        let seasonOption = document.createElement('option');
+        seasonOption.value = 'season';
+        seasonOption.setAttribute('season-id', season.id);
+        seasonOption.innerHTML = 'Season ' + season.id;
+        graphTimeframe.prepend(seasonOption);
+    }
+}
+
+async function getELOGraph(timeframe, seasonId = null) {
+    let data = { userId: userId, ratingHistoryOption: ratingHistoryOptions[timeframe], seasonId: seasonId };
+    let result = await postData('/user/GetUserRatingHistory', data);
     /*if (result.length > 0){
         result.unshift({
             match_id: null,
@@ -484,13 +529,13 @@ async function getELOGraph(timeframe) {
             unix_date: Math.round((Date.now() / 1000))
         });
     }*/
-    console.log(result);
     return result.data;
 }
 
-async function setELOGraph(timeframe = 'month') {
+async function setELOGraph(timeframe = 'month', seasonId = null) {
     chosenTimeframe = timeframe;
-    graphData = await getELOGraph(timeframe);
+    chosenSeason = seasonId;
+    graphData = await getELOGraph(timeframe, seasonId);
 
     google.charts.load('current', {'packages':['corechart']});
     google.charts.setOnLoadCallback(drawELOChart);
@@ -499,7 +544,7 @@ async function setELOGraph(timeframe = 'month') {
 }
 
 function GetChartOptions(timeframe){
-    var result = {
+    let result = {
         width: 750,
         legend: { position: 'bottom' },
         lineWidth: 4,
@@ -585,7 +630,7 @@ function GetChartOptions(timeframe){
 
 function drawELOChart() {
 
-    var testData = [
+    let testData = [
         {unix_date: 1719835276, old_rating: 1458, new_rating: 1479 },
         {unix_date: 1719975276, old_rating: 1479, new_rating: 1485 },
         {unix_date: 1720440076, old_rating: 1463, new_rating: 1491 },
@@ -594,34 +639,32 @@ function drawELOChart() {
         {unix_date: 1720463596, old_rating: 1463, new_rating: 1475 }
     ];
 
-    /*var dataArray = [
+    /*let dataArray = [
         ['Date', 'Match Rating', 'Rating Decay/Manual Adjustments']
     ];*/
-    var dataArray = [];
+    let dataArray = [];
 
-    var currentMatch;
-    var previousMatch;
+    let currentMatch;
+    let previousMatch;
     for ( let match of graphData ) {
-        console.log(match);
-        var matchDate = new Date(match.unix_date*1000);
+        let matchDate = new Date(match.unix_date*1000);
         if ( match == graphData[0] ) {
-            console.log('first element!');
-            dataArray.push([matchDate, match.old_rating, null, null]);
+            dataArray.push([matchDate, match.new_rating, null, null]);
         } else {
             dataArray.push([matchDate, match.new_rating, null, null]);
         }
         /*currentMatch = match;
         if ( !previousMatch || currentMatch.old_rating == previousMatch.new_rating ) {
-            var matchDate = new Date(match.unix_date*1000);
+            let matchDate = new Date(match.unix_date*1000);
             //dateString = getMatchDateString(matchDate);
             dataArray.push([matchDate, match.new_rating, null, null, null]);
         } else {
             // Set up the rating decay graph
-            var startDate = new Date(previousMatch.unix_date*1000);
+            let startDate = new Date(previousMatch.unix_date*1000);
             //dateString = getMatchDateString(startDate);
             dataArray.push([startDate, null, null, null, previousMatch.new_rating]);
 
-            var endDate = new Date(currentMatch.unix_date*1000);
+            let endDate = new Date(currentMatch.unix_date*1000);
             //dateString = getMatchDateString(endDate);
             dataArray.push([endDate, null, null, null, currentMatch.old_rating]);
             dataArray.push([endDate, currentMatch.old_rating, null, null, null]);
@@ -630,12 +673,17 @@ function drawELOChart() {
         previousMatch = match;*/
     }
     if (graphData.length > 0){
-        dataArray.unshift([new Date(Date.now() - ratingHistoryOptions[chosenTimeframe]), graphData[0].old_rating,
-        'point { size: 0; visible: false; }', `Start rating: ${graphData[0].old_rating}`]);
-        //dataArray.push([new Date(Date.now()), graphData[graphData.length - 1].new_rating, null, 'point {visible: false; }']);
+        if ( chosenTimeframe != 'season' ) {
+            dataArray.unshift([new Date(Date.now() - ratingHistoryOptions[chosenTimeframe]), graphData[0].old_rating,
+            'point { size: 0; visible: false; }', `Start rating: ${graphData[0].old_rating}`]);
+            //dataArray.push([new Date(Date.now()), graphData[graphData.length - 1].new_rating, null, 'point {visible: false; }']);
+        } else {
+            dataArray.unshift([ new Date(seasons[chosenSeason].startDate), graphData[0].old_rating,
+            'point { size: 0; visible: false; }', `Start rating: ${graphData[0].old_rating}`]);
+        }
     }
 
-    var data = new google.visualization.DataTable();
+    let data = new google.visualization.DataTable();
     data.addColumn('date', 'Date');
     data.addColumn('number', 'Match Rating');
     data.addColumn({'type': 'string', 'role': 'style'});
@@ -643,12 +691,12 @@ function drawELOChart() {
     //data.addColumn('number', 'Rating Decay/Manual adjustments');
     data.addRows(dataArray);
 
-    var options = GetChartOptions(chosenTimeframe);
+    let options = GetChartOptions(chosenTimeframe);
 
     //series[0] = {visibleInLegend: false, pointsVisible: false};
     //series[graphData.length - 1] = {visibleInLegend: false, pointsVisible: false, color: 'd3d3d3'};
 
-    var chart = new google.visualization.LineChart(document.getElementById('user-graph'));
+    let chart = new google.visualization.LineChart(document.getElementById('user-graph'));
 
     chart.draw(data, options);
 }
@@ -661,13 +709,13 @@ function getMatchDateString(matchDate) {
 
 async function setUserBanLength() {
     if ( user.banned && user.id == loggedInUserID ) {
-        var banInfo = await getUserBanLength();
+        let banInfo = await getUserBanLength();
         if ( banInfo.banned ) {
             if ( banInfo.banLength ) {
-                var banLength = banInfo.banLength
-                var currentTime = new Date().getTime() / 1000;
-                var remainingTime = banLength - currentTime;
-                var readableLength = getReadableTime(remainingTime);
+                let banLength = banInfo.banLength
+                let currentTime = new Date().getTime() / 1000;
+                let remainingTime = banLength - currentTime;
+                let readableLength = getReadableTime(remainingTime);
 
                 banDetails.innerHTML = 'You are suspened from using TableturfQ until ' + new Date(banLength*1000) + `<br />` + 'Which is ' + readableLength + ' from now.' + `<br />` + 'Reason: ' + banInfo.reason;
                 banDetails.style.display = 'block';
@@ -680,21 +728,20 @@ async function setUserBanLength() {
 }
 
 async function getUserBanLength() {
-    //var data = { user: userID };
-    var result = await getData('/user/GetUserBanInfo');
-    console.log(result);
+    //let data = { user: userID };
+    let result = await getData('/user/GetUserBanInfo');
     return result.data;
 }
 
 async function setAdminBanLength(userID) {
-    var banInfo = await getAdminBanLength(userID);
+    let banInfo = await getAdminBanLength(userID);
     if ( banInfo.banned ) {
         if ( banInfo.banLength ) {
 
-            var banLength = banInfo.banLength
-            var currentTime = new Date().getTime() / 1000;
-            var remainingTime = banLength - currentTime;
-            var readableLength = getReadableTime(remainingTime);
+            let banLength = banInfo.banLength
+            let currentTime = new Date().getTime() / 1000;
+            let remainingTime = banLength - currentTime;
+            let readableLength = getReadableTime(remainingTime);
 
             banDetails.innerHTML = 'User is suspended from using TableturfQ until ' + new Date(banLength*1000) + `<br />` + 'Which is ' + readableLength + ' from now.' + `<br />` + 'Reason: ' + banInfo.reason;
             banDetails.style.display = 'block';
@@ -706,15 +753,13 @@ async function setAdminBanLength(userID) {
 }
 
 async function getAdminBanLength(userID) {
-    console.log(userID);
-    var data = { userId: userID };
-    var result = await postData('/admin/GetUserBanInfo', data);
-    console.log(result);
+    let data = { userId: userID };
+    let result = await postData('/admin/GetUserBanInfo', data);
     return result.data;
 }
 
 function getMatchPlayer( matchUsers, playerId ) {
-    var player = matchUsers.filter( (user) => user.id === playerId );
+    let player = matchUsers.filter( (user) => user.id === playerId );
     return player;
 }
 
@@ -741,21 +786,21 @@ async function showAdminBanInfo() {
 
 function getReadableTime(time) {
     time = Number(time);
-    var d = Math.floor(time / (3600*24));
-    var h = Math.floor(time % (3600*24) / 3600);
-    var m = Math.floor(time % 3600 / 60);
-    var s = Math.floor(time % 60);
+    let d = Math.floor(time / (3600*24));
+    let h = Math.floor(time % (3600*24) / 3600);
+    let m = Math.floor(time % 3600 / 60);
+    let s = Math.floor(time % 60);
 
-    var dDisplay = d > 0 ? d + (d == 1 ? " day, " : " days, ") : "";
-    var hDisplay = h > 0 ? h + (h == 1 ? " hour, " : " hours, ") : "";
-    var mDisplay = m > 0 ? m + (m == 1 ? " minute, " : " minutes, ") : "";
-    var sDisplay = s > 0 ? s + (s == 1 ? " second" : " seconds") : "";
+    let dDisplay = d > 0 ? d + (d == 1 ? " day, " : " days, ") : "";
+    let hDisplay = h > 0 ? h + (h == 1 ? " hour, " : " hours, ") : "";
+    let mDisplay = m > 0 ? m + (m == 1 ? " minute, " : " minutes, ") : "";
+    let sDisplay = s > 0 ? s + (s == 1 ? " second" : " seconds") : "";
     return dDisplay + hDisplay + mDisplay + sDisplay;
 }
 
 function getReadableMatchTime(time) {
-    var returnTime;
-    var timeUnit;
+    let returnTime;
+    let timeUnit;
     if ( time / 3600 > 24 ) {
         returnTime = Math.floor( time / 3600 / 24);
         if ( returnTime != 1 ) {

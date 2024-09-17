@@ -21,9 +21,8 @@ setAnnouncements();
 
 guestSubmit.addEventListener('click', async (e) => {
     if ( validateDisplayname(guestName.value) ) {
-        var data = { username: guestName.value };
-        var response = await postData('/api/auth/unverified/login', data);
-        console.log(response);
+        let data = { username: guestName.value };
+        let response = await postData('/api/auth/unverified/login', data);
         if ( response.code == 201 ) {
             window.location.href = '/queue';
         }
@@ -38,20 +37,18 @@ async function setUserInfo() {
             throw new Error(userInfo.error);
         }
 
-        console.log(userInfo);
         if ( userInfo.user.id ) {
             hideLogInOptions();
             showLoggedInButton();
         }
     } catch (error) {
         // error
-        console.log(error);
     }
 }
 
 async function getUserInfo() {
-    var data = {};
-    var result = await getData('/user/GetUserInfo');
+    let data = {};
+    let result = await getData('/user/GetUserInfo');
     return result.data;
 }
 
@@ -65,16 +62,13 @@ function showLoggedInButton() {
 
 async function setAnnouncements() {
     try {
-        var announcement = await getNextAnnouncement();
-        console.log(announcement);
+        let announcement = await getNextAnnouncement();
         if ( announcement ) {
-            console.log('adding');
             addNextAnnouncement(announcement);
             nextAnnouncement.style.display = 'block';
 
             // If there's no next announcement, there can't be any upcoming ones right?
-            var announcements = await getUpcomingAnnouncements();
-            console.log(announcements);
+            let announcements = await getUpcomingAnnouncements();
             if ( announcements ) {
                 upcomingAnnouncements.style.display = 'block';
                 addUpcomingAnnouncements(announcements);
@@ -90,13 +84,11 @@ async function setAnnouncements() {
         noAnnouncements.innerHTML = 'There are currently no announcements.';
         nextAnnouncement.append(noAnnouncements);
         nextAnnouncement.style.display = 'block';
-        console.log(error);
     }
 }
 
 async function getNextAnnouncement() {
-    var result = await getData('/announcementInfo/GetNextAnnouncement');
-    console.log(result);
+    let result = await getData('/announcementInfo/GetNextAnnouncement');
     return result.data;
 }
 
@@ -127,7 +119,7 @@ function addNextAnnouncement(announcement) {
 }
 
 async function getUpcomingAnnouncements() {
-    var result = await getData('/announcementInfo/GetUpcomingAnnouncements');
+    let result = await getData('/announcementInfo/GetUpcomingAnnouncements');
     return result.data;
 }
 
@@ -145,7 +137,7 @@ function addUpcomingAnnouncements(announcements) {
         upcomingIcon.classList.add('announcement-icon');
         upcomingIcon.src = announcement.iconSrc;
 
-        var upcomingDate = document.createElement('div');
+        let upcomingDate = document.createElement('div');
         upcomingDate.classList.add('announcement-date');
         if ( announcement.isEvent ) {
             upcomingDate.innerHTML = new Date(announcement.date*1000).toLocaleString();

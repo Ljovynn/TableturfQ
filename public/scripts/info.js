@@ -30,7 +30,6 @@ var bestOfSets = {
 
 var rankedRules = rulesets[ matchModes['ranked'] ];
 
-console.log(rankedRules);
 bestOf.innerHTML = bestOfSets[rankedRules.setLength];
 
 getStageList(starterList, 'starterStagesArr');
@@ -82,13 +81,11 @@ for ( let link of siteRulesLinks ) {
 }
 
 async function getStageList(stageElement, stageList) {
-	var stages = rankedRules[stageList];
-	var stageString = '';
+	let stages = rankedRules[stageList];
+	let stageString = '';
 
-	var i = 1;
-	console.log(stages.length);
+	let i = 1;
 	for ( let stage of stages ) {
-		console.log(i);
 		stageString += stageIdToName[stage];
 
 		// Formatting

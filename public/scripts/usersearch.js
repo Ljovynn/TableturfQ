@@ -6,11 +6,11 @@ const searchResults = document.getElementById('user-search-results');
 
 userSearchForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    var searchValue = searchInput.value;
+    let searchValue = searchInput.value;
 
     if ( validateSeach(searchValue) ) {
-        var data = { input: searchValue };
-        var response = await postData('/user/SearchUser', data);
+        let data = { input: searchValue };
+        let response = await postData('/user/SearchUser', data);
 
         addSearchUser(response.data);
         // If success, recreate the table with the retrieved results
@@ -21,7 +21,6 @@ userSearchForm.addEventListener('submit', async (e) => {
 
 async function addSearchUser(users) {
     refreshSearch();
-    console.log(users);
     if ( users.length != 0 ) {
         for (  let user of users ) {
             let row = document.createElement('div');
@@ -62,7 +61,6 @@ async function addSearchUser(users) {
             let userRank = GetRank(user.g2_rating);
             let rankImage = document.createElement('img');
             rankImage.classList.add('user-search-rank-icon')
-            console.log(userRank);
             rankImage.src = userRank.imageURL;
             rankCell.append(rankImage);
 

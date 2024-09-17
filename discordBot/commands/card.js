@@ -38,10 +38,11 @@ export const data = new SlashCommandBuilder()
                 .setMaxValue(3)))
 export async function autocomplete(interaction){
     const focusedValue = interaction.options.getFocused();
+    const sanitizedFocusedValue = SanitizeString(focusedValue);
 	const choices = GetCardListByLanguage('en');
     let filteredChoices = [];
     for (let i = 0; i < choices.length; i++){
-        if (choices[i].sanitizedName.search(SanitizeString(focusedValue)) != -1) filteredChoices.push(choices[i].name);
+        if (choices[i].sanitizedName.search(sanitizedFocusedValue) != -1) filteredChoices.push(choices[i].name);
     }
     if (filteredChoices.length > 25) filteredChoices = filteredChoices.splice(0, 25);
 	await interaction.respond(

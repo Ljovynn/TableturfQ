@@ -42,7 +42,7 @@ router.post("/ResolveDispute", async (req, res) => {
             case disputeResolveOptions.gameWinPlayer2:
                 if (responseData.data.matchFinished){
                     res.status(responseData.code).send({});
-                    let data = {winnerId: winnerId, newPlayerRatings: matchData.newPlayerRatings};
+                    let data = {winnerId: matchData.winnerId, newPlayerRatings: matchData.newPlayerRatings};
                     SendSocketMessage('match' + matchId, "matchWin", data);
                 } else{
                     res.status(responseData.code).send({});
@@ -52,7 +52,7 @@ router.post("/ResolveDispute", async (req, res) => {
             case disputeResolveOptions.matchWinPlayer1:
             case disputeResolveOptions.matchWinPlayer2:
                 res.status(responseData.code).send({});
-                let data = {winnerId: winnerId, newPlayerRatings: matchData.newPlayerRatings};
+                let data = {winnerId: matchData.winnerId, newPlayerRatings: matchData.newPlayerRatings};
                 SendSocketMessage('match' + matchId, "matchWin", data);
                 break;
             case disputeResolveOptions.noChanges:

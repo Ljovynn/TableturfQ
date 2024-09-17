@@ -20,28 +20,23 @@ var disputeOptions = {
 await checkUserAdmin();
 
 if ( isAdmin ) {
-	console.log('user is admin!');
 	getDisputedMatches();
 }
 
 /*for (let resolutionButton of resolveButtons ) {
-	console.log(resolutionButton);
     resolutionButton.addEventListener('click', async (e) => {
-    	console.log('clicked resolution button');
     	var matchId = resolutionButton.value;
     	var resolveOption = document.getElementById('match-resolve-' + matchId);
 
         var data = { matchId: matchId, resolveOption: parseInt(resolveOption) };
         var response = await postData('/admin/ResolveDispute', data);
-        console.log(response);
         
     });
 }*/
 
 async function checkUserAdmin() {
-    var data = {};
-    var result = await fetchData('/user/GetUserInfo');
-    console.log(result);
+    let data = {};
+    let result = await fetchData('/user/GetUserInfo');
     if ( result.user.role == 2 ) {
     	isAdmin = true;
     	loading.style.display = 'none';
@@ -50,21 +45,18 @@ async function checkUserAdmin() {
 }
 
 async function getDisputedMatches() {
-	var data = {};
-    console.log(data);
-    var result = await fetchData('/admin/GetDisputedMatchesList', data);
-    var disputedMatches = result;
+	let data = {};
+    let result = await fetchData('/admin/GetDisputedMatchesList', data);
+    let disputedMatches = result;
 
-    console.log(disputedMatches);
     for ( let match of disputedMatches ) {
-    	var players = await getMatchUsers( [match.players[0].id, match.players[1].id] );
+    	let players = await getMatchUsers( [match.players[0].id, match.players[1].id] );
     	await addDisputedMatch(match, players);
     }
 }
 
 async function addDisputedMatch(match, players) {
-	console.log(players);
-	var scores = [];
+	let scores = [];
 	scores[players[0].id] = 0;
 	scores[players[1].id] = 0;
 
@@ -73,7 +65,6 @@ async function addDisputedMatch(match, players) {
 			scores[game.winnerId]++;
 	}
 
-	console.log(scores);
 	let row = document.createElement('div');
     row.classList.add('disputed-match-row');
     row.setAttribute('id', 'disputed-match-row-' + match.id);
@@ -90,7 +81,7 @@ async function addDisputedMatch(match, players) {
     selectOption.classList.add('admin-dispute-options');
     selectOption.setAttribute('id', 'match-action-' + match.id);
 
-    for ( var i=0; i <= 7; i++ ) {
+    for ( let i=0; i <= 7; i++ ) {
     	let optionValue = document.createElement('option');
     	optionValue.setAttribute('value', i);
     	optionValue.append(disputeOptions[i]);
@@ -114,25 +105,21 @@ async function addDisputedMatch(match, players) {
 }
 
 async function getMatchUsers(users) {
-    var data = { userIdList: users };
-    console.log(data);
-    var result = await getData('/user/GetUsers', data);
+    let data = { userIdList: users };
+    let result = await getData('/user/GetUsers', data);
     return result;
 }
 
 async function setListeners() {
 	for (let resolutionButton of resolveButtons ) {
-		console.log(resolutionButton);
 	    resolutionButton.addEventListener('click', async (e) => {
-		    	console.log('clicked resolution button');
-		    	var matchId = resolutionButton.value;
-		    	var resolveOption = document.getElementById('match-action-' + matchId);
+		    	let matchId = resolutionButton.value;
+		    	let resolveOption = document.getElementById('match-action-' + matchId);
 
-		        var data = { matchId: matchId, resolveOption: parseInt(resolveOption.value) };
-		        var response = await postData('/admin/ResolveDispute', data);
-		        console.log(response);
+		        let data = { matchId: matchId, resolveOption: parseInt(resolveOption.value) };
+		        let response = await postData('/admin/ResolveDispute', data);
 		        if ( response == 201 ) {
-		        	var disputedRow = document.getElementById('disputed-match-row-' + matchId);
+		        	let disputedRow = document.getElementById('disputed-match-row-' + matchId);
 		        	disputedRow.remove();
 		        }
 	    });

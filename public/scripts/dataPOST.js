@@ -34,7 +34,6 @@ async function postData(url='', data={}) {
 }
 
 async function getData(url='', data={}) {
-    console.log('Get Data body: ' + JSON.stringify(data));
     try {
         return fetch(url, {
             mode: 'cors',

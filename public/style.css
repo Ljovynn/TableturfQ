@@ -576,6 +576,7 @@ footer {
 
 #profile-content {
     display: none;
+    margin-bottom: 20px;
 }
 
 #user-info-section {
@@ -585,9 +586,26 @@ footer {
     margin-bottom: 20px;
 }
 
+#user-profile-picture-content {
+    position: relative;
+    width: 25%;
+    margin: auto;
+}
+
 #user-profile-picture {
     width: 150px;
     border-radius: 50%;
+}
+
+#user-profile-picture-refresh {
+    position: absolute;
+    bottom: 0;
+    width: 20px;
+    padding: 5px;
+}
+
+#user-profile-picture-refresh:hover {
+    cursor: pointer;
 }
 
 #user-in-game-name.editing {
@@ -1163,6 +1181,18 @@ div.recent-matchup-name {
     }
 
     /**** PROFILE ****/
+
+    #user-profile-picture-content {
+        position: initial;
+        width: auto;
+    }
+
+    #user-profile-picture-refresh {
+        position: initial;
+        width: 20px;
+        padding: 5px;
+        margin-left: -20px;
+    }
 
     #user-match-history {
         width: 100%;

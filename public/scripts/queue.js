@@ -51,13 +51,11 @@ await getRecentMatches();
 joinCompetitive.addEventListener('click', async (e) => {
     await clearError();
 
-    console.log('User has joined the competitive queue');
-    var data = { matchMode: 'ranked' }
+    let data = { matchMode: 'ranked' }
     queuedMatchMode = 'ranked';
 
     // Join the queue
-    var response = await postData('/que/PlayerEnterQue', data);
-    console.log('Response data: ' + JSON.stringify(response));
+    let response = await postData('/que/PlayerEnterQue', data);
     if ( response.code == 201 ) {
         for ( let queueButton of queueButtons ) {
             queueButton.style.display = 'none';
@@ -70,9 +68,7 @@ joinCompetitive.addEventListener('click', async (e) => {
         //matchMakingReady.style.display = 'block';
     } else {
         //alert('There was a problem joining the queue. Please refresh and try again');
-        console.log('error');
-        var error = response.data.error;
-        console.log(error);
+        let error = response.data.error;
         await userError(error);
     }
 });
@@ -80,13 +76,12 @@ joinCompetitive.addEventListener('click', async (e) => {
 joinCasual.addEventListener('click', async (e) => {
     await clearError();
 
-    console.log('User has joined the casual queue');
 
     // Check that there is a username entered
-    var data = { matchMode: 'casual' }
+    let data = { matchMode: 'casual' }
     queuedMatchMode = 'casual';
     // Join the queue
-    var response = await postData('/que/PlayerEnterQue', data);
+    let response = await postData('/que/PlayerEnterQue', data);
     
     if ( response.code == 201 ) {
         for ( let queueButton of queueButtons ) {
@@ -100,31 +95,25 @@ joinCasual.addEventListener('click', async (e) => {
         //matchMakingReady.style.display = 'block';
     } else {
         //alert('There was a problem joining the queue. Please refresh and try again');
-        console.log('error');
-        var error = response.data.error;
-        console.log(error);
+        let error = response.data.error;
         await userError(error);
     }
 });
 
 readyButton.addEventListener('click', async (e) => {
-    console.log('User is ready for competitive match.');
     readyButton.style.display = 'none';
     ready = true;
 
     // Not sure if we need to send any data but we can leave it blank for now
 
-    var response = await postData('/que/PlayerReady');
-    console.log(response);
+    let response = await postData('/que/PlayerReady');
 
     // Redirect to the game room once the game is created
 });
 
 leaveButton.addEventListener('click', async (e) => {
-    console.log('leaving queue');
-    var data = { matchMode: queuedMatchMode };
-    var response = await postData('/que/PlayerLeaveQue', data);
-    console.log(response);
+    let data = { matchMode: queuedMatchMode };
+    let response = await postData('/que/PlayerLeaveQue', data);
     if ( response.code == 201 ) {
         for ( let queueButton of queueButtons ) {
             queueButton.style.display = 'block';
@@ -138,9 +127,8 @@ leaveButton.addEventListener('click', async (e) => {
 
 guestSubmit.addEventListener('click', async (e) => {
     if ( validateDisplayname(guestName.value) ) {
-        var data = { username: guestName.value };
-        var response = await postData('/api/auth/unverified/login', data);
-        console.log(response);
+        let data = { username: guestName.value };
+        let response = await postData('/api/auth/unverified/login', data);
         if ( response.code == 201 ) {
             window.location.href = '/queue';
         }
@@ -148,35 +136,32 @@ guestSubmit.addEventListener('click', async (e) => {
 });
 
 async function getMatchMakingStatus() {
-    var data = {};
-    var result = await getData('/que/GetMatchmakingStatus');
+    let data = {};
+    let result = await getData('/que/GetMatchmakingStatus');
     return result.data;
 }
 
 async function setMatchMakingStatus() {
     try {
-        var status = await getMatchMakingStatus();
-        console.log(status);
+        let status = await getMatchMakingStatus();
         if ( !status ) {
             loading.style.display = 'none';
             matchMakingUnavailable.style.display = 'block';
         }
         matchMakingStatus = status;
     } catch (error) {
-        console.log(error);
     }
 }
 
 async function getUserInfo() {
-    var data = {};
-    var result = await getData('/user/GetUserInfo');
+    let data = {};
+    let result = await getData('/user/GetUserInfo');
     return result.data;
 }
 
 async function setUserInfo() {
-    console.log('Setting user info');
     try {
-        var userInfo = await getUserInfo();
+        let userInfo = await getUserInfo();
         user = userInfo.user;
         if ( !user.banned ) {
             userID = user.id;
@@ -210,7 +195,6 @@ async function setUserInfo() {
             window.location.href = '/profile?playerId=' + user.id;
         }
     } catch (error) {
-        console.log(error);
         //window.location.href = '/';
         matchMakingQueues.style.display = 'none';
         loading.style.display = 'none';
@@ -218,9 +202,9 @@ async function setUserInfo() {
 }
 
 function setQueueInfo(queueData) {
-    var timeStarted = Math.floor( queueData.timeQueStarted / 1000 );
-    var timeNow = Math.floor(Date.now() / 1000);
-    var timeElapsed = timeNow - timeStarted;
+    let timeStarted = Math.floor( queueData.timeQueStarted / 1000 );
+    let timeNow = Math.floor(Date.now() / 1000);
+    let timeElapsed = timeNow - timeStarted;
     queuedMatchMode = queueData.matchMode;
     timer = timeElapsed;
     queueInfo.style.display = 'block';
@@ -228,16 +212,15 @@ function setQueueInfo(queueData) {
 }
 
 async function getRecentMatches() {
-    var data = {};
-    var result = await getData('/matchHistory/GetRecentMatches');
-    console.log(result);
+    let data = {};
+    let result = await getData('/matchHistory/GetRecentMatches');
     displayRecentMatches(result.data);
 }
 
 function displayRecentMatches(recentMatchData) {
-    //var players = recentMatchData.users;
-    //var matches = recentMatchData.recentMatches;
-    var matches = recentMatchData;
+    //let players = recentMatchData.users;
+    //let matches = recentMatchData.recentMatches;
+    let matches = recentMatchData;
     if ( matches.length > 0 ) {
         for ( let match of matches ) {
             try {
@@ -246,19 +229,19 @@ function displayRecentMatches(recentMatchData) {
 
                 let dateCell = document.createElement('div');
                 dateCell.classList.add('match-date');
-                var matchDate = match.unix_created_at;
+                let matchDate = match.unix_created_at;
                 matchDate = new Date(matchDate);
                 matchDate = matchDate.getTime();
-                var timeNow = Math.floor(Date.now() / 1000);
-                var timeElapsed = timeNow - matchDate;
-                var readableTime = getReadableTime(timeElapsed);
+                let timeNow = Math.floor(Date.now() / 1000);
+                let timeElapsed = timeNow - matchDate;
+                let readableTime = getReadableTime(timeElapsed);
 
                 dateCell.append(readableTime);
 
                 let matchupCell = document.createElement('div');
-               // var players = await getMatchUsers( [match.player1_id, match.player2_id] );
-                var player1 = match.player1_id;
-                var player2 = match.player2_id;
+               // let players = await getMatchUsers( [match.player1_id, match.player2_id] );
+                let player1 = match.player1_id;
+                let player2 = match.player2_id;
                 matchupCell.classList.add('matchup');
 
                 let matchPlayer1 = document.createElement('a');
@@ -382,9 +365,9 @@ function displayRecentMatches(recentMatchData) {
 }
 
 function setReadyUp(readyData) {
-    var timeStarted = Math.floor( readyData.timeWaitingStarted / 1000 );
-    var timeNow = Math.floor(Date.now() / 1000);
-    var timeElapsed = timeNow - timeStarted;
+    let timeStarted = Math.floor( readyData.timeWaitingStarted / 1000 );
+    let timeNow = Math.floor(Date.now() / 1000);
+    let timeElapsed = timeNow - timeStarted;
     queuedMatchMode = readyData.matchMode;
     countdown = PublicQueDatas[queuedMatchMode].readyTimer;
     countdown = countdown - timeElapsed;
@@ -408,21 +391,19 @@ function validateDisplayname(displayName) {
 
 function updateTimer() {
     timer += 1;
-    var time = secondsToHMS(timer);
+    let time = secondsToHMS(timer);
     queueTimer.innerHTML = 'Finding Match... ' + time;    
 }
 
 function countdownTimer() {
     countdown -= 1;
-    var time = secondsToMS(countdown);
+    let time = secondsToMS(countdown);
     readyCountdown.innerHTML = time;
     if ( countdown == 0 ) {
         clearTimer(readyUp);
         if ( modal.offsetTop == 0 ) {
-            console.log('hidden modal');
             // Make the logic work if they clicked ready from the modal
             if ( readyButton.classList.contains('modal-readied') ) {
-                console.log('readied on modal');
                 ready = true;
                 readyButton.classList.remove('modal-readied');
             }
@@ -442,23 +423,24 @@ function countdownTimer() {
 
 function clearTimer(intervalId) {
     timer = 0;
+    let time = 0;
     countdown = PublicQueDatas[queuedMatchMode].readyTimer;
     clearInterval(intervalId);
 
     // Reset the timers
-    var time = secondsToHMS(timer);
+    time = secondsToHMS(timer);
     queueTimer.innerHTML = 'Finding Match... ' + time;
 
-    var time = secondsToMS(countdown);
+    time = secondsToMS(countdown);
     readyCountdown.innerHTML = time;
 }
 
 function secondsToHMS(d) {
     d = Number(d);
 
-    var h = Math.floor(d / 3600);
-    var m = Math.floor(d % 3600 / 60);
-    var s = Math.floor(d % 3600 % 60);
+    let h = Math.floor(d / 3600);
+    let m = Math.floor(d % 3600 / 60);
+    let s = Math.floor(d % 3600 % 60);
 
     return ('0' + h).slice(-2) + ":" + ('0' + m).slice(-2) + ":" + ('0' + s).slice(-2);
 }
@@ -466,16 +448,16 @@ function secondsToHMS(d) {
 function secondsToMS(d) {
     d = Number(d);
 
-    var h = Math.floor(d / 3600);
-    var m = Math.floor(d % 3600 / 60);
-    var s = Math.floor(d % 3600 % 60);
+    let h = Math.floor(d / 3600);
+    let m = Math.floor(d % 3600 / 60);
+    let s = Math.floor(d % 3600 % 60);
 
     return ('0' + m).slice(-2) + ":" + ('0' + s).slice(-2);
 }
 
 function getReadableTime(time) {
-    var returnTime;
-    var timeUnit;
+    let returnTime;
+    let timeUnit;
     if ( time / 3600 > 24 ) {
         returnTime = Math.floor( time / 3600 / 24);
         if ( returnTime != 1 ) {
@@ -510,7 +492,7 @@ function getReadableTime(time) {
 }
 
 function getMatchPlayer( matchUsers, playerId ) {
-    var player = matchUsers.filter( (user) => user.id === playerId );
+    let player = matchUsers.filter( (user) => user.id === playerId );
     return player;
 }
 
@@ -524,7 +506,6 @@ async function reconnectSocket() {
 socket.emit('join', 'userRoom');
 
 socket.on('matchFound', () => {
-    console.log('Socket event match ready');
     timer = 0;
     clearTimer(mainTimer);
     countdown = PublicQueDatas[queuedMatchMode].readyTimer;
@@ -537,7 +518,6 @@ socket.on('matchFound', () => {
 
 socket.on('matchReady', (matchID) => {
     clearTimer(readyUp);
-    console.log('/game?matchID=' + matchID);
     window.location.href = '/game?matchID=' + matchID;
 });
 

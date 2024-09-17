@@ -17,18 +17,16 @@ var readyUp;
 var readySound = new Audio('../assets/sounds/match-found.wav');
 
 readyButton.addEventListener('click', async (e) => {
-    console.log('User is ready for competitive match.');
     readyButton.style.display = 'none';
     ready = true;
 
-    var readyNonModal = document.getElementById('ranked-match-ready-button-non-modal');
+    let readyNonModal = document.getElementById('ranked-match-ready-button-non-modal');
     readyNonModal.style.display = 'none';
     readyNonModal.classList.add('modal-readied');
 
     // Not sure if we need to send any data but we can leave it blank for now
 
-    var response = await postData('/que/PlayerReady');
-    console.log(response);
+    let response = await postData('/que/PlayerReady');
 
     // Redirect to the game room once the game is created
 });
@@ -36,8 +34,7 @@ readyButton.addEventListener('click', async (e) => {
 closeModalBtn.addEventListener('click', closeModal);
 
 async function setUserInfo() {
-    var userInfo = await getUserInfo();
-    console.log(userInfo);
+    let userInfo = await getUserInfo();
     if ( userInfo.queData ) {
         queuedMatchMode = userInfo.queData.matchMode;
     } else if ( userInfo.readyData ) {
@@ -48,8 +45,8 @@ async function setUserInfo() {
 }
 
 async function getUserInfo() {
-    var data = {};
-    var result = await fetchData('/user/GetUserInfo');
+    let data = {};
+    let result = await fetchData('/user/GetUserInfo');
     return result.data;
 }
 
@@ -68,7 +65,7 @@ function closeModal() {
 
 function countdownTimer() {
     countdown -= 1;
-    var time = secondsToMS(countdown);
+    let time = secondsToMS(countdown);
     readyCountdown.innerHTML = time;
     if ( countdown == 0 ) {
         clearTimer(readyUp);
@@ -88,16 +85,16 @@ function clearTimer(intervalId) {
     countdown = PublicQueDatas[queuedMatchMode].readyTimer;
     clearInterval(intervalId);
 
-    var time = secondsToMS(countdown);
+    let time = secondsToMS(countdown);
     readyCountdown.innerHTML = time;
 }
 
 function secondsToMS(d) {
     d = Number(d);
 
-    var h = Math.floor(d / 3600);
-    var m = Math.floor(d % 3600 / 60);
-    var s = Math.floor(d % 3600 % 60);
+    let h = Math.floor(d / 3600);
+    let m = Math.floor(d % 3600 / 60);
+    let s = Math.floor(d % 3600 % 60);
 
     return ('0' + m).slice(-2) + ":" + ('0' + s).slice(-2);
 }
@@ -116,9 +113,6 @@ socket.on('matchFound', async () => {
     openModal();
 
     // timer
-    console.log('Socket event match ready');
-    console.log(queuedMatchMode);
-    console.log(PublicQueDatas[queuedMatchMode]);
     countdown = PublicQueDatas[queuedMatchMode].readyTimer;
     ready = false;
     readyUp = window.setInterval(countdownTimer, 1000);
@@ -126,7 +120,6 @@ socket.on('matchFound', async () => {
 
 socket.on('matchReady', (matchID) => {
     clearTimer(readyUp);
-    console.log('/game?matchID=' + matchID);
     window.location.href = '/game?matchID=' + matchID;
 });
 

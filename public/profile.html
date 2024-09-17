@@ -31,7 +31,7 @@
         <header id="site-header">
                <div id="site-header-container">
                 <div id="site-header-home-button">
-                    <a id="site-header-logo" href="/"><img src="./assets/images/chumper.png" /></a>
+                    <a id="site-header-logo" href="/"><img src="./assets/images/TableturfQ_logo.png" /></a>
                     <a id="site-header-hamburger"><i class="fa-solid fa-bars"></i></a>
                 </div>
                 <div id="site-header-page-links">
@@ -67,7 +67,10 @@
             <div id="page-loading">Loading...</div>
             <div id="profile-content">
                 <div id="user-info-section">
-                    <img id="user-profile-picture" src=""/>
+                    <div id="user-profile-picture-content">
+                        <img id="user-profile-picture" src="">
+                        <i id="user-profile-picture-refresh" class="fa-solid fa-rotate-right"></i>
+                    </div>
                     <p id="user-in-game-name">
                         <span id="user-profile-edit-name"><i class="fa-solid fa-pencil"></i></span>&nbsp;
                         <span id="user-in-game-name-value"></span>
@@ -128,7 +131,6 @@
                     <div id="user-rating-graph" class="untoggled">
                         <div id="user-rating-graph-options">
                             <select id="user-rating-graph-timeframe">
-                                <option value="season" disabled>Season</option>
                                 <option value="day">Day</option>
                                 <option value="week">Week</option>
                                 <option value="month" selected>Month</option>
