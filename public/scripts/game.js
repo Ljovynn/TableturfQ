@@ -1036,6 +1036,9 @@ async function gameFinish(winnerId) {
         name = sanitizeInput( players[1].username );
     }
 
+    gameMessage.innerHTML = name + ' has won the match!';
+    gameMessage.style.display = 'block';
+
 
     setMatchWinnerMessage(winnerId);
     
