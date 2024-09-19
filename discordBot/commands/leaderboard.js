@@ -33,7 +33,7 @@ export async function execute(interaction) {
 
         let isMember = guildMembers.find(discordUser => (discordUser.user.id === leaderboard[i].discord_id));
 
-        let tagValue = (isMember) ? `<@${leaderboard[i].discord_id}>` : SanitizeDiscordLog(leaderboard[i].discord_username);
+        let tagValue = (isMember) ? `<@${leaderboard[i].discord_id}>` : SanitizeDiscordLog(leaderboard[i].username);
         let countryValue = (leaderboard[i].country !== null) ? `:flag_${leaderboard[i].country}:` : ':earth_africa:';
 
         leaderboardsFields[0].value += `\n${startPosition + i}. ${countryValue} ${rank.emoji} **${Math.floor(leaderboard[i].g2_rating)}** ${tagValue}`;

@@ -14,7 +14,7 @@ import { CancelOldMatches } from "./matchManager.js";
 import { AnnouncementManagerSetup, DeletePastAnnouncements } from "./cache/announcementManager.js";
 import { LeaderboardSizeSetup, UpdateLeaderboardSize } from "./cache/leaderboardSize.js";
 import { MatchHistoryManagerSetup } from "./cache/matchHistoryManager.js";
-import { CleanupChatRateLimitList } from "./chatRateLimitManager.js";
+import { CleanupChatRateLimitList, CleanupAvatarRefreshList } from "./rateLimitManager.js";
 
 dotenv.config();
 
@@ -32,6 +32,7 @@ const deleteOldAnnouncementsInterval = 2 * 60 * 60 * 1000;
 const deleteOldChatMessagesInterval = 24 * 60 * 60 * 1000;
 const decayRankInterval = 24 * 60 * 60 * 1000;
 const cleanupChatRateLimitInterval = 30 * 1000;
+const cleanupAvatarRefreshInterval = 5 * 60 * 1000;
 
 //Todo: test if account deletion when user is in match messes anything
 const unverifiedUserDeletionThreshold = 7 * 24 * 60 * 60 * 1000;
@@ -83,8 +84,9 @@ const server = app.listen(port, () => {
         UpdateRankDecay(decayRankAmount, rdIncrease, decayRankThreshold, decayRatingLimit);
     }, decayRankInterval);
 
-    //chat rate limit
+    //rate limits
     setInterval(CleanupChatRateLimitList, cleanupChatRateLimitInterval);
+    setInterval(CleanupAvatarRefreshList, cleanupAvatarRefreshInterval);
     
     StartDiscordBot();
 

@@ -10,7 +10,7 @@ import { ResponseData, ResponseSucceeded } from "./responses/ResponseData.js";
 import { casualMatchEndErrors, chatMessageErrors, disputeErrors, gameWinErrors, databaseErrors, resolveErrors, stagePickErrors, stageStrikeErrors, nullErrors, forfeitErrors } from "./responses/matchErrors.js";
 import { HasBadWords, SanitizeDiscordLog } from "./utils/string.js";
 import { CasualMatchEndChatMessage, ChooseStageChatMessage, DisputeChatMessage, ForfeitChatMessage, GamePlayerConfirmMessage, GameWinChatMessage, MatchStartChatMessage, MatchWinChatMessage, ResolveDisputeChatMessage, StrikeStagesChatMessage } from "./public/scripts/utils/systemChatMessages.js";
-import { CheckChatLimitReached, NewMessage } from "./chatRateLimitManager.js";
+import { CheckChatLimitReached, NewMessage } from "./rateLimitManager.js";
 import { UpdateRecentMatches } from "./cache/matchHistoryManager.js";
 import { currentSeason } from "./public/constants/seasonData.js";
 
