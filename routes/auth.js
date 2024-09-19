@@ -60,7 +60,8 @@ router.post("/discord/updateAvatar", async (req, res) => {
     if (typeof(userId) !== 'string') return SetErrorResponse(res, definitionErrors.userNotDefined);
     try{
         const userData = await GetUserLoginData(userId);
-        if (!userData || userData.discord_id == null) return SetErrorResponse(res, definitionErrors.userNotDefined);
+        if (!userData || userData.discord_id === null) return SetErrorResponse(res, definitionErrors.userNotDefined);
+        if (userData.discord_refresh_token === null) return SetErrorResponse(res, authErrors.noRefreshToken);
 
         if (CheckAvatarRefreshLimit(userId)) return SetErrorResponse(res, authErrors.avatarRefreshLimit);
 

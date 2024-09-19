@@ -218,6 +218,8 @@ footer {
 }
 
 .login-button {
+    display: block;
+    widht: 150px;
     color: white;
 }
 
