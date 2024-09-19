@@ -8,5 +8,6 @@ export const databaseErrors = Object.freeze({
 export const authErrors = Object.freeze({ 
     userLoggedIn: new ResponseData(403, 'User is already logged in'),
     verifiedCreateError: new ResponseData(500, 'Database couldn\'t create verified user'),
+    noRefreshToken: new ResponseData(503, 'Refresh token revoked'),
     avatarRefreshLimit: new ResponseData(403, 'Avatar refresh limit reached'),
 });
