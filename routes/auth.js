@@ -15,6 +15,7 @@ import { SetErrorResponse } from '../responses/ResponseData.js';
 import { userRoles, usernameMaxLength, usernameMinLength } from '../public/constants/userData.js';
 import { definitionErrors } from '../responses/requestErrors.js';
 import { HasBadWords } from '../utils/string.js';
+import { CheckAvatarRefreshLimit, NewAvatarRefresh } from '../rateLimitManager.js';
 
 const apiRouteOauth2Token = "https://discord.com/api/v10/oauth2/token";
 const apiRouteUserInfo = "https://discord.com/api/v10/users/@me";
@@ -61,6 +62,8 @@ router.post("/discord/updateAvatar", async (req, res) => {
         const userData = await GetUserLoginData(userId);
         if (!userData || userData.discord_id == null) return SetErrorResponse(res, definitionErrors.userNotDefined);
 
+        if (CheckAvatarRefreshLimit(userId)) return SetErrorResponse(res, authErrors.avatarRefreshLimit);
+
         const formData = new url.URLSearchParams({
             client_id: clientId,
             client_secret: clientSecret,
@@ -81,6 +84,7 @@ router.post("/discord/updateAvatar", async (req, res) => {
         if (response.data) {
 
             await StoreUserData(access_token, refresh_token);
+            NewAvatarRefresh(userId);
             
             res.status(200).send({});
         }
