@@ -122,7 +122,7 @@ async function setLeaderBoard(startPos, hitCount) {
 
         let eloCell = document.createElement('div');
         eloCell.classList.add('leaderboard-ELO');
-        eloCell.append( (Math.round(user.g2_rating * 100) / 100).toFixed(2) );
+        eloCell.append(Math.floor(user.g2_rating));
 
         row.append(placementCell);
         row.append(nameCell);
