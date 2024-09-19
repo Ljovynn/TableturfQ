@@ -1324,7 +1324,7 @@ socket.on('dispute', async () => {
     await setMatchInfo();
     await showAdminDispute();
     await showPlayerResolve();
-    confirmationMessage.innerHTML = 'Please wait for a moderator to resolve the match dispute. If the dispute was made by accident, please press the resolve dispute button and properly mark the winner.';
+    confirmationMessage.innerHTML = 'Please wait for a moderator to resolve the match dispute. If the dispute was made by accident, please press the resolve dispute button and properly mark the winner. If a moderator does not respond within 5 minutes, please ping the TTBQ Mod role on the TBS discord server.';
     confirmationMessage.style.display = 'block';
 });
 
