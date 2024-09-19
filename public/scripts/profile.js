@@ -391,11 +391,6 @@ async function appendMatches(matchList) {
 
             matchupCell.classList.add('matchup');
 
-            console.log('p1',player1);
-            console.log(player1[0]);
-            console.log('p2',player2);
-            console.log(player2[0]);
-
             let matchPlayer1 = document.createElement('a');
             matchPlayer1.href = '/profile?playerId=' + match.player1_id;
             matchPlayer1.classList.add('recent-matchup-player');
