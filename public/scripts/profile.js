@@ -374,10 +374,27 @@ async function appendMatches(matchList) {
             dateCell.append(readableTime);
 
             let matchupCell = document.createElement('div');
-           // let players = await getMatchUsers( [match.player1_id, match.player2_id] );
-            let player1 = getMatchPlayer(matchUsers, match.player1_id);
-            let player2 = getMatchPlayer(matchUsers, match.player2_id);
+
+            // defaults
+            let player1 = [{'username': 'Deleted User', 'discord_avatar_hash': false}];
+            let player2 = [{'username': 'Deleted User', 'discord_avatar_hash': false}];
+
+            // let players = await getMatchUsers( [match.player1_id, match.player2_id] );
+
+            if ( match.player1_id != null ) {
+                player1 = getMatchPlayer(matchUsers, match.player1_id);
+            }
+
+            if ( match.player2_id != null ) {
+                player2 = getMatchPlayer(matchUsers, match.player2_id);
+            }
+
             matchupCell.classList.add('matchup');
+
+            console.log('p1',player1);
+            console.log(player1[0]);
+            console.log('p2',player2);
+            console.log(player2[0]);
 
             let matchPlayer1 = document.createElement('a');
             matchPlayer1.href = '/profile?playerId=' + match.player1_id;
@@ -492,6 +509,7 @@ async function appendMatches(matchList) {
 
             matchHistory.append(row);
         } catch (error) {
+            console.log(error);
         }
     }
 }
