@@ -211,10 +211,6 @@ graphSubmit.addEventListener('click', async (e) => {
 
 window.addEventListener('scroll', async (e) => {
     // Only do this when they're on the correct tab
-    console.log('scrollY', window.scrollY);
-    console.log('screen height', screen.height);
-    console.log('1/3 screen height', screen.height/3);
-    console.log('div height', matchHistory.offsetHeight);
     if ( toggleMatchHistory.classList.contains('active') ) {
         if ( window.scrollY + (screen.height/3) >= matchHistory.offsetHeight/2 ) {
             if ( !loadingMatches ) {
