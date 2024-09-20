@@ -1,3 +1,5 @@
+import { GetRank } from "../constants/rankData.js";
+
 const leaderBoard = document.getElementById('leaderboard');
 //const leaderBoardForm = document.getElementById('leaderboard-form');
 
@@ -65,10 +67,11 @@ for ( let nextButton of nextButtons ) {
 }
 
 async function setLeaderBoard(startPos, hitCount) {
-    result = await getLeaderBoard(startPos, hitCount);
-    users = result.result;
-    totalPlayers = result.totalPlayers;
+    let result = await getLeaderBoard(startPos, hitCount);
+    let users = result.result;
     let placement = 1 + startPos;
+
+    totalPlayers = result.totalPlayers;
 
     // If the current page is 0, hide the prev button, otherwise show it
     if ( page == 0 ) {
@@ -113,7 +116,7 @@ async function setLeaderBoard(startPos, hitCount) {
             let countryElement = document.createElement('img');
             countryElement.src = 'https://flagcdn.com/w20/' + user.country + '.png';
             userLink.append(countryElement);
-            flagSpace = document.createTextNode("\u00A0");
+            let flagSpace = document.createTextNode("\u00A0");
             userLink.append(flagSpace);
         }
 
@@ -122,6 +125,13 @@ async function setLeaderBoard(startPos, hitCount) {
 
         let eloCell = document.createElement('div');
         eloCell.classList.add('leaderboard-ELO');
+
+        let userRank = GetRank(user.g2_rating);
+        let rankImage = document.createElement('img');
+        rankImage.src = userRank.imageURL;
+        rankImage.setAttribute('id', 'user-rank');
+
+        eloCell.append(rankImage);
         eloCell.append(Math.floor(user.g2_rating));
 
         row.append(placementCell);
