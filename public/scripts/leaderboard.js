@@ -103,7 +103,11 @@ async function setLeaderBoard(startPos, hitCount) {
 
         let placementCell = document.createElement('div');
         placementCell.classList.add('leaderboard-placement');
-        placementCell.append(placement);
+        
+        let placementDiv = document.createElement('div');
+        placementDiv.append(placement);
+
+        placementCell.append(placementDiv);
 
         let nameCell = document.createElement('div');
         nameCell.classList.add('leaderboard-name');
@@ -131,8 +135,11 @@ async function setLeaderBoard(startPos, hitCount) {
         rankImage.src = userRank.imageURL;
         rankImage.setAttribute('id', 'user-rank');
 
+        let eloDiv = document.createElement('div');
+        eloDiv.append( Math.floor(user.g2_rating) );
+
         eloCell.append(rankImage);
-        eloCell.append(Math.floor(user.g2_rating));
+        eloCell.append(eloDiv);
 
         row.append(placementCell);
         row.append(nameCell);
@@ -153,7 +160,11 @@ function addSearchedUser(users) {
 
         let placementCell = document.createElement('div');
         placementCell.classList.add('leaderboard-placement');
-        placementCell.append(user.position);
+        
+        let placementDiv = document.createElement('div');
+        placementDiv.append(user.position);
+
+        placementCell.append(placementDiv);
 
         let nameCell = document.createElement('div');
         nameCell.classList.add('leaderboard-name');
@@ -175,7 +186,11 @@ function addSearchedUser(users) {
 
         let eloCell = document.createElement('div');
         eloCell.classList.add('leaderboard-ELO');
-        eloCell.append( (Math.round(user.user.g2_rating * 100) / 100).toFixed(2) );
+
+        let eloDiv = document.createElement('div');
+        eloDiv.append( (Math.round(user.user.g2_rating * 100) / 100).toFixed(2) );
+
+        eloCell.append( eloDiv );
 
         row.append(placementCell);
         row.append(nameCell);

@@ -874,8 +874,18 @@ div.recent-matchup-name {
     width: 10%;
 }
 
-.leaderboard-placement {
+.leaderboard-placement div {
+    display: inline;
     vertical-align: sub;
+}
+
+.leaderboard-ELO img {
+    vertical-align: middle;
+}
+
+.leaderboard-ELO div {
+    display: inline;
+    vertical-align: middle;
 }
 
 .leaderboard-name a {

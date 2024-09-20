@@ -238,7 +238,7 @@ export async function PlayerSentGameWin(playerId, winnerId){
 
         game.winnerId = winnerId;
         match.status = matchStatuses.stageSelection;
-        if (rulesets[match.mode].dsr){
+        if (rulesets[match.mode].dsr && !match.players[winnerPos - 1].unpickableStagesArr.includes(game.stage)){
             match.players[winnerPos - 1].unpickableStagesArr.push(game.stage);
         }
 
