@@ -874,6 +874,14 @@ div.recent-matchup-name {
     width: 10%;
 }
 
+.leaderboard-placement {
+    vertical-align: sub;
+}
+
+.leaderboard-name a {
+    vertical-align: sub;
+}
+
 .page-prev, .page-next {
     cursor: pointer;
 }
