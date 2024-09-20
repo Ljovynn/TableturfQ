@@ -243,9 +243,10 @@ export async function GetStageStrikes(gameId){
 export async function SetMatchResult(match){
     try{
         let ranked = (match.mode == matchModes.ranked && !match.privateBattle);
+        let convertedDate = Math.floor(match.createdAt / 1000);
 
-        await pool.execute(`INSERT INTO matches (id, player1_id, player2_id, ranked, set_length, result, private_battle) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [match.id, match.players[0].id, match.players[1].id, ranked, match.setLength, match.status, match.privateBattle]);
+        await pool.execute(`INSERT INTO matches (id, player1_id, player2_id, ranked, set_length, result, private_battle, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, FROM_UNIXTIME(?))`,
+        [match.id, match.players[0].id, match.players[1].id, ranked, match.setLength, match.status, match.privateBattle, convertedDate]);
 
         CreateFirstGameStrikes(match);
 
