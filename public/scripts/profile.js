@@ -212,7 +212,7 @@ graphSubmit.addEventListener('click', async (e) => {
 window.addEventListener('scroll', async (e) => {
     // Only do this when they're on the correct tab
     if ( toggleMatchHistory.classList.contains('active') ) {
-        if ( window.scrollY + (screen.height/3) >= matchHistory.offsetHeight - 10 ) {
+        if ( window.scrollY + (screen.height/3) >= matchHistory.offsetHeight/2 ) {
             if ( !loadingMatches ) {
                 loadingMatches = true;
                 let hits = document.getElementsByClassName('match-row');
@@ -374,9 +374,21 @@ async function appendMatches(matchList) {
             dateCell.append(readableTime);
 
             let matchupCell = document.createElement('div');
-           // let players = await getMatchUsers( [match.player1_id, match.player2_id] );
-            let player1 = getMatchPlayer(matchUsers, match.player1_id);
-            let player2 = getMatchPlayer(matchUsers, match.player2_id);
+
+            // defaults
+            let player1 = [{'username': 'Deleted User', 'discord_avatar_hash': false}];
+            let player2 = [{'username': 'Deleted User', 'discord_avatar_hash': false}];
+
+            // let players = await getMatchUsers( [match.player1_id, match.player2_id] );
+
+            if ( match.player1_id != null ) {
+                player1 = getMatchPlayer(matchUsers, match.player1_id);
+            }
+
+            if ( match.player2_id != null ) {
+                player2 = getMatchPlayer(matchUsers, match.player2_id);
+            }
+
             matchupCell.classList.add('matchup');
 
             let matchPlayer1 = document.createElement('a');
@@ -492,6 +504,7 @@ async function appendMatches(matchList) {
 
             matchHistory.append(row);
         } catch (error) {
+            console.log(error);
         }
     }
 }

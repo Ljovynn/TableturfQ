@@ -253,6 +253,18 @@ function displayRecentMatches(recentMatchData) {
                 matchPlayer2.classList.add('recent-matchup-player');
                 matchPlayer2.classList.add('recent-matchup-player2');
 
+                let player1Username = match.player1_username;
+                let player2Username = match.player2_username;
+                
+                if ( player1Username == undefined ) {
+                    player1Username = 'Deleted User';
+                }
+
+                if ( player2Username == undefined ) {
+                    player2Username = 'Deleted User';
+                }
+
+
                 let avatarPlayer1 = document.createElement('img')
                 avatarPlayer1.classList.add('recent-matchup-avatar');
                 let avatarPlayer2 = document.createElement('img');
@@ -310,8 +322,8 @@ function displayRecentMatches(recentMatchData) {
                         break;
                 }
 
-                player1Name.innerHTML = sanitizeDisplayName( match.player1_username );
-                player2Name.innerHTML = sanitizeDisplayName( match.player2_username );
+                player1Name.innerHTML = sanitizeDisplayName( player1Username );
+                player2Name.innerHTML = sanitizeDisplayName( player2Username );
 
                 matchPlayer1.append(avatarPlayer1);
                 matchPlayer1.append( player1Name );
