@@ -8,7 +8,7 @@ import { enterQueErrors, readyUpErrors } from "./responses/queErrors.js";
 import { matchModes } from "./public/constants/matchData.js";
 
 const readyTimerGracePeriod = 1000 * 3;
-const alreadyMatchedPlayersTime = 1000 * 60 * 20;
+const alreadyMatchedPlayersTime = 1000 * 60 * 60 * 4;
 
 function Que(matchMode){
     this.players = [];
@@ -164,9 +164,9 @@ export function CheckMatchmadePlayers(){
 
 //Checks if timer has run out for recently matched players
 function CheckRecentlyMatchedPlayers(){
-    for (let i = alreadyMatchedPlayersTime.length - 1; i >= 0; i--){
-        if (Date.now() - alreadyMatchedPlayersTime[i].createdAt >  alreadyMatchedPlayersTime){
-            alreadyMatchedPlayersTime.splice(i, 1);
+    for (let i = recentlyMatchedPlayersList.length - 1; i >= 0; i--){
+        if (Date.now() - recentlyMatchedPlayersList[i].createdAt >  alreadyMatchedPlayersTime){
+            recentlyMatchedPlayersList.splice(i, 1);
         }
     }
 }
