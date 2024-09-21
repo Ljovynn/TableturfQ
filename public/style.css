@@ -399,7 +399,7 @@ footer {
 }
 
 #match-chat-log {
-    height: 100px;
+    height: 250px;
     background: #363636;
     padding: 5px;
     overflow-y: scroll;
