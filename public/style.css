@@ -572,6 +572,11 @@ footer {
 
 #leave-match-button {
     width: 150px;
+    background: #ff0000;
+}
+
+#leave-match-button:hover {
+    background: #990000;
 }
 
 /**** USER PROFILE ****/
