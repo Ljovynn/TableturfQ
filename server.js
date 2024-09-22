@@ -6,7 +6,7 @@ import path from 'path';
 
 import { sessionMiddleware } from "./utils/session.js";
 
-import { MatchMakingTick, CheckMatchmadePlayers } from "./queManager.js";
+import { MatchMakingTick, CheckMatchmadePlayers, CheckRecentlyMatchedPlayers } from "./queManager.js";
 
 import { StartDiscordBot } from "./discordBot/discordBotManager.js";
 import { DeleteOldChatMessages, DeleteOldSuspensions, DeleteOldUnverifiedAccounts, DeleteUnfinishedMatches, UpdateRankDecay } from "./database.js";
@@ -23,12 +23,13 @@ const port = process.env.PORT;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const matchmakingTickInterval = 5 * 1000;
-const checkMatchmadePlayersInterval = 60 * 1000;
+const checkMatchmadePlayersInterval = 2 * 60 * 1000;
+const checkRecentlyMatchedPlayersInteval = 5 * 1000;//10 * 60 * 1000;
 const cancelLongMatchesInterval = 3 * 60 * 1000;
 const updateLeaderboardSizeInterval = 5 * 60 * 1000;
 const deleteOldUnverifiedUsersInterval = 24 * 60 * 60 * 1000;
-const deleteOldSuspensionsInterval = 60 * 60 * 1000;
-const deleteOldAnnouncementsInterval = 2 * 60 * 60 * 1000;
+const deleteOldSuspensionsInterval = 2 * 60 * 60 * 1000;
+const deleteOldAnnouncementsInterval = 3 * 60 * 60 * 1000;
 const deleteOldChatMessagesInterval = 24 * 60 * 60 * 1000;
 const decayRankInterval = 24 * 60 * 60 * 1000;
 const cleanupChatRateLimitInterval = 30 * 1000;
@@ -58,6 +59,7 @@ const server = app.listen(port, () => {
     
     setInterval(MatchMakingTick, matchmakingTickInterval);
     setInterval(CheckMatchmadePlayers, checkMatchmadePlayersInterval);
+    setInterval(CheckRecentlyMatchedPlayers, checkRecentlyMatchedPlayersInteval);
 
     //match
     setInterval(TickCancelOldMatches, cancelLongMatchesInterval);
