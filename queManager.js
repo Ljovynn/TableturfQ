@@ -8,7 +8,7 @@ import { enterQueErrors, readyUpErrors } from "./responses/queErrors.js";
 import { matchModes } from "./public/constants/matchData.js";
 
 const readyTimerGracePeriod = 1000 * 3;
-const alreadyMatchedPlayersTime = 1000 * 30;//1000 * 60 * 60 * 4;
+const alreadyMatchedPlayersTime = 1000 * 60 * 60 * 4;
 
 function Que(matchMode){
     this.players = [];
