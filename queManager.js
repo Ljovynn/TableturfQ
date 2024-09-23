@@ -33,6 +33,12 @@ function MatchedPlayers(player1Id, player2Id, matchMode){
     this.createdAt = Date.now();
 }
 
+function RecentlyMatchedPlayers(playerId, opponentId){
+    this.playerId = playerId;
+    this.opponentId = opponentId;
+    this.createdAt = Date.now();
+}
+
 var ques = [
     new Que(matchModes.casual),
     new Que(matchModes.ranked)
@@ -53,6 +59,9 @@ export function SetQueAvailible(availible){
 //also uses MathedPlayers function
 var recentlyMatchedPlayersList = [];
 
+recentlyMatchedPlayersList.push(new RecentlyMatchedPlayers("hej", "yea"));
+recentlyMatchedPlayersList.push(new RecentlyMatchedPlayers("nah", "mogus"));
+
 //ban check is in post
 export async function AddPlayerToQue(playerId, matchMode){
     if (!queAvailible) return enterQueErrors.queUnavailible;
@@ -69,8 +78,8 @@ export async function AddPlayerToQue(playerId, matchMode){
         if (user.role == userRoles.unverified) return enterQueErrors.unverified;
     }
 
-    let index = SearchMatchedPlayersList(matchingPlayersList, playerId);
-    if (index != -1) return enterQueErrors.inQue;
+    let matchingPlayers = matchingPlayersList.find(x => x.players[0].id === playerId || x.players[1].id === playerId);
+    if (matchingPlayers) return enterQueErrors.inQue;
 
     let baseSearchElo = Math.max(user.g2_rating, queDatas[que.matchMode].minEloStart);
     baseSearchElo = Math.min(user.g2_rating, queDatas[que.matchMode].maxEloStart);
@@ -81,8 +90,7 @@ export async function AddPlayerToQue(playerId, matchMode){
 
 //main matchmaking algorithm. once every n seconds
 export async function MatchMakingTick(){
-    CheckMatchmadePlayers();
-    CheckRecentlyMatchedPlayers();
+    //CheckRecentlyMatchedPlayers();
     
     let newlyMatchedPlayers = [];
     for (let i = 0; i < ques.length; i++){
@@ -138,14 +146,18 @@ function FindPlayersToMatch(que){
             if (que.players[j].baseSearchElo - que.players[j].eloSearchRange > que.players[i].baseSearchElo + que.players[i].eloSearchRange) continue;
 
             //check if players didn't match recently
-            let index = SearchMatchedPlayersList(recentlyMatchedPlayersList, que.players[i].id);
-            if (index != -1){
-                if (recentlyMatchedPlayersList[index].players[0].id == que.players[j].id || recentlyMatchedPlayersList[index].players[1].id == que.players[j].id) continue;
+            let recentlyMatched = recentlyMatchedPlayersList.find(x => x.playerId === que.players[i].id);
+            if (recentlyMatched){
+                if (recentlyMatched.opponentId = que.players[j].id) continue;
             }
+            recentlyMatched = recentlyMatchedPlayersList.find(x => x.playerId === que.players[j].id);
+            if (recentlyMatched){
+                if (recentlyMatched.opponentId = que.players[i].id) continue;
+            }
+
             let data = {
                 players: [que.players[i].id, que.players[j].id],
                 matchMode: que.matchMode,
-                matchId: 0
             }
             return data;
         }
@@ -163,9 +175,10 @@ export function CheckMatchmadePlayers(){
 }
 
 //Checks if timer has run out for recently matched players
-function CheckRecentlyMatchedPlayers(){
+export function CheckRecentlyMatchedPlayers(){
     for (let i = recentlyMatchedPlayersList.length - 1; i >= 0; i--){
         if (Date.now() - recentlyMatchedPlayersList[i].createdAt >  alreadyMatchedPlayersTime){
+            console.log(recentlyMatchedPlayersList[i])
             recentlyMatchedPlayersList.splice(i, 1);
         }
     }
@@ -239,12 +252,13 @@ export function RemovePlayerFromAnyQue(playerId){
 
 export function AddRecentlyMatchedPlayers(player1Id, player2Id, matchMode){
     //delete older data
-    let index = SearchMatchedPlayersList(recentlyMatchedPlayersList, player1Id);
+    let index = recentlyMatchedPlayersList.findIndex(x => x.playerId === player1Id);
     if (index != -1) recentlyMatchedPlayersList.splice(index, 1);
-    index = SearchMatchedPlayersList(recentlyMatchedPlayersList, player2Id);
+    index = recentlyMatchedPlayersList.find(x => x.playerId === player2Id);
     if (index != -1) recentlyMatchedPlayersList.splice(index, 1);
 
-    recentlyMatchedPlayersList.push(new MatchedPlayers(player1Id, player2Id, matchMode));
+    recentlyMatchedPlayersList.push(new RecentlyMatchedPlayers(player1Id, player2Id));
+    recentlyMatchedPlayersList.push(new RecentlyMatchedPlayers(player2Id, player1Id));
 }
 
 function RemovePlayersFromQue(playersArr, player1Id, player2Id){

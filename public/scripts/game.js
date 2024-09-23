@@ -340,10 +340,12 @@ playerResolveDispute.addEventListener('click', async (e) => {
 
 leaveMatch.addEventListener('click', async (e) => {
     if ( casualMatch || privateMatch ) {
-        userLeft = true;
-        let data = {userId: userID};
-        let response = await postData('/match/CasualMatchEnd', data);
-        window.location.href = '/';
+        if ( window.confirm('Are you sure you want to leave the match?') ) {
+            userLeft = true;
+            let data = {userId: userID};
+            let response = await postData('/match/CasualMatchEnd', data);
+            window.location.href = '/';
+        }
     } else {
         if ( window.confirm('Are you sure you want to leave the match? It will be considered a forfeit and result in a loss.') ) {
             userLeft = true;
