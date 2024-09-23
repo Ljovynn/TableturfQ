@@ -434,6 +434,8 @@ export async function PlayerSentResolveDispute(playerId){
 
     if (match.status != matchStatuses.dispute) return resolveErrors.notDisputed;
 
+    if (match.mode == matchModes.casual) return forfeitErrors.casual;
+
     let playerPos = FindPlayerPosInMatch(match, playerId);
     if (match.players[playerPos - 1].disputeResolveSent == true) return resolveErrors.alreadyConfirmed;
     match.players[playerPos - 1].disputeResolveSent = true;
@@ -466,7 +468,6 @@ export async function ResolveMatchDispute(matchId, resolveOption){
     match.players[1].disputeResolveSent = false;
 
     if (match.mode == matchModes.casual){
-        match.chat.push(new ChatMessage(ResolveDisputeChatMessage(match.players[0].id, match.players[1].id, disputeResolveOptions.noChanges), systemId));
         match.status = matchStatuses.ingame;
         SendDisputeMessage(GetDisputedMatchesList(), false);
         return new ResponseData(201, matchModes.casual);
