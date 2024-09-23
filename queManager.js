@@ -148,11 +148,11 @@ function FindPlayersToMatch(que){
             //check if players didn't match recently
             let recentlyMatched = recentlyMatchedPlayersList.find(x => x.playerId === que.players[i].id);
             if (recentlyMatched){
-                if (recentlyMatched.opponentId = que.players[j].id) continue;
+                if (recentlyMatched.opponentId == que.players[j].id) continue;
             }
             recentlyMatched = recentlyMatchedPlayersList.find(x => x.playerId === que.players[j].id);
             if (recentlyMatched){
-                if (recentlyMatched.opponentId = que.players[i].id) continue;
+                if (recentlyMatched.opponentId == que.players[i].id) continue;
             }
 
             let data = {
