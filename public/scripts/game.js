@@ -933,7 +933,7 @@ function setCasualGame() {
         scoreContainer.style.display = 'none';
     }
 
-    playerRaiseDispute.innerHTML = 'Get Help';
+    playerRaiseDispute.innerHTML = 'Get Moderator Help';
 
     setLength.innerHTML = 'Unlimited games';
     turnTimer.innerHTML = 'Players may choose timer duration';
