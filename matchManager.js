@@ -399,17 +399,16 @@ export function PlayerSentMatchDispute(playerId){
 
     if (match.status == matchStatuses.dispute) return disputeErrors.alreadyDispute;
 
-    //temp fix?
-    if (match.mode == matchModes.casual) return disputeErrors.privateBattle;
-
     StartMatchDispute(match);
     return new ResponseData(201, match.id);
 }
 
 function StartMatchDispute(match){
-    match.players[0].markedWinner = 0;
-    match.players[1].markedWinner = 0;
-    match.gamesArr[match.gamesArr.length - 1].winnerId = null;
+    if (match.mode != matchModes.casual){
+        match.players[0].markedWinner = 0;
+        match.players[1].markedWinner = 0;
+        match.gamesArr[match.gamesArr.length - 1].winnerId = null;
+    }
     if (match.privateBattle) return;
     match.chat.push(new ChatMessage(DisputeChatMessage(), systemId));
     match.status = matchStatuses.dispute;
