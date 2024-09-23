@@ -23,7 +23,7 @@ const port = process.env.PORT;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const matchmakingTickInterval = 5 * 1000;
-const checkMatchmadePlayersInterval = 2 * 1000;
+const checkMatchmadePlayersInterval = 3 * 1000;
 const checkRecentlyMatchedPlayersInteval = 10 * 60 * 1000;
 const cancelLongMatchesInterval = 3 * 60 * 1000;
 const updateLeaderboardSizeInterval = 5 * 60 * 1000;

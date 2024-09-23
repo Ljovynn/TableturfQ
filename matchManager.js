@@ -9,7 +9,7 @@ import { SendDisputeMessage, SendNewSuspiciousAction, SuspiciousAction } from ".
 import { ResponseData, ResponseSucceeded } from "./responses/ResponseData.js";
 import { casualMatchEndErrors, chatMessageErrors, disputeErrors, gameWinErrors, databaseErrors, resolveErrors, stagePickErrors, stageStrikeErrors, nullErrors, forfeitErrors } from "./responses/matchErrors.js";
 import { HasBadWords, SanitizeDiscordLog } from "./utils/string.js";
-import { CasualMatchEndChatMessage, ChooseStageChatMessage, DisputeChatMessage, ForfeitChatMessage, GamePlayerConfirmMessage, GameWinChatMessage, MatchStartChatMessage, MatchWinChatMessage, ResolveDisputeChatMessage, StrikeStagesChatMessage } from "./public/scripts/utils/systemChatMessages.js";
+import { CasualDisputeChatMessage, CasualMatchEndChatMessage, ChooseStageChatMessage, DisputeChatMessage, ForfeitChatMessage, GamePlayerConfirmMessage, GameWinChatMessage, MatchStartChatMessage, MatchWinChatMessage, ResolveDisputeChatMessage, StrikeStagesChatMessage } from "./public/scripts/utils/systemChatMessages.js";
 import { CheckChatLimitReached, NewMessage } from "./rateLimitManager.js";
 import { UpdateRecentMatches } from "./cache/matchHistoryManager.js";
 import { currentSeason } from "./public/constants/seasonData.js";
@@ -332,8 +332,6 @@ export async function PlayerSentCasualMatchEnd(playerId){
     let match = FindMatchWithPlayer(playerId);
     if (!match) return nullErrors.noMatch;
 
-    if (match.status == matchStatuses.dispute) return casualMatchEndErrors.inDispute;
-
     if (match.mode != matchModes.casual) return casualMatchEndErrors.notCasual;
 
     match.status = matchStatuses.noWinner;
@@ -399,19 +397,22 @@ export function PlayerSentMatchDispute(playerId){
 
     if (match.status == matchStatuses.dispute) return disputeErrors.alreadyDispute;
 
-    //temp fix?
-    if (match.mode == matchModes.casual) return disputeErrors.privateBattle;
-
     StartMatchDispute(match);
     return new ResponseData(201, match.id);
 }
 
 function StartMatchDispute(match){
-    match.players[0].markedWinner = 0;
-    match.players[1].markedWinner = 0;
-    match.gamesArr[match.gamesArr.length - 1].winnerId = null;
+    if (match.mode != matchModes.casual){
+        match.players[0].markedWinner = 0;
+        match.players[1].markedWinner = 0;
+        match.gamesArr[match.gamesArr.length - 1].winnerId = null;
+    }
     if (match.privateBattle) return;
-    match.chat.push(new ChatMessage(DisputeChatMessage(), systemId));
+    if (match.mode == matchModes.casual){
+        match.chat.push(new ChatMessage(CasualDisputeChatMessage(), systemId));
+    } else{
+        match.chat.push(new ChatMessage(DisputeChatMessage(), systemId));
+    }
     match.status = matchStatuses.dispute;
     SendDisputeMessage(GetDisputedMatchesList(), true);
 }
@@ -432,6 +433,8 @@ export async function PlayerSentResolveDispute(playerId){
     if (!match) return nullErrors.noMatch;
 
     if (match.status != matchStatuses.dispute) return resolveErrors.notDisputed;
+
+    if (match.mode == matchModes.casual) return forfeitErrors.casual;
 
     let playerPos = FindPlayerPosInMatch(match, playerId);
     if (match.players[playerPos - 1].disputeResolveSent == true) return resolveErrors.alreadyConfirmed;
@@ -465,7 +468,6 @@ export async function ResolveMatchDispute(matchId, resolveOption){
     match.players[1].disputeResolveSent = false;
 
     if (match.mode == matchModes.casual){
-        match.chat.push(new ChatMessage(ResolveDisputeChatMessage(match.players[0].id, match.players[1].id, disputeResolveOptions.noChanges), systemId));
         match.status = matchStatuses.ingame;
         SendDisputeMessage(GetDisputedMatchesList(), false);
         return new ResponseData(201, matchModes.casual);

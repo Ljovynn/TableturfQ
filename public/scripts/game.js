@@ -933,6 +933,8 @@ function setCasualGame() {
         scoreContainer.style.display = 'none';
     }
 
+    playerRaiseDispute.innerHTML = 'Get Help';
+
     setLength.innerHTML = 'Unlimited games';
     turnTimer.innerHTML = 'Players may choose timer duration';
 }
@@ -1055,6 +1057,10 @@ function playerResetDispute() {
 function showAdminDispute() {
     if ( user.role == 2 && match.status == 2 ) {
         adminContent.style.display = 'block';
+        if ( casualMatch ) {
+            // You can only resolve with no change
+            adminDisputeOptions.style.display = 'none';
+        }
         // Hide player resolve if user is admin
         playerResolve.style.display = 'none';
     }
@@ -1080,8 +1086,8 @@ function showAdminBanInfo() {
 }
 
 function showPlayerResolve() {
-    if ( !privateMatch ) {
-        needHelp.style.display = 'none';
+    needHelp.style.display = 'none';
+    if ( !privateMatch && !casualMatch ) {
         // Don't show player resolve for users who are admins
         if ( user.role != 2 ) {
             playerResolve.style.display = 'block';
@@ -1321,17 +1327,25 @@ socket.on('forfeit', async (data) => {
 
 socket.on('dispute', async () => {
     if ( !privateMatch ) {
-        alert('There has been a dispute in match results. Please wait for a moderator to resolve the issue. If the dispute was made by accident, please press the resolve dispute button and properly mark the winner.');
+        if ( casualMatch ) {
+            alert('A moderator has been contacted and will help shortly.')
+        } else {
+            alert('There has been a dispute in match results. Please wait for a moderator to resolve the issue. If the dispute was made by accident, please press the resolve dispute button and properly mark the winner.');
+        }
     }
     await setMatchInfo();
     await showAdminDispute();
     await showPlayerResolve();
-    confirmationMessage.innerHTML = 'Please wait for a moderator to resolve the match dispute. If the dispute was made by accident, please press the resolve dispute button and properly mark the winner. If a moderator does not respond within 5 minutes, please ping the TTBQ Mod role on the TBS discord server.';
+    if ( casualMatch ) {
+        confirmationMessage.innerHTML = 'A moderator has been contacted and will help shortly. If a moderator does not respond within 5 minutes, please ping the TTBQ Mod role on the TBS discord server.'
+    } else {
+        confirmationMessage.innerHTML = 'Please wait for a moderator to resolve the match dispute. If the dispute was made by accident, please press the resolve dispute button and properly mark the winner. If a moderator does not respond within 5 minutes, please ping the TTBQ Mod role on the TBS discord server.';
+    }
     confirmationMessage.style.display = 'block';
 });
 
 socket.on('resolveDispute', async (resolveOption) => {
-    if ( !privateMatch ) {
+    if ( !privateMatch && !casualMatch ) {
         alert('The dispute has been resolved.');
     }
     await setMatchInfo();
