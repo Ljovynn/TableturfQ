@@ -689,7 +689,7 @@ async function getMessageString(chatData) {
         // probably for mods
     }
 
-    chatString = '<div class="match-chat-message"><span class="match-chat-player ' + senderClass + '">' + senderName + ' [' + ( '0' + chatDate.getHours() ).slice(-2) + ':' + ( '0' + chatDate.getMinutes() ).slice(-2) + ']:&nbsp;</span>' + chatMessage + '</div>';
+    chatString = `<div class="match-chat-message"><span class="match-chat-player ${senderClass}">[${('0' + chatDate.getHours()).slice(-2)}:${('0' + chatDate.getMinutes()).slice(-2)}] ${senderName}:&nbsp;</span>${chatMessage}</div>`;
     return chatString;
 }
 
