@@ -708,6 +708,13 @@ footer {
     margin: auto;
 }
 
+#user-win-loss {
+    width: 50%;
+    margin: auto;
+    padding: 10px;
+    font-size: 2rem;
+}
+
 #user-match-history {
     display: block;
     width: 90%;

@@ -36,6 +36,8 @@ const toggleRatingGraph = document.getElementById('toggle-rating-graph');
 
 const matchInfo = document.getElementById('user-match-info');
 const matchHistory = document.getElementById('user-match-history');
+const userWinCount = document.getElementById('user-win-count');
+const userLossCount = document.getElementById('user-loss-count');
 
 const ratingGraph = document.getElementById('user-rating-graph');
 const graphTimeframe = document.getElementById('user-rating-graph-timeframe');
@@ -76,6 +78,9 @@ var matchList;
 var matches;
 var matchUsers;
 var playerID = '';
+
+var matchWins = 0;
+var matchLosses = 0;
 
 var graphData;
 
@@ -462,15 +467,28 @@ async function appendMatches(matchList) {
                 case 3:
                     // player 1 win
                     player1Score.classList.add('recent-matchup-victor');
+                    if ( match.player1_id == userId ) {
+                        matchWins++;
+                    } else {
+                        matchLosses++;
+                    }
                     break;
                 case 4:
                     // player 2 win
                     player2Score.classList.add('recent-matchup-victor');
+                    if ( match.player1_id == userId ) {
+                        matchWins++;
+                    } else {
+                        matchLosses++;
+                    }
                     break;
                 default:
                     //
                     break;
             }
+
+            userWinCount.innerHTML = matchWins;
+            userLossCount.innerHTML = matchLosses;
 
             player1Name.innerHTML = sanitizeDisplayName( player1[0].username );
             player2Name.innerHTML = sanitizeDisplayName( player2[0].username );
