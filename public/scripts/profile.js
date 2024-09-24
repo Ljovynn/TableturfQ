@@ -379,24 +379,43 @@ async function appendMatches(matchList) {
             let player1 = [{'username': 'Deleted User', 'discord_avatar_hash': false}];
             let player2 = [{'username': 'Deleted User', 'discord_avatar_hash': false}];
 
-            // let players = await getMatchUsers( [match.player1_id, match.player2_id] );
-
-            if ( match.player1_id != null ) {
-                player1 = getMatchPlayer(matchUsers, match.player1_id);
+            let orderedMatchPlayer1;
+            let orderedMatchPlayer2;
+            let orderedPlayer1Score;
+            let orderedPlayer2Score;
+            if (match.player2_id == userId){
+                orderedMatchPlayer1 = match.player2_id;
+                orderedMatchPlayer2 = match.player1_id;
+                orderedPlayer1Score = match.player2_score;
+                orderedPlayer2Score = match.player1_score;
+                if (match.result == 3){
+                    match.result = 4;
+                } else if (match.result == 4) match.result = 3;
+            } else{
+                orderedMatchPlayer1 = match.player1_id;
+                orderedMatchPlayer2 = match.player2_id;
+                orderedPlayer1Score = match.player1_score;
+                orderedPlayer2Score = match.player2_score;
             }
 
-            if ( match.player2_id != null ) {
-                player2 = getMatchPlayer(matchUsers, match.player2_id);
+            // let players = await getMatchUsers( [match.player1_id, match.player2_id] );
+
+            if ( orderedMatchPlayer1 != null ) {
+                player1 = getMatchPlayer(matchUsers, orderedMatchPlayer1);
+            }
+
+            if ( orderedMatchPlayer2 != null ) {
+                player2 = getMatchPlayer(matchUsers, orderedMatchPlayer2);
             }
 
             matchupCell.classList.add('matchup');
 
             let matchPlayer1 = document.createElement('a');
-            matchPlayer1.href = '/profile?playerId=' + match.player1_id;
+            matchPlayer1.href = '/profile?playerId=' + orderedMatchPlayer1;
             matchPlayer1.classList.add('recent-matchup-player');
             matchPlayer1.classList.add('recent-matchup-player1');
             let matchPlayer2 = document.createElement('a');
-            matchPlayer2.href = '/profile?playerId=' + match.player2_id;
+            matchPlayer2.href = '/profile?playerId=' + orderedMatchPlayer2;
             matchPlayer2.classList.add('recent-matchup-player');
             matchPlayer2.classList.add('recent-matchup-player2');
 
@@ -424,17 +443,13 @@ async function appendMatches(matchList) {
 
             let player1Score = document.createElement('div');
             player1Score.classList.add('recent-matchup-score');
-            if ( match.ranked ) {
-                player1Score.innerHTML = match.player1_score;
-            } else {
-                player1Score.innerHTML = `&ndash;`;
-            }
-
             let player2Score = document.createElement('div');
             player2Score.classList.add('recent-matchup-score');
             if ( match.ranked ) {
-                player2Score.innerHTML = match.player2_score;
+                player1Score.innerHTML = orderedPlayer1Score;
+                player2Score.innerHTML = orderedPlayer2Score;
             } else {
+                player1Score.innerHTML = `&ndash;`;
                 player2Score.innerHTML = `&ndash;`;
             }
 

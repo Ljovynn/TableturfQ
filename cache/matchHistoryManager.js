@@ -65,9 +65,8 @@ export async function UpdateRecentMatches(match){
         ranked: (match.mode == matchModes.ranked) ? true : false,
         set_length: match.setLength,
         result: match.status,
-        unix_created_at: Math.round(match.createdAt / 1000)
+        unix_created_at: Math.round(Date.now() / 1000)
     }
     matchHistory.unshift(newMatch);
-    matchHistory.sort((a, b) => b.unix_created_at - a.unix_created_at);
     if (matchHistory.length > matchHistoryLength) matchHistory.pop();
 }
