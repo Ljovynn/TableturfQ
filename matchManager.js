@@ -634,7 +634,7 @@ export async function FinishMatch(match, cancelled = false){
     if (matchIndex == -1) return false;
     matches.splice(matchIndex, 1);
 
-    AddRecentlyMatchedPlayers(match.players[0].id, match.players[1].id, match.mode);
+    AddRecentlyMatchedPlayers(match.players[0].id, match.players[1].id);
 
     return true;
 }

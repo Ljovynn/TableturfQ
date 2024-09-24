@@ -295,6 +295,16 @@ footer {
     margin: 10px;
 }
 
+.tutorial-div {
+    width: auto;
+}
+
+.tutorial-video {
+    width: 854px;
+    height: 480px;
+    margin: auto;
+}
+
 /**** GAME PAGE STYLES ****/
 
 #match-container {
@@ -696,6 +706,13 @@ footer {
 #user-match-info {
     width: 100%;
     margin: auto;
+}
+
+#user-win-loss {
+    width: 50%;
+    margin: auto;
+    padding: 10px;
+    font-size: 2rem;
 }
 
 #user-match-history {
@@ -1197,6 +1214,11 @@ div.recent-matchup-name {
 
     .homepage-image {
         width: 100%;
+    }
+
+    .tutorial-video {
+        height: auto;
+        width: 98%;
     }
 
     /**** INFO ****/

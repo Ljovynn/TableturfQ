@@ -13,6 +13,7 @@ const queueMatchmaking = document.getElementById('queue-matchmaking');
 const matchMakingReady = document.getElementById('ranked-match-ready-non-modal');
 const queueTimer = document.getElementById('queue-timer');
 const queueInfo = document.getElementById('queue-info');
+const queueType = document.getElementById('queue-type');
 const readyCountdown = document.getElementById('ranked-match-ready-countdown-non-modal');
 const recentMatches = document.getElementById('recent-matches');
 const recentMatchesList = document.getElementById('recent-matches-list');
@@ -54,6 +55,8 @@ joinCompetitive.addEventListener('click', async (e) => {
     let data = { matchMode: 'ranked' }
     queuedMatchMode = 'ranked';
 
+    queueType.innerHTML = 'Competetive Queue';
+
     // Join the queue
     let response = await postData('/que/PlayerEnterQue', data);
     if ( response.code == 201 ) {
@@ -80,6 +83,9 @@ joinCasual.addEventListener('click', async (e) => {
     // Check that there is a username entered
     let data = { matchMode: 'casual' }
     queuedMatchMode = 'casual';
+
+    queueType.innerHTML = 'Casual Queue';
+
     // Join the queue
     let response = await postData('/que/PlayerEnterQue', data);
     
@@ -179,6 +185,11 @@ async function setUserInfo() {
 
                 if ( userInfo.queData ) {
                     setQueueInfo(userInfo.queData);
+                    if ( queuedMatchMode == 'ranked' ) {
+                        queueType.innerHTML = 'Competetive Queue';
+                    } else {
+                        queueType.innerHTML = 'Casual Queue';
+                    }
                     for ( let queueButton of queueButtons ) {
                         queueButton.style.display = 'none';
                     }
