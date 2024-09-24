@@ -247,7 +247,7 @@ export function RemovePlayerFromAnyQue(playerId){
     return false;
 }
 
-export function AddRecentlyMatchedPlayers(player1Id, player2Id, matchMode){
+export function AddRecentlyMatchedPlayers(player1Id, player2Id){
     //delete older data
     let index = recentlyMatchedPlayersList.findIndex(x => x.playerId === player1Id);
     if (index != -1) recentlyMatchedPlayersList.splice(index, 1);
