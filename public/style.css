@@ -1121,7 +1121,15 @@ div.recent-matchup-name {
     display: none;
 }
 
-/**** SMALLER WIDTH BREAK POINT ****/
+/**** XTRA LARGE WIDTH BREAK POINT ****/
+@media only screen and (max-width: 1750px) {
+    /***** PROFILE ****/
+    .recent-matchup-player1, .recent-matchup-player2 {
+        margin: 0;
+    }
+}
+
+/**** LARGE WIDTH BREAK POINT ****/
 @media only screen and (max-width: 1574px) {
     /**** PROFILE ****/
 
@@ -1130,6 +1138,21 @@ div.recent-matchup-name {
     }
 }
 
+/**** MEDIUM WIDTH BREAK POINT ****/
+@media only screen and (max-width: 1360px) {
+    .recent-matchup-score {
+        margin: 0 25px;
+    }
+}
+
+/**** IDK I think I'm over fitting styles at this point ****/
+@media only screen and (max-width: 1145px) {
+    .recent-matchup-score {
+        margin: 0 10px;
+    }
+}
+
+/**** SMALL WIDTH BREAK POINT ****/
 /**** MOBILE STLYES ****/
 @media only screen and (max-width: 810px) {
     main {
