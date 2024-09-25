@@ -659,7 +659,7 @@ async function getMessageString(chatData) {
     let senderName = '';
     let chatString = '';
     let senderClass = 'match-chat-opponent-player';
-
+    let messageClass = 'match-chat-user-message';
 
     // Check if the incoming message is from the current user to set the sender color
     if ( userId == user.id ) {
@@ -676,6 +676,7 @@ async function getMessageString(chatData) {
         chatMessage = chatMessage.replaceAll('<' + players[0].id + '>', sanitizeInput( players[0].username) );
         chatMessage = chatMessage.replaceAll('<' + players[1].id + '>', sanitizeInput( players[1].username) );
         senderName = 'System';
+        messageClass = 'match-chat-system-message';
         senderClass = 'match-chat-system';
     } else {
         let modUser = await getModUser([userId]);
@@ -689,7 +690,7 @@ async function getMessageString(chatData) {
         // probably for mods
     }
 
-    chatString = `<div class="match-chat-message"><span class="match-chat-player ${senderClass}">[${('0' + chatDate.getHours()).slice(-2)}:${('0' + chatDate.getMinutes()).slice(-2)}] ${senderName}:&nbsp;</span>${chatMessage}</div>`;
+    chatString = `<div class="match-chat-message"><span class="match-chat-player ${senderClass}">[${('0' + chatDate.getHours()).slice(-2)}:${('0' + chatDate.getMinutes()).slice(-2)}] ${senderName}:&nbsp;</span><span class="${messageClass}">${chatMessage}</span></div>`;
     return chatString;
 }
 

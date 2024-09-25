@@ -439,15 +439,23 @@ footer {
 }
 
 .match-chat-opponent-player {
-    color: #6858c2;
+    color: #8170e2;
 }
 
 .match-chat-system {
-    color: grey;
+    color: lightgray;
 }
 
 .match-chat-moderator {
-    color: purple;
+    color: rgb(189, 6, 189);
+}
+
+.match-chat-user-message {
+    color: white
+}
+
+.match-chat-system-message {
+    color:lightgray
 }
 
 #player-raise-dispute {
