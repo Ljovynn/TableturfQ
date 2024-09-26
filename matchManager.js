@@ -560,7 +560,7 @@ async function HandleDisputeGameWin(match, winnerIndex){
         winnerPos = 2;
     }
 
-    if (rulesets[match.mode].dsr && currentGame.stage != stages.unpicked){
+    if (rulesets[match.mode].dsr && currentGame.stage != stages.unpicked && !match.players[winnerPos - 1].unpickableStagesArr.includes(currentGame.stage)){
         match.players[winnerPos - 1].unpickableStagesArr.push(currentGame.stage);
     }
 
