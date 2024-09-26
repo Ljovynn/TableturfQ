@@ -133,6 +133,7 @@ var strikeAmount = 1;
 var counterpickStrikeAmount;
 var strikesRemaining = strikeAmount;
 var currentStriker = 0;
+var gameStage = 0;
 var mapSelect = false;
 var starters = [];
 var counterpicks = [];
@@ -450,6 +451,7 @@ async function setMatchInfo() {
 
     match = matchInfo.match;
     players = matchInfo.players;
+    gameStage = matchInfo.match.gamesArr.at(-1).stage;
 
     if ( match.players[0].id == userID ) {
         oppID = match.players[1].id;
@@ -659,7 +661,7 @@ async function getMessageString(chatData) {
     let senderName = '';
     let chatString = '';
     let senderClass = 'match-chat-opponent-player';
-
+    let messageClass = 'match-chat-user-message';
 
     // Check if the incoming message is from the current user to set the sender color
     if ( userId == user.id ) {
@@ -676,6 +678,7 @@ async function getMessageString(chatData) {
         chatMessage = chatMessage.replaceAll('<' + players[0].id + '>', sanitizeInput( players[0].username) );
         chatMessage = chatMessage.replaceAll('<' + players[1].id + '>', sanitizeInput( players[1].username) );
         senderName = 'System';
+        messageClass = 'match-chat-system-message';
         senderClass = 'match-chat-system';
     } else {
         let modUser = await getModUser([userId]);
@@ -689,7 +692,7 @@ async function getMessageString(chatData) {
         // probably for mods
     }
 
-    chatString = `<div class="match-chat-message"><span class="match-chat-player ${senderClass}">[${('0' + chatDate.getHours()).slice(-2)}:${('0' + chatDate.getMinutes()).slice(-2)}] ${senderName}:&nbsp;</span>${chatMessage}</div>`;
+    chatString = `<div class="match-chat-message"><span class="match-chat-player ${senderClass}">[${('0' + chatDate.getHours()).slice(-2)}:${('0' + chatDate.getMinutes()).slice(-2)}] ${senderName}:&nbsp;</span><span class="${messageClass}">${chatMessage}</span></div>`;
     return chatString;
 }
 
@@ -734,6 +737,7 @@ function setStages() {
 }
 
 function resetStages() {
+    gameStage = 0;
     if ( match.gamesArr.length > 1 ) {
         for ( let counterpick of counterpicks ) {
             let stage = document.querySelectorAll('[stage-value="' + counterpick + '"]')[0];
@@ -877,7 +881,8 @@ function setCurrentStriker() {
 }
 
 function isPlayerStriker() {
-    if ( userID == currentStriker ) {
+    console.log('gameStage', gameStage);
+    if ( userID == currentStriker && gameStage == 0) {
         tabAlert(toggleMatchStrikes);
         gameMessage.style.display = 'none';
         strikeContent.style.display = 'block';

@@ -467,7 +467,7 @@ async function appendMatches(matchList) {
                 case 3:
                     // player 1 win
                     player1Score.classList.add('recent-matchup-victor');
-                    if ( match.player1_id == userId ) {
+                    if ( orderedMatchPlayer1 == userId ) {
                         matchWins++;
                     } else {
                         matchLosses++;
@@ -476,10 +476,10 @@ async function appendMatches(matchList) {
                 case 4:
                     // player 2 win
                     player2Score.classList.add('recent-matchup-victor');
-                    if ( match.player1_id == userId ) {
-                        matchWins++;
-                    } else {
+                    if ( orderedMatchPlayer1 == userId ) {
                         matchLosses++;
+                    } else {
+                        matchWins++;
                     }
                     break;
                 default:
