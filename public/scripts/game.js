@@ -133,6 +133,7 @@ var strikeAmount = 1;
 var counterpickStrikeAmount;
 var strikesRemaining = strikeAmount;
 var currentStriker = 0;
+var gameStage = 0;
 var mapSelect = false;
 var starters = [];
 var counterpicks = [];
@@ -450,6 +451,7 @@ async function setMatchInfo() {
 
     match = matchInfo.match;
     players = matchInfo.players;
+    gameStage = matchInfo.match.gamesArr.at(-1).stage;
 
     if ( match.players[0].id == userID ) {
         oppID = match.players[1].id;
@@ -735,6 +737,7 @@ function setStages() {
 }
 
 function resetStages() {
+    gameStage = 0;
     if ( match.gamesArr.length > 1 ) {
         for ( let counterpick of counterpicks ) {
             let stage = document.querySelectorAll('[stage-value="' + counterpick + '"]')[0];
@@ -878,7 +881,8 @@ function setCurrentStriker() {
 }
 
 function isPlayerStriker() {
-    if ( userID == currentStriker ) {
+    console.log('gameStage', gameStage);
+    if ( userID == currentStriker && gameStage == 0) {
         tabAlert(toggleMatchStrikes);
         gameMessage.style.display = 'none';
         strikeContent.style.display = 'block';
