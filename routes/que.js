@@ -60,6 +60,9 @@ router.post("/PlayerReady", async (req, res) => {
 
         let responseData = await PlayerSentReady(userId);
         if (!ResponseSucceeded(responseData.code)) return SetErrorResponse(res, responseData);
+        req.session.touch();
+        //update irrelevant part of cookie so browser gets new expire date (express session... why...)
+        req.session.now = Math.floor(Date.now() / 1000);
         res.status(responseData.code).send({});
 
         if (!responseData.data) return;
