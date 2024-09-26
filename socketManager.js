@@ -1,5 +1,5 @@
 import { Server } from "socket.io";
-import { sessionMiddleware } from "./utils/session.js";
+import { SessionMiddleware } from "./utils/session.js";
 import { FindIfPlayerInMatch } from "./matchManager.js";
 import { GetMatch, GetUserRole } from "./database.js";
 import { userRoles } from "./public/constants/userData.js";
@@ -19,7 +19,7 @@ export function CreateSocketConnection (server){
         }
     });
 
-    io.engine.use(sessionMiddleware);
+    io.engine.use(SessionMiddleware);
 
     io.on("connection", socket => {
 
