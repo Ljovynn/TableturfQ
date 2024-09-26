@@ -6,6 +6,7 @@ const modal = document.getElementById("ready-modal");
 const overlay = document.querySelector(".overlay");
 const openModalBtn = document.querySelector(".btn-open");
 const closeModalBtn = document.querySelector(".btn-close");
+const matchFoundMessage = document.getElementsByClassName('match-found-message');
 
 const socket = io();
 
@@ -21,8 +22,14 @@ readyButton.addEventListener('click', async (e) => {
     ready = true;
 
     let readyNonModal = document.getElementById('ranked-match-ready-button-non-modal');
-    readyNonModal.style.display = 'none';
-    readyNonModal.classList.add('modal-readied');
+    if ( readyNonModal != null ) {
+        readyNonModal.style.display = 'none';
+        readyNonModal.classList.add('modal-readied');
+    }
+
+    for ( let message of matchFoundMessage ) {
+        message.innerHTML = 'Waiting for opponent.';
+    }
 
     // Not sure if we need to send any data but we can leave it blank for now
 
@@ -108,6 +115,9 @@ async function reconnectSocket() {
 socket.emit('join', 'userRoom');
 
 socket.on('matchFound', async () => {
+    for ( let message of matchFoundMessage ) {
+        message.innerHTML = 'Match found! Please ready up.';
+    }
     await setUserInfo();
     // show modal
     openModal();
