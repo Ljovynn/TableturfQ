@@ -18,6 +18,7 @@ const readyCountdown = document.getElementById('ranked-match-ready-countdown-non
 const recentMatches = document.getElementById('recent-matches');
 const recentMatchesList = document.getElementById('recent-matches-list');
 const modal = document.getElementById('ready-modal');
+const matchFoundMessage = document.getElementsByClassName('match-found-message');
 
 // Interactable Elements
 const joinCompetitive = document.getElementById('join-competitive-queue');
@@ -113,6 +114,10 @@ readyButton.addEventListener('click', async (e) => {
     // Not sure if we need to send any data but we can leave it blank for now
 
     let response = await postData('/que/PlayerReady');
+
+    for ( let message of matchFoundMessage ) {
+        message.innerHTML = 'Waiting for opponent.';
+    }
 
     // Redirect to the game room once the game is created
 });
@@ -398,6 +403,9 @@ function setReadyUp(readyData) {
     ready = readyData.ready;
     if ( ready ) {
         readyButton.style.display = 'none';
+        for ( let message of matchFoundMessage ) {
+            message.innerHTML = 'Waiting for opponent.';
+        }
     } else {
         readyButton.style.display = 'inline-block'
     }
@@ -429,6 +437,9 @@ function countdownTimer() {
             if ( readyButton.classList.contains('modal-readied') ) {
                 ready = true;
                 readyButton.classList.remove('modal-readied');
+                for ( let message of matchFoundMessage ) {
+                    message.innerHTML = 'Waiting for opponent.';
+                }
             }
 
             if ( !ready ) {
@@ -529,6 +540,9 @@ async function reconnectSocket() {
 socket.emit('join', 'userRoom');
 
 socket.on('matchFound', () => {
+    for ( let message of matchFoundMessage ) {
+        message.innerHTML = 'Match found! Please ready up.';
+    }
     timer = 0;
     clearTimer(mainTimer);
     countdown = PublicQueDatas[queuedMatchMode].readyTimer;

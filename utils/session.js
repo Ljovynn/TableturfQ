@@ -6,8 +6,6 @@ dotenv.config();
 const sessionSecret = process.env.SESSION_SECRET;
 const SSL = (process.env.SSL === 'true') ? true : false;
 
-
-
 export const sessionMiddleware = session({
     secret: sessionSecret,
     name: 'DISCORD_OAUTH2_SESSION_ID',
@@ -17,7 +15,7 @@ export const sessionMiddleware = session({
         sameSite: 'strict',
         secure: SSL,
         //partitioned: true,
-        maxAge: 7 * 24 * 60 * 60 * 1000,
+        maxAge: 30 * 24 * 60 * 60 * 1000,
     },
     store: sessionStore,
 })

@@ -307,6 +307,12 @@ export async function PlayerSentForfeit(playerId){
         matchId: match.id,
         newPlayerRatings: undefined,
     }
+
+    if (match.status == matchStatuses.dispute){
+        //new status doesn't matter (changes at HandleRankedMatchWin), just needs to not be dispute
+        match.status = matchStatuses.noWinner;
+        SendDisputeMessage(GetDisputedMatchesList(), false);
+    }
     
     match.chat.push(new ChatMessage(ForfeitChatMessage(playerId), systemId));
     result.newPlayerRatings = await HandleRankedMatchWin(match);
@@ -334,7 +340,12 @@ export async function PlayerSentCasualMatchEnd(playerId){
 
     if (match.mode != matchModes.casual) return casualMatchEndErrors.notCasual;
 
-    match.status = matchStatuses.noWinner;
+    if (match.status == matchStatuses.dispute){
+        match.status = matchStatuses.noWinner;
+        SendDisputeMessage(GetDisputedMatchesList(), false);
+    } else{
+        match.status = matchStatuses.noWinner;
+    }
 
     match.chat.push(new ChatMessage(CasualMatchEndChatMessage(playerId), systemId));
 
@@ -549,7 +560,7 @@ async function HandleDisputeGameWin(match, winnerIndex){
         winnerPos = 2;
     }
 
-    if (rulesets[match.mode].dsr && currentGame.stage != stages.unpicked){
+    if (rulesets[match.mode].dsr && currentGame.stage != stages.unpicked && !match.players[winnerPos - 1].unpickableStagesArr.includes(currentGame.stage)){
         match.players[winnerPos - 1].unpickableStagesArr.push(currentGame.stage);
     }
 
