@@ -6,7 +6,7 @@ dotenv.config();
 const sessionSecret = process.env.SESSION_SECRET;
 const SSL = (process.env.SSL === 'true') ? true : false;
 
-export const SessionMiddleware = session({
+export const sessionMiddleware = session({
     secret: sessionSecret,
     name: 'DISCORD_OAUTH2_SESSION_ID',
     resave: false,

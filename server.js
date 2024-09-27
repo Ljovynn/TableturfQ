@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 import { CreateSocketConnection, SendSocketMessage } from "./socketManager.js";
 import path from 'path';
 
-import { SessionMiddleware } from "./utils/session.js";
+import { sessionMiddleware } from "./utils/session.js";
 
 import { MatchMakingTick, CheckMatchmadePlayers, CheckRecentlyMatchedPlayers } from "./queManager.js";
 
@@ -109,7 +109,7 @@ async function TickCancelOldMatches(){
 }
 
 if (process.env.NODE_ENV === 'production') app.set('trust proxy', 2);
-app.use(SessionMiddleware);
+app.use(sessionMiddleware);
 app.use(express.static('public',{extensions:['html']}));
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
