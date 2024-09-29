@@ -340,7 +340,7 @@ playerResolveDispute.addEventListener('click', async (e) => {
 });
 
 leaveMatch.addEventListener('click', async (e) => {
-    if ( casualMatch || privateMatch ) {
+    if ( casualMatch ) {
         if ( window.confirm('Are you sure you want to leave the match?') ) {
             userLeft = true;
             let data = {userId: userID};
