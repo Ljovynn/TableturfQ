@@ -236,7 +236,7 @@ export function RemovePlayerFromQue(playerId, matchMode){
 //does remove from ready list
 export function RemovePlayerFromAnyQue(playerId){
     for (let i = 0; i < ques.length; i++){
-        for (let j = 0; j < ques[i].players.length; i++){
+        for (let j = 0; j < ques[i].players.length; j++){
             if (ques[i].players[j].id == playerId){
                 ques[i].players.splice(j, 1);
                 return true;
