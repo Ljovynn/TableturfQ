@@ -1151,6 +1151,12 @@ div.recent-matchup-name {
     .recent-matchup-player1, .recent-matchup-player2 {
         margin: 0;
     }
+
+    .tutorial-video {
+        width: 640px;
+        height: 360px;
+        margin: auto;
+    }
 }
 
 /**** LARGE WIDTH BREAK POINT ****/
@@ -1166,6 +1172,12 @@ div.recent-matchup-name {
 @media only screen and (max-width: 1360px) {
     .recent-matchup-score {
         margin: 0 25px;
+    }
+
+    .tutorial-video {
+        width: 426px;
+        height: 240px;
+        margin: auto;
     }
 }
 
@@ -1267,10 +1279,10 @@ div.recent-matchup-name {
         width: 100%;
     }
 
-    .tutorial-video {
+    /*.tutorial-video {
         height: auto;
         width: 98%;
-    }
+    }*/
 
     /**** INFO ****/
 
