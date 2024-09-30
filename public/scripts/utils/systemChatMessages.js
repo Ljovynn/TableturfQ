@@ -44,7 +44,7 @@ export function CasualMatchEndChatMessage(userId){
 }
 
 export function ForfeitChatMessage(forfeitUserId){
-    let result = `<${forfeitUserId}> forfeited the match.`;
+    let result = `<${forfeitUserId}> forfeit the match.`;
     return result;
 }
 
