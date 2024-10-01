@@ -250,10 +250,10 @@ export function RemovePlayerFromAnyQue(playerId){
 
 export function AddRecentlyMatchedPlayers(player1Id, player2Id){
     //delete older data
-    let index = recentlyMatchedPlayersList.findIndex(x => x.playerId === player1Id);
-    if (index != -1) recentlyMatchedPlayersList.splice(index, 1);
-    index = recentlyMatchedPlayersList.findIndex(x => x.playerId === player2Id);
-    if (index != -1) recentlyMatchedPlayersList.splice(index, 1);
+    let recentlyMatchedP1Index = recentlyMatchedPlayersList.findIndex(x => x.playerId === player1Id);
+    if (recentlyMatchedP1Index != -1) recentlyMatchedPlayersList.splice(recentlyMatchedP1Index, 1);
+    let recentlyMatchedP2Index = recentlyMatchedPlayersList.findIndex(x => x.playerId === player2Id);
+    if (recentlyMatchedP2Index != -1) recentlyMatchedPlayersList.splice(recentlyMatchedP2Index, 1);
 
     recentlyMatchedPlayersList.push(new RecentlyMatchedPlayers(player1Id, player2Id));
     recentlyMatchedPlayersList.push(new RecentlyMatchedPlayers(player2Id, player1Id));
