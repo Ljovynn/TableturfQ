@@ -143,13 +143,13 @@ function FindPlayersToMatch(que){
             if (que.players[j].baseSearchElo - que.players[j].eloSearchRange > que.players[i].baseSearchElo + que.players[i].eloSearchRange) continue;
 
             //check if players didn't match recently
-            let recentlyMatched = recentlyMatchedPlayersList.find(x => x.playerId === que.players[i].id);
-            if (recentlyMatched){
-                if (recentlyMatched.opponentId == que.players[j].id) continue;
+            let recentlyMatchedP1 = recentlyMatchedPlayersList.find(x => x.playerId === que.players[i].id);
+            if (recentlyMatchedP1){
+                if (recentlyMatchedP1.opponentId == que.players[j].id) continue;
             }
-            recentlyMatched = recentlyMatchedPlayersList.find(x => x.playerId === que.players[j].id);
-            if (recentlyMatched){
-                if (recentlyMatched.opponentId == que.players[i].id) continue;
+            let recentlyMatchedP2 = recentlyMatchedPlayersList.find(x => x.playerId === que.players[j].id);
+            if (recentlyMatchedP2){
+                if (recentlyMatchedP2.opponentId == que.players[i].id) continue;
             }
 
             let data = {
@@ -173,7 +173,7 @@ export function CheckMatchmadePlayers(){
 
 //Checks if timer has run out for recently matched players
 export function CheckRecentlyMatchedPlayers(){
-    if (recentlyMatchedPlayersList[0] && recentlyMatchedPlayersList[0].createdAt <= alreadyMatchedPlayersTime) return;
+    if (recentlyMatchedPlayersList.length === 0 && recentlyMatchedPlayersList[0].createdAt <= alreadyMatchedPlayersTime) return;
     for (let i = 1; i < recentlyMatchedPlayersList.length; i++){
         if (Date.now() - recentlyMatchedPlayersList[i].createdAt <= alreadyMatchedPlayersTime){
             recentlyMatchedPlayersList.splice(0, i);
