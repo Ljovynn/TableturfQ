@@ -173,7 +173,7 @@ export function CheckMatchmadePlayers(){
 
 //Checks if timer has run out for recently matched players
 export function CheckRecentlyMatchedPlayers(){
-    if (recentlyMatchedPlayersList.length === 0 && recentlyMatchedPlayersList[0].createdAt <= alreadyMatchedPlayersTime) return;
+    if (recentlyMatchedPlayersList.length > 0 && recentlyMatchedPlayersList[0].createdAt <= alreadyMatchedPlayersTime) return;
     for (let i = 1; i < recentlyMatchedPlayersList.length; i++){
         if (Date.now() - recentlyMatchedPlayersList[i].createdAt <= alreadyMatchedPlayersTime){
             recentlyMatchedPlayersList.splice(0, i);
