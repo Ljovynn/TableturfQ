@@ -37,6 +37,7 @@ a {
 
 a:hover {
     color: #6858c2;
+    cursor: pointer;
 }
 
 h3 {
@@ -102,6 +103,91 @@ select {
     display: block;
 }
 
+.toggle {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+    width: 70px;
+    height: 30px;
+    padding: 3px;
+    margin: auto;
+    border-radius: 50px;
+    cursor: pointer;
+}
+.toggle-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+}
+.toggle-label {
+    position: relative;
+    display: block;
+    height: inherit;
+    font-size: 14px;
+    background: grey;
+    border-radius: inherit;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.12), 
+                inset 0 0 3px rgba(0, 0, 0, 0.15);
+}
+.toggle-label:before, .toggle-label:after {
+    position: absolute;
+    top: 50%;
+    color: black;
+    margin-top: -.5em;
+    line-height: 1;
+}
+.toggle-label:before {
+    content: attr(data-off);
+    right: 10px;
+    color: #fff;
+}
+.toggle-label:after {
+    content: attr(data-on);
+    left: 12px;
+    color: #fff;
+    opacity: 0;
+}
+.toggle-input:checked~.toggle-label {
+    background: #dbc639;
+}
+.toggle-input:checked~.toggle-label:before {
+    opacity: 0;
+}
+.toggle-input:checked~.toggle-label:after {
+    opacity: 1;
+}
+.toggle-handle {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 28px;
+    height: 28px;
+    background: linear-gradient(to bottom, 
+              #FFFFFF 40%, #f0f0f0);
+    border-radius: 50%;
+}
+.toggle-handle:before {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin: -6px 0 0 -6px;
+    width: 16px;
+    height: 16px;
+}
+.toggle-input:checked~.toggle-handle {
+    left: 43.5px;
+    box-shadow: -1px 1px 5px 
+              rgba(0, 0, 0, 0.2);
+}
+.toggle-label,
+.toggle-handle {
+    transition: All 0.3s ease;
+    -webkit-transition: All 0.3s ease;
+    -moz-transition: All 0.3s ease;
+    -o-transition: All 0.3s ease;
+}
+
 /**** HEADER MENU ****/
 
 #site-header-container {
@@ -121,7 +207,7 @@ select {
 }
 
 #site-header-social-media-buttons {
-    width: 100px;
+    width: 125px;
     height: 50px;
     padding-top: 15px;
     float: right;
@@ -133,6 +219,15 @@ select {
 }
 
 .header-social-media-link i {
+    width: 25px;
+}
+
+.header-settings-link {
+    color: white;
+}
+
+.settings-link {
+    display: inline-block;
     width: 25px;
 }
 

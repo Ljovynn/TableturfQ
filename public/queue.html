@@ -27,6 +27,25 @@
                 </div>
             </section>
         </div>
+        <div class="modal-container">
+            <section id="settings-modal" class="modal hidden">
+                <div class="flex">
+                    <button class="btn-close settings-close">⨉</button>
+                </div>
+                <div id="global-settings">
+                    <div class="settings-div">
+                        <label class="settings-label">Queue Notification Sound</label>
+                        <label class="toggle">
+                            <input id="settings-queue-sound" class="toggle-input" type="checkbox"/>
+                            <span class="toggle-label" data-off="OFF" 
+                                  data-on="ON">
+                            </span>
+                            <span class="toggle-handle"></span>
+                        </label>
+                    </div>
+                </div>
+            </section>
+        </div>
         <div class="overlay hidden"></div>
         <header id="site-header">
             <div id="site-header-container">
@@ -68,10 +87,14 @@
                     <a class="mobile-header-button header-button" href="https://www.youtube.com/@TTableturf">
                         <div>YouTube</div>
                     </a>
+                    <a class="mobile-header-button header-button settings-link">
+                        <div>Settings</div>
+                    </a>
                     <div id="site-header-social-media-buttons">
                         <a class="header-social-media-link" target="_blank" href="https://discord.gg/tableturf-battle-server-1029875130656116766"><i class="fa-brands fa-discord"></i></a>
                         <a class="header-social-media-link" target="_blank" href="https://twitter.com/tableturfS"><i class="fa-brands fa-twitter"></i></a>
                         <a class="header-social-media-link" target="_blank" href="https://www.youtube.com/@TTableturf"><i class="fa-brands fa-youtube"></i></a>
+                        <a class="header-settings-link settings-link"><i class="fa-solid fa-gear"></i></a>
                     </div>
                 </div>
             </div>
@@ -129,4 +152,5 @@
     <script type="module" src="./scripts/queue.js"></script>
     <script type="module" src="./scripts/global-header.js"></script>
     <script type="module" src="./scripts/global-queue.js"></script>
+    <script type="module" src="./scripts/global-settings.js"></script>
 </html>
