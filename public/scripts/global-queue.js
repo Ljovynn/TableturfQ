@@ -62,7 +62,13 @@ function openModal() {
     modal.classList.remove('hidden');
     overlay.classList.remove('hidden');
     overlay.scrollTop = 0;
-    readySound.play();
+
+    let settingsReady = localStorage.getItem('queueSound');
+    console.log(settingsReady);
+
+    if ( settingsReady != 'false' ) {
+        readySound.play();
+    }
 }
 
 function closeModal() {
