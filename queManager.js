@@ -52,8 +52,11 @@ var queAvailible = (process.env.NODE_ENV === 'production') ? false : true;
 export function GetQueAvailible(){return queAvailible}
 export function SetQueAvailible(availible){
     queAvailible = availible;
-    for (let i = 0; i < ques.length; i++){
-        ques[i].players = [];
+    if (!queAvailible){
+        for (let i = 0; i < ques.length; i++){
+            ques[i].players = [];
+        }
+        SendQueueInfo([0, 0], false);
     }
 }
 
