@@ -78,7 +78,7 @@ export async function execute(interaction) {
 
     const embed = {
         color: embedColor,
-        title: `${announcmentCalled} ${title} added`,
+        title: `${announcmentCalled} "${title}" added`,
         fields: [ {
             name: `Announcement ID: ${newAnnouncementId}`,
             value: description,

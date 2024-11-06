@@ -7,6 +7,8 @@ const overlay = document.querySelector(".overlay");
 const openModalBtn = document.querySelector(".btn-open");
 const closeModalBtn = document.querySelector(".btn-close");
 const matchFoundMessage = document.getElementsByClassName('match-found-message');
+const favicons = document.querySelectorAll('link[rel="icon"]');
+const originalFaviconhref = document.querySelector('link[rel="icon"]').href;
 
 const socket = io();
 
@@ -39,6 +41,12 @@ readyButton.addEventListener('click', async (e) => {
 });
 
 closeModalBtn.addEventListener('click', closeModal);
+
+window.addEventListener('focus', (e) => {
+    console.log('FOCUSING');
+    favicons.forEach(clearBadge);
+});
+
 
 async function setUserInfo() {
     let userInfo = await getUserInfo();
@@ -74,6 +82,42 @@ function openModal() {
 function closeModal() {
     modal.classList.add('hidden');
     overlay.classList.add('hidden');
+}
+
+function addBadge(favicon) {
+  const faviconSize = 32;
+  const canvas = document.createElement('canvas');
+
+  canvas.width = faviconSize;
+  canvas.height = faviconSize;
+
+  const context = canvas.getContext('2d');
+  const img = document.createElement('img');
+
+  const createBadge = () => {
+      context.drawImage(img, 0, 0, faviconSize, faviconSize);
+
+      context.beginPath();
+      context.arc(canvas.width - faviconSize / 3 , faviconSize / 3, faviconSize / 3, 0, 2 * Math.PI);
+      context.fillStyle = '#e30';
+      context.fill();
+
+      context.font = '15px Arial, sans-serif';
+      context.textAlign = 'center';
+      context.textBaseline = 'middle';
+      context.fillStyle = '#fff';
+      context.fillText('', canvas.width - faviconSize / 3, faviconSize / 3);
+
+      favicon.href = canvas.toDataURL('image/png');
+   };
+
+  img.addEventListener('load', createBadge);
+
+  img.src = favicon.href;
+}
+
+function clearBadge(favicon) {
+    favicon.href = originalFaviconhref;
 }
 
 function countdownTimer() {
@@ -127,6 +171,7 @@ socket.on('matchFound', async () => {
     await setUserInfo();
     // show modal
     openModal();
+    favicons.forEach(addBadge);
 
     // timer
     countdown = PublicQueDatas[queuedMatchMode].readyTimer;
