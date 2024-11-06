@@ -6,6 +6,7 @@ import { SendEmptySocketMessage, SendSocketMessage } from "./socketManager.js";
 import { ResponseData } from "./responses/ResponseData.js";
 import { enterQueErrors, readyUpErrors } from "./responses/queErrors.js";
 import { matchModes } from "./public/constants/matchData.js";
+import { SendQueueInfo } from "./discordBot/discordBotManager.js";
 
 const readyTimerGracePeriod = 1000 * 3;
 const alreadyMatchedPlayersTime = 1000 * 60 * 60 * 4;
@@ -51,8 +52,11 @@ var queAvailible = (process.env.NODE_ENV === 'production') ? false : true;
 export function GetQueAvailible(){return queAvailible}
 export function SetQueAvailible(availible){
     queAvailible = availible;
-    for (let i = 0; i < ques.length; i++){
-        ques[i].players = [];
+    if (!queAvailible){
+        for (let i = 0; i < ques.length; i++){
+            ques[i].players = [];
+        }
+        SendQueueInfo([0, 0], false);
     }
 }
 
@@ -82,6 +86,9 @@ export async function AddPlayerToQue(playerId, matchMode){
     baseSearchElo = Math.min(user.g2_rating, queDatas[que.matchMode].maxEloStart);
 
     que.players.push(new PlayerInQue(playerId, baseSearchElo));
+
+    let queInfo = GetQueInfo();
+    SendQueueInfo(queInfo, true);
     return new ResponseData(201);
 }
 
@@ -132,6 +139,14 @@ async function QueTick(que){
     }
 
     return FindPlayersToMatch(que);
+}
+
+function GetQueInfo(){
+    let queInfo = [];
+    for (let i = 0; i < ques.length; i++){
+        queInfo.push(ques[i].players.length);
+    }
+    return queInfo;
 }
 
 function FindPlayersToMatch(que){
@@ -226,6 +241,8 @@ export function RemovePlayerFromQue(playerId, matchMode){
     for (let i = 0; i < que.players.length; i++){
         if (que.players[i].id == playerId){
             que.players.splice(i, 1);
+            let queInfo = GetQueInfo();
+            SendQueueInfo(queInfo, false);
             return true;
         }
     }
@@ -238,6 +255,8 @@ export function RemovePlayerFromAnyQue(playerId){
         for (let j = 0; j < ques[i].players.length; j++){
             if (ques[i].players[j].id == playerId){
                 ques[i].players.splice(j, 1);
+                let queInfo = GetQueInfo();
+                SendQueueInfo(queInfo, false);
                 return true;
             }
         }
@@ -262,6 +281,8 @@ function RemovePlayersFromQue(playersArr, player1Id, player2Id){
     for (let i = playersArr.length - 1; i >= 0; i--){
         if (playersArr[i].id == player1Id || playersArr[i].id == player2Id) playersArr.splice(i, 1);
     }
+    let queInfo = GetQueInfo();
+    SendQueueInfo(queInfo, false);
 }
 
 export async function PlayerSentReady(playerId){
