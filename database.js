@@ -247,10 +247,10 @@ export async function SetMatchResult(match){
         await pool.execute(`INSERT INTO matches (id, player1_id, player2_id, ranked, set_length, result, private_battle) VALUES (?, ?, ?, ?, ?, ?, ?)`,
         [match.id, match.players[0].id, match.players[1].id, ranked, match.setLength, match.status, match.privateBattle]);
 
-        CreateFirstGameStrikes(match);
+        await CreateFirstGameStrikes(match);
 
         for (let i = 1; i < match.gamesArr.length; i++){
-            CreateCounterpickGameAndStrikes(match, i + 1);
+            await CreateCounterpickGameAndStrikes(match, i + 1);
         }
 
         let chatData = [];
@@ -278,12 +278,21 @@ export async function SetMatchResult(match){
 
 async function CreateFirstGameStrikes(match){
     let game = match.gamesArr[0];
-    let strikePos = FindPlayerPosInMatch(match, game.winnerId);
-    const result = await pool.execute(`INSERT INTO games (match_id, stage, result) VALUES (?, ?, ?)`, [match.id, game.stage, strikePos]);
+    let winnerPos = FindPlayerPosInMatch(match, game.winnerId);
+    const result = await pool.execute(`INSERT INTO games (match_id, stage, result) VALUES (?, ?, ?)`, [match.id, game.stage, winnerPos]);
 
     const gameId = result[0].insertId;
     if (game.strikes.length == 0) return;
-    await pool.query(`INSERT INTO stage_strikes (game_id, stage, strike_owner) VALUES ?`, [game.strikes.map(strike => [gameId, strike, strikePos])]);
+    let strikesMap = game.strikes.map(strike => [gameId, strike, 1]);
+    for (let i = 0; i < strikesMap.length; i++){
+        if ((i + 1) % 4 < 2){
+            strikesMap[i][2] = 1;
+        } else{
+            strikesMap[i][2] = 2;
+        }
+    }
+    console.log(strikesMap);
+    await pool.query(`INSERT INTO stage_strikes (game_id, stage, strike_owner) VALUES ?`, [strikesMap]);
 }
 
 async function CreateCounterpickGameAndStrikes(match, gameNumber){
