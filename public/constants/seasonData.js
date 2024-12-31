@@ -8,6 +8,7 @@ function Season(id, startDate, endDate){
 export const seasons = Object.freeze([
     new Season(0, 1721488200000, 1724454000000),
     new Season(1, 1726783200000, 1733050800000),
+    new Season(2, 1735747200000, 1746025200000),
 ]);
 
 export const currentSeason = seasons[seasons.length - 1];

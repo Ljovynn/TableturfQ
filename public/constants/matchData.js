@@ -80,6 +80,7 @@ const currentRankedCounterpicks = [
     stages.maskMansion,
     stages.stickyThicket,
     stages.crackerSnap,
+    stages.twoLaneSplattop,
     stages.pedalToTheMedal,
     stages.overTheLine
 ];
